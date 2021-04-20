@@ -37,7 +37,7 @@ void init()
 
    printk("Init est parti ...\n");
 
-   //   printf("                           PRINTF PRINTF PRINTF !!!!\n");
+   printf("PRINTF PRINTF PRINTF !!!!\n");
 
    for (n = 0; n < 10000000; n++) {
       printk("Init is alive\n");

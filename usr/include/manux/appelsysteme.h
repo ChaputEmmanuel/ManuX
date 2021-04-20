@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des appels système de Manux.                               */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef APPEL_SYSTEME_DEF
 #define APPEL_SYSTEME_DEF
@@ -112,8 +112,7 @@ typedef struct _ParametreAS {
   __attribute__ ((noinline)) typeRetour nom(typeArgument1 arg1, typeArgument2 arg2, typeArgument3 arg3) \
    {                                                        \
       typeRetour resultat;                                  \
-   printk("ecrire fd = %d, b = %d, nb = %d IN\n", arg1, arg2, arg3); \
-   while (1){basculerTache();};		\
+      printk("AS3 ecrire fd=%d, ch=%d, cnt=%d\n", arg1, arg2, arg3);	    \
    __asm__ __volatile__ ("int %2"			    \
               : "=a"(resultat)                              \
               : "0" (numero),                               \

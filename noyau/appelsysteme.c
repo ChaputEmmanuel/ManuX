@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Implantation des sous-programmes de gestion des appels système.       */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2002 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/appelsysteme.h>
 

@@ -1,6 +1,10 @@
 .SUFFIXES: .nasm .bin .obj .c
 
-CFLAGS   = -fno-pie -m32 -march=i686 -Wall -I../usr/include -O2 -nostdinc -fno-builtin -fomit-frame-pointer -fno-toplevel-reorder
+#
+# -fno-stack-protector permet d'éviter les "undefined references to `__stack_chk_fail'" sur les GCC récents
+#
+CFLAGS   = -fno-pie -m32 -march=i686 -Wall -I../usr/include -O2 -nostdinc -fno-builtin -fomit-frame-pointer -fno-toplevel-reorder -fno-stack-protector
+
 ASM_EXT  = nasm
 
 ASM         = nasm

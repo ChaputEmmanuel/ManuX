@@ -4,7 +4,12 @@ ROOTDIR := $(shell pwd)
 
 COMPRESS = gzip
 
-CFLAGS   = -g -gdwarf -fno-pie -m32 -march=i686 -Wall -I$(ROOTDIR)/include -O2 -nostdinc -fno-builtin -fno-toplevel-reorder # -fomit-frame-pointer
+#
+# -fno-stack-protector permet d'éviter les "undefined references to `__stack_chk_fail'" sur les GCC récents
+#
+CFLAGS   = -g -gdwarf -fno-pie -m32 -march=i686 -Wall -I$(ROOTDIR)/include -O2 -nostdinc -fno-builtin -fno-toplevel-reorder \
+           -fno-stack-protector \
+         # -fomit-frame-pointer
 
 RUN_MANUX= qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
 
