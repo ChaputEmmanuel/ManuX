@@ -1,0 +1,25 @@
+This VGA/VBE Bios is released under the GNU LGPL
+
+Please visit :
+ . http://bochs.sourceforge.net
+ . http://www.nongnu.org/vgabios
+
+Bochs VBE Display Adapter enabled
+
+Bochs BIOS - build: 09/02/12
+$Revision: 11318 $ $Date: 2012-08-06 19:59:54 +0200 (Mo, 06. Aug 2012) $
+Options: apmbios pcibios pnpbios eltorito rombios32
+
+
+Press F12 for boot menu.
+
+Booting from Floppy...
+ManuX loading ...
+La, je devrais detecter le matos !
+OK, on est en mode reel !
+Validation de la ligne A20 ...
+Chargement du RamDisk ...
+Erreur de chargement RamDisk ...
+Pas de RamDisk ...
+Allez zou, on passe en mode protege ...
+ß

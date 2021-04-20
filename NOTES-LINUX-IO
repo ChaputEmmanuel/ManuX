@@ -1,0 +1,56 @@
+
+Les entrées-sorties sous Linux
+==============================
+
+Les fichiers
+------------
+
+   Du point de vue du système, un fichier est décrit par une instance
+de la structure suivante, définie dans le fichier linux/fs.h :
+
+struct file {
+	struct list_head	f_list;
+	struct dentry		*f_dentry;
+	struct vfsmount         *f_vfsmnt;
+	struct file_operations	*f_op;
+	atomic_t		f_count;
+	unsigned int 		f_flags;
+	mode_t			f_mode;
+	loff_t			f_pos;
+	unsigned long 		f_reada, f_ramax, f_raend, f_ralen, f_rawin;
+	struct fown_struct	f_owner;
+	unsigned int		f_uid, f_gid;
+	int			f_error;
+
+	unsigned long		f_version;
+
+	/* needed for tty driver, and maybe others */
+	void			*private_data;
+
+	/* preallocated helper kiobuf to speedup O_DIRECT */
+	struct kiobuf		*f_iobuf;
+	long			f_iobuf_lock;
+};
+
+   Où
+
+   f_op est un pointeur vers une structure définissant toutes les fonctions
+pouvant être réalisées sur ce fichier.
+
+L'appel système write
+---------------------
+
+   L'appel système write est mis en oeuvre par la fonction suivante
+codée dans le fichier fs/read_write.c :
+
+asmlinkage ssize_t sys_write(unsigned int fd, const char * buf, size_t count)
+
+   Cette fonction commence par obtenir un pointeur sur la structure
+décrivant le fichier cible grâce à la fonction fget(), le résultat est
+stocké dans la variable local file.
+
+   Elle invoque ensuite la méthode write de la structure file->f_op. C'est
+cette dernière qui réalise l'écriture sur le fichier voulu. Si ce fichier est
+un fichier spécial, une fonction spécifique sera invoquée.
+
+   A VOIR : comment l'aiguillage est fait pour, par exemple, /dev/toto.

@@ -1,0 +1,159 @@
+/*----------------------------------------------------------------------------*/
+/*      Définition des fonctions de base d'accés à la console.                */
+/*                                                                            */
+/*      Une console est protégée par un verrour de type ExclusionMutuelle.    */
+/*   C'est à l'utilisateur de veiller à respecter les appels aux fonctions    */
+/*   d'entrée et de sortie de la section critique avant et aprés chaque       */
+/*   utilisation de la console. Bien sur le printf s'en occupe.               */
+/*      La seule fonction dans laquelle ces appels sont effectués est celle   */
+/*   permettant le basculement de console active.                             */
+/*                                                                            */
+/*                                                (C) Manu Chaput 2000 - 2020 */
+/*----------------------------------------------------------------------------*/
+/*   A voir                                                                   */
+/*                                                                            */
+/*   Dans la plupart des fonctions, c'est un pointeur sur la console qui est  */
+/* passé en paramètre. En revanche, pour montrerConsole(), c'est l'indice de  */
+/* la console. C'est logique vue que je dois la chercher dans un tableau,     */
+/* mais ce n'est pas très cohérent. Je n'ai pas envie de de parcourir un      */
+/* tableau pour y trouver un pointeur. Bref, il faut homogénéiser ça !        */
+/*   La solution est peut être que initialiserConsole renvoie un entier et    */
+/* que ce soit lui que l'on utilise systématiquement.                         */
+/*   Sauf que ça veut dire que les consoles virtuelles sont allouées ici.     */
+/*   Une autre solution serait tout bêtement de mettre dans une console un    */
+/* pointeur vers la suivante, et d'en faire une liste chaînée cyclique.       */
+/*----------------------------------------------------------------------------*/
+
+#ifndef MANUX_CONSOLE_DEF
+#define MANUX_CONSOLE_DEF
+
+#include <manux/config.h>
+#include <manux/types.h>
+#include <manux/atomique.h>     /* Accés unique à la console  */
+#include <manux/fichier.h>      /* Une console est un fichier */
+
+/*
+ * Structure d'une console. Pour le moment c'est simple
+ * mais il faudra étendre plus tard.
+ */
+typedef struct _Console {
+   char              * adresseEcran;      // Adresse à laquelle se trouve
+                                          // le contenu affiché
+   char              * adresseEcranCopie; // Une copie pour lorsque la
+                                          // console est active
+   int                 ligne, colonne ;
+   unsigned char       attribut;
+   uint8               nbLignes;
+   uint8               nbColonnes;
+   ExclusionMutuelle   scAcces;
+} Console;
+
+extern Console ecranPhysique;
+
+/*
+ * Les méthodes permettant de traiter une console comme un fichier
+ */
+extern MethodesFichier consoleMethodesFichier;
+
+/*
+ * Définition des couleurs WARNING, c'est portnawak
+ */
+typedef enum {
+   COUL_NOIR       = 0x0,
+   COUL_BLEU_CLAIR = 0x9,
+   COUL_VERT,
+   COUL_CYAN,
+   COUL_ROUGE,
+   COUL_MAGENTA,
+   COUL_JAUNE,
+   COUL_BLANC,
+   COUL_BLEU_FONCE = 0x01,
+   COUL_BLEU,
+   COUL_MAUVE = 13
+} Couleur;
+
+/*
+ * Définition de certains caractères ASCII
+ */
+#define ASCII_ESC 27
+
+/*
+ * Initialisation de la console (ou du système de gestion de consoles
+ * virtuelles)
+ */
+void consoleInit();
+
+/*
+ * Choix des couleurs de texte et de fond (voir l'enum ci dessus)
+ */
+void affecterCouleurFond(Console * cons, Couleur coul);
+
+void affecterCouleurTexte(Console * cons, Couleur coul);
+
+/*
+ * Affichage d'un message à l'écran. Attention, aucun formatage
+ * n'est fait. En revanche, la chaine de caractères doit être terminée
+ * par un zéro.
+ */
+void afficherEcran(char * msg);
+void afficherConsole(Console * cons, char * msg);
+
+/*
+ * Affichage d'un message à l'écran. Attention, aucun formatage
+ * n'est fait. Seuls les nbOctets premiers octets sont affichés,
+ * indépemment de la présence d'un caractère nul.
+ */
+void afficherConsoleN(Console * cons, char * msg, int nbOctets);
+
+/*
+ * Effacement (avec la couleur courante) et positionnement du curseur en
+ * haut à gauche.
+ */
+void effacerConsole(Console * cons);
+
+/*
+ * Affichage d'un entier sur la console
+ */
+void afficherConsoleEntier(Console * cons, int n);
+
+/*
+ * Affichage d'un entier sur la console. En hexa sur le nbre d'octets
+ * voulu.
+ */
+void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
+
+/*
+ * La notion de console virtuelle permet de gérer plusieurs affichages
+ * disjoints. Chaque console est donc gérée indépendemment des autres.
+ * Une seule est affichée à l'écran à un instant t.
+ * Les consoles sont stoquées dans un tableau et repérées par leur
+ * indice dans ce tableau.
+ */
+#ifdef CONSOLES_VIRTUELLES
+
+/*
+ * Initialisation d'une console virtuelle. Nécessaire avant toute
+ * autre opération. 
+ * L'adresse de l'écran doit être fournie.
+ */
+void initialiserConsole(Console * cons, char * adresseEcran);
+
+/*
+ * Forcer l'apparition de la console à l'écran
+ */
+void montrerConsole(int idx);
+
+/*
+ * Basculer vers la prochaine console virtuelle
+ */
+void basculerConsole();
+
+#endif  // CONSOLES_VIRTUELLES
+
+/*
+ * Écriture sur une console
+ */
+int consoleEcrire(Fichier * f, void * buffer, int nbOctets);
+
+
+#endif

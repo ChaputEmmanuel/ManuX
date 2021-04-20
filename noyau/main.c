@@ -1,0 +1,643 @@
+/*----------------------------------------------------------------------------*/
+/*      Un exemple pitoyable de début de noyau.                               */
+/*                                                                            */
+/*                                                  (C) Manu Chaput 2000-2021 */
+/*----------------------------------------------------------------------------*/
+#include <manux/config.h>
+#include <manux/console.h>
+#include <manux/clavier.h>
+#include <manux/tache.h>
+#include <manux/scheduler.h>
+#include <manux/interruptions.h>
+#include <manux/irq.h>
+#include <manux/io.h>
+#include <manux/segment.h>
+#include <manux/memoire.h>
+#include <manux/atomique.h>
+#include <manux/appelsysteme.h>
+#include <manux/ramdisk.h>
+#include <manux/printk.h>
+#include <manux/limites.h>
+#include <manux/pagination.h>
+#include <manux/string.h>        /* bcopy() */
+#ifdef MANUX_JOURNAL
+#   include <manux/journal.h>       /* initialiserJournal() */
+#endif
+#include <manux/fichier.h>
+
+extern void init(); // Faire un init.h
+
+/*----------------------------------------------------------------------------*/
+/*     Définition des différentes macros activant les tests.                  */
+/*----------------------------------------------------------------------------*/
+/*#define TEST_EXCLUSION_MUTUELLE */
+
+/*#define TEST_ATOMIQUE*/
+
+/*
+ * Définition d'un appel système à un paramètre et utilisation
+ * de cet appel.
+ */
+//#define TEST_APPEL_SYSTEME
+
+/*
+ * Lance 5 tâches qui affichent leur identificateur sur la même
+ * console à des rythmes différents.
+ *
+ * Nécessite un appel système (numeroTache())...
+ */
+//#define TEST_SCHEDULER
+
+/*#define TEST_ALLOC*/
+
+/*
+ * Un test trés élémentaire du clavier qui affiche le code de la
+ * touche enfoncée.
+ */
+//#define TEST_CLAVIER
+
+/* 
+ * Un test élémentaire de ma fonction printf()
+ */
+//#define TEST_STDIO  Non ! dans init 
+
+//#define TEST_PAGINATION
+
+/*
+ * Lance 2 tâches qui placent un message différent à la même
+ * adresse virtuelle.
+ */
+//#define TEST_CONSOLE_VIRTUELLE
+
+/*----------------------------------------------------------------------------*/
+/*     Fin des macros de test.                                                */
+/*----------------------------------------------------------------------------*/
+
+
+void tacheVoid();
+
+#ifdef TEST_ATOMIQUE
+void tacheBete();
+void tacheDebile();
+Atomique atome;
+#define tourBete   1
+#define tourDebile 2
+#endif
+
+#ifdef TEST_EXCLUSION_MUTUELLE
+ExclusionMutuelle exclusionMutuelle;
+void exclusionMutuelleTestA();
+void exclusionMutuelleTestB();
+void exclusionMutuelleTestC();
+#endif
+
+#ifdef TEST_APPEL_SYSTEME
+void testAppelSysteme();
+#endif
+
+#ifdef TEST_SCHEDULER
+void tacheA();
+void tacheB();
+void tacheC();
+void tacheD();
+void tacheE();
+#endif
+
+#ifdef TEST_STDIO
+void testStdio();
+#endif
+
+#ifdef TEST_CONSOLE_VIRTUELLE
+void testCV1();
+void testCV2();
+void calculerPremiers();
+#endif
+
+#ifdef TEST_PAGINATION
+void testPagTache1();
+void testPagTache2();
+#endif
+
+/*
+ * Structure passée en paramètre par la phase d'init
+ * (cf init-manux.nasm)
+ */
+typedef struct _InfoSysteme {
+   uint16 memoireDeBase;   // En Ko
+   uint16 memoireEtendue;  // En Ko
+   uint16 tailleRamdisk;   // En Ko (0 si pas de ramdisk)
+   uint16 adresseRamdiskLo;// WARNING, pourquoi cet entremellage ?
+   uint16 adresseRamdiskHi;
+} InfoSysteme;
+
+void _start(InfoSysteme * infoSysteme)
+{
+   uint32 adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
+                         + infoSysteme->adresseRamdiskLo;
+
+   //int i;
+
+   interdireIRQ(IRQTimer);
+   consoleInit();
+   
+   /* Initialisation du journal */
+#ifdef MANUX_JOURNAL
+   initialiserJournal();
+#endif
+   
+   //basculerConsole();
+   printk("32 bit ManuX running ...\n");
+
+   /* Affichage de la mémoire disponible */
+   printk("Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
+
+   /* Initialisation de la gestion mémoire */
+   printk("Initialisation memoire : ");
+   initialiserMemoire(infoSysteme->memoireEtendue);
+   printk("OK\n");
+
+   /* Initialisation de la pagination */
+   printk("Initialisation pagination : ");
+   initialiserPagination(infoSysteme->memoireEtendue);
+   printk("OK\n");
+
+   /* Initilisation des descripteurs de segments */
+   printk("Chargement GDT : ");
+   initialiserGDT();
+   printk("OK\n");
+
+   /* Initialisation de la table des interruptions */
+   printk("Chargement IDT : ");
+   initialiserIDT();
+   printk("OK\n");
+
+   /* Initialisation de la table des appels système*/
+   printk("Initialisation appels systeme : ");
+   initialiserAppelsSysteme();
+   printk("OK\n");
+
+   printk("Initialisation du systeme de fichiers : ");
+   sfInitialiser();
+   printk("OK\n");
+
+   /* Initialisation du ramdisk */
+   if (infoSysteme->tailleRamdisk > 0) {
+      printk("Initialisation du ramdisk (a %d de taille %d Ko) : ",
+	     adresseRamdisk, infoSysteme->tailleRamdisk);
+      initialiserRamDisk(adresseRamdisk, infoSysteme->tailleRamdisk);
+      printk("OK\n");
+   }
+     
+   /* Initialisation du clavier */
+   printk("Initialisation du clavier : ");
+   initialiserClavier();
+   printk("OK\n");
+
+   /* Initialisation de la fréquence du timer */
+   setFrequenceTimer(18);
+   autoriserIRQ(IRQTimer);
+
+   /* Initialisation de la gestion des processus */
+
+   printk("Initialisation du scheduler : ");
+   initialiserScheduler();
+   printk("OK\n"); 
+
+   sti();
+
+   printk("C'est parti les amis ...\n");
+   printk("Adresse de __start : %x\n", _start);
+   printk("Adresse de nbActibvations : %x\n", &nbActivations);
+
+#ifdef TEST_EXCLUSION_MUTUELLE
+   printk("\033[31m\n\n        -< Test exclusion mutuelle >-\n\n\033[0m");
+   initialiserExclusionMutuelle(&exclusionMutuelle);
+   ordonnancerTache(exclusionMutuelleTestA, FALSE);
+   ordonnancerTache(exclusionMutuelleTestB, FALSE);
+   ordonnancerTache(exclusionMutuelleTestC, FALSE);
+   while (1) {};
+#endif
+
+#ifdef TEST_ATOMIQUE
+   atomiqueInit(&atome, tourBete);
+   ordonnancerTache(tacheBete, FALSE);
+   ordonnancerTache(tacheDebile, FALSE);
+   ordonnancerTache(tacheVoid, FALSE);
+   while (1) {};
+#endif
+
+#ifdef TEST_APPEL_SYSTEME
+   printk("\033[31m\n\n        -< Test appel systeme >-\n\n\033[0m");
+   testAppelSysteme();
+   while (1) {};
+#endif
+
+#ifdef TEST_SCHEDULER
+   printk("-< Test scheduler >-\n");
+   ordonnancerTache(tacheA, TRUE);
+   printk("SSS\n");
+   ordonnancerTache(tacheB, FALSE);
+   printk("TTT\n");
+   //   ordonnancerTache(tacheC, FALSE);
+   //   ordonnancerTache(tacheD, TRUE);
+   //   tacheE();
+   //   ordonnancerTache(tacheE, FALSE);printk("VVV\n");
+   while (1) {};
+#endif
+
+#ifdef TEST_ALLOC
+   printk("\033[31m\n\n        -< Test alloc >-\n\n\033[0m");
+   do {
+      adresse = allouerPage();
+      afficherConsoleEntier(&ecranPhysique, (int)adresse);
+      afficherConsole(&ecranPhysique, "\n");
+   } while (adresse);
+#endif
+
+#ifdef TEST_CLAVIER
+   int i;
+   printk("\n--< test du clavier >--\n");
+   while(1){
+      for (i=0; i<1000000; i++){};
+      printk("Nb ticks : %d, touche = %d\n", nbTicks, toucheTouche);
+   };
+#endif
+
+#ifdef TEST_STDIO
+   ordonnancerTache(testStdio, FALSE);
+   ordonnancerTache(tacheVoid, FALSE);
+   while (TRUE){}
+#endif
+
+#ifdef TEST_CONSOLE_VIRTUELLE
+   printk("\033[31m\n\n        -< Test console virtuelle >-\033[0m\n\n");
+
+   ordonnancerTache(testCV1, TRUE);
+   //   ordonnancerTache(testCV2, TRUE);
+   //   ordonnancerTache(calculerPremiers, TRUE);
+
+   // while(TRUE){};
+   scheduler();
+   while(TRUE){basculerTache();}
+#endif
+
+#ifdef TEST_PAGINATION
+   //   affecterCouleurTexte(&ecranPhysique, COUL_ROUGE);
+   //   afficherConsole(&ecranPhysique, "\n\n        -< Test pagination >-\n\n");
+   //   affecterCouleurTexte(&ecranPhysique, COUL_BLANC);
+   printk("\033[31m\n\n        -< Test pagination >-\n\n\033[0m");
+
+   //   ordonnancerTache(testPagTache1, TRUE);printk("Une...\n");
+   //ordonnancerTache(testPagTache2, TRUE);printk("Et deux !\n");
+   while(TRUE){printk("A");}
+#endif
+
+   /* Bascule vers le mode utilisateur WARNING à faire !*/
+   printk("Lancement de init ...\n");
+   //   while(TRUE){printk("A");}
+
+   init();
+}   /* main */
+
+void tacheVoid(){while(1){}};
+
+#ifdef TEST_ATOMIQUE
+
+void tacheBete()
+{
+   int i, j;
+
+   while (TRUE) {
+      for (j=0; j<100000; j++) {
+         while (!atomiqueTestInit(&atome, tourBete, tourBete)){} 
+         afficherConsole(&ecranPhysique, "Tache bete [");
+         afficherConsoleEntier(&ecranPhysique, j);
+         afficherConsole(&ecranPhysique, "] ...\n");
+         while (!atomiqueTestInit(&atome, tourDebile, tourBete)){} 
+      }
+   }
+}
+
+void tacheDebile()
+{
+   int i, j;
+
+   while (TRUE) {
+      for (j=0; j<100000; j++) {
+         while (!atomiqueTestInit(&atome, tourDebile, tourDebile)){} 
+         afficherConsole(&ecranPhysique, "Tache debile [");
+         afficherConsoleEntier(&ecranPhysique, j);
+         afficherConsole("&ecranPhysique, ] ...\n");
+         for (i = 0; i < 200000; i++){};
+         while (!atomiqueTestInit(&atome, tourBete, tourDebile)){} 
+      }
+   }
+}
+
+#endif
+
+#ifdef TEST_EXCLUSION_MUTUELLE
+void exclusionMutuelleTest(int n)
+{
+   int i;
+
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, " veut entrer en section critique\n");
+   entrerExclusionMutuelle(&exclusionMutuelle);
+
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, " est en section critique\n");
+   for (i = 0; i < 1000000; i++) {}
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, " est encore en section critique\n");
+   for (i = 0; i < 1000000; i++) {}
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, " est toujours en section critique\n");
+   for (i = 0; i < 1000000; i++) {}
+
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, " va sortir de section critique\n");
+   sortirExclusionMutuelle(&exclusionMutuelle);
+}
+
+void exclusionMutuelleTestA()
+{
+   int i;
+
+   while (TRUE) {
+      for (i = 0; i < 500000; i++) {}
+      exclusionMutuelleTest(1);
+   }
+}
+
+void exclusionMutuelleTestB()
+{
+   int i;
+
+   while (TRUE) {
+      for (i = 0; i < 1000000; i++) {}
+      exclusionMutuelleTest(2);
+   }
+}
+
+void exclusionMutuelleTestC()
+{
+   int i;
+
+   while (TRUE) {
+      for (i = 0; i < 1500000; i++) {}
+      exclusionMutuelleTest(3);
+   }
+}
+
+#endif
+
+#ifdef TEST_APPEL_SYSTEME
+appelSysteme1(5, int, appelSystemeNul, int);
+
+#define NBRE_APPELS 10
+
+int  __appelSystemeNul(ParametreAS p, int n)
+{
+   int i;
+
+   affecterCouleurTexte(&ecranPhysique, COUL_VERT);
+   afficherConsole(&ecranPhysique, "Dans l'appel : ");
+   afficherConsoleEntier(&ecranPhysique, n);
+   afficherConsole(&ecranPhysique, "\n");
+   affecterCouleurTexte(&ecranPhysique, COUL_BLANC);
+
+   for (i = 0; i < 1000000; i++){}
+
+   affecterCouleurTexte(&ecranPhysique, COUL_VERT);
+   afficherConsole(&ecranPhysique, "Fin d'appel.\n");
+   affecterCouleurTexte(&ecranPhysique, COUL_BLANC);
+
+   return 10*n;
+}
+
+void testAppelSysteme()
+{
+   int i, j, r;
+
+   definirAppelSysteme(5, __appelSystemeNul);
+
+   for (i = 0; i < NBRE_APPELS; i++) {
+      afficherConsole(&ecranPhysique, "On appelle (a ");
+      afficherConsoleEntier(&ecranPhysique, nbTicks);
+      afficherConsole(&ecranPhysique, ") ...\n");
+      r = appelSystemeNul(i);
+      afficherConsole(&ecranPhysique, "Retour d'appel (a ");
+      afficherConsoleEntier(&ecranPhysique, nbTicks);
+      afficherConsole(&ecranPhysique, ") => ");
+      afficherConsoleEntier(&ecranPhysique, r);
+      afficherConsole(&ecranPhysique, "\n");
+      for (j = 0; j < 1000000; j++) {};
+   }
+}
+#endif
+
+#ifdef TEST_SCHEDULER
+
+#define NBRE_MESSAGES 10000000
+
+void tacheA()
+{
+   int n; // nombre de messages affichés
+   int i;
+
+   for (n = 0; n < NBRE_MESSAGES; n++) {
+      printk("Tache A\n");
+      for (i = 0; i < 100000; i++){}
+   }
+}
+
+
+void tacheB()
+{
+   int n; // nombre de messages affichés
+   int i;
+
+   for (n = 0; n < NBRE_MESSAGES; n++) {
+     printk("Tache B\n");
+/*
+      afficherConsole(&ecranPhysique, "[");
+      afficherConsoleEntier(&ecranPhysique, numeroTache());
+      afficherConsole(&ecranPhysique, "] tache B tourne ...\n");
+*/
+      for (i = 0; i < 150000; i++){}
+   }
+}
+
+void tacheC()
+{
+   int n; // nombre de messages affichés
+   int i;
+
+   for (n = 0; n < NBRE_MESSAGES; n++) {
+     printk("Tache C\n");
+/*
+      afficherConsole(&ecranPhysique, "[");
+      afficherConsoleEntier(&ecranPhysique, numeroTache());
+      afficherConsole(&ecranPhysique, "] tache C marche ...\n");
+*/
+      for (i = 0; i < 300000; i++){}
+   }
+}
+
+void tacheD()
+{
+   int n; // nombre de messages affichés
+   int i;
+
+   for (n = 0; n < NBRE_MESSAGES; n++) {
+     printk("Tache D\n");
+/*
+      afficherConsole(&ecranPhysique, "[");
+      afficherConsoleEntier(&ecranPhysique, numeroTache());
+      afficherConsole(&ecranPhysique, "] tache D se marre ...\n");
+*/
+      for (i = 0; i < 200000; i++){}
+   }
+}
+
+void tacheE()
+{
+   int n; // nombre de messages affichés
+   int i;
+
+   for (n = 0; n < NBRE_MESSAGES; n++) {
+     printk("Tache E\n");
+/*
+      afficherConsole(&ecranPhysique, "[");
+      afficherConsoleEntier(&ecranPhysique, numeroTache());
+      afficherConsole(&ecranPhysique, "] tache E vous dit bonjour ...\n");
+*/
+      for (i = 0; i < 250000; i++){}
+   }
+}
+
+#endif
+
+#ifdef TEST_STDIO
+NON ! Dans init ...
+
+void testStdio()
+{
+   int i;
+
+   for (i = 0; i < 1000000; i++){}
+
+   afficherConsole(&ecranPhysique, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+   for (i = -10; i < 11; i++){
+      printf("[%d] Ceci est ecrit par un printf !\n", i);
+   }
+   afficherConsole(console(), ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
+   while (TRUE) {}
+}
+
+#endif
+
+#ifdef TEST_CONSOLE_VIRTUELLE
+
+
+void testCV1()
+{
+  int i, j, k=0;
+
+   while (TRUE) {
+      printk("[%d] Bonjour je suis testCV1 ", k++);
+      for (j = 0 ; j<10; j++) {
+	for (i = 0 ; i<100000000; i++){}
+        printk("+");
+      }
+      printk("\n");
+
+      basculerTache(); // Faisons du collaboratif
+   }
+}
+
+void testCV2()
+{
+  int i, j, k=0;
+
+   while (TRUE) {
+      printk("[%d] Bonjour je suis testCV2 ", k++);
+      for (j = 0 ; j<10; j++) {
+	for (i = 0 ; i<100000000; i++){}
+        printk("+");
+      }
+      printk("\n\n");
+
+      basculerTache(); // Faisons du collaboratif
+   }
+}
+
+#endif
+
+#ifdef TEST_PAGINATION
+
+void testPagTache1()
+{
+   int i;    // Pour boucle attente
+   int j;    // Nombre d'affichages du message
+
+   char * message = "Ce message est dans tache1";
+
+   printk("[1] Coucou\n");
+   for (i = 0; i < 100000; i++){}
+
+   /* Allocation d'une page supplémentaire */
+   obtenirPages(1);
+
+   printk("[1] Je place un message en %d\n",
+          nombrePagesSysteme*TAILLE_PAGE);
+
+   bcopy(message, (char *)(nombrePagesSysteme*TAILLE_PAGE), 28);
+
+   for (j = 0; j < 20; j++) {
+      printk("[1] en %d => \"%s\"\n",
+	     ((int)   (nombrePagesSysteme*TAILLE_PAGE)),
+	     ((char *)(nombrePagesSysteme*TAILLE_PAGE)));
+      basculerTache();
+      for (i = 0; i < 100000; i++){}
+   }
+
+   printk("[1] Au revoir\n");
+
+   while(1){basculerTache();}
+}
+
+void testPagTache2()
+{
+   int i;    // Pour boucle attente
+   int j;    // Nombre d'affichages du message
+
+   char * message = "Dans la tache2 est ce mess";
+
+   printk("[2] Coucou\n");
+   for (i = 0; i < 100000; i++){}
+
+   /* Allocation d'une page supplémentaire */
+   obtenirPages(1);
+
+   printk("[2] Je place un message en %d\n",
+          nombrePagesSysteme*TAILLE_PAGE);
+
+   bcopy(message, (char *)(nombrePagesSysteme*TAILLE_PAGE), 28);
+
+   for (j = 0; j < 30; j++) {
+      printk("[2] en %d => \"%s\"\n",
+	     ((int)   (nombrePagesSysteme*TAILLE_PAGE)),
+	     ((char *)(nombrePagesSysteme*TAILLE_PAGE)));
+      basculerTache();
+      //      for (i = 0; i < 100000; i++){}
+   }
+
+   printk("[2] Au revoir\n");
+
+   while(1){basculerTache();}
+}
+
+#endif

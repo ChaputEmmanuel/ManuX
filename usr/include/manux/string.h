@@ -1,0 +1,14 @@
+/*----------------------------------------------------------------------------*/
+/*      Définition des fonctions de manipulation des chaines.                 */
+/*                                                                            */
+/*                                                       (C) Manu Chaput 2000 */
+/*----------------------------------------------------------------------------*/
+#ifndef DEF_MANUX_STRING
+#define DEF_MANUX_STRING
+
+void bcopy (const void *src, void *dest, int n);
+/*
+ * Copie de n octets depuis src vers dest.
+ */
+
+#endif

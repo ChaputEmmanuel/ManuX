@@ -1,0 +1,191 @@
+# 1 "stdio.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "stdio.c"
+
+
+
+
+
+# 1 "../usr/include/stdio.h" 1
+# 9 "../usr/include/stdio.h"
+# 1 "../usr/include/stdarg.h" 1
+# 70 "../usr/include/stdarg.h"
+typedef void *__gnuc_va_list;
+# 93 "../usr/include/stdarg.h"
+void va_end (__gnuc_va_list);
+# 181 "../usr/include/stdarg.h"
+typedef __gnuc_va_list va_list;
+# 10 "../usr/include/stdio.h" 2
+
+void printf(char * format, ...);
+# 7 "stdio.c" 2
+# 1 "../usr/include/unistd.h" 1
+
+
+
+# 1 "../usr/include/manux/types.h" 1
+# 10 "../usr/include/manux/types.h"
+typedef unsigned char uint8;
+
+
+
+typedef unsigned short uint16;
+
+
+
+typedef unsigned long uint32;
+
+
+
+typedef int booleen;
+# 37 "../usr/include/manux/types.h"
+typedef struct _TousRegistres {
+   uint32 edi;
+   uint32 esi;
+   uint32 ebp;
+   uint32 esp;
+   uint32 ebx;
+   uint32 edx;
+   uint32 ecx;
+   uint32 eax;
+} TousRegistres;
+
+
+
+
+typedef uint16 TacheID;
+
+
+
+
+typedef void * Page;
+# 5 "../usr/include/unistd.h" 2
+# 1 "../usr/include/manux/appelsysteme.h" 1
+# 28 "../usr/include/manux/appelsysteme.h"
+extern void * vecteurAppelsSysteme[10];
+# 41 "../usr/include/manux/appelsysteme.h"
+int numeroTache();
+int obtenirPages(int n);
+
+
+
+
+
+typedef struct _ParametreAS {
+   uint32 ecx;
+   uint32 edx;
+   uint32 ebx;
+   uint32 esp;
+   uint32 ebp;
+   uint32 esi;
+   uint32 edi;
+   uint32 adresseRetourInterruption;
+   uint32 eflags;
+   uint32 csretour;
+   uint32 adresseRetourInterface;
+} ParametreAS;
+# 116 "../usr/include/manux/appelsysteme.h"
+      __asm__ __volatile__ ("int %2"
+              : "=a"(resultat)
+              : "0" (numero),
+                "N" (0x80));
+      return resultat;
+   }
+
+int definirAppelSysteme(int num, void * appel);
+
+
+
+
+
+
+
+void initialiserAppelsSysteme();
+# 6 "../usr/include/unistd.h" 2
+
+__attribute__ ((noinline)) int ecrire(int arg1, void * arg2, int arg3) { int resultat;;
+TacheID fork() { TacheID resultat; __asm__ __volatile__ ("int %2" : "=a"(resultat) : "0" (4), "N" (0x80)); return resultat; };
+# 8 "stdio.c" 2
+
+
+
+
+void printf(char * format, ...)
+{
+   va_list argList;
+   char chaine[4096];
+   int indice = 0;
+   int n;
+   char nombre[10];
+   char * s;
+   int in;
+   int nbChiffres;
+   int base;
+
+   (argList = ((__gnuc_va_list) __builtin_next_arg (format)));
+
+   while (*format) {
+      switch (*format) {
+         case '%' :
+            format++;
+
+            nbChiffres = 0;
+            while ((*format <= '9') && (*format >= '0')) {
+               nbChiffres = nbChiffres * 10 + *format - '0';
+               format++;
+     }
+
+            switch (*format) {
+        case 'o' :
+                  base = 8;
+                  goto affent;
+        case 'x' :
+                  base = 16;
+                  goto affent;
+        case 'd' :
+                  base = 10;
+affent : n = (argList = (__gnuc_va_list) ((char *) (argList) + (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int))), *((int *) (void *) ((char *) (argList) - (((sizeof (int) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))));
+                  if (n < 0) {
+       n = -n;
+       chaine[indice++] = '-';
+    }
+                  in = 0;
+                  do {
+                     nombre[in++] = "0123456789abcdef"[n%base];
+                     n = n/base;
+    } while (n != 0);
+                  while (nbChiffres > in) {
+                     nbChiffres--;
+                     chaine[indice++] = ' ';
+    }
+                  do {
+                     chaine[indice++] = nombre[--in];
+                  } while (in);
+               break;
+               case 's' :
+                  s = (argList = (__gnuc_va_list) ((char *) (argList) + (((sizeof (char *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int))), *((char * *) (void *) ((char *) (argList) - (((sizeof (char *) + sizeof (int) - 1) / sizeof (int)) * sizeof (int)))));
+                  in = 0;
+                  while (s[in]) {
+                     chaine[indice++] = s[in++];
+    }
+               break;
+               default :
+               break;
+     }
+         break;
+  default :
+            chaine[indice++] = *format;
+         break;
+      }
+      format++;
+   }
+
+   chaine[indice] = 0;
+
+   printk("printf va ecrire (fd = 1, ch = %d, in = %d\n", chaine, indice);
+
+   ecrire(1, chaine, indice);
+
+   ((void)0);
+}

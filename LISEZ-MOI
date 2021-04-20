@@ -1,0 +1,140 @@
+                              -=  Manux-32  =-
+                                  --------
+
+   Le but de ce document est de stocker quelques informations sur Manux-32.
+Je ne stockerai ici que les informations concernant les points instables.
+Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
+
+En cours
+--------
+
+   A affiner : la gestion des consoles. Pour le moment,
+TEST_CONSOLE_VIRTUELLE   marchotte, ... mais j'ai l'impression
+qu'il y en a 5 ! Je vais commencer par clarifier printk en y ajoutant
+une date (nbTicks).
+
+   BON, on va essayer d'être plus propre dans ce qui suit en
+commençant à mettre des choses dans init et y faire appel à ce qui est
+dans /usr.
+
+   Pour ça, faire un appel système "à la fork ?"
+
+   ATTENTION : creerConsole n'accepte plus un pointeur NULL !
+   OrdonnancerTache le fait, ...
+
+
+   Gestion des tâches (voir ci dessous)
+
+   ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
+ne démarre pas car l'adresse est hard-codée dans
+init-manux.nasm. Trois solutions temporaires :
+   . Mettre des gros warning dans main.c pour ne pas placer de code
+   avant _start (bof)
+   . Tester noyau/symbols pour l'adresse de _start et arréter la
+   compil si ce n'est pas la bonne valeur
+   . Tester noyau/symbols et modifier MANUX_KERNEL_SEG_16 dans
+   init-manux.asm
+   SOLUTION : pour le moment, l'option -fno-toplevel-reorder a l'air
+   d'y suffir
+   
+   ATTENTION, ... il va falloir être clair sur la répartition entre
+include et usr/include ! C'est (presque) une copie l'un de l'autre.
+Pas très sage/safe !!!
+
+   La fonction printk() fonctionne jusqu'au lancement du scheduler !
+   Peut-être un pb avec la commutation de console ?
+
+   Apparemment c'est OK maintenant !? NON
+
+   Non, apparemment c'est le scheduler qui est à revoir. Son démarrage
+entraine une boucle sans fin. Lorsque la première interruption d'horloge
+arrive, activerTache(tacheScheduler) est invoqué, elle invoque donc la
+fonction scheduler(), qui appelle  basculerTache() qui appelle 
+activerTache(tacheEnCours).
+
+   Or tacheEnCours est initialisée à la valeur décrivant le fil d'exécution
+initial ... Mais la tâche décrivant le scheduler est dans la liste des
+tâches activables ...
+
+   Bon, momentanément, le scheduler est invalidé. Le multitâche est donc
+obtenu de façon coopérative. Du coup on s'apperçoit d'un soucis au niveau
+de la console. Ca à l'air OK si on utilise moins de 25 lignes (eg 20).
+Sinon le bas de l'écran est étrange et dès que l'afichage atteint le bas,
+ça plante ! Etrangement cela fonctionne si la console est "active". Ce
+qui laisse à penser que quelquechose est niché dans la mémoire située à
+la fin de la console ... A voir !
+
+Introduction
+------------
+
+   Ceci est l'embryon de Manux ("Misérable Approximation de Noyau Un*X"),
+une tentative de développement de noyau de système d'exploitation qui n'a
+bd'autres but que le divertissement de son auteur et une utilisation en temps
+que support pédagogique.
+
+Structure de l'arborescence
+---------------------------
+
+   include        tous les fichiers inclus
+   lib            les sources de la "librairie" du noyau
+   usr            userland
+   usr/include    les fichiers inclus pour userland
+   noyau          sources du noyau, la partie de plus bas niveau
+   boot           code de chargement et d'initialisation du noyau
+
+A faire
+-------
+
+   Gestion des Makefile : il faut définir le maximum dans le Makefile
+de plus haut niveau, et hériter dans les autres. C'est en gros ce qui
+est déjà fait, sauf usr (à revoir) qui n'a pas les mêmes include, et
+outils, mais c'est moins génant, il n'utilise rien !
+
+   . Une gestion claire de la console !!!! Le mieux est de ne plus utiliser
+   d'accès directe à la console, mais de taper uniquement sur la console de
+   chaque processus. ON AIR
+   . Différents "main" pour les tests. En fait, le mieux serait sûrement de
+   procéder à une compilation séparée du code en mode utilisateur. Sans pour
+   autant introduire déjà la notion de de format d'exécution, cela permet
+   de bien établir la coupure entre les modes noyau et utilisateur. ON AIR
+   . Créer tous les appels systèmes possibles afin de reporter les tests en
+   mode utilisateur : fork, alloc/brk, ... ON AIR
+
+   . Utiliser un loader classique (LILO, GRUB, ...)
+   . Une terminaison propre des tâches
+   . Une gestion mémoire réaliste
+   . De ce fait, passer malloc en librairie
+   . Un ramdisk pour pouvoir faire un FS sans disque ...
+   . Mettre le code des tâches au niveau 2
+   . Décider d'une arborescence correcte. Dispatcher en particulier les fichiers
+   inclus dans des sous-répertoires de include, pas uniquement dans manux
+   . Déterminer des règles de nommage des identifiants
+   . Des makefiles propres avec des constantes factorisées
+   . Etendre print[kf] ...
+
+Le scheduler
+------------
+
+   Il est évidemment minimaliste. Pour simplifier son fonctionnement, on supposera
+qu'il y a toujours une tâche à ordonnancer. Ce ne devrait pas être trop pénalisant.
+
+Les Makefile
+------------
+
+   -fno-builtin  pour éviter les prédéfinitions de printf et autres
+
+# Les outils nécessaires
+
+## Compilation
+
+  * nasm : l'assembleur
+  
+  apt-get install nasm
+  
+## Lancement
+
+### Bochs
+
+### Qemu
+
+   apt-get install qemu-system-i386
