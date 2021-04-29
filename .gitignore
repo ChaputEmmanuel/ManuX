@@ -1,7 +1,11 @@
 *~
 *.o
 *.a
+*.bin
 noyau/symbols
-noyau/manux
 noyau/noyau.obj
 noyau/noyau.elf
+boot/bourage
+manux
+outils/taillenoyau
+taille.conf
