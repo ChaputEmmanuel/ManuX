@@ -13,10 +13,13 @@ void calculerPremiers()
    int n; /* Indice de la boucle de recherche d'un premier*/
    int d; /* Indice de la boucle de recherche de diviseur */
    booleen compose;
-
+   int cpt = 0;
+   
    while (TRUE) {
-      printk("%d", 2);
-      for (n = 3; n < 1073741820; n += 2) {
+      basculerTache();
+      printf("C'est la %d eme boucle : \n", cpt++);
+      printf("%d", 2);
+      for (n = 3; n < 1024; n += 2) {
          compose = FALSE;
          d = 3;
          while ((!compose) && (d*d <= n)) {
@@ -24,24 +27,27 @@ void calculerPremiers()
             d += 2;
          }
          if (!compose) {
-	   printk(", %d", n); for (int i = 0; i<10000000; i+=2){asm("");};
+    	   printf(", %d", n); for (int i = 0; i<10000000; i+=2){asm("");};
 	 }
       }
+      printf("\n--------------------------------------------------------------------------------\n");
    }
 }
 
 void init()
 {
-   int n; // nombre de messages affichés
-   int i,j;
+   int n=2; // nombre de messages affichés
 
    printk("Init est parti ...\n");
 
    printf("PRINTF PRINTF PRINTF !!!!\n");
 
+   //   __asm__ __volatile__ ("int $17"::);
+
+   //printk("Printf done ...\n");
+   //basculerTache();
+   //while(1){};
    for (n = 0; n < 10000000; n++) {
-      printk("Init is alive\n");
       calculerPremiers();
-      basculerTache();
    }
 }

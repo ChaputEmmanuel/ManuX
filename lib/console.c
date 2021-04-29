@@ -14,51 +14,42 @@
 #include <manux/appelsysteme.h>
 #include <manux/memoire.h>      /* NULL */
 
-#define CON_SCREEN   (char *)0x000B8000
-
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
 #ifdef CONSOLES_VIRTUELLES
-/*
- * Table des consoles et leur nombre. WARNING à changer en liste dès que
- * la gestion mémoire est plus claire.
- */
-Console * consolesVirtuelles[MANUX_NB_CONSOLES_MAX];
 
-static int nbreConsolesVirtuelles = 0;
-
-/*
- * Numéro de la console actuellement active
- */
-int consoleCourante = 0;   
-
-#else
-/*
- * Structure permettant de manipuler l'écran
- */
-static Console ecran;
+/* A tout moment, il n'y a qu'une console "active" (ie visible) */
+Console * consoleActive;
 
 #endif // CONSOLES_VIRTUELLES
 
 /*
- * Initialisation du système. J'ai un soucis, nbreConsolesVirtuelles
- * n'est pas initialisé à 0 ! Est-ce une fuite mémoire ou un problème
- * lié au format binaire ?
+ * La console du noyau est celle "par défaut", sur laquelle seront
+ * envoyés en particulier les messages du noyau (ceux affichés par
+ * printk).
  */
-void consoleInit()
+static Console _consoleNoyau;
+
+/*
+ * Initialisation du système.
+ */
+Console * consoleInit()
 {
+   // L'écran est une zone CON_LIGNESxCON_COLONNES d'adresse fixe
+   _consoleNoyau.adresseEcran = CON_SCREEN;
+   _consoleNoyau.ligne = 0; //14;
+   _consoleNoyau.colonne = 0;
+   _consoleNoyau.nbLignes = CON_LIGNES;
+   _consoleNoyau.nbColonnes = CON_COLONNES;
+   _consoleNoyau.attribut = 15;
+
 #ifdef CONSOLES_VIRTUELLES
-   nbreConsolesVirtuelles = 0;
-   consoleCourante = 0;
-#else
-   // L'écran est une zone 25x80 d'adresse fixe
-   ecran.adresseEcran = CON_SCREEN;
-   ecran.ligne = 14;
-   ecran.colonne = 0;
-   ecran.nbLignes = 25;
-   ecran.nbColonnes = 80;// WARNING hardcodé
-   ecran.attribut = 15;
+   consoleActive = &_consoleNoyau;
+   consoleActive->suivante = consoleActive;
+   consoleActive->precedente = consoleActive;
 #endif
+
+   return &_consoleNoyau;
 }
 
 
@@ -118,21 +109,10 @@ void scrollUp(Console * cons)
 
 void avancerLigne(Console * cons)
 {
-  /* DEBOGAGE
-  static char p = '!';
-      cons->attribut  = COUL_VERT;
-   afficherConsoleCaractere(cons, '?');
-   afficherConsoleEntier(cons, scrollUp);
-  */
    cons->ligne++;
    if (!(cons->ligne % cons->nbLignes)) {
       cons->ligne = cons->nbLignes - 1;
       scrollUp(cons);
-      /*
-      cons->attribut  = COUL_ROUGE;
-      afficherConsoleCaractere(cons, p++);
-      cons->attribut  = COUL_BLANC;
-      */
    }
 }
 
@@ -163,20 +143,8 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
    while (nbOctets) {
       switch (*msg) {
          case '\n' :
-	     /*
-            afficherConsoleCaractere(cons, '#');
-
-            afficherConsoleEntier(cons, cons->ligne);
-            afficherConsoleCaractere(cons, '/');
-            afficherConsoleEntier(cons, cons->nbLignes);
-            afficherConsoleCaractere(cons, ':');
-            afficherConsoleEntier(cons, cons->colonne);
-            afficherConsoleCaractere(cons, '/');
-            afficherConsoleEntier(cons, cons->nbColonnes);
-	     */
             avancerLigne(cons);
             cons->colonne = 0;
-	    //            afficherConsoleCaractere(cons, '@');
          break;
          case ASCII_ESC :
             msg++;
@@ -191,38 +159,38 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 	          }
                   switch (controle) {
                      case 0 : 
-                        affecterCouleurTexte(cons, COUL_BLANC);
-                        affecterCouleurFond(cons, COUL_NOIR);
+                        affecterCouleurTexte(cons, COUL_TXT_BLANC);
+                        affecterCouleurFond(cons, COUL_FOND_NOIR);
                      break;
                      case 30 : 
-                        affecterCouleurTexte(cons, COUL_NOIR);
+                        affecterCouleurTexte(cons, COUL_TXT_NOIR);
                      break;
                      case 31 :
-                        affecterCouleurTexte(cons, COUL_ROUGE);
+                        affecterCouleurTexte(cons, COUL_TXT_ROUGE);
                      break;
                      case 32 : 
-                        affecterCouleurTexte(cons, COUL_VERT);
+                        affecterCouleurTexte(cons, COUL_TXT_VERT);
                      break;
                      case 34 :
-                        affecterCouleurTexte(cons, COUL_BLEU);
+                        affecterCouleurTexte(cons, COUL_TXT_BLEU);
                      break;
                      case 37 :
-                        affecterCouleurTexte(cons, COUL_BLANC);
+                        affecterCouleurTexte(cons, COUL_TXT_BLANC);
                      break;
                      case 40 : 
-                        affecterCouleurFond(cons, COUL_NOIR);
+                        affecterCouleurFond(cons, COUL_FOND_NOIR);
                      break;
                      case 41 :
-                        affecterCouleurFond(cons, COUL_ROUGE);
+                        affecterCouleurFond(cons, COUL_FOND_ROUGE);
                      break;
                      case 42 : 
-                        affecterCouleurFond(cons, COUL_VERT);
+                        affecterCouleurFond(cons, COUL_FOND_VERT);
                      break;
                      case 44 :
-                        affecterCouleurFond(cons, COUL_BLEU);
+                        affecterCouleurFond(cons, COUL_FOND_BLEU);
                      break;
                      case 47 :
-                        affecterCouleurFond(cons, COUL_BLANC);
+                        affecterCouleurFond(cons, COUL_FOND_GRIS_CLAIR);
                      break;
                      default:
                      break;
@@ -242,9 +210,11 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 #endif
 }
 
+/*
 void afficherEcran(char * msg){
-   afficherConsole(&ecran, msg);
+   afficherConsole(&_consoleNoyau, msg);
 }
+*/
 
 void afficherConsole(Console * cons, char * msg)
 {
@@ -285,27 +255,20 @@ void afficherConsoleRegistre(Console * cons, int nbOctets, int reg)
 
 #ifdef CONSOLES_VIRTUELLES
 /*
- * Initialisation d'une nouvelle console virtuelle
+ * Initialisation d'une nouvelle console virtuelle. Les espaces
+ * mémoire doivent avoir été alloués par ailleurs.
  */
 void initialiserConsole(Console * cons, char * adresseEcran)
 {
-   if (nbreConsolesVirtuelles >= MANUX_NB_CONSOLES_MAX ){
-     return;  // WARNING code d'erreur
-   }
+   // Chaque console a sa propre zone mémoire
+   cons->adresseEcran = adresseEcran;
+   cons->adresseEcranCopie = adresseEcran;
 
-   // Si pas de place d'écran on va taper dans la console 0 ...
-   // WARNING : pas beau !
-   if (adresseEcran == NULL) {
-      cons->adresseEcran = consolesVirtuelles[0]->adresseEcran;
-      cons->adresseEcranCopie = consolesVirtuelles[0]->adresseEcran;
-   } else {
-      cons->adresseEcran = adresseEcran;
-      cons->adresseEcranCopie = adresseEcran;
-   }
-   cons->ligne = 14;     // WARNING pourquoi ?
+   // La configuration de base
+   cons->ligne = 0; 
    cons->colonne = 0;
-   cons->nbLignes = 25;
-   cons->nbColonnes = 80;// WARNING hardcodé
+   cons->nbLignes = CON_LIGNES;
+   cons->nbColonnes = CON_COLONNES;
    cons->attribut = 15;
 
    /* Initialisation du verrou */
@@ -313,94 +276,76 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    initialiserExclusionMutuelle(&cons->scAcces);
 #endif
 
-   // Si c'est la première, elle est active
-   if (nbreConsolesVirtuelles == 0) {
-      consoleCourante = 0;
-      cons->adresseEcran = CON_SCREEN;
-   }
-   //      cons->adresseEcran = CON_SCREEN;
-
    // Un peu de ménage
    effacerConsole(cons);
-   afficherConsole(cons, "CONSOLE...\n");   
-   afficherConsoleEntier(cons, nbreConsolesVirtuelles);
-   /* On l'insère dans la table des consoles gérées */
-   consolesVirtuelles[nbreConsolesVirtuelles++] = cons;
+   
+   afficherConsole(cons, "Console [%d] ");   
+   afficherConsoleEntier(cons, (int)cons);
+   afficherConsole(cons, " creee ...\n");   
+
+   /* On l'insère après la console active dans la liste des consoles gérées */
+   cons->suivante = consoleActive->suivante;
+   consoleActive->suivante = cons;
+   cons->precedente = consoleActive;
+   cons->suivante->precedente = cons;
 }
 
 /*
  * Basculer vers une console virtuelle. Attention, elle doit exister.
  */
-void basculerVersConsole(int idx)
+void basculerVersConsoleSuivante()
 {
    int i, l, c, a;
-   char * ecran = CON_SCREEN;
 
-   // Vérifions qu'on ne tente pas de basculer vers une console inexistante
-   if (idx >= nbreConsolesVirtuelles)
+   if (consoleActive->suivante == consoleActive)
       return;
 
-   // On sauvegarde l'écran physique dans la CV active
-   // Inutile de protéger l'accés, elle ne peut pas être utilisée
-   // WARNING pourquoi !?
-   for (i=0; i < 25*80*2; i++) { // WARNING utiliser bopy
-      consolesVirtuelles[consoleCourante]->adresseEcranCopie[i] = ecran[i];
+   // On sauvegarde l'écran physique dans la console active
+   for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
+      consoleActive->adresseEcranCopie[i] = consoleActive->adresseEcran[i];
    }
 
    // On la désactive (à partir de maintenant, ce qui y est écrit
    // n'est plus visible à l'écran)
-   consolesVirtuelles[consoleCourante]->adresseEcran = consolesVirtuelles[consoleCourante]->adresseEcranCopie;
+   consoleActive->adresseEcran = consoleActive->adresseEcranCopie;
    
    // On passe à la nouvelle CV 
-   consoleCourante = idx;
+   consoleActive = consoleActive->suivante;
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
    entrerExclusionMutuelle(&consolesVirtuelles[consoleCourante]->scAcces);
 #endif
 
-   // On copie son état actuel sur l'écran
-   for (i=0; i < 25*80*2; i++) { // WARNING utiliser bopy
-      ecran[i] = consolesVirtuelles[consoleCourante]->adresseEcranCopie[i];
-   }
-
    // On l'active (à partir de maintenant, ce qui y est écrit apparaît
    // directement à l'écran).
-   consolesVirtuelles[consoleCourante]->adresseEcran = ecran;
+   consoleActive->adresseEcran = CON_SCREEN;
+
+   // On copie son état actuel sur l'écran
+   for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
+      consoleActive->adresseEcran[i] = consoleActive->adresseEcranCopie[i];
+   }
 
    /* On affiche un bandeau d'info en haut */
-   l = consolesVirtuelles[consoleCourante]->ligne;
-   c = consolesVirtuelles[consoleCourante]->colonne;
-   a = consolesVirtuelles[consoleCourante]->attribut;
-   consolesVirtuelles[consoleCourante]->ligne = 0;
-   consolesVirtuelles[consoleCourante]->colonne = 0;
+   l = consoleActive->ligne;
+   c = consoleActive->colonne;
+   a = consoleActive->attribut;
+   consoleActive->ligne = 0;
+   consoleActive->colonne = 0;
 
-   consolesVirtuelles[consoleCourante]->attribut = 0x1B;
-   afficherConsole(consolesVirtuelles[consoleCourante], "Cons ");
-   afficherConsoleEntier(consolesVirtuelles[consoleCourante], consoleCourante);
-   afficherConsole(consolesVirtuelles[consoleCourante], "/");
-   afficherConsoleEntier(consolesVirtuelles[consoleCourante], nbreConsolesVirtuelles);
-   afficherConsole(consolesVirtuelles[consoleCourante], "  nbTicks ");
-   afficherConsoleEntier(consolesVirtuelles[consoleCourante], nbTicks);
-   afficherConsole(consolesVirtuelles[consoleCourante], "            ");
+   consoleActive->attribut = 0x1B;
+   afficherConsole(consoleActive, "Cons ");
+   afficherConsoleEntier(consoleActive, (int)consoleActive);
+   afficherConsole(consoleActive, "  nbTicks ");
+   //   afficherConsoleEntier(consoleActive, nbTicks);
+   afficherConsole(consoleActive, "            ");
 
-   consolesVirtuelles[consoleCourante]->ligne = l;
-   consolesVirtuelles[consoleCourante]->colonne = c;
-   consolesVirtuelles[consoleCourante]->attribut = a;
+   consoleActive->ligne = l;
+   consoleActive->colonne = c;
+   consoleActive->attribut = a;
    
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   sortirExclusionMutuelle(&consolesVirtuelles[consoleCourante]->scAcces);
+   sortirExclusionMutuelle(&consoleActive->scAcces);
 #endif
-}
-
-void montrerConsole(int idx)
-{
-   if (idx != consoleCourante)
-      basculerVersConsole(idx);
-}
-
-void basculerConsole()
-{
-  basculerVersConsole((consoleCourante + 1) % nbreConsolesVirtuelles);
 }
 
 #endif  // CONSOLES_VIRTUELLES
@@ -409,10 +354,23 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    Console * con = f->prive;
 
+   //   printk("Coucou on va balancer sur la console 0x%x (e=0x%x)\n", con, con->adresseEcran);
    afficherConsoleN(con, buffer, nbOctets);
+   //printk("Ca y est !");
+
+   //while(1){};
 
    return nbOctets; // WARNING
 }
+
+/*
+ * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
+ * console afficher.
+ */
+Console * consoleNoyau()
+{
+  return &_consoleNoyau;
+};
 
 /*
  * Les méthodes permettant de traiter une console comme un fichier
@@ -420,3 +378,4 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
 MethodesFichier consoleMethodesFichier = {
   ecrire : consoleEcrire,
 };
+

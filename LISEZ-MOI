@@ -8,19 +8,21 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 En cours
 --------
 
-   A affiner : la gestion des consoles. Pour le moment,
-TEST_CONSOLE_VIRTUELLE   marchotte, ... mais j'ai l'impression
-qu'il y en a 5 ! Je vais commencer par clarifier printk en y ajoutant
-une date (nbTicks).
+   Ca plante, et ça dépend du code que je commente, bref, ça sent
+la fuite mémoire et ça pourrait être chaud à déboguer. C'est de toute
+évidence le moment de
+
+   . revoir la gestion des handlers (trop d'asm, je pense qu'on peut
+   faire un emballage général)
+   . mettre un handler par défaut qui affiche des choses
+   . faire un assert.h
+   . bref des outils pour débuguer !
 
    BON, on va essayer d'être plus propre dans ce qui suit en
 commençant à mettre des choses dans init et y faire appel à ce qui est
 dans /usr.
 
    Pour ça, faire un appel système "à la fork ?"
-
-   ATTENTION : creerConsole n'accepte plus un pointeur NULL !
-   OrdonnancerTache le fait, ...
 
 
    Gestion des tâches (voir ci dessous)

@@ -10,19 +10,6 @@
 /*                                                                            */
 /*                                                (C) Manu Chaput 2000 - 2020 */
 /*----------------------------------------------------------------------------*/
-/*   A voir                                                                   */
-/*                                                                            */
-/*   Dans la plupart des fonctions, c'est un pointeur sur la console qui est  */
-/* passé en paramètre. En revanche, pour montrerConsole(), c'est l'indice de  */
-/* la console. C'est logique vue que je dois la chercher dans un tableau,     */
-/* mais ce n'est pas très cohérent. Je n'ai pas envie de de parcourir un      */
-/* tableau pour y trouver un pointeur. Bref, il faut homogénéiser ça !        */
-/*   La solution est peut être que initialiserConsole renvoie un entier et    */
-/* que ce soit lui que l'on utilise systématiquement.                         */
-/*   Sauf que ça veut dire que les consoles virtuelles sont allouées ici.     */
-/*   Une autre solution serait tout bêtement de mettre dans une console un    */
-/* pointeur vers la suivante, et d'en faire une liste chaînée cyclique.       */
-/*----------------------------------------------------------------------------*/
 
 #ifndef MANUX_CONSOLE_DEF
 #define MANUX_CONSOLE_DEF
@@ -33,8 +20,18 @@
 #include <manux/fichier.h>      /* Une console est un fichier */
 
 /*
- * Structure d'une console. Pour le moment c'est simple
- * mais il faudra étendre plus tard.
+ * Caractéristiques de l'écran physique
+ */
+#define CON_SCREEN   (char *)0x000B8000
+#define CON_COLONNES 80
+#define CON_LIGNES   25
+
+/*
+ * Structure d'une console. Attention, en cas de consoles virtuelles,
+ * l'ordonnanceur stoque ça au début d'une page qui contient également
+ * une copie de l'écran. Il faut donc que la somme des deux tailles
+ * soit inférieure à la taille d'une page. Ca nous laisse 96 octets
+ * pour cette structure.
  */
 typedef struct _Console {
    char              * adresseEcran;      // Adresse à laquelle se trouve
@@ -46,9 +43,11 @@ typedef struct _Console {
    uint8               nbLignes;
    uint8               nbColonnes;
    ExclusionMutuelle   scAcces;
+#ifdef CONSOLES_VIRTUELLES
+   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
+   struct _Console   * precedente;  // doublement chaînées
+#endif
 } Console;
-
-extern Console ecranPhysique;
 
 /*
  * Les méthodes permettant de traiter une console comme un fichier
@@ -59,17 +58,31 @@ extern MethodesFichier consoleMethodesFichier;
  * Définition des couleurs WARNING, c'est portnawak
  */
 typedef enum {
-   COUL_NOIR       = 0x0,
-   COUL_BLEU_CLAIR = 0x9,
-   COUL_VERT,
-   COUL_CYAN,
-   COUL_ROUGE,
-   COUL_MAGENTA,
-   COUL_JAUNE,
-   COUL_BLANC,
-   COUL_BLEU_FONCE = 0x01,
-   COUL_BLEU,
-   COUL_MAUVE = 13
+   COUL_TXT_NOIR       = 0x00,
+   COUL_TXT_BLEU       = 0x01,
+   COUL_TXT_VERT       = 0x02,
+   COUL_TXT_CYAN       = 0x03,
+   COUL_TXT_ROUGE      = 0x04,
+   COUL_TXT_MAGENTA    = 0x05,
+   COUL_TXT_MARRON     = 0x06,
+   COUL_TXT_GRIS_CLAIR = 0x07,
+   COUL_TXT_GRIS       = 0x08,
+   COUL_TXT_BLEU_CLAIR       = 0x09,
+   COUL_TXT_VERT_CLAIR       = 0x0A,
+   COUL_TXT_CYAN_CLAIR       = 0x0B,
+   COUL_TXT_ROUGE_CLAIR      = 0x0C,
+   COUL_TXT_MAGENTA_CLAIR    = 0x0D,
+   COUL_TXT_JAUNE            = 0x0E,
+   COUL_TXT_BLANC            = 0x0F,
+   COUL_FOND_NOIR       = 0x00,
+   COUL_FOND_BLEU       = 0x10,
+   COUL_FOND_VERT       = 0x20,
+   COUL_FOND_CYAN       = 0x30,
+   COUL_FOND_ROUGE      = 0x40,
+   COUL_FOND_MAGENTA    = 0x50,
+   COUL_FOND_MARRON     = 0x60,
+   COUL_FOND_GRIS_CLAIR = 0x70,
+   COUL_CLIGNOTANT     = 0x80
 } Couleur;
 
 /*
@@ -78,10 +91,10 @@ typedef enum {
 #define ASCII_ESC 27
 
 /*
- * Initialisation de la console (ou du système de gestion de consoles
- * virtuelles)
+ * Initialisation de la console. Le pointeur retourné permet de
+ * manipuler ensuite la console.
  */
-void consoleInit();
+Console * consoleInit();
 
 /*
  * Choix des couleurs de texte et de fond (voir l'enum ci dessus)
@@ -95,7 +108,6 @@ void affecterCouleurTexte(Console * cons, Couleur coul);
  * n'est fait. En revanche, la chaine de caractères doit être terminée
  * par un zéro.
  */
-void afficherEcran(char * msg);
 void afficherConsole(Console * cons, char * msg);
 
 /*
@@ -146,14 +158,22 @@ void montrerConsole(int idx);
 /*
  * Basculer vers la prochaine console virtuelle
  */
-void basculerConsole();
+void basculerVersConsoleSuivante();
 
 #endif  // CONSOLES_VIRTUELLES
+
+#ifndef MANUX_JOURNAL
+/*
+ * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
+ * console afficher.
+ */
+Console * consoleNoyau();
+
+#endif // MANUX_JOURNAL
 
 /*
  * Écriture sur une console
  */
 int consoleEcrire(Fichier * f, void * buffer, int nbOctets);
 
-
-#endif
+#endif 

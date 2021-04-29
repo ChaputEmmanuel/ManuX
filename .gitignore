@@ -1,0 +1,7 @@
+*~
+*.o
+*.a
+noyau/symbols
+noyau/manux
+noyau/noyau.obj
+noyau/noyau.elf

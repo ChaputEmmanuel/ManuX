@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des appels système de Manux.                               */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef APPEL_SYSTEME_DEF
 #define APPEL_SYSTEME_DEF

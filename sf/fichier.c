@@ -12,17 +12,25 @@
 int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
-
+   int result;
+   
    printk("sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
    f = &tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
    
 #ifdef MANUX_DEBUG_FS_BASE
-   printk("sys_ecrire : %d, %d\n", fd, f);
+   printk("sys_ecrire : fd=%d, file=%x\n", fd, f);
 #endif
-   while (1){};		
+   //   while (1){};		
 
-   return f->methodes->ecrire(f, buffer, nbOctets);
+   result = f->methodes->ecrire(f, buffer, nbOctets);
+   
+#ifdef MANUX_DEBUG_FS_BASE
+   printk("sys_ecrire : res = %d\n", result);
+#endif
+   //   while (1){};
+   
+   return result;
 }
 
 void sfInitialiser()

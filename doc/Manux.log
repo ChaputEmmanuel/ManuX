@@ -1,39 +1,38 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2021.4.2)  20 APR 2021 11:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2019/dev/Debian) (preloaded format=pdflatex 2020.9.26)  28 APR 2021 09:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **Manux.tex
 (./Manux.tex
-LaTeX2e <2020-02-02> patch level 2
-L3 programming layer <2020-02-14>
+LaTeX2e <2018-12-01>
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+Document Class: article 2018/09/03 v1.4i Standard LaTeX document class
 (/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+File: size10.clo 2018/09/03 v1.4i Standard LaTeX file (size option)
 )
-\c@part=\count167
-\c@section=\count168
-\c@subsection=\count169
-\c@subsubsection=\count170
-\c@paragraph=\count171
-\c@subparagraph=\count172
-\c@figure=\count173
-\c@table=\count174
-\abovecaptionskip=\skip47
-\belowcaptionskip=\skip48
-\bibindent=\dimen134
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
 )
 (/usr/share/texlive/texmf-dist/tex/generic/epsf/epsf.sty
 This is `epsf.tex' v2.7.4 <14 February 2011>
-\epsffilein=\read2
-\epsfframemargin=\dimen135
-\epsfframethickness=\dimen136
-\epsfrsize=\dimen137
-\epsftmp=\dimen138
-\epsftsize=\dimen139
-\epsfxsize=\dimen140
-\epsfysize=\dimen141
-\pspoints=\dimen142
+\epsffilein=\read1
+\epsfframemargin=\dimen103
+\epsfframethickness=\dimen104
+\epsfrsize=\dimen105
+\epsftmp=\dimen106
+\epsftsize=\dimen107
+\epsfxsize=\dimen108
+\epsfysize=\dimen109
+\pspoints=\dimen110
 ) (/usr/share/texlive/texmf-dist/tex/latex/ntgclass/a4.sty
 Package: a4 2004/04/15 v1.2g A4 based page layout
 )
@@ -46,102 +45,81 @@ Package: makeidx 2014/09/29 v1.0m Standard LaTeX package
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/tools/verbatim.sty
-Package: verbatim 2019/11/10 v1.5r LaTeX2e package for verbatim enhancements
+Package: verbatim 2014/10/28 v1.5q LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks14
 \verbatim@line=\toks15
-\verbatim@in@stream=\read3
+\verbatim@in@stream=\read2
 )
-\c@oldexocount=\count175
-\c@exercicecount=\count176
-\c@questioncount=\count177
-\c@solutioncount=\count178
-\c@solutionquestioncount=\count179
-\c@madefinition=\count180
-\c@exocount=\count181
-\c@defcount=\count182
+\c@oldexocount=\count88
+\c@exercicecount=\count89
+\c@questioncount=\count90
+\c@solutioncount=\count91
+\c@solutionquestioncount=\count92
+\c@madefinition=\count93
+\c@exocount=\count94
+\c@defcount=\count95
 )
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/palatino.sty
 Package: palatino 2005/04/12 PSNFSS-v9.2a (SPQR) 
 )
 (/usr/share/texlive/texmf-dist/tex/latex/tools/multicol.sty
-Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
-\c@tracingmulticols=\count183
-\mult@box=\box45
-\multicol@leftmargin=\dimen143
-\c@unbalance=\count184
-\c@collectmore=\count185
-\doublecol@number=\count186
-\multicoltolerance=\count187
-\multicolpretolerance=\count188
-\full@width=\dimen144
-\page@free=\dimen145
-\premulticols=\dimen146
-\postmulticols=\dimen147
-\multicolsep=\skip49
-\multicolbaselineskip=\skip50
-\partial@page=\box46
-\last@line=\box47
-\maxbalancingoverflow=\dimen148
-\mult@rightbox=\box48
-\mult@grightbox=\box49
-\mult@gfirstbox=\box50
-\mult@firstbox=\box51
-\@tempa=\box52
-\@tempa=\box53
-\@tempa=\box54
-\@tempa=\box55
-\@tempa=\box56
-\@tempa=\box57
-\@tempa=\box58
-\@tempa=\box59
-\@tempa=\box60
-\@tempa=\box61
-\@tempa=\box62
-\@tempa=\box63
-\@tempa=\box64
-\@tempa=\box65
-\@tempa=\box66
-\@tempa=\box67
-\@tempa=\box68
-\@tempa=\box69
-\@tempa=\box70
-\@tempa=\box71
-\@tempa=\box72
-\@tempa=\box73
-\@tempa=\box74
-\@tempa=\box75
-\@tempa=\box76
-\@tempa=\box77
-\@tempa=\box78
-\@tempa=\box79
-\@tempa=\box80
-\@tempa=\box81
-\@tempa=\box82
-\@tempa=\box83
-\@tempa=\box84
-\@tempa=\box85
-\@tempa=\box86
-\@tempa=\box87
-\@tempa=\box88
-\c@minrows=\count189
-\c@columnbadness=\count190
-\c@finalcolumnbadness=\count191
-\last@try=\dimen149
-\multicolovershoot=\dimen150
-\multicolundershoot=\dimen151
-\mult@nat@firstbox=\box89
-\colbreak@box=\box90
-\mc@col@check@num=\count192
+Package: multicol 2018/12/27 v1.8v multicolumn formatting (FMi)
+\c@tracingmulticols=\count96
+\mult@box=\box27
+\multicol@leftmargin=\dimen111
+\c@unbalance=\count97
+\c@collectmore=\count98
+\doublecol@number=\count99
+\multicoltolerance=\count100
+\multicolpretolerance=\count101
+\full@width=\dimen112
+\page@free=\dimen113
+\premulticols=\dimen114
+\postmulticols=\dimen115
+\multicolsep=\skip43
+\multicolbaselineskip=\skip44
+\partial@page=\box28
+\last@line=\box29
+\maxbalancingoverflow=\dimen116
+\mult@rightbox=\box30
+\mult@grightbox=\box31
+\mult@gfirstbox=\box32
+\mult@firstbox=\box33
+\@tempa=\box34
+\@tempa=\box35
+\@tempa=\box36
+\@tempa=\box37
+\@tempa=\box38
+\@tempa=\box39
+\@tempa=\box40
+\@tempa=\box41
+\@tempa=\box42
+\@tempa=\box43
+\@tempa=\box44
+\@tempa=\box45
+\@tempa=\box46
+\@tempa=\box47
+\@tempa=\box48
+\@tempa=\box49
+\@tempa=\box50
+\c@columnbadness=\count102
+\c@finalcolumnbadness=\count103
+\last@try=\dimen117
+\multicolovershoot=\dimen118
+\multicolundershoot=\dimen119
+\mult@nat@firstbox=\box51
+\colbreak@box=\box52
+\mc@col@check@num=\count104
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
-Package: graphicx 2019/11/30 v1.2a Enhanced LaTeX Graphics (DPC,SPQR)
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks16
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2019/11/30 v1.4a Standard LaTeX Graphics (DPC,SPQR)
+Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
 Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
@@ -149,13 +127,13 @@ Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: pdftex.def on input line 105.
+Package graphics Info: Driver file: pdftex.def on input line 99.
 
 (/usr/share/texlive/texmf-dist/tex/latex/graphics-def/pdftex.def
 File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen152
-\Gin@req@width=\dimen153
+\Gin@req@height=\dimen120
+\Gin@req@width=\dimen121
 )
 (/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty
 Package: inputenc 2018/08/11 v1.3c Input encoding file
@@ -166,130 +144,169 @@ Package: inputenc 2018/08/11 v1.3c Input encoding file
 File: latin1.def 2018/08/11 v1.3c Input encoding file
 ))
 (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty
-Package: babel 2020/02/14 3.40 The Babel package
+Package: babel 2018/11/13 3.27 The Babel package
 
 (/usr/share/texlive/texmf-dist/tex/generic/babel/switch.def
-File: switch.def 2020/02/14 3.40 Babel switching mechanism
+File: switch.def 2018/11/13 3.27 Babel switching mechanism
 )
 (/usr/share/texlive/texmf-dist/tex/generic/babel-french/french.ldf
-Language: french 2020/01/30 v3.5g French support from the babel system
+Language: french 2019/01/30 v3.5d French support from the babel system
 
 (/usr/share/texlive/texmf-dist/tex/generic/babel/babel.def
-File: babel.def 2020/02/14 3.40 Babel common definitions
-\babel@savecnt=\count193
-\U@D=\dimen154
+File: babel.def 2018/11/13 3.27 Babel common definitions
+\babel@savecnt=\count105
+\U@D=\dimen122
 
 (/usr/share/texlive/texmf-dist/tex/generic/babel/txtbabel.def)
-\bbl@readstream=\read4
-\bbl@dirlevel=\count194
+\bbl@dirlevel=\count106
 )
-Package babel Info: \l@acadian = using hyphenrules for french
-(babel)             (\language25) on input line 91.
-Package babel Info: \l@canadien = using hyphenrules for french
-(babel)             (\language25) on input line 92.
-\FB@nonchar=\count195
-Package babel Info: Making : an active character on input line 419.
-Package babel Info: Making ; an active character on input line 420.
-Package babel Info: Making ! an active character on input line 421.
-Package babel Info: Making ? an active character on input line 422.
-\FBguill@level=\count196
+\l@french = a dialect from \language\l@nohyphenation 
+
+
+Package babel Warning: No hyphenation patterns were preloaded for
+(babel)                the language `French' into the format.
+(babel)                Please, configure your TeX system to add them and
+(babel)                rebuild the format. Now I will use the patterns
+(babel)                preloaded for \language=nohyphenation instead on input l
+ine 87.
+
+\l@acadian = a dialect from \language\l@french 
+\FB@nonchar=\count107
+Package babel Info: Making : an active character on input line 414.
+Package babel Info: Making ; an active character on input line 415.
+Package babel Info: Making ! an active character on input line 416.
+Package babel Info: Making ? an active character on input line 417.
+\FBguill@level=\count108
 \FBold@everypar=\toks19
-\FB@Mht=\dimen155
-\mc@charclass=\count197
-\mc@charfam=\count198
-\mc@charslot=\count199
-\std@mcc=\count266
-\dec@mcc=\count267
-\c@FBcaption@count=\count268
-\listindentFB=\dimen156
-\descindentFB=\dimen157
-\labelindentFB=\dimen158
-\labelwidthFB=\dimen159
-\leftmarginFB=\dimen160
-\parindentFFN=\dimen161
-\FBfnindent=\dimen162
-))
-(/usr/share/texlive/texmf-dist/tex/latex/carlisle/scalefnt.sty)
+\FB@Mht=\dimen123
+\mc@charclass=\count109
+\mc@charfam=\count110
+\mc@charslot=\count111
+\std@mcc=\count112
+\dec@mcc=\count113
+\c@FBcaption@count=\count114
+\listindentFB=\dimen124
+\descindentFB=\dimen125
+\labelindentFB=\dimen126
+\labelwidthFB=\dimen127
+\leftmarginFB=\dimen128
+\parindentFFN=\dimen129
+\FBfnindent=\dimen130
+)) (/usr/share/texlive/texmf-dist/tex/latex/carlisle/scalefnt.sty)
 (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
-\lst@mode=\count269
-\lst@gtempboxa=\box91
+\lst@mode=\count115
+\lst@gtempboxa=\box53
 \lst@token=\toks20
-\lst@length=\count270
-\lst@currlwidth=\dimen163
-\lst@column=\count271
-\lst@pos=\count272
-\lst@lostspace=\dimen164
-\lst@width=\dimen165
-\lst@newlines=\count273
-\lst@lineno=\count274
-\lst@maxwidth=\dimen166
+\lst@length=\count116
+\lst@currlwidth=\dimen131
+\lst@column=\count117
+\lst@pos=\count118
+\lst@lostspace=\dimen132
+\lst@width=\dimen133
+\lst@newlines=\count119
+\lst@lineno=\count120
+\lst@maxwidth=\dimen134
 
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
-\c@lstnumber=\count275
-\lst@skipnumbers=\count276
-\lst@framebox=\box92
+File: lstmisc.sty 2018/09/02 1.7 (Carsten Heinz)
+\c@lstnumber=\count121
+\lst@skipnumbers=\count122
+\lst@framebox=\box54
 )
 (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2019/09/10 1.8c listings configuration
+File: listings.cfg 2018/09/02 1.7 listings configuration
 ))
-Package: listings 2019/09/10 1.8c (Carsten Heinz)
+Package: listings 2018/09/02 1.7 (Carsten Heinz)
 
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
-File: lstlang1.sty 2019/09/10 1.8c listings language file
+File: lstlang1.sty 2018/09/02 1.7 listings language file
 )
 (/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
+File: lstmisc.sty 2018/09/02 1.7 (Carsten Heinz)
 ) (./lstasm.tex)
 \@indexfile=\write3
 \openout3 = `Manux.idx'.
 
 
 Writing index file Manux.idx
-(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
-File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
-\l__kernel_color_stack_int=\count277
-\l__pdf_internal_box=\box93
-)
 (./Manux.aux)
 \openout1 = `Manux.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
 LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
-LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 21.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
 LaTeX Font Info:    ... okay on input line 21.
-LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 2
-1.
+LaTeX Font Info:    Try loading font information for OT1+ppl on input line 21.
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 )
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count278
-\scratchdimen=\dimen167
-\scratchbox=\box94
-\nofMPsegments=\count279
-\nofMParguments=\count280
+\scratchcounter=\count123
+\scratchdimen=\dimen135
+\scratchbox=\box55
+\nofMPsegments=\count124
+\nofMParguments=\count125
 \everyMPshowfont=\toks21
-\MPscratchCnt=\count281
-\MPscratchDim=\dimen168
-\MPnumerator=\count282
-\makeMPintoPDFobject=\count283
+\MPscratchCnt=\count126
+\MPscratchDim=\dimen136
+\MPnumerator=\count127
+\makeMPintoPDFobject=\count128
 \everyMPtoPDFconversion=\toks22
-) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
-Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+)))
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+))))
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2018/09/10 v0.29 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2018/09/07 v3.3 Provides the ifpdf switch
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
-85.
+38.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 456.
 
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
@@ -304,20 +321,25 @@ Package french.ldf Warning: OT1 encoding should not be used for French.
 (french.ldf)                Add \usepackage[T1]{fontenc} to the preamble
 (french.ldf)                of your document; reported on input line 21.
 
-\c@lstlisting=\count284
+\c@lstlisting=\count129
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <12> on input line 30.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 30.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 30.
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 35.
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 46.
 (./Manux.toc
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 2.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 4.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 4.
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 6
-.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 6.
  (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
@@ -327,265 +349,446 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 \tf@toc=\write4
 \openout4 = `Manux.toc'.
 
+ [2]
+LaTeX Font Info:    Font shape `OT1/pcr/bx/n' in size <10> not available
+(Font)              Font shape `OT1/pcr/b/n' tried instead on input line 70.
 LaTeX Font Info:    Font shape `OT1/pcr/m/it' in size <10> not available
 (Font)              Font shape `OT1/pcr/m/sl' tried instead on input line 70.
- [2]
-Overfull \hbox (0.3957pt too wide) in paragraph at lines 77--80
-[]\OT1/ppl/m/n/10 dans les-quelles on m[]elange all[]egrement le contenu (ici u
-n pro-ces-sus) et le conte-
+
+Overfull \hbox (16.96553pt too wide) in paragraph at lines 77--80
+[]\OT1/ppl/m/n/10 dans lesquelles on m[]elange all[]egrement le contenu (ici un
+ processus) et le contenant
  []
 
 
 Overfull \hbox (3.31558pt too wide) in paragraph at lines 81--88
 \OT1/ppl/m/n/10 compr[]ehensible ; de plus elle se pr[]ete []a la mise en ^^[uv
-re de struc-tures ``g[]en[]eriques'',
+re de structures ``g[]en[]eriques'',
  []
 
-
-Overfull \hbox (6.90573pt too wide) in paragraph at lines 151--154
-[]\OT1/ppl/m/n/10 La sec-tion ``\OT1/ppl/m/it/10 Les ou-tils de d^^Seveloppemen
-t\OT1/ppl/m/n/10 '' d[]ecrit som-mai-re-ment les ou-tils n[]ecessaires
- []
-
+LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 102.
 [3]
-Overfull \hbox (4.82536pt too wide) in paragraph at lines 214--216
-[]\OT1/ppl/m/n/10 Le but n'est []evidemment pas de faire tour-ner cette mer-vei
-lle sur du vrai mat[]eriel,
+Overfull \hbox (6.90573pt too wide) in paragraph at lines 163--166
+[]\OT1/ppl/m/n/10 La section ``\OT1/ppl/m/it/10 Les outils de d^^Seveloppement\
+OT1/ppl/m/n/10 '' d[]ecrit sommairement les outils n[]ecessaires
  []
 
 
-Overfull \hbox (58.65428pt too wide) in paragraph at lines 235--236
+Overfull \hbox (3.26564pt too wide) in paragraph at lines 167--174
+\OT1/ppl/m/n/10 en m[]emoire par le \OT1/ppl/m/sc/10 bios \OT1/ppl/m/n/10 de la
+ machine puis ex[]ecut[]e. C'est une partie assez technique,
+ []
+
+
+Overfull \hbox (4.82536pt too wide) in paragraph at lines 232--234
+[]\OT1/ppl/m/n/10 Le but n'est []evidemment pas de faire tourner cette merveill
+e sur du vrai mat[]eriel,
+ []
+
+[4]
+Overfull \hbox (58.65428pt too wide) in paragraph at lines 253--254
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (28.65398pt too wide) in paragraph at lines 253--254
+Overfull \hbox (28.65398pt too wide) in paragraph at lines 271--272
 [][][][][][][][][][][][][][][][][][][][][][][][][][]
  []
 
-[4]
-Overfull \hbox (1.3571pt too wide) in paragraph at lines 300--305
-[]\OT1/ppl/m/n/10 Le sec-teur de boot de Ma-nuX est cod[]e dans le fi-chier [][
-][][][]
+
+Overfull \hbox (1.30553pt too wide) in paragraph at lines 299--302
+[]\OT1/ppl/m/n/10 permet de lancer l'ex[]ecution d'un programme (inutilisable i
+ci []etant donn[]e
  []
 
 
-Overfull \hbox (92.42624pt too wide) in paragraph at lines 312--315
-\OT1/ppl/m/n/10 d'ini-tia-li-ser le syst[]eme. Ce code est []ecrit en as-sem-bl
-eur dans le fi-chier [][][][][][][]. 
+Overfull \hbox (56.10535pt too wide) in paragraph at lines 302--304
+[]\OT1/ppl/m/n/10 permet de poursuivre l'ex[]ecution jusqu'au prochain point d'
+arr[]et/bug/fin/... ; 
  []
 
 [5]
-Overfull \hbox (14.23656pt too wide) in paragraph at lines 371--374
-[]\OT1/ppl/m/n/10 Charger en m[]emoire un ram-disk qui nous per-met-tra de joue
-r avec des syst[]emes
+Overfull \hbox (1.3571pt too wide) in paragraph at lines 375--380
+[]\OT1/ppl/m/n/10 Le secteur de boot de ManuX est cod[]e dans le fichier [][][]
+[][]
  []
 
 
-Overfull \hbox (1.78575pt too wide) in paragraph at lines 388--391
-\OT1/ppl/m/n/10 pa-ram[]etre l'adresse d'une struc-ture dans la-quelle se-ront 
-en-re-gistr[]ees ces diff[]erentes
+Overfull \hbox (92.42624pt too wide) in paragraph at lines 387--390
+\OT1/ppl/m/n/10 d'initialiser le syst[]eme. Ce code est []ecrit en assembleur d
+ans le fichier [][][][][][][]. 
+ []
+
+
+Overfull \hbox (30.71526pt too wide) in paragraph at lines 395--397
+[]\OT1/ppl/m/n/10 Apr[]es ces deux chargements, le code du secteur de boot ex[]
+ecute le code d'initialisation. 
  []
 
 [6]
-Overfull \hbox (1.58592pt too wide) in paragraph at lines 428--431
-\OT1/ppl/m/n/10 phases et qu'il est donc im-por-tant que le pro-gram-meur d[]ef
-inisse de fa[]on coh[]erente
+Overfull \hbox (14.23656pt too wide) in paragraph at lines 446--449
+[]\OT1/ppl/m/n/10 Charger en m[]emoire un ramdisk qui nous permettra de jouer a
+vec des syst[]emes
  []
 
 
-Overfull \hbox (17.03633pt too wide) in paragraph at lines 468--472
-\OT1/ppl/m/n/10 sous-syst[]emes du noyau. Ils pour-ront []etre af-fich[]es sur 
-une console, ou conserv[]es
+Overfull \hbox (13.7255pt too wide) in paragraph at lines 458--462
+\OT1/ppl/m/n/10 m[]ecanisme permettant de faire passer ces informations depuis 
+la phase d'initialisation
+ []
+
+
+Overfull \hbox (1.78575pt too wide) in paragraph at lines 463--466
+\OT1/ppl/m/n/10 param[]etre l'adresse d'une structure dans laquelle seront enre
+gistr[]ees ces diff[]erentes
+ []
+
+
+Overfull \hbox (15.46523pt too wide) in paragraph at lines 480--484
+\OT1/ppl/m/n/10 phase d'initialisation, d'empiler l'adresse de la structure dan
+s laquelle les informations
+ []
+
+
+Overfull \hbox (2.43544pt too wide) in paragraph at lines 480--484
+\OT1/ppl/m/n/10 ont []et[]e enregistr[]ees. Voici donc par exemple []a quoi peu
+vent ressembler les derni[]eres
  []
 
 [7]
-Overfull \hbox (8.83792pt too wide) in paragraph at lines 534--537
-[]\OT1/ppl/m/n/10 Le jour-nal est im-plant[]e dans les fi-chiers [][][][][] et 
-[][][][][].
+Overfull \hbox (1.58592pt too wide) in paragraph at lines 503--506
+\OT1/ppl/m/n/10 phases et qu'il est donc important que le programmeur d[]efinis
+se de fa[]on coh[]erente
  []
 
 
-Overfull \hbox (2.90797pt too wide) in paragraph at lines 557--559
-[]\OT1/ppl/m/n/10 Elle est mise en ^^[uvre dans les fi-chiers [][][][][] et [][
-][][][] 
- []
-
-
-Overfull \hbox (46.65416pt too wide) in paragraph at lines 586--587
-[][][][][][][][][][][][][][][][][][][][] 
+Overfull \hbox (17.03633pt too wide) in paragraph at lines 543--547
+\OT1/ppl/m/n/10 sous-syst[]emes du noyau. Ils pourront []etre affich[]es sur un
+e console, ou conserv[]es
  []
 
 [8]
-Overfull \hbox (4.65373pt too wide) in paragraph at lines 616--617
-[][][][][][][][][][][][][][] 
+Overfull \hbox (15.05609pt too wide) in paragraph at lines 603--608
+[]\OT1/ppl/m/n/10 Nous allons d[]efinir un m[]ecanisme de journal permettant de
+ conserver les messages
  []
 
 
-Overfull \hbox (40.6541pt too wide) in paragraph at lines 624--626
-[][][][][][][][][][][][][][] 
+Overfull \hbox (8.83792pt too wide) in paragraph at lines 609--612
+[]\OT1/ppl/m/n/10 Le journal est implant[]e dans les fichiers [][][][][] et [][
+][][][].
  []
 
 
-Overfull \hbox (64.65434pt too wide) in paragraph at lines 627--628
-[][][][][][][][][][][][][][] 
+Overfull \hbox (2.90797pt too wide) in paragraph at lines 632--634
+[]\OT1/ppl/m/n/10 Elle est mise en ^^[uvre dans les fichiers [][][][][] et [][]
+[][][] 
  []
 
 
-Overfull \hbox (4.8078pt too wide) in paragraph at lines 644--646
-[]\OT1/ppl/m/n/10 Ce hand-ler doit bien en-tendu []etre d[]eclar[]e dans \OT1/p
-cr/m/n/10 i386/interBasNiveau.nasm\OT1/ppl/m/n/10 . 
+Overfull \hbox (7.1051pt too wide) in paragraph at lines 649--652
+[]\OT1/ppl/m/n/10 Sur le 386, une table (l'\OT1/ppl/m/sc/10 idt \OT1/ppl/m/n/10
+ pour \OT1/ppl/m/it/10 Interrupt Descriptor Table\OT1/ppl/m/n/10 ) d[]efinit le
+ comportement
  []
 
 [9]
-<adresse-logique.png, id=38, 692.5875pt x 367.3725pt>
+Overfull \hbox (46.65416pt too wide) in paragraph at lines 661--662
+[][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (13.40562pt too wide) in paragraph at lines 674--677
+\OT1/ppl/m/n/10 des interruptions. Dans un premier temps, nous d[]efinissons un
+ handler d'interruption
+ []
+
+
+Overfull \hbox (0.86604pt too wide) in paragraph at lines 685--687
+[]\OT1/ppl/m/n/10 Nous positionnons alors tous les handlers par d[]efaut sur ce
+ handler minimaliste
+ []
+
+
+Overfull \hbox (4.65373pt too wide) in paragraph at lines 691--692
+[][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (40.6541pt too wide) in paragraph at lines 699--701
+[][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (64.65434pt too wide) in paragraph at lines 702--703
+[][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (18.47716pt too wide) in paragraph at lines 715--718
+[]\OT1/ppl/m/n/10 Le clavier est g[]er[]e dans [][][][][] et [][][]. Il s'agit 
+essentiellement
+ []
+
+
+Overfull \hbox (4.8078pt too wide) in paragraph at lines 719--721
+[]\OT1/ppl/m/n/10 Ce handler doit bien entendu []etre d[]eclar[]e dans \OT1/pcr
+/m/n/10 i386/interBasNiveau.nasm\OT1/ppl/m/n/10 . 
+ []
+
+
+Overfull \hbox (26.52548pt too wide) in paragraph at lines 727--732
+[]\OT1/ppl/m/n/10 Nous disposons d[]esormais du minimum permettant d'ex[]ecuter
+ quelques instructions
+ []
+
+[10]
+Overfull \hbox (1.11638pt too wide) in paragraph at lines 738--740
+[]\OT1/ppl/m/n/10 De plus, nous ne nous int[]eressons pas non plus []a l'ordonn
+ancement, et mettrons
+ []
+
+
+Overfull \hbox (1.73729pt too wide) in paragraph at lines 777--779
+[][][][][][] \OT1/ppl/m/n/10 est la table locale de decripteurs associ[]ee []a 
+cette
+ []
+
+(PageTache.eps
+)
+
+Overfull \hbox (12.34575pt too wide) in paragraph at lines 799--805
+[]\OT1/ppl/m/n/10 Le \OT1/ppl/m/it/10 Task State Segment \OT1/ppl/m/n/10 (\OT1/
+ppl/m/sc/10 tss\OT1/ppl/m/n/10 ) des processeurs Intel permet de stoquer et de 
+manipuler
+ []
+
+
+Overfull \hbox (21.48557pt too wide) in paragraph at lines 799--805
+\OT1/ppl/m/n/10 les informations relatives []a une t[]ache. Dans ManuX, une str
+ucture est d[]efinie permettant
+ []
+
+
+Overfull \hbox (8.845pt too wide) in paragraph at lines 816--823
+\OT1/ppl/m/n/10 L'\OT1/ppl/m/it/10 Indirect far JMP \OT1/ppl/m/n/10 permet en e
+ffet de faire un basculement de t[]ache lorsque l'argument
+ []
+
+[11
+Non-PDF special ignored!
+<special> PSfile=PageTache.eps llx=0 lly=0 urx=292 ury=80 rwi=1417 
+]
+Overfull \hbox (7.55548pt too wide) in paragraph at lines 832--835
+[]\OT1/ppl/m/n/10 La gestion de la m[]emoire est une fonction essentielle d'un 
+syst[]eme d'exploitation.
+ []
+
+
+Overfull \hbox (2.23581pt too wide) in paragraph at lines 836--839
+[]\OT1/ppl/m/n/10 Il y a plusieurs concepts []a int[]egrer. Cela peut sembler c
+omplexe, mais en prenant
+ []
+
+
+Overfull \hbox (6.8455pt too wide) in paragraph at lines 847--853
+\OT1/ppl/m/n/10 pagination va n[]ecessiter la mise en place d'un certain nombre
+ de tables d'indirection,
+ []
+
+
+Overfull \hbox (6.08546pt too wide) in paragraph at lines 847--853
+\OT1/ppl/m/n/10 ce qui peut sembler un peu lourd, mais qui va en particulier pe
+rmettre de la m[]emoire
+ []
+
+<adresse-logique.png, id=44, 692.5875pt x 367.3725pt>
 File: adresse-logique.png Graphic file (type png)
 <use adresse-logique.png>
-Package pdftex.def Info: adresse-logique.png  used on input line 680.
+Package pdftex.def Info: adresse-logique.png  used on input line 878.
 (pdftex.def)             Requested size: 144.53778pt x 76.66841pt.
-<adresse-logique-sel.png, id=40, 693.59125pt x 529.98pt>
+<adresse-logique-sel.png, id=46, 693.59125pt x 529.98pt>
 File: adresse-logique-sel.png Graphic file (type png)
 <use adresse-logique-sel.png>
-Package pdftex.def Info: adresse-logique-sel.png  used on input line 699.
+Package pdftex.def Info: adresse-logique-sel.png  used on input line 897.
 (pdftex.def)             Requested size: 144.53778pt x 110.44186pt.
-
-
-LaTeX Warning: Reference `Figure:addlin' on page 10 undefined on input line 709
-.
-
-<adresse-lineaire.png, id=41, 776.9025pt x 433.62pt>
-File: adresse-lineaire.png Graphic file (type png)
-<use adresse-lineaire.png>
-Package pdftex.def Info: adresse-lineaire.png  used on input line 713.
-(pdftex.def)             Requested size: 289.08109pt x 161.34996pt.
-[10 <./adresse-logique.png> <./adresse-logique-sel.png>]
-Overfull \hbox (5.57498pt too wide) in paragraph at lines 747--752
+[12]
+Overfull \hbox (5.57498pt too wide) in paragraph at lines 921--926
 \OT1/ppl/b/n/10 D\OT1/ppl/m/it/10 escriptor \OT1/ppl/b/n/10 T\OT1/ppl/m/it/10 a
 ble\OT1/ppl/m/n/10 ) ou la \OT1/ppl/m/sc/10 ldt \OT1/ppl/m/n/10 (\OT1/ppl/b/n/1
 0 L\OT1/ppl/m/it/10 ocal \OT1/ppl/b/n/10 D\OT1/ppl/m/it/10 escriptor \OT1/ppl/b
-/n/10 T\OT1/ppl/m/it/10 able\OT1/ppl/m/n/10 ). Un re-gistre de seg-ment repr[]e
-sente
+/n/10 T\OT1/ppl/m/it/10 able\OT1/ppl/m/n/10 ). Un registre de segment repr[]ese
+nte
  []
 
 
 
 pdfTeX warning: pdflatex (file ./DescrSegment.pdf): PDF inclusion: found PDF ve
 rsion <1.7>, but at most version <1.5> allowed
-<DescrSegment.pdf, id=47, 336.25626pt x 274.02374pt>
+<DescrSegment.pdf, id=50, 336.25626pt x 274.02374pt>
 File: DescrSegment.pdf Graphic file (type pdf)
 <use DescrSegment.pdf>
-Package pdftex.def Info: DescrSegment.pdf  used on input line 768.
+Package pdftex.def Info: DescrSegment.pdf  used on input line 942.
 (pdftex.def)             Requested size: 108.4061pt x 88.34166pt.
-[11 <./adresse-lineaire.png> <./DescrSegment.pdf>]
-Overfull \hbox (102.30682pt too wide) in paragraph at lines 783--786
-[]\OT1/ppl/m/n/10 Pour cela, elle ini-ta-lise une struc-ture de type [] d[]efin
-ie dans [][][][][][][]
+[13 <./adresse-logique.png> <./adresse-logique-sel.png> <./DescrSegment.pdf>]
+Overfull \hbox (102.30682pt too wide) in paragraph at lines 957--960
+[]\OT1/ppl/m/n/10 Pour cela, elle initalise une structure de type [] d[]efinie 
+dans [][][][][][][]
  []
 
 
-Overfull \hbox (9.69547pt too wide) in paragraph at lines 844--849
-\OT1/ppl/m/n/10 phy-sique (et sa r[]epartition entre les diff[]erentes t[]aches
-) et l'or-ga-ni-sa-tion de la m[]emoire
+LaTeX Warning: Reference `Figure:addlin' on page 14 undefined on input line 101
+3.
+
+<adresse-lineaire.png, id=63, 776.9025pt x 433.62pt>
+File: adresse-lineaire.png Graphic file (type png)
+<use adresse-lineaire.png>
+Package pdftex.def Info: adresse-lineaire.png  used on input line 1017.
+(pdftex.def)             Requested size: 289.08109pt x 161.34996pt.
+[14]
+Overfull \hbox (9.69547pt too wide) in paragraph at lines 1048--1053
+\OT1/ppl/m/n/10 physique (et sa r[]epartition entre les diff[]erentes t[]aches)
+ et l'organisation de la m[]emoire
  []
 
 
 
 pdfTeX warning: pdflatex (file ./Pagination.pdf): PDF inclusion: found PDF vers
 ion <1.7>, but at most version <1.5> allowed
-<Pagination.pdf, id=58, 346.29375pt x 360.34625pt>
+<Pagination.pdf, id=67, 346.29375pt x 360.34625pt>
 File: Pagination.pdf Graphic file (type pdf)
 <use Pagination.pdf>
-Package pdftex.def Info: Pagination.pdf  used on input line 863.
+Package pdftex.def Info: Pagination.pdf  used on input line 1067.
 (pdftex.def)             Requested size: 180.67499pt x 188.00795pt.
-[12]
+
+Overfull \hbox (10.75563pt too wide) in paragraph at lines 1076--1079
+[]\OT1/ppl/m/n/10 Lorsque la pagination est activ[]ee, le registre \OT1/ppl/m/s
+c/10 cr3 \OT1/ppl/m/n/10 doit contenir l'adresse (physique)
+ []
+
+
+Overfull \hbox (22.08536pt too wide) in paragraph at lines 1085--1089
+[]\OT1/ppl/m/n/10 La m[]emoire physique est partag[]ee entre une partie syst[]e
+me et une partie application.
+ []
+
+
 
 pdfTeX warning: pdflatex (file ./MemoirePhysique.pdf): PDF inclusion: found PDF
  version <1.7>, but at most version <1.5> allowed
-<MemoirePhysique.pdf, id=62, 419.5675pt x 170.6375pt>
+<MemoirePhysique.pdf, id=68, 419.5675pt x 170.6375pt>
 File: MemoirePhysique.pdf Graphic file (type pdf)
 <use MemoirePhysique.pdf>
-Package pdftex.def Info: MemoirePhysique.pdf  used on input line 888.
+Package pdftex.def Info: MemoirePhysique.pdf  used on input line 1092.
 (pdftex.def)             Requested size: 180.67499pt x 73.47943pt.
-[13 <./Pagination.pdf> <./MemoirePhysique.pdf>]
-Overfull \hbox (9.03575pt too wide) in paragraph at lines 942--947
-[]\OT1/ppl/m/n/10 Le but du ram-disk est uni-que-ment de nous per-mettre de va-
-li-der cer-tains []el[]ements
+[15 <./adresse-lineaire.png>] [16 <./Pagination.pdf> <./MemoirePhysique.pdf>]
+Overfull \hbox (9.03575pt too wide) in paragraph at lines 1146--1151
+[]\OT1/ppl/m/n/10 Le but du ramdisk est uniquement de nous permettre de valider
+ certains []el[]ements
  []
 
 
-Overfull \hbox (94.65465pt too wide) in paragraph at lines 977--978
+Overfull \hbox (27.64523pt too wide) in paragraph at lines 1152--1155
+[]\OT1/ppl/m/n/10 Il permet de plus une certaine forme de communication avec le
+ syst[]eme d'exploitation
+ []
+
+
+Overfull \hbox (94.65465pt too wide) in paragraph at lines 1181--1182
 [][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[14]
-Overfull \hbox (1.03592pt too wide) in paragraph at lines 1028--1032
-\OT1/ppl/m/n/10 noyau et les ap-pli-ca-tions. Dans Ma-nuX, le choix a []et[]e f
-ait d'im-plan-ter ce m[]ecanisme
+
+Overfull \hbox (15.82538pt too wide) in paragraph at lines 1196--1199
+[]\OT1/ppl/m/n/10 Les variables d'exclusion mutuelle permettent d'assurer que l
+'acc[]es []a une ressource
+ []
+
+[17]
+Overfull \hbox (25.95544pt too wide) in paragraph at lines 1214--1218
+[]\OT1/ppl/m/n/10 Naturellement, comme leurs noms l'indiquent, les trois sous-p
+rogrammes permettent
  []
 
 
-Overfull \hbox (9.11557pt too wide) in paragraph at lines 1064--1067
-[]\OT1/ppl/m/n/10 Des ma-cros ont []et[]e cr[]e[]ees pour sim-pli-fier une tell
-e d[]efinition. Ce sont par exemple
+Overfull \hbox (23.03447pt too wide) in paragraph at lines 1214--1218
+\OT1/ppl/m/n/10 respectivement d'initialiser une variable d'exclusion mutuelle,
+ de prendre une exclusion
  []
 
 
-Overfull \hbox (5.6954pt too wide) in paragraph at lines 1083--1089
-[]\OT1/ppl/m/n/10 La par-tie la plus im-por-tante est na-tu-rel-le-ment d'[]ecr
-ire le code de l'ap-pel syst[]eme.
+Overfull \hbox (1.03592pt too wide) in paragraph at lines 1232--1236
+\OT1/ppl/m/n/10 noyau et les applications. Dans ManuX, le choix a []et[]e fait 
+d'implanter ce m[]ecanisme
  []
 
 
-Overfull \hbox (16.47401pt too wide) in paragraph at lines 1083--1089
-\OT1/ppl/m/n/10 Celui-ci consiste sim-ple-ment en une fonc-tion C clas-sique (q
-ui en uti-lise []eventuellement
+Overfull \hbox (1.76535pt too wide) in paragraph at lines 1237--1244
+[]\OT1/ppl/m/n/10 Leur mise en ^^[uvre passe part plusieurs []etapes que je vai
+s d[]etailler ici. L'objectif
  []
 
-[15]
+
+Overfull \hbox (9.11557pt too wide) in paragraph at lines 1268--1271
+[]\OT1/ppl/m/n/10 Des macros ont []et[]e cr[]e[]ees pour simplifier une telle d
+[]efinition. Ce sont par exemple
+ []
+
+[18]
+Overfull \hbox (5.6954pt too wide) in paragraph at lines 1287--1293
+[]\OT1/ppl/m/n/10 La partie la plus importante est naturellement d'[]ecrire le 
+code de l'appel syst[]eme.
+ []
+
+
+Overfull \hbox (16.47401pt too wide) in paragraph at lines 1287--1293
+\OT1/ppl/m/n/10 Celui-ci consiste simplement en une fonction C classique (qui e
+n utilise []eventuellement
+ []
+
+
+Overfull \hbox (21.33543pt too wide) in paragraph at lines 1287--1293
+\OT1/ppl/m/n/10 d'autres, naturellement). La seule contrainte []etant que si ce
+tte fonction a des param[]etres,
+ []
+
+LaTeX Font Info:    Font shape `OT1/pcr/bx/it' in size <10> not available
+(Font)              Font shape `OT1/pcr/b/it' tried instead on input line 1316.
+
 LaTeX Font Info:    Font shape `OT1/pcr/b/it' in size <10> not available
-(Font)              Font shape `OT1/pcr/b/sl' tried instead on input line 1112.
+(Font)              Font shape `OT1/pcr/b/sl' tried instead on input line 1316.
 
 
-Overfull \hbox (1.73729pt too wide) in paragraph at lines 1160--1162
-[][][][][][] \OT1/ppl/m/n/10 est la table lo-cale de de-crip-teurs as-soci[]ee 
-[]a cette
+Overfull \hbox (0.60698pt too wide) in paragraph at lines 1321--1324
+\OT1/ppl/m/n/10 appels syst[]emes ([]) la fonction de traitement de cet appel
  []
 
-(PageTache.eps
-)
-[16]
 No file Manux.ind.
-[17
-Non-PDF special ignored!
-<special> PSfile=PageTache.eps llx=0 lly=0 urx=292 ury=80 rwi=1417 
-] (./Manux.aux)
+[19] (./Manux.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 5158 strings out of 482577
- 72376 string characters out of 5948913
- 516163 words of memory out of 5000000
- 20146 multiletter control sequences out of 15000+600000
- 549106 words of font info for 65 fonts, out of 8000000 for 9000
- 350 hyphenation exceptions out of 8191
- 30i,8n,40p,244b,1612s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 5357 strings out of 494561
+ 74510 string characters out of 6177388
+ 338093 words of memory out of 5000000
+ 8912 multiletter control sequences out of 15000+600000
+ 22090 words of font info for 59 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 41i,8n,40p,272b,1562s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/urw/courier/ucrbo8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/co
-urier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/courier/ucrro8a
-.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/s
-hare/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/share/texlive
-/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on Manux.pdf (17 pages, 237748 bytes).
+type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/cou
+rier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplb8a
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
+Output written on Manux.pdf (19 pages, 239885 bytes).
 PDF statistics:
- 118 PDF objects out of 1000 (max. 8388607)
- 78 compressed objects within 1 object stream
+ 121 PDF objects out of 1000 (max. 8388607)
+ 80 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

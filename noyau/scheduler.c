@@ -8,8 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/scheduler.h>
 
-//#define DEBUG_MANUX_SCHEDULER
-#define SCHEDULER_A_LA_CON
+#define DEBUG_MANUX_SCHEDULER
 
 #include <manux/console.h>
 #include <manux/io.h>
@@ -71,18 +70,10 @@ void basculerTache()
 {
    Tache * tachePrecedente = tacheEnCours;
 
-#ifdef SCHEDULER_A_LA_CON
-      // VERSION STUPIDE DE DEBOGAGE, ON CONTINUE LA TACHE EN COURS
-      cli();
-      atomiqueInit(&schedulerEnCours, 0);
-      activerTache(tacheEnCours);
-      sti();return;
-#endif
-
    do {
       if (tacheEnCours != NULL) { /* WARNING on doit pouvoir s'en passer */
 #ifdef DEBUG_MANUX_SCHEDULER
-         printk("[SCHED] On quitte la tache %d de TSS %x\n",
+         printk("[SCHED] On quitte la tache %d de TSS %x, ...\n",
 		tacheEnCours->numero, tacheEnCours->indiceTSSDescriptor);
 #endif
          insererCelluleTache(&listeTaches,
@@ -95,7 +86,14 @@ void basculerTache()
       }
 
       tacheEnCours = extraireTache(&listeTaches);
-   } while ((tacheEnCours != NULL) && (tacheEnCours->etat != Tache_Prete));
+   } while ((tacheEnCours == NULL) || (tacheEnCours->etat != Tache_Prete));
+      //   } while ((tacheEnCours != NULL) && (tacheEnCours->etat != Tache_Prete));
+
+#ifdef DEBUG_MANUX_SCHEDULER
+   printk("[SCHED] ... pour la tache %d de TSS %x\n",
+		tacheEnCours->numero, tacheEnCours->indiceTSSDescriptor);
+#endif
+   //     while (1){};
 
    /* WARNING on doit pouvoir se passer du test suivant */
    if ((tacheEnCours != NULL) && (tacheEnCours != tachePrecedente)){
@@ -106,11 +104,8 @@ void basculerTache()
 	     tacheEnCours->tss.CS);
 #endif
 
-      /* On sort du scheduler pour passer à la tâche */
-      cli();
-      atomiqueInit(&schedulerEnCours, 0);
-      activerTache(tacheEnCours);
-      sti();
+      basculerVersTache(tacheEnCours);
+
 #ifdef DEBUG_MANUX_SCHEDULER
    } else {
       printk("[SCHED] Pas de nouvelle tache !\n");
@@ -126,60 +121,57 @@ void scheduler()
    CelluleTache * celluleTache;
 
    printk("Scheduler le mal nomme, ...\n");
+
    while(1) {
       if (afficheEtatSystemeDemande) {
 	 printk("\n-------------------------<SCHEDULER t = %d>----------------------------\n", nbTicks);
-         printk("Nombre de taches : %d\n", numeroProchaineTache - 1);
+         printk("Nombre de taches : %d\n", numeroProchaineTache);
          afficheEtatSystemeDemande = FALSE;
-	 for (celluleTache = listeTaches.tete; celluleTache != NULL; celluleTache = celluleTache->suivant){
-	   printk("[%d]  %s\n", celluleTache->tache->numero, (celluleTache->tache->etat == Tache_En_Cours)?"c":((celluleTache->tache->etat == Tache_Prete)?"p":"b"));
+	 for (celluleTache = listeTaches.tete;
+	      celluleTache != NULL;
+	      celluleTache = celluleTache->suivant){
+	   printk("[%d]  %s\n",
+		  celluleTache->tache->numero,
+		  (celluleTache->tache->etat == Tache_En_Cours)?"c":((celluleTache->tache->etat == Tache_Prete)?"p":"b"));
 	 }
          printk("\n-------------------------------------------------------------------------------\n");
 
-      }// else {printk(".");}
+      }
 
 #ifdef CONSOLES_VIRTUELLES
       /* Basculement entre les consoles virtuelles */
       /* WARNING, c'est sûrement pas le meilleur endroit ... */
       if (basculeConsoleDemandee) {
          basculeConsoleDemandee = FALSE;
-         printk("Bascule console ...\n");
-         basculerConsole();
+         printk("\n\nBascule console ...\n\n");
+         basculerVersConsoleSuivante();
       }
 #endif
-      //   basculerTache();
+      basculerTache();
    }
 }
 
 void initialiserScheduler()
 {
-   /* Pas le meilleur endroit, et ce compteur peut disparaitre */
-   nbActivations = 0;
-
    numeroProchaineTache = 0;
    
    /* Initialisation de la liste des taches en cours */
    initialiserListeTache(&listeTaches);
    
    /* Création d'une tâche pour le fil actuel */
-   ordonnancerTache(NULL, FALSE); // Pas de console ! Des printk
+   ordonnancerTache(NULL, TRUE);
 
    /* Initialisation de la tache scheduler */
-   ordonnancerTache(scheduler, NULL);// tacheScheduler = creerTache(scheduler, NULL);
+   ordonnancerTache(scheduler, FALSE);
 
-   /* Le scheduler ne tourne pas pour le moment WARNING inutile */
-   //atomiqueInit(&schedulerEnCours, 0);
-
-   // On autorise les interruptions WARNING ça n'a surement rien à faire là
-   //   autoriserIRQ(IRQTimer);
-   //   sti();
+   //while(1){};
 }
 
 void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 {
    Tache   * tache;
    
-   Console * cons;
+   Console * cons = NULL;
    void    * page;
 
 #ifdef CONSOLES_VIRTUELLES
@@ -187,17 +179,18 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    if (nouvelleConsole) {
       page = allouerPageSysteme();  // WARNING, gérer erreur
       cons = (Console *)page;
-      initialiserConsole(cons, page + sizeof(Console));
-   } else { // Sinon, on hérite ...
-      cons = NULL; //console(); // WARNING AS_console ?
+      initialiserConsole(cons, page + sizeof(Console)); // WARNING ! il faut que ça tienne !
+      printk("Console 0x%x creee\n", cons);
    }
-   printk("Console creee\n");
 #endif
    
    /* Création de la tache */
-   tache = creerTache(corpsTache, NULL);
-   printk("Tache %d creee\n", tache->numero);
-
+   tache = creerTache(corpsTache, cons);
+      printk("Tache %d creee de TSSdesc 0x%x et tss=0x%x\n",
+	  tache->numero,
+	  tache->indiceTSSDescriptor,
+	  &(tache->tss));
+   
    /* On insère la nouvelle tache à la fin de la liste */
    if (corpsTache) {
       insererCelluleTache(&listeTaches,

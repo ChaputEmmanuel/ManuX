@@ -7,12 +7,11 @@
 #include <manux/config.h>
 #include <manux/memoire.h>  // NULL
 #include <manux/journal.h>
-#include <manux/console.h>
 
 /*
  * Pour le moment, le journal est une console virtuelle spécifique.
  */
-static Console journal;
+static Console * journal;
 //static ExclusionMutuelle emj;
 
 /*
@@ -20,26 +19,17 @@ static Console journal;
  */
 char bufferJournal[4096];
 
-void initialiserJournal()
+void initialiserJournal(Console * console)
 {
     //   initialiserExclusionMutuelle(&emj);
     //   entrerExclusionMutuelle(&emj);
 
-#ifdef CONSOLES_VIRTUELLES
-
-   // Si l'on utilise des consoles virtuelles, il faut initialiser
-   // celle du journal
-  
-   initialiserConsole(&journal, bufferJournal);
-   affecterCouleurTexte(&journal, COUL_BLANC);
+   journal = console;
+   affecterCouleurTexte(journal, COUL_TXT_BLANC);
 
    // Affichons un petit message   
-   afficherConsole(&journal, "Journal de ManuX-32\n");
-#else
-   afficherEcran("Journal de ManuX-32\n");   
-#endif // CONSOLES_VIRTUELLES
+   afficherConsole(journal, "Journal de ManuX-32\n");
 
-   
    //   sortirExclusionMutuelle(&emj);
 }
 
@@ -47,11 +37,7 @@ void journaliser(char * message)
 {
     //   entrerExclusionMutuelle(&emj);
 
-#ifdef CONSOLES_VIRTUELLES
-  afficherConsole(&journal, message);
-#else
-  afficherEcran(message);
-#endif // CONSOLES_VIRTUELLES
+  afficherConsole(journal, message);
 
   //   sortirExclusionMutuelle(&emj);
 }

@@ -81,9 +81,10 @@ affent :          n = va_arg(argList, int);
 
    chaine[indice] = 0;
 
-   printk("printf va ecrire (fd = 1, ch = %d, in = %d)\n", chaine, indice);
+   //   printk("printf va ecrire (fd = 1, ch = %d, in = %d)\n", chaine, indice);
    //while(1){};
    ecrire(1, chaine, indice); // WARNING : 1 à remplacer par stdout par exemple
+   //printk("printf termine\n");
 
    va_end(argList);
 }

@@ -20,7 +20,7 @@
 /*
  * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
  */
-TacheID numeroProchaineTache = 1;
+TacheID numeroProchaineTache;
 
 /*
  * Chaque tâche pourra voir les infos la concernant à cette adresse
@@ -29,16 +29,12 @@ Tache * tacheCourante = (Tache*)(TAILLE_PAGE * NOMBRE_PAGES_SYSTEME);
 
 unsigned int nbActivations = 0; //  Nombre d'appels à activerTache
 
-void activerTache(Tache * tache)
+void basculerVersTache(Tache * tache)
 /*
  * Activation d'une tâche
  */
 {
-   uint32 selecteur[2];
-
-   nbActivations++;
-   
-   selecteur[1] = tache->indiceTSSDescriptor;
+   volatile uint32 selecteur[2] = {0 , tache->indiceTSSDescriptor};
 
    __asm__ __volatile__ ("ljmp %0"::"m" (*selecteur));
 }

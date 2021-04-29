@@ -112,7 +112,6 @@ typedef struct _ParametreAS {
   __attribute__ ((noinline)) typeRetour nom(typeArgument1 arg1, typeArgument2 arg2, typeArgument3 arg3) \
    {                                                        \
       typeRetour resultat;                                  \
-      printk("AS3 ecrire fd=%d, ch=%d, cnt=%d\n", arg1, arg2, arg3);	    \
    __asm__ __volatile__ ("int %2"			    \
               : "=a"(resultat)                              \
               : "0" (numero),                               \

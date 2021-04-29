@@ -87,11 +87,11 @@ affent :          n = va_arg(argList, int);
 
    chaine[indice] = 0;
 
-   /* On affiche et on déverouille */
+   /* On affiche  */
 #ifdef MANUX_JOURNAL
    journaliser(chaine);
 #else
-   afficherEcran(message);
+   afficherConsole(consoleNoyau(), chaine);
 #endif
    
    va_end(argList);

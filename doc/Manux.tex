@@ -138,6 +138,18 @@ pré-traiter.
 %...............................................................................
 \subsubsection{Le fichier {\tt include/config.h}}
 
+   Il permet de choisir l'inclusion, ou non, de certines parties du
+noyau, et parfois de les paramétrer.
+
+\begin{description}
+   \item[{\tt TAILLE\_PAGE}]
+   \item[{\tt NOMBRE\_PAGES\_SYSTEME}]
+   \item[{\tt ADRESSE\_DEBUT\_TAS}]
+   \item[{\tt NB\_MAX\_FICHIERS}]
+   \item[{\tt CONSOLES\_VIRTUELLES}]
+   \item[{\tt MANUX\_JOURNAL}]
+\end{description}
+
 %-------------------------------------------------------------------------------
 %   
 %-------------------------------------------------------------------------------
@@ -152,18 +164,24 @@ un noyau qui fonctionne.
 les outils nécessaires à la compilation, le débogage et le lancement
 de ManuX.
 
-   La section ``{\em Le boot} montre comment faire en sorte que notre
+   La section ``{\em Le boot}'' montre comment faire en sorte que notre
 code soit chargé en mémoire par le {\sc bios} de la machine puis
 exécuté. C'est une partie assez technique, très spécifique au matériel
-ciblé, et peu intéressante. Je vous autorise à la passer.
-
-   À la fin de cette partie, le code du noyau lui même commence à être
-exécuté, c'est donc là que les choses deviennent croustillantes ! Mais
-c'est également là que les ennuis commencent, \ldots
+ciblé, et peu intéressante. Je vous autorise à la passer. À la fin de
+cette partie, le code du noyau lui même commence à être exécuté, c'est
+donc là que les choses deviennent croustillantes ! Mais c'est
+également là que les ennuis commencent, \ldots
 
    Afin de pouvoir voir ce que nous faisons, une première activité va
 consister à écrire du code pouvant afficher des choses à l'écran, nous
-pourrons enfin avoir notre ``{\tt Hello world !}'' du noyau.
+pourrons enfin avoir notre ``{\tt Hello world !}'' du noyau. Pour
+cela, nous allons créer une ``console'' et une fonction
+\lstinline!printk! dans la section ``{\em L'affichage}''.
+
+   Nous allons ensuite nous attaquer à un morceau assez conséquent :
+la gestion de la mémoire qui sera décrite dans la section ``{\em La
+  gestion de la mémoire}''. Nous ferons dans ManuX les choses aussi
+simplement que possible. 
    
 %===============================================================================
 %
@@ -228,7 +246,7 @@ Bochs, il faudrait les mettre à jour ! Des volontaires ?
 %...............................................................................
 \subsubsection{L'émulateur QEMU}
 
-   C'est maintenant QEMU que j'utilise, par exemple de la façon
+   C'est maintenant {\tt qemu} que j'utilise, par exemple de la façon
 suivante
    
 \begin{lstlisting}{}
@@ -247,14 +265,14 @@ qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
 \subsection{Le débugage}
 
    Une technique pour débuguer est d'utiliser {\tt qemu} couplé avec
-{\tt gdb}. Pour cela, je lance par exemple qemu de la façon suivante
+{\tt gdb}. Pour cela, je lance par exemple {\tt qemu} de la façon suivante
 
 \begin{lstlisting}{}
 qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc
 base=localtime -m 64M -gdb tcp::1234  -S 
 \end{lstlisting}
 
-   Je lance ensuite gdb dans un autre terminal avec un
+   Je lance ensuite {\tt gdb} dans un autre terminal avec un
 \lstinline!.gdbinit! qui contient :
 
 \begin{lstlisting}{}
@@ -269,6 +287,63 @@ les fichiers sources et la command \lstinline:file: lui permet de
 consulter le binaire du noyau pour y trouver l'adresse des fonctions
 et variables (ici en fait, c'est une autre compilation du noyau au
 format {\sc elf} !).
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Exécution}
+
+   Quelques commandes de base pour l'exécution de code dans {\tt gdb}
+
+\begin{description}
+     \item[{\tt {\bf r} un}] permet de lancer l'exécution d'un
+       programme (inutilisable ici étant donné notre fonctionnement :
+       on débogue à distance) ;
+     \item[{\tt {\bf c} ontinue}] permet de poursuivre l'exécution jusqu'au
+       prochain point d'arrêt/bug/fin/\ldots ;
+     \item[{\tt {\bf s} tep}] avance d'une instruction dans le code ;
+     \item[{\tt {\bf n} ext}]
+     \item[{\tt {\bf b} reakpoint fonction}]
+     \item[{\tt {\bf b} reakpoint fichier:ligne}]
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Affichage des registres}
+
+   Il peut être intéressant de consulter le contenu des registres
+
+\begin{description}
+     \item[{\tt info registers}] donne le contenu des principaux registres.
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Affichage des variables}
+
+   {\tt Gdb} permet également de consulter le contenu des variables :
+
+\begin{description}
+   \item[{\tt p toto}] affiche le contenu de la variable {\tt toto}.
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Désassemblage du code}
+
+    Une fonctionnalité intéressante est de pouvoir observer le code
+assembleur, ce qui peut permettre de comprendre certains comportements
+étranges, tels que les conséquences de choix d'optimisation du
+compilateur :
+
+\begin{description}
+   \item[{\tt disassemble fonc}] affiche le code assembleur de la
+     fonction {\tt fonc}.
+\end{description}
+
 
 %===============================================================================
 %      Le boot
@@ -373,7 +448,7 @@ comme :
     de matériel.
 \end{itemize}
 
-Voyons rapidement quelques points.
+   Voyons rapidement quelques points.
 
 %...............................................................................
 %      Passage des informations au noyau
@@ -442,14 +517,14 @@ cohérente la structure C et la zone mémoire gérée en assembleur.
 %...............................................................................
 %      
 %...............................................................................
-\subsubsection{Démarrage du noyau}
+\subsubsection{Démarrage du noyau ({\tt noyau/main.c})}
 
    Exécution de la fonction \lstinline!_start()!.
 
 %===============================================================================
 %      L'affichage
 %===============================================================================
-\section{L'affichage}
+\section{L'affichage ({\tt lib/console.c lib/printk.c})}
 
    Une des premières choses à faire, afin de nous simplifier la vie
 pour la suite du développement, est de se doter d'un service minimal
@@ -645,6 +720,111 @@ d'initialisation et du handler de l'interrruption correspondante.
  i386/interBasNiveau.nasm}.
    
 %===============================================================================
+%      Gestion des tâches
+%===============================================================================
+\section{Gestion des tâches}
+
+   Nous disposons désormais du minimum permettant d'exécuter quelques
+instructions et d'en voir les conséquences à l'écran. Je vous propose
+donc de mettre en place la notion de {\em tâche} qui nous permettra de
+faire avancer ``en même temps'' plusieurs activités. ManuX devient
+donc à partir de maintenant un système multitâche.
+
+   Attention, pour le moment, ce ne sera que du multitâche
+collaboratif. En effet, nous n'allons pas encore mettre en place du
+multitâche {\em préemptif}, ce qui signifie que une tâche ne rendra la
+main (enfin, le processeur) que lorsqu'elle en aura envie !
+
+   De plus, nous ne nous intéressons pas non plus à l'ordonnancement,
+et mettrons en place un simple {\em round robin}.
+
+%-------------------------------------------------------------------------------
+%      Définition d'une tâche
+%-------------------------------------------------------------------------------
+\subsection{Définition d'une tâche}
+
+   La structure d'une tâche est définie dans le fichier {\tt
+manux/tache.h} au travers d'une struture \lstinline!Tache!. Afin de
+nous simplifier la vie, nous allons utiliser dans ManuX l'aide
+proposée par les processeurs Intel\footnote{Les systèmes récents, pour
+  des raisons de performances, n'utilisent pas ces fonctionnalités.}.
+
+   De ce fait, la structure \lstinline!Tache! contient des champs liés
+au processeur et des champs purement liés au noyau.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Champs liés au noyau}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Champs liés au processeur}
+
+\begin{itemize}
+   \item \lstinline!IntelTSS tss! qui permet, comme son nom laisse à
+penser, de stoquer les informations relatives à l'état de la tâche au
+niveau du processeur ({\sc tss} pour {\em Task State Segment}). On
+trouvera des informations sur ce champs dans les documentations Intel.
+Dans ManuX, une initialisation minimale est faite de cette structure
+lors de la création d'une tâche dans \lstinline!creerTache!.
+
+   \item \lstinline!uint16 indiceTSSDescriptor! représente l'indice,
+dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tâche. C'est
+par un \lstinline!ljmp! vers ce champs que l'on va activer la tâche.
+
+   \item \lstinline!DescriptorTable * ldt! est la table locale de
+decripteurs associée à cette tâche.
+\end{itemize}
+
+   Étant donnée la gestion limitée de la mémoire à ce niveau du
+système, les structures définissant une tâche sont placées dans une
+même page mémoire et organisées comme représenté sur la figure
+\ref{Figure:PageTache}.
+
+\begin{figure}[htbp]
+\epsfxsize=5cm
+$$
+\epsfbox{PageTache.eps}
+$$
+\caption{\label{Figure:PageTache}Structure d'une page de tâche}
+\end{figure} 
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Les descripteurs de tâche Intel}
+
+   Le {\em Task State Segment} ({\sc tss}) des processeurs Intel
+permet de stoquer et de manipuler les informations relatives à une
+tâche. Dans ManuX, une structure est définie permettant de décrire
+dans le noyau le {\sc tss} de chaque tâche : la structure
+\lstinline!IntelTSS! est définie dans
+\lstinline!manux/tache.h!
+
+%-------------------------------------------------------------------------------
+%      Création d'une tâche
+%-------------------------------------------------------------------------------
+\subsection{Création d'une tâche}
+
+%-------------------------------------------------------------------------------
+%      Basculement vers une tâche
+%-------------------------------------------------------------------------------
+\subsection{Basculement vers une tâche}
+
+   En ce qui concerne le basculement d'une tâche à l'autre, nous
+allons profiter des mécanismes fournis par les processeurs Intel au
+travers de l'instruction {\tt ljmp}. L'{\em Indirect far JMP} permet
+en effet de faire un basculement de tâche lorsque l'argument qui lui
+est passé, sur 48 bits (oui madame, 6 octets !) est constitué d'un
+sélecteur de segment (sur 16 bits) qui référence un {\sc tss} puis
+d'un {\em offset} (qui ne sera pas utilisé pour le coup !).
+
+   Bref, le basculement d'une tâche vers une autre se résume à une
+instruction de saut !
+
+%===============================================================================
 %      Gestion de la mémoire
 %===============================================================================
 \section{Gestion de la mémoire}
@@ -653,10 +833,28 @@ d'initialisation et du handler de l'interrruption correspondante.
 d'exploitation. Nous allons dans un premier temps jeter un coup
 d'\oe{}uil rapide à la gestion de la mémoire vue par Intel.
 
+   Il y a plusieurs concepts à intégrer. Cela peut sembler complexe,
+mais en prenant un peu de temps, vous vous rendrez compte qu'il n'y a
+rien de méchant !
+
+   Le premier est la {\em segmentation}. Pour faire simple,
+imaginez-vous fin des années 70 avec un microprocesseur dont les
+registres sont sur 32 bits. Comment adresser plus de 64 Ko ? La
+segmentation consiste à utiliser deux registres pour composer une
+adresse de plus de 32 bits. Nous allons voir que ce concept a été
+enrichi et utilisé à d'autres fins.
+
+   Le second est la {\em pagination}. L'idée ici est de découper la
+mémoire en {\em pages} de taille fixe. Chaque page pourra être dotée
+de propriétées qui lui sont propre. La pagination va nécessiter la
+mise en place d'un certain nombre de tables d'indirection, ce qui peut
+sembler un peu lourd, mais qui va en particulier permettre de la
+mémoire virtuelle, de l'isolation entre les tâches, \ldots
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Vue générale}
+\subsection{La segmentation}
 
    Essayons de comprendre ce qui se passe lorsqu'une instruction du
 processeur doit manipuler une adresse. Nous nous en tiendrons ici à
@@ -684,7 +882,7 @@ $$
 
    Le segment est contenu dans un registre qui peut être fourni
 explicitement ou implicitement par l'instruction. Il donne donc
-l'adresse de la zone mémoire que l'on appelle un segment. Saut que
+l'adresse de la zone mémoire que l'on appelle un segment. Sauf que
 c'est malheureusement un peu plus complexe que ça ! Un segment n'est
 en effet pas décrit uniquement par son adresse (et quand bien même !
 On a dit qu'un registre ne pouvait pas contenir une adresse entière).
@@ -701,35 +899,11 @@ $$
 \caption{\label{Figure:addlogsel}Adresse logique et sélecteur de segment}
 \end{figure} 
 
-   C'est finalement relativement simple, non ? Alors continuons,
-   \ldots
-
-   L'adresse ainsi obtenu est une adresse qualifiée de {\em
-     linéaire}. La structure d'une adresse linéaire est donnée dans la
-   figure \ref{Figure:addlin}.
-
-\begin{figure}[htbp]
-$$
-\includegraphics[width=0.8\textwidth]{adresse-lineaire}
-$$
-\caption{\label{Figure:addline}Structure d'une adresse linéaire.}
-\end{figure} 
-
-   Les bits de poids forts ({\tt Dir}) donnent la position dans le
-répertoire de page de l'adresse d'une table de pages. Les bits
-suivants ({\tt Page}) donnent la position dans dans cette table de
-l'adresse d'une page en mémoire. Les derniers bits ({\tt Offset})
-donnent alors la postion recherchée dans cette page.
-
-   Bien entendu, toutes les tables évoquées ici sont stoquées en
-mémoire.
-
-Observons tous ces mécanismes en détail.
 
 %-------------------------------------------------------------------------------
 %      Segmentation
 %-------------------------------------------------------------------------------
-\subsection{La segmentation sur les processeurs Intel}
+%\subsection{La segmentation sur les processeurs Intel}
 
    Dans les versions antérieures de ses processeurs (et dans le mode
 ``réel'' du 386), la mémoire est découpée logiquement en {\em
@@ -739,7 +913,7 @@ segments}. Une adresse est alors désignée par un couple composé d'un
    Concrètement, la taille d'un segment est de 64 Ko (puisque le
 registre d'offset est sur 32 bits).
 
-   À partir du 286 (c'est ça ?), en mode dit ``protégé'', un
+   À partir du 286 (si je ne me trompe pas), en mode dit ``protégé'', un
 registre de segment devient une référence vers un {\em descripteur de
 segment}. Ce dernier permet une gestion beaucoup plus évoluée de la
 mémoire.
@@ -750,7 +924,7 @@ gdt} ({\em {\bf G}lobal {\bf D}escriptor {\bf T}able}) ou la {\sc ldt}
 segment représente alors simplement le décalage d'un descripteur dans
 la table.
 
-   Lorsque l'on utiliser un registre de segment, il contient donc
+   Lorsque l'on utilise un registre de segment, il contient donc
 en fait l'adresse (dans la {\sc ldt} ou dans la {\sc gdt}) d'un
 descripteur de registre. Ce descripteur contient lui-même l'adresse du
 segment.
@@ -798,7 +972,7 @@ typedef struct _DescSegment {
 %...............................................................................
 %      Les LDT et la GDT
 %...............................................................................
-\subsubsection{Les {\sc ldt} et la {\sc gdt}}
+\subsubsection{Les tables de descripteurs de segments {\sc ldt} et {\sc gdt}}
 
    La {\sc gdt} est donc la table globale contenant les descripteurs
 de segment du système.
@@ -824,6 +998,36 @@ crée quatre descripteurs de segments
    La {\sc ldt} est une table similaire à la {\sc gdt} mais spécifique
 à une tâche. Dans ManuX, pour le moment, elle est initialisée, lors de
 la création de chaque tâche, comme une copie de la {\sc gdt}.
+
+
+%-------------------------------------------------------------------------------
+%      
+%-------------------------------------------------------------------------------
+\subsection{Adresse linéaire et adresse physique}
+
+C'est finalement relativement simple, non ? Alors continuons,
+   \ldots
+
+   L'adresse ainsi obtenu est une adresse qualifiée de {\em
+     linéaire}. La structure d'une adresse linéaire est donnée dans la
+   figure \ref{Figure:addlin}.
+
+\begin{figure}[htbp]
+$$
+\includegraphics[width=0.8\textwidth]{adresse-lineaire}
+$$
+\caption{\label{Figure:addline}Structure d'une adresse linéaire.}
+\end{figure} 
+
+   Les bits de poids forts ({\tt Dir}) donnent la position dans le
+répertoire de page de l'adresse d'une table de pages. Les bits
+suivants ({\tt Page}) donnent la position dans dans cette table de
+l'adresse d'une page en mémoire. Les derniers bits ({\tt Offset})
+donnent alors la position recherchée dans cette page.
+
+   Bien entendu, toutes les tables évoquées ici sont stoquées en
+mémoire.
+
 
 %-------------------------------------------------------------------------------
 %      La mémoire virtuelle
@@ -1140,51 +1344,6 @@ l'élection de la prochaine tâche.
 
    Naturellement, la tâche de l'ordonnanceur n'est pas stockée dans la
 liste des tâches actives du système.
-
-%-------------------------------------------------------------------------------
-%      Définition d'une tâche
-%-------------------------------------------------------------------------------
-\subsection{Définition d'une tâche}
-
-   La structure d'une tâche est définie dans le fichier {\tt
-tache.h}. Parmis les champs importants, nous avons
-
-\begin{itemize}
-   \item \lstinline!IntelTSS tss! qui permet, comme son nom laisse à
-penser, de stoquer les informations relatives à l'état de la tâche au
-niveau du processeur ({\sc tss} pour {\em Task State Segment}). On
-trouvera des informations sur ce champs dans les documentations Intel.
-   \item \lstinline!uint16 indiceTSSDescriptor! représente l'indice,
-dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tâche. C'est
-par un \lstinline!ljmp! vers ce champs que l'on va activer la tâche.
-   \item \lstinline!DescriptorTable * ldt! est la table locale de
-decripteurs associée à cette tâche.
-\end{itemize}
-
-   Étant donnée la gestion limitée de la mémoire à ce niveau du
-système, les structures définissants une tâche sont placées dans une
-même page mémoire et organisées comme représenté sur la figure
-\ref{Figure:PageTache}.
-
-\begin{figure}[htbp]
-\epsfxsize=5cm
-$$
-\epsfbox{PageTache.eps}
-$$
-\caption{\label{Figure:PageTache}Structure d'une page de tâche}
-\end{figure} 
-
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{Les descripteurs de tâche Intel}
-
-   Le {\em Task State Segment} ({\sc tss}) des processeurs Intel
-permet de stoquer et de manipuler les informations relatives à une
-tâche. Dans Manux, une structure est définie permettant de décrire
-dans le noyau le {\sc tss} de chaque tâche : la structure
-\lstinline!IntelTSS! est définie dans
-\lstinline!include/manux/tache.h!
 
 %===============================================================================
 %      Le système de fichiers

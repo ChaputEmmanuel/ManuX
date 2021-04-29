@@ -17,7 +17,6 @@
  */
 #define LDT_NB_BYTES 1024 /* WARNING, pas top */
 
-extern unsigned int nbActivations; //  Nombre d'appels à activerTache
 /*
  * Les différents états possibles pour une tâche
  */
@@ -34,6 +33,7 @@ typedef void (CorpsTache());
 
 /*
  * Définition de la structure TSS (Task State Segment)
+ * WARNING : à mettre dans i386/processeur.h
  */
 typedef struct _IntelTSS {
    uint16 TSSPrecedent;  /* Pour le chaînage */
@@ -76,12 +76,12 @@ typedef struct _IntelTSS {
  */
 typedef struct _Tache {
    IntelTSS           tss;
-   uint16             tss_LDT;
    DescriptorTable *  ldt;
    uint16             indiceTSSDescriptor; /* Indice du TSS dans la GDT */
+
    TacheID            numero;
    EtatTache          etat;
-   void             * tailleMemoire;       /* en octets */
+   void             * tailleMemoire;             /* en octets */
    struct _Console  * console;                   /* WARNING à virer ? */
    Fichier            fichiers[NB_MAX_FICHIERS]; /* WARNING à généraliser */
 } Tache;
@@ -97,9 +97,9 @@ Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
  * insérée dans la liste des tâches en cours.
  */
 
-void activerTache(Tache * tache);
+void basculerVersTache(Tache * tache);
 /*
- * Activation d'une tâche. A l'utilisation exclusive du scheduler
+ * Exécuter une tâche. A l'utilisation exclusive du scheduler
  */
 
 TacheID sysFork();

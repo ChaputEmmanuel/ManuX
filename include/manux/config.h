@@ -37,18 +37,11 @@
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
-//#define CONSOLES_VIRTUELLES 
-
-/*
- * Nombre de consoles gérées
- */
-#ifndef MANUX_NB_CONSOLES_MAX
-#   define MANUX_NB_CONSOLES_MAX  10
-#endif
+#define CONSOLES_VIRTUELLES 
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
  */
-#define MANUX_JOURNAL
+//#define MANUX_JOURNAL
 
 #endif

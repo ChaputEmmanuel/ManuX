@@ -47,6 +47,6 @@ void sortirAppelSysteme()
  * Déclaration des appels système. WARNING à dispatcher ...
  */
 appelSysteme0(NBAS_NUMERO_TACHE,  int,       numeroTache);
-appelSysteme0(NBAS_CONSOLE,       Console *, console);
+appelSysteme0(NBAS_CONSOLE,       Console *, getConsole);
 appelSysteme1(NBAS_OBTENIR_PAGES, int,       obtenirPages, int);
 
