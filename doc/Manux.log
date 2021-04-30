@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2019/dev/Debian) (preloaded format=pdflatex 2020.9.26)  28 APR 2021 09:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2019/dev/Debian) (preloaded format=pdflatex 2020.9.26)  30 APR 2021 13:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -345,7 +345,13 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (3.69911pt too wide) in paragraph at lines 37--37
+ [] []\OT1/ppl/b/n/10 Gestion des interruptions (\OT1/pcr/m/n/10 interruptions.
+c interBasNiveau.nasm\OT1/ppl/b/n/10 ) []  
+ []
+
+)
 \tf@toc=\write4
 \openout4 = `Manux.toc'.
 
@@ -380,13 +386,13 @@ Overfull \hbox (3.26564pt too wide) in paragraph at lines 167--174
  machine puis ex[]ecut[]e. C'est une partie assez technique,
  []
 
-
+[4]
 Overfull \hbox (4.82536pt too wide) in paragraph at lines 232--234
 []\OT1/ppl/m/n/10 Le but n'est []evidemment pas de faire tourner cette merveill
 e sur du vrai mat[]eriel,
  []
 
-[4]
+
 Overfull \hbox (58.65428pt too wide) in paragraph at lines 253--254
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
@@ -414,7 +420,7 @@ Overfull \hbox (1.3571pt too wide) in paragraph at lines 375--380
 [][]
  []
 
-
+[6]
 Overfull \hbox (92.42624pt too wide) in paragraph at lines 387--390
 \OT1/ppl/m/n/10 d'initialiser le syst[]eme. Ce code est []ecrit en assembleur d
 ans le fichier [][][][][][][]. 
@@ -426,7 +432,7 @@ Overfull \hbox (30.71526pt too wide) in paragraph at lines 395--397
 ecute le code d'initialisation. 
  []
 
-[6]
+
 Overfull \hbox (14.23656pt too wide) in paragraph at lines 446--449
 []\OT1/ppl/m/n/10 Charger en m[]emoire un ramdisk qui nous permettra de jouer a
 vec des syst[]emes
@@ -444,7 +450,7 @@ Overfull \hbox (1.78575pt too wide) in paragraph at lines 463--466
 gistr[]ees ces diff[]erentes
  []
 
-
+[7]
 Overfull \hbox (15.46523pt too wide) in paragraph at lines 480--484
 \OT1/ppl/m/n/10 phase d'initialisation, d'empiler l'adresse de la structure dan
 s laquelle les informations
@@ -456,7 +462,7 @@ Overfull \hbox (2.43544pt too wide) in paragraph at lines 480--484
 vent ressembler les derni[]eres
  []
 
-[7]
+
 Overfull \hbox (1.58592pt too wide) in paragraph at lines 503--506
 \OT1/ppl/m/n/10 phases et qu'il est donc important que le programmeur d[]efinis
 se de fa[]on coh[]erente
@@ -486,71 +492,115 @@ Overfull \hbox (2.90797pt too wide) in paragraph at lines 632--634
 [][][] 
  []
 
+[9]
+Overfull \hbox (142.00052pt too wide) in paragraph at lines 647--647
+[]\OT1/ppl/b/n/14.4 Gestion des interruptions (\OT1/pcr/m/n/14.4 interruptions.
+c interBasNiveau.nasm\OT1/ppl/b/n/14.4 ) 
+ []
 
-Overfull \hbox (7.1051pt too wide) in paragraph at lines 649--652
+
+Overfull \hbox (7.1051pt too wide) in paragraph at lines 649--653
 []\OT1/ppl/m/n/10 Sur le 386, une table (l'\OT1/ppl/m/sc/10 idt \OT1/ppl/m/n/10
  pour \OT1/ppl/m/it/10 Interrupt Descriptor Table\OT1/ppl/m/n/10 ) d[]efinit le
  comportement
  []
 
-[9]
-Overfull \hbox (46.65416pt too wide) in paragraph at lines 661--662
+
+Overfull \hbox (16.17516pt too wide) in paragraph at lines 649--653
+[]\OT1/ppl/m/n/10 a adopter pour chacune des 256 interruptions et exceptionns. 
+Cette table est enregistr[]ee
+ []
+
+
+Overfull \hbox (52.76724pt too wide) in paragraph at lines 656--661
+\OT1/ppl/m/n/10 fonctions ``bas niveau'' seront implant[]ees dans les fichiers 
+\OT1/pcr/m/n/10 manux/i386/interBasNiveau.h
+ []
+
+
+Overfull \hbox (31.70836pt too wide) in paragraph at lines 656--661
+\OT1/pcr/m/n/10 i386/interBasNiveau.nasm\OT1/ppl/m/n/10 . Tout le reste sera en
+ C dans \OT1/pcr/m/n/10 manux/interruptions.h
+ []
+
+
+Overfull \hbox (15.21584pt too wide) in paragraph at lines 670--675
+\OT1/ppl/m/n/10 sans int[]er[]et ici) dont le r[]ole est d'invoquer une fonctio
+n C nomm[]ee [].
+ []
+
+
+LaTeX Warning: Citation `intel386pru1986' on page 10 undefined on input line 70
+3.
+
+[10]
+Overfull \hbox (5.27629pt too wide) in paragraph at lines 725--728
+[]\OT1/ppl/m/n/10 Nous la d[]efinissons avec les param[]etres qui sont, dans l'
+ordre inverse, les valeurs
+ []
+
+
+Overfull \hbox (20.84769pt too wide) in paragraph at lines 729--732
+[]\OT1/ppl/m/n/10 La structure [], d[]ecrite dans \OT1/pcr/m/n/10 manux/types.h
+\OT1/ppl/m/n/10 , permet de manipuler
+ []
+
+
+Overfull \hbox (46.65416pt too wide) in paragraph at lines 741--742
 [][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (13.40562pt too wide) in paragraph at lines 674--677
-\OT1/ppl/m/n/10 des interruptions. Dans un premier temps, nous d[]efinissons un
- handler d'interruption
- []
-
-
-Overfull \hbox (0.86604pt too wide) in paragraph at lines 685--687
-[]\OT1/ppl/m/n/10 Nous positionnons alors tous les handlers par d[]efaut sur ce
- handler minimaliste
- []
-
-
-Overfull \hbox (4.65373pt too wide) in paragraph at lines 691--692
+Overfull \hbox (4.65373pt too wide) in paragraph at lines 771--772
 [][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (40.6541pt too wide) in paragraph at lines 699--701
+Overfull \hbox (22.65392pt too wide) in paragraph at lines 779--780
+[][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (22.65392pt too wide) in paragraph at lines 780--781
+[][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (40.6541pt too wide) in paragraph at lines 788--790
 [][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (64.65434pt too wide) in paragraph at lines 702--703
+Overfull \hbox (64.65434pt too wide) in paragraph at lines 791--792
 [][][][][][][][][][][][][][] 
  []
 
-
-Overfull \hbox (18.47716pt too wide) in paragraph at lines 715--718
+[11]
+Overfull \hbox (18.47716pt too wide) in paragraph at lines 804--807
 []\OT1/ppl/m/n/10 Le clavier est g[]er[]e dans [][][][][] et [][][]. Il s'agit 
 essentiellement
  []
 
 
-Overfull \hbox (4.8078pt too wide) in paragraph at lines 719--721
+Overfull \hbox (4.8078pt too wide) in paragraph at lines 808--810
 []\OT1/ppl/m/n/10 Ce handler doit bien entendu []etre d[]eclar[]e dans \OT1/pcr
 /m/n/10 i386/interBasNiveau.nasm\OT1/ppl/m/n/10 . 
  []
 
 
-Overfull \hbox (26.52548pt too wide) in paragraph at lines 727--732
+Overfull \hbox (26.52548pt too wide) in paragraph at lines 816--821
 []\OT1/ppl/m/n/10 Nous disposons d[]esormais du minimum permettant d'ex[]ecuter
  quelques instructions
  []
 
-[10]
-Overfull \hbox (1.11638pt too wide) in paragraph at lines 738--740
+
+Overfull \hbox (1.11638pt too wide) in paragraph at lines 827--829
 []\OT1/ppl/m/n/10 De plus, nous ne nous int[]eressons pas non plus []a l'ordonn
 ancement, et mettrons
  []
 
 
-Overfull \hbox (1.73729pt too wide) in paragraph at lines 777--779
+Overfull \hbox (1.73729pt too wide) in paragraph at lines 866--868
 [][][][][][] \OT1/ppl/m/n/10 est la table locale de decripteurs associ[]ee []a 
 cette
  []
@@ -558,63 +608,64 @@ cette
 (PageTache.eps
 )
 
-Overfull \hbox (12.34575pt too wide) in paragraph at lines 799--805
+Overfull \hbox (12.34575pt too wide) in paragraph at lines 888--894
 []\OT1/ppl/m/n/10 Le \OT1/ppl/m/it/10 Task State Segment \OT1/ppl/m/n/10 (\OT1/
 ppl/m/sc/10 tss\OT1/ppl/m/n/10 ) des processeurs Intel permet de stoquer et de 
 manipuler
  []
 
 
-Overfull \hbox (21.48557pt too wide) in paragraph at lines 799--805
+Overfull \hbox (21.48557pt too wide) in paragraph at lines 888--894
 \OT1/ppl/m/n/10 les informations relatives []a une t[]ache. Dans ManuX, une str
 ucture est d[]efinie permettant
  []
 
-
-Overfull \hbox (8.845pt too wide) in paragraph at lines 816--823
+[12]
+Overfull \hbox (8.845pt too wide) in paragraph at lines 905--912
 \OT1/ppl/m/n/10 L'\OT1/ppl/m/it/10 Indirect far JMP \OT1/ppl/m/n/10 permet en e
 ffet de faire un basculement de t[]ache lorsque l'argument
  []
 
-[11
-Non-PDF special ignored!
-<special> PSfile=PageTache.eps llx=0 lly=0 urx=292 ury=80 rwi=1417 
-]
-Overfull \hbox (7.55548pt too wide) in paragraph at lines 832--835
+
+Overfull \hbox (7.55548pt too wide) in paragraph at lines 921--924
 []\OT1/ppl/m/n/10 La gestion de la m[]emoire est une fonction essentielle d'un 
 syst[]eme d'exploitation.
  []
 
 
-Overfull \hbox (2.23581pt too wide) in paragraph at lines 836--839
+Overfull \hbox (2.23581pt too wide) in paragraph at lines 925--928
 []\OT1/ppl/m/n/10 Il y a plusieurs concepts []a int[]egrer. Cela peut sembler c
 omplexe, mais en prenant
  []
 
 
-Overfull \hbox (6.8455pt too wide) in paragraph at lines 847--853
+Overfull \hbox (6.8455pt too wide) in paragraph at lines 936--942
 \OT1/ppl/m/n/10 pagination va n[]ecessiter la mise en place d'un certain nombre
  de tables d'indirection,
  []
 
 
-Overfull \hbox (6.08546pt too wide) in paragraph at lines 847--853
+Overfull \hbox (6.08546pt too wide) in paragraph at lines 936--942
 \OT1/ppl/m/n/10 ce qui peut sembler un peu lourd, mais qui va en particulier pe
 rmettre de la m[]emoire
  []
 
-<adresse-logique.png, id=44, 692.5875pt x 367.3725pt>
+[13
+Non-PDF special ignored!
+<special> PSfile=PageTache.eps llx=0 lly=0 urx=292 ury=80 rwi=1417 
+]
+<adresse-logique.png, id=51, 692.5875pt x 367.3725pt>
 File: adresse-logique.png Graphic file (type png)
 <use adresse-logique.png>
-Package pdftex.def Info: adresse-logique.png  used on input line 878.
+Package pdftex.def Info: adresse-logique.png  used on input line 967.
 (pdftex.def)             Requested size: 144.53778pt x 76.66841pt.
-<adresse-logique-sel.png, id=46, 693.59125pt x 529.98pt>
+<adresse-logique-sel.png, id=53, 693.59125pt x 529.98pt>
 File: adresse-logique-sel.png Graphic file (type png)
 <use adresse-logique-sel.png>
-Package pdftex.def Info: adresse-logique-sel.png  used on input line 897.
+Package pdftex.def Info: adresse-logique-sel.png  used on input line 986.
 (pdftex.def)             Requested size: 144.53778pt x 110.44186pt.
-[12]
-Overfull \hbox (5.57498pt too wide) in paragraph at lines 921--926
+
+Overfull \hbox (5.57498pt too wide) in paragraph at lines 1010--1015
 \OT1/ppl/b/n/10 D\OT1/ppl/m/it/10 escriptor \OT1/ppl/b/n/10 T\OT1/ppl/m/it/10 a
 ble\OT1/ppl/m/n/10 ) ou la \OT1/ppl/m/sc/10 ldt \OT1/ppl/m/n/10 (\OT1/ppl/b/n/1
 0 L\OT1/ppl/m/it/10 ocal \OT1/ppl/b/n/10 D\OT1/ppl/m/it/10 escriptor \OT1/ppl/b
@@ -626,28 +677,29 @@ nte
 
 pdfTeX warning: pdflatex (file ./DescrSegment.pdf): PDF inclusion: found PDF ve
 rsion <1.7>, but at most version <1.5> allowed
-<DescrSegment.pdf, id=50, 336.25626pt x 274.02374pt>
+<DescrSegment.pdf, id=54, 336.25626pt x 274.02374pt>
 File: DescrSegment.pdf Graphic file (type pdf)
 <use DescrSegment.pdf>
-Package pdftex.def Info: DescrSegment.pdf  used on input line 942.
+Package pdftex.def Info: DescrSegment.pdf  used on input line 1031.
 (pdftex.def)             Requested size: 108.4061pt x 88.34166pt.
-[13 <./adresse-logique.png> <./adresse-logique-sel.png> <./DescrSegment.pdf>]
-Overfull \hbox (102.30682pt too wide) in paragraph at lines 957--960
+[14 <./adresse-logique.png> <./adresse-logique-sel.png>]
+Overfull \hbox (102.30682pt too wide) in paragraph at lines 1046--1049
 []\OT1/ppl/m/n/10 Pour cela, elle initalise une structure de type [] d[]efinie 
 dans [][][][][][][]
  []
 
+[15 <./DescrSegment.pdf>]
 
-LaTeX Warning: Reference `Figure:addlin' on page 14 undefined on input line 101
-3.
+LaTeX Warning: Reference `Figure:addlin' on page 16 undefined on input line 110
+2.
 
-<adresse-lineaire.png, id=63, 776.9025pt x 433.62pt>
+<adresse-lineaire.png, id=69, 776.9025pt x 433.62pt>
 File: adresse-lineaire.png Graphic file (type png)
 <use adresse-lineaire.png>
-Package pdftex.def Info: adresse-lineaire.png  used on input line 1017.
+Package pdftex.def Info: adresse-lineaire.png  used on input line 1106.
 (pdftex.def)             Requested size: 289.08109pt x 161.34996pt.
-[14]
-Overfull \hbox (9.69547pt too wide) in paragraph at lines 1048--1053
+
+Overfull \hbox (9.69547pt too wide) in paragraph at lines 1137--1142
 \OT1/ppl/m/n/10 physique (et sa r[]epartition entre les diff[]erentes t[]aches)
  et l'organisation de la m[]emoire
  []
@@ -656,128 +708,132 @@ Overfull \hbox (9.69547pt too wide) in paragraph at lines 1048--1053
 
 pdfTeX warning: pdflatex (file ./Pagination.pdf): PDF inclusion: found PDF vers
 ion <1.7>, but at most version <1.5> allowed
-<Pagination.pdf, id=67, 346.29375pt x 360.34625pt>
+<Pagination.pdf, id=70, 346.29375pt x 360.34625pt>
 File: Pagination.pdf Graphic file (type pdf)
 <use Pagination.pdf>
-Package pdftex.def Info: Pagination.pdf  used on input line 1067.
+Package pdftex.def Info: Pagination.pdf  used on input line 1156.
 (pdftex.def)             Requested size: 180.67499pt x 188.00795pt.
 
-Overfull \hbox (10.75563pt too wide) in paragraph at lines 1076--1079
+Overfull \hbox (10.75563pt too wide) in paragraph at lines 1165--1168
 []\OT1/ppl/m/n/10 Lorsque la pagination est activ[]ee, le registre \OT1/ppl/m/s
 c/10 cr3 \OT1/ppl/m/n/10 doit contenir l'adresse (physique)
  []
 
 
-Overfull \hbox (22.08536pt too wide) in paragraph at lines 1085--1089
+Overfull \hbox (22.08536pt too wide) in paragraph at lines 1174--1178
 []\OT1/ppl/m/n/10 La m[]emoire physique est partag[]ee entre une partie syst[]e
 me et une partie application.
  []
 
-
+[16 <./adresse-lineaire.png>]
 
 pdfTeX warning: pdflatex (file ./MemoirePhysique.pdf): PDF inclusion: found PDF
  version <1.7>, but at most version <1.5> allowed
-<MemoirePhysique.pdf, id=68, 419.5675pt x 170.6375pt>
+<MemoirePhysique.pdf, id=75, 419.5675pt x 170.6375pt>
 File: MemoirePhysique.pdf Graphic file (type pdf)
 <use MemoirePhysique.pdf>
-Package pdftex.def Info: MemoirePhysique.pdf  used on input line 1092.
+Package pdftex.def Info: MemoirePhysique.pdf  used on input line 1181.
 (pdftex.def)             Requested size: 180.67499pt x 73.47943pt.
-[15 <./adresse-lineaire.png>] [16 <./Pagination.pdf> <./MemoirePhysique.pdf>]
-Overfull \hbox (9.03575pt too wide) in paragraph at lines 1146--1151
+[17 <./Pagination.pdf> <./MemoirePhysique.pdf>]
+Overfull \hbox (9.03575pt too wide) in paragraph at lines 1235--1240
 []\OT1/ppl/m/n/10 Le but du ramdisk est uniquement de nous permettre de valider
  certains []el[]ements
  []
 
 
-Overfull \hbox (27.64523pt too wide) in paragraph at lines 1152--1155
+Overfull \hbox (27.64523pt too wide) in paragraph at lines 1241--1244
 []\OT1/ppl/m/n/10 Il permet de plus une certaine forme de communication avec le
  syst[]eme d'exploitation
  []
 
 
-Overfull \hbox (94.65465pt too wide) in paragraph at lines 1181--1182
+Overfull \hbox (94.65465pt too wide) in paragraph at lines 1270--1271
 [][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (15.82538pt too wide) in paragraph at lines 1196--1199
+Overfull \hbox (15.82538pt too wide) in paragraph at lines 1285--1288
 []\OT1/ppl/m/n/10 Les variables d'exclusion mutuelle permettent d'assurer que l
 'acc[]es []a une ressource
  []
 
-[17]
-Overfull \hbox (25.95544pt too wide) in paragraph at lines 1214--1218
+
+Overfull \hbox (25.95544pt too wide) in paragraph at lines 1303--1307
 []\OT1/ppl/m/n/10 Naturellement, comme leurs noms l'indiquent, les trois sous-p
 rogrammes permettent
  []
 
 
-Overfull \hbox (23.03447pt too wide) in paragraph at lines 1214--1218
+Overfull \hbox (23.03447pt too wide) in paragraph at lines 1303--1307
 \OT1/ppl/m/n/10 respectivement d'initialiser une variable d'exclusion mutuelle,
  de prendre une exclusion
  []
 
-
-Overfull \hbox (1.03592pt too wide) in paragraph at lines 1232--1236
+[18]
+Overfull \hbox (1.03592pt too wide) in paragraph at lines 1321--1325
 \OT1/ppl/m/n/10 noyau et les applications. Dans ManuX, le choix a []et[]e fait 
 d'implanter ce m[]ecanisme
  []
 
 
-Overfull \hbox (1.76535pt too wide) in paragraph at lines 1237--1244
+Overfull \hbox (1.76535pt too wide) in paragraph at lines 1326--1333
 []\OT1/ppl/m/n/10 Leur mise en ^^[uvre passe part plusieurs []etapes que je vai
 s d[]etailler ici. L'objectif
  []
 
 
-Overfull \hbox (9.11557pt too wide) in paragraph at lines 1268--1271
+Overfull \hbox (9.11557pt too wide) in paragraph at lines 1357--1360
 []\OT1/ppl/m/n/10 Des macros ont []et[]e cr[]e[]ees pour simplifier une telle d
 []efinition. Ce sont par exemple
  []
 
-[18]
-Overfull \hbox (5.6954pt too wide) in paragraph at lines 1287--1293
+
+Overfull \hbox (5.6954pt too wide) in paragraph at lines 1376--1382
 []\OT1/ppl/m/n/10 La partie la plus importante est naturellement d'[]ecrire le 
 code de l'appel syst[]eme.
  []
 
 
-Overfull \hbox (16.47401pt too wide) in paragraph at lines 1287--1293
+Overfull \hbox (16.47401pt too wide) in paragraph at lines 1376--1382
 \OT1/ppl/m/n/10 Celui-ci consiste simplement en une fonction C classique (qui e
 n utilise []eventuellement
  []
 
 
-Overfull \hbox (21.33543pt too wide) in paragraph at lines 1287--1293
+Overfull \hbox (21.33543pt too wide) in paragraph at lines 1376--1382
 \OT1/ppl/m/n/10 d'autres, naturellement). La seule contrainte []etant que si ce
 tte fonction a des param[]etres,
  []
 
+[19]
 LaTeX Font Info:    Font shape `OT1/pcr/bx/it' in size <10> not available
-(Font)              Font shape `OT1/pcr/b/it' tried instead on input line 1316.
+(Font)              Font shape `OT1/pcr/b/it' tried instead on input line 1405.
 
 LaTeX Font Info:    Font shape `OT1/pcr/b/it' in size <10> not available
-(Font)              Font shape `OT1/pcr/b/sl' tried instead on input line 1316.
+(Font)              Font shape `OT1/pcr/b/sl' tried instead on input line 1405.
 
 
-Overfull \hbox (0.60698pt too wide) in paragraph at lines 1321--1324
+Overfull \hbox (0.60698pt too wide) in paragraph at lines 1410--1413
 \OT1/ppl/m/n/10 appels syst[]emes ([]) la fonction de traitement de cet appel
  []
 
 No file Manux.ind.
-[19] (./Manux.aux)
+[20] (./Manux.aux)
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 5357 strings out of 494561
- 74510 string characters out of 6177388
- 338093 words of memory out of 5000000
- 8912 multiletter control sequences out of 15000+600000
- 22090 words of font info for 59 fonts, out of 8000000 for 9000
+ 5391 strings out of 494561
+ 74981 string characters out of 6177388
+ 339093 words of memory out of 5000000
+ 8945 multiletter control sequences out of 15000+600000
+ 23222 words of font info for 61 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 41i,8n,40p,272b,1562s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 41i,8n,40p,272b,1558s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/share/texlive/texmf-dist/fonts/
@@ -785,10 +841,10 @@ type1/urw/courier/ucrr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/cou
 rier/ucrro8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplb8a
 .pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/s
 hare/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on Manux.pdf (19 pages, 239885 bytes).
+Output written on Manux.pdf (20 pages, 243366 bytes).
 PDF statistics:
- 121 PDF objects out of 1000 (max. 8388607)
- 80 compressed objects within 1 object stream
+ 124 PDF objects out of 1000 (max. 8388607)
+ 82 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

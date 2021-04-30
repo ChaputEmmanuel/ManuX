@@ -6,7 +6,7 @@ ASM_EXT  = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f bin
 
-OBJETS      = console.o ramdisk.o printk.o journal.o malloc.o string.o#clavier.o
+OBJETS      = console.o debug.o ramdisk.o printk.o journal.o malloc.o string.o#clavier.o
 
 libmanux.a : $(OBJETS) clavier.o
 	ar rf libmanux.a $(OBJETS)

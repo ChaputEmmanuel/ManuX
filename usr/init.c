@@ -13,11 +13,11 @@ void calculerPremiers()
    int n; /* Indice de la boucle de recherche d'un premier*/
    int d; /* Indice de la boucle de recherche de diviseur */
    booleen compose;
-   int cpt = 0;
+   int cpt = 1;
    
    while (TRUE) {
       basculerTache();
-      printf("C'est la %d eme boucle : \n", cpt++);
+      printf("C'est la boucle numero %d : \n", cpt++);
       printf("%d", 2);
       for (n = 3; n < 1024; n += 2) {
          compose = FALSE;
@@ -40,13 +40,13 @@ void init()
 
    printk("Init est parti ...\n");
 
-   printf("PRINTF PRINTF PRINTF !!!!\n");
-
-   //   __asm__ __volatile__ ("int $17"::);
-
+   //   printf("PRINTF PRINTF PRINTF !!!!\n");
+  
+   //__asm__ __volatile__ ("int $31"::);
+   
    //printk("Printf done ...\n");
-   //basculerTache();
-   //while(1){};
+   basculerTache();
+   while(1){};
    for (n = 0; n < 10000000; n++) {
       calculerPremiers();
    }

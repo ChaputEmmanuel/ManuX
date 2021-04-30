@@ -12,11 +12,13 @@ En cours
 la fuite mémoire et ça pourrait être chaud à déboguer. C'est de toute
 évidence le moment de
 
-   . revoir la gestion des handlers (trop d'asm, je pense qu'on peut
-   faire un emballage général)
-   . mettre un handler par défaut qui affiche des choses
-   . faire un assert.h
-   . bref des outils pour débuguer !
+   . Il faut s'attaquer à la mémoire ... est-il normal que la même page
+   seve pour les données et la pile (cf tache.c) alors que ce n'est
+   pas le même sélecteur de segment ?
+
+
+
+
 
    BON, on va essayer d'être plus propre dans ce qui suit en
 commençant à mettre des choses dans init et y faire appel à ce qui est
@@ -36,8 +38,10 @@ init-manux.nasm. Trois solutions temporaires :
    compil si ce n'est pas la bonne valeur
    . Tester noyau/symbols et modifier MANUX_KERNEL_SEG_16 dans
    init-manux.asm
+   
    SOLUTION : pour le moment, l'option -fno-toplevel-reorder a l'air
-   d'y suffir
+   d'y suffir. Mais il faut utiliser la dernière solution, comme pour
+   la taille avec tools/taille_noyau
    
    ATTENTION, ... il va falloir être clair sur la répartition entre
 include et usr/include ! C'est (presque) une copie l'un de l'autre.
@@ -66,23 +70,6 @@ Sinon le bas de l'écran est étrange et dès que l'afichage atteint le bas,
 qui laisse à penser que quelquechose est niché dans la mémoire située à
 la fin de la console ... A voir !
 
-Introduction
-------------
-
-   Ceci est l'embryon de Manux ("Misérable Approximation de Noyau Un*X"),
-une tentative de développement de noyau de système d'exploitation qui n'a
-bd'autres but que le divertissement de son auteur et une utilisation en temps
-que support pédagogique.
-
-Structure de l'arborescence
----------------------------
-
-   include        tous les fichiers inclus
-   lib            les sources de la "librairie" du noyau
-   usr            userland
-   usr/include    les fichiers inclus pour userland
-   noyau          sources du noyau, la partie de plus bas niveau
-   boot           code de chargement et d'initialisation du noyau
 
 A faire
 -------
@@ -92,9 +79,6 @@ de plus haut niveau, et hériter dans les autres. C'est en gros ce qui
 est déjà fait, sauf usr (à revoir) qui n'a pas les mêmes include, et
 outils, mais c'est moins génant, il n'utilise rien !
 
-   . Une gestion claire de la console !!!! Le mieux est de ne plus utiliser
-   d'accès directe à la console, mais de taper uniquement sur la console de
-   chaque processus. ON AIR
    . Différents "main" pour les tests. En fait, le mieux serait sûrement de
    procéder à une compilation séparée du code en mode utilisateur. Sans pour
    autant introduire déjà la notion de de format d'exécution, cela permet
@@ -114,11 +98,6 @@ outils, mais c'est moins génant, il n'utilise rien !
    . Des makefiles propres avec des constantes factorisées
    . Etendre print[kf] ...
 
-Le scheduler
-------------
-
-   Il est évidemment minimaliste. Pour simplifier son fonctionnement, on supposera
-qu'il y a toujours une tâche à ordonnancer. Ce ne devrait pas être trop pénalisant.
 
 Les Makefile
 ------------

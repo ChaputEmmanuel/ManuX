@@ -44,4 +44,10 @@
  */
 //#define MANUX_JOURNAL
 
+/*
+ * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
+ * les assert ne produisent aucun code.
+ */
+#define MANUX_ASSERT_ACTIVES
+
 #endif

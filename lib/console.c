@@ -7,12 +7,13 @@
 /*   simplement son adresse avec celle de l'écran physique. Du coup, les      */
 /*   affichages se font réellement à l'écran.                                 */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2020 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/console.h>
 
 #include <manux/appelsysteme.h>
-#include <manux/memoire.h>      /* NULL */
+#include <manux/memoire.h>      /* NULL   */
+#include <manux/debug.h>        /* assert */
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
@@ -297,9 +298,13 @@ void basculerVersConsoleSuivante()
 {
    int i, l, c, a;
 
+   assert(consoleActive != NULL);
+   
    if (consoleActive->suivante == consoleActive)
       return;
 
+   assert(consoleActive->suivante != NULL);
+   
    // On sauvegarde l'écran physique dans la console active
    for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
       consoleActive->adresseEcranCopie[i] = consoleActive->adresseEcran[i];
@@ -369,13 +374,13 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
  */
 Console * consoleNoyau()
 {
-  return &_consoleNoyau;
+   return &_consoleNoyau;
 };
 
 /*
  * Les méthodes permettant de traiter une console comme un fichier
  */
 MethodesFichier consoleMethodesFichier = {
-  ecrire : consoleEcrire,
+   ecrire : consoleEcrire,
 };
 

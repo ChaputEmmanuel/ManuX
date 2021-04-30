@@ -43,7 +43,7 @@ void initialiserMemoire(unsigned int tailleMemoireEtendue)
 {
    int i;                     /* Pour compter les pages initialisées */
 
-   nombrePages = tailleMemoireEtendue / 4;
+   nombrePages = tailleMemoireEtendue / 4; // WARNING c'est le nombre depages total ou étendu ?
 
 #ifdef DEBUG_MEMOIRE
    printk("%d pages de %d octets\n",  nombrePages, TAILLE_PAGE);

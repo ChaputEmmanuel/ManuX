@@ -262,7 +262,41 @@ qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Le débugage}
+\subsection{Le débugage ``interne''}
+
+   Ce que j'appelle ici le débugage interne, c'est tous les outils que
+l'on peut utiliser dans le code lui-même pour essayer de comprendre ce
+qu'il s'y passe.
+
+   Nous avons pour le moment quelques outils de base, copieusement bugués
+eux-mêmes (!).
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La fonction {\tt printk_debug}}
+
+   Elle permet de produire des messages d'erreur qui seront envoyés de
+façon sélective en fonction de la valeur de \lstinline!masqueDebugage!
+qui doit être construite dans {\tt manux/debug.h}.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La macro {\tt assert}}
+
+   Voir {\tt manux/debug.h}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le handler {\tt handlerPanique}}
+ 
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Le débugage ``externe''}
 
    Une technique pour débuguer est d'utiliser {\tt qemu} couplé avec
 {\tt gdb}. Pour cela, je lance par exemple {\tt qemu} de la façon suivante
@@ -630,7 +664,7 @@ une chaîne de caractères et de la transmettre au journal (ou
 directement à la console si on n'utilise pas le journal).
 
    Elle est mise en \oe{}uvre dans les fichiers
-   \lstinline!manux/printk.h! et \lstinline!noyau/printk.c!
+\lstinline!manux/printk.h! et \lstinline!noyau/printk.c!
 
    La fonction essentielle est bien sûr :
 
@@ -644,16 +678,96 @@ qu'elle envoie ensuite à la console ou au journal.
 %===============================================================================
 %      Gestion des interruptions
 %===============================================================================
-\section{Gestion des interruptions}
+\section{Gestion des interruptions ({\tt interruptions.c interBasNiveau.nasm})}
 
    Sur le 386, une table (l'{\sc idt} pour {\em Interrupt Descriptor Table})
-définit le comportement à adopter pour chacune des 256 interruptions. Cette
-table est enregistrée grâce à l'instruction \lstinline!lidt!.
+définit le comportement à adopter pour chacune des 256 interruptions
+et exceptionns. Cette table est enregistrée grâce à l'instruction
+\lstinline!lidt!.
 
+   Observons ici comment tout cela est mis en place dans ManuX.
+
+   Nous ne pouvons pas ici faire l'impasse sur un peu d'assembleur, si
+bien que les fonctions ``bas niveau'' seront implantées dans les
+fichiers {\tt manux/i386/interBasNiveau.h
+  i386/interBasNiveau.nasm}. Tout le reste sera en C dans {\tt
+  manux/interruptions.h} et {\tt i386/interruptions.c}.
+
+   C'est la fonction C \lstinline!initialiserIDT()! qui est invoquée
+par \lstinline!main()! pour initialiser la table.
+   
 %-------------------------------------------------------------------------------
-%      Initialisation de la table
+%      
 %-------------------------------------------------------------------------------
-\subsection{Initialisation de la table}
+\subsection{Définition ``bas niveau'' d'un handler}
+
+   Voici par exemple comment est écrit un handler pour l'interruption
+7 (mais c'est sans intérêt ici) dont le rôle est d'invoquer une
+fonction C nommée \lstinline!handlerPanique!. Notez que ce handler
+empile tous les registres ainsi que le numéro de l'interruption
+concernée. 
+
+\begin{lstlisting}{language=nasm}
+; Un handler qui va afficher un message
+;--------------------------------------
+stubHandlerPanique 7
+  
+         pusha
+	 push dword 07h
+
+         call handlerPanique
+	 
+         add esp, 4
+	 popa
+
+         iret
+\end{lstlisting}
+
+   Vous trouverez également un handler qui ne fait rien :
+
+\begin{lstlisting}{language=nasm}
+; Un handler qui ne fait rien ...
+;--------------------------------
+stubHandlerNop :
+        iret                        ; On revient ...
+\end{lstlisting}
+
+   Notons que lors d'une interruption, le microprocesseur empile les
+valeurs de {\tt EFLAGS}, {\tt CS} et {\tt EIP} (voir par exemple
+\cite{intel386pru1986} page 159).
+
+   Voyons maintenant comment écrire la suite plus confortablement en
+C.
+   
+%-------------------------------------------------------------------------------
+%      
+%-------------------------------------------------------------------------------
+\subsection{Définition d'un handler en C}
+
+   Nous pouvons par exemple écire la fonction
+\lstinline!handlerPanique! dont le rôle est d'afficher un message
+permettant de déterminer la cause de l'interruption :
+
+\begin{lstlisting}
+void handlerPanique(uint32 itNum, TousRegistres registres,
+		    uint32 eip, uint32 cs, uint32 eFlags)
+{
+   ...
+}
+\end{lstlisting}
+
+   Nous la définissons avec les paramètres qui sont, dans l'ordre
+inverse, les valeurs empilées par le processeur lors de l'interruption
+puis par le handler ``bas niveau'' décrit ci-desssus.
+
+   La structure \lstinline!TousRegistres!, décrite dans {\tt
+manux/types.h}, permet de manipuler simplement l'ensemble des
+registres.
+   
+%-------------------------------------------------------------------------------
+%      
+%-------------------------------------------------------------------------------
+\subsection{Insertion d'un handler dans l'{\sc idt}}
 
    La procédure suivante initialise une entrée dans l'{\sc idt} :
 
@@ -672,18 +786,18 @@ void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
 \end{lstlisting}
 
    Elle sera donc appelée par la procédure d'initialisation de l'{\sc idt} pour
-chacune des interruptions. Dans un premier temps, nous définissons un handler
-d'interruption qui ne fait rien (dans {\tt i386/interBasNiveau.nasm}) :
+chacune des interruptions.
 
-\begin{lstlisting}{language=nasm}
-; Un handler qui ne fait rien ...
-;--------------------------------
-stubHandlerNop :
-        iret                        ; On revient ...
-\end{lstlisting}
+%-------------------------------------------------------------------------------
+%      Initialisation de la table
+%-------------------------------------------------------------------------------
+\subsection{Initialisation de la table}
 
-   Nous positionnons alors tous les handlers par défaut sur ce handler minimaliste
-dans la procédure d'initialisation de l'{\sc idt} :
+   Nous avons maintenant tous les éléments pour construire notre {\sc
+idt}. C'est le rôle de la fonction C \lstinline!initialiserIDT()!.
+   
+   Nous y positionnons donc tous les handlers sur le handler minimaliste
+qui ne fait rien :
 
 \begin{lstlisting}{}
    /* Comportement par défaut : on ne fait rien ! */
@@ -692,7 +806,16 @@ dans la procédure d'initialisation de l'{\sc idt} :
    }
 \end{lstlisting}
 
-   Nous pouvons alors ensuite définir les handlers plus spécifiques
+   Nous allons ensuite définir un handler un peu plus utile pour les
+interruptions que peut nous générer le matériel
+
+\begin{lstlisting}{}
+   positionnerHandlerInterruption(idt, 0, stubHandlerPanique_0);
+   positionnerHandlerInterruption(idt, 1, stubHandlerPanique_1);
+   ...
+\end{lstlisting}
+   
+   Nous pouvons enfin définir les handlers plus spécifiques
 
 \begin{lstlisting}{}
    /* Le handler du timer */

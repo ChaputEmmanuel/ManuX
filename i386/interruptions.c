@@ -84,8 +84,14 @@ void chargerIDT(IDT idt)
 
 void initialiserIDT()
 {
+   int i;
    IDT idt = (IDT) 0x30000; /* WARNING pas terrible ! */
 
+   /* Comportement par défaut : on ne fait rien ! */
+   for (i = 0; i < 256; i++) {
+      positionnerHandlerInterruption(idt, i, stubHandlerNop);
+   }
+   
    positionnerHandlerInterruption(idt, 0, stubHandlerPanique_0);
    positionnerHandlerInterruption(idt, 1, stubHandlerPanique_1);
    positionnerHandlerInterruption(idt, 2, stubHandlerPanique_2);
@@ -132,7 +138,7 @@ void initialiserIDT()
    chargerIDT(idt);
 
    /* On autorise les IRQ WARNING pourquoi ? */
- //  sti();
+   //sti();
 }
 
 /*
@@ -146,11 +152,11 @@ void initialiserIDT()
       __val /=16 ;			                                \
    }                                                                    \
 }
-#define afficherBin(v, n, l, c)		                        \
+#define afficherBin(v, n, l, c)		                                \
 {                                                                       \
    uint32 __val = (uint32) v;						\
    for (int __i = CON_COLONNES*l+c+n-1; __i>=CON_COLONNES*l+c; __i--) { \
-      ecran[2*__i] = chiffre[__val&1] ;                                \
+      ecran[2*__i] = chiffre[__val&1] ;                                 \
       __val /=2 ;			                                \
    }                                                                    \
 }
@@ -180,7 +186,7 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
    // On fait un peu de place en haut de l'écran
    for (i=0; i<11*2*CON_COLONNES; i+=2) {
       ecran[i]   = ecranPanique[i/2];
-      ecran[i+1] = COUL_FOND_GRIS_CLAIR | COUL_TXT_BLEU;
+      ecran[i+1] = COUL_FOND_BLEU | COUL_TXT_JAUNE;
    }
    __asm__ __volatile__("str %%eax" : "=a" (indice));
    
@@ -201,19 +207,21 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
    // Première ligne
    afficherHexa(itNum, 2, 1, 9);
    afficherHexa(tssDuFautif, 8, 1, 25);
-   //   afficherHexa(indice, 4, 1, 45);
-   afficherBin(tssDuFautif->EFLAGS, 32, 1, 45);
+   //afficherBin(tssDuFautif->EFLAGS, 32, 1, 45);
+   afficherBin(eFlags, 32, 1, 45);
 
    // Les descripteurs de segment
-   afficherHexa(tssDuFautif->CS, 4, 3, 9);
+   afficherHexa(cs, 4, 3, 9);
    afficherHexa(tssDuFautif->SS, 4, 5, 9);
    afficherHexa(tssDuFautif->DS, 4, 7, 9);
 
    // Les pointeurs
-   afficherHexa(tssDuFautif->EIP, 8, 3, 25);
+   //afficherHexa(tssDuFautif->EIP, 8, 3, 25);
+   afficherHexa(eip, 8, 3, 25);
    afficherHexa(tssDuFautif->ESP, 8, 5, 25);
    afficherHexa(tssDuFautif->ESI, 8, 7, 25);
    afficherHexa(tssDuFautif->EDI, 8, 9, 25);
    
-   __asm__ __volatile__ ("hlt");
+   halt();
 }
+ 

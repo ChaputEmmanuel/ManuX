@@ -115,10 +115,13 @@ void _start(InfoSysteme * infoSysteme)
    initialiserScheduler();
    printk("OK\n"); 
 
-   sti();
+   assert(1 == 2);
+   //   while(1){};
+   //sti();
 
-   printk_debug(DBG_KERNEL_START, "C'est parti les amis ...\n");
-   //   printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
+   printk("C'est parti mon kiki, ...\n");
+   //printk_debug(DBG_KERNEL_START, "C'est parti mon kiki, ...\n");
+   //printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
 
    init();
 }   /* main */
