@@ -65,6 +65,6 @@
 /*
  * Active-t-on la pagination ?
  */
-//#define MANUX_PAGINATION
+#define MANUX_PAGINATION
 
 #endif

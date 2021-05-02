@@ -33,5 +33,5 @@ symbols : $(OBJETS) $(LIBI386) $(LIBMANUX)
 
 
 clean :
-	rm -f bochs.out *.bin *.obj *.o *.a symbols
+	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols
 
