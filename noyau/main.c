@@ -6,7 +6,6 @@
 #include <manux/config.h>
 #include <manux/console.h>
 #include <manux/clavier.h>
-#include <manux/debug.h>
 #include <manux/tache.h>
 #include <manux/scheduler.h>
 #include <manux/interruptions.h>
@@ -16,15 +15,22 @@
 #include <manux/memoire.h>
 #include <manux/atomique.h>
 #include <manux/appelsysteme.h>
-#include <manux/ramdisk.h>
+#ifdef MANUX_RAMDISK
+#   include <manux/ramdisk.h>
+#endif
 #include <manux/printk.h>
+#include <manux/debug.h>
 #include <manux/limites.h>
-#include <manux/pagination.h>
+#ifdef MANUX_PAGINATION
+#   include <manux/pagination.h>
+#endif
 #include <manux/string.h>        /* bcopy() */
 #ifdef MANUX_JOURNAL
 #   include <manux/journal.h>       /* initialiserJournal() */
 #endif
-#include <manux/fichier.h>
+#ifdef MANUX_FS
+#   include <manux/fichier.h>
+#endif
 
 extern void init(); // Faire un init.h
 
@@ -44,12 +50,20 @@ Console * console; // La console système
  
 void _start(InfoSysteme * infoSysteme)
 {
+#ifdef MANUX_RAMDISK
    uint32 adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
                          + infoSysteme->adresseRamdiskLo;
-
-   //int i;
-
+#endif
+   
+   /*
+    * Ici, c'est surtout pour le côté artistique car si l'assertion
+    * est fausse, le co de ne sera pas exécuté :-/
+    */
+   assert(_start == (void *)0x20000);
+   
    interdireIRQ(IRQTimer);
+
+   /* Initialisation de la console noyau */
    console = consoleInit();
    
    /* Initialisation du journal */
@@ -58,52 +72,58 @@ void _start(InfoSysteme * infoSysteme)
 #endif
    
    //basculerConsole();
-   printk("32 bit ManuX running ...\n");
+   printk_debug(DBG_KERNEL_START, "32 bit ManuX running ...\n");
 
    /* Affichage de la mémoire disponible */
-   printk("Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
+   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
 
    /* Initialisation de la gestion mémoire */
-   printk("Initialisation memoire : ");
+   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme->memoireEtendue);
-   printk("OK\n");
+   printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
 
    /* Initialisation de la pagination */
-   printk("Initialisation pagination : ");
+#ifdef MANUX_PAGINATION
+   printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
    initialiserPagination(infoSysteme->memoireEtendue);
-   printk("OK\n");
-
+   printk_debug(DBG_KERNEL_START, "Paginiation initialisee\n");
+#endif
+   
    /* Initilisation des descripteurs de segments */
-   printk("Chargement GDT : ");
+   printk_debug(DBG_KERNEL_START, "Chargement GDT, ...\n");
    initialiserGDT();
-   printk("OK\n");
+   printk_debug(DBG_KERNEL_START, "GDT chargee\n");
 
    /* Initialisation de la table des interruptions */
-   printk("Chargement IDT : ");
+   printk_debug(DBG_KERNEL_START, "Chargement IDT ...\n");
    initialiserIDT();
-   printk("OK\n");
+   printk_debug(DBG_KERNEL_START, "IDT chargee\n");
 
    /* Initialisation de la table des appels système*/
-   printk("Initialisation appels systeme : ");
+   printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
-   printk("OK\n");
+   printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
 
-   printk("Initialisation du systeme de fichiers : ");
+#ifdef MANUX_FS
+   printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers : ");
    sfInitialiser();
-   printk("OK\n");
-
+   printk_debug(DBG_KERNEL_START, "OK\n");
+#endif
+   
    /* Initialisation du ramdisk */
+#ifdef MANUX_RAMDISK
    if (infoSysteme->tailleRamdisk > 0) {
-      printk("Initialisation du ramdisk (a %d de taille %d Ko) : ",
+      printk_debug(DBG_KERNEL_START, "Ramdisk (a %d de taille %d Ko) ...\n",
 	     adresseRamdisk, infoSysteme->tailleRamdisk);
       initialiserRamDisk(adresseRamdisk, infoSysteme->tailleRamdisk);
-      printk("OK\n");
+      printk_debug(DBG_KERNEL_START, "Ramdisk initilise\n");
    }
-     
+#endif
+   
    /* Initialisation du clavier */
-   printk("Initialisation du clavier : ");
+   printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
-   printk("OK\n");
+   printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
 
    /* Initialisation de la fréquence du timer */
    setFrequenceTimer(18);
@@ -111,18 +131,13 @@ void _start(InfoSysteme * infoSysteme)
 
    /* Initialisation de la gestion des processus */
 
-   printk("Initialisation du scheduler : ");
+   printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
-   printk("OK\n"); 
+   printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 
-   assert(1 == 2);
-   //   while(1){};
-   //sti();
-
-   printk("C'est parti mon kiki, ...\n");
-   //printk_debug(DBG_KERNEL_START, "C'est parti mon kiki, ...\n");
-   //printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
-
+   printk_debug(DBG_KERNEL_START, "C'est parti mon kiki, ...\n");
+   printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
+   //   halt();
    init();
 }   /* main */
 

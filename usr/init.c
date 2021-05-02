@@ -1,7 +1,14 @@
-#include <manux/scheduler.h>
-#include <manux/printk.h>
+/*
+ * Attention, ici les include sont dans usr/include !!!
+ */
+//#include <manux/scheduler.h>  // basculerTache devrait être un AS !!
+//#include <manux/printk.h>
+
+#include <manux/types.h>
 #include <stdio.h>
 
+#include <manux/i386.h> // halt
+#include <manux/appelsysteme.h> // basculerTache (bof !)
 
 void calculerPremiers()
 /*
@@ -16,7 +23,6 @@ void calculerPremiers()
    int cpt = 1;
    
    while (TRUE) {
-      basculerTache();
       printf("C'est la boucle numero %d : \n", cpt++);
       printf("%d", 2);
       for (n = 3; n < 1024; n += 2) {
@@ -31,6 +37,7 @@ void calculerPremiers()
 	 }
       }
       printf("\n--------------------------------------------------------------------------------\n");
+      if (cpt %3 == 0 ) basculerTache();
    }
 }
 
@@ -38,15 +45,7 @@ void init()
 {
    int n=2; // nombre de messages affichés
 
-   printk("Init est parti ...\n");
-
-   //   printf("PRINTF PRINTF PRINTF !!!!\n");
-  
-   //__asm__ __volatile__ ("int $31"::);
-   
-   //printk("Printf done ...\n");
-   basculerTache();
-   while(1){};
+   printf("Greetings from userland !\n");
    for (n = 0; n < 10000000; n++) {
       calculerPremiers();
    }

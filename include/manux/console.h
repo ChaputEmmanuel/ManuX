@@ -151,9 +151,9 @@ void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
 void initialiserConsole(Console * cons, char * adresseEcran);
 
 /*
- * Forcer l'apparition de la console à l'écran
+ * Forcer l'apparition d'une console à l'écran
  */
-void montrerConsole(int idx);
+void basculerVersConsole(Console * cons);
 
 /*
  * Basculer vers la prochaine console virtuelle
@@ -175,5 +175,10 @@ Console * consoleNoyau();
  * Écriture sur une console
  */
 int consoleEcrire(Fichier * f, void * buffer, int nbOctets);
+
+/*
+ * La fonction réalisant l'appel système  NBAS_ECRIRE_CONS 
+ */
+int sys_ecrireConsole(ParametreAS as, void * msg, int n);
 
 #endif 

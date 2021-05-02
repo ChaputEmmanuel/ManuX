@@ -7,17 +7,34 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
 En cours
 --------
+   Faire un as ecrireConsole et l'utiliser comme exemple de doc. En profiter
+pour structure noyau vs usr.
 
+   ATTENTION, ... il va falloir être clair sur la répartition entre
+include et usr/include ! C'est (presque) une copie l'un de l'autre.
+Pas très sage/safe !!! Peut-être faut-il partir du code de init.c et
+voir ce qui est utile. Si ça l'est vraiment, on ajoute à une cible de
+make qui copie de include/manux vers usr/include/manux.
+
+   En cours, voir quels fichiers on peut virer de usr/include et finir
+   la doc
+   
+   D'ailleurs, il faudra probablement changer include/manux en
+   include
+   
+   Un truc étrange : pourquoi avec le journal (ou après le premier
+   changemet de console )je perds les messages système !?
+   
    Ca plante, et ça dépend du code que je commente, bref, ça sent
-la fuite mémoire et ça pourrait être chaud à déboguer. C'est de toute
-évidence le moment de
-
-   . Il faut s'attaquer à la mémoire ... est-il normal que la même page
-   seve pour les données et la pile (cf tache.c) alors que ce n'est
-   pas le même sélecteur de segment ?
-
-
-
+la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute
+évidence le moment des'attaquer à la mémoire ... est-il normal que la
+même page serve pour les données et la pile (cf tache.c) alors que
+ce n'est pas le même sélecteur de segment ? Il faut faire la doc, ...
+Il faut aller voir notemment dans tache.c, j'ai l'impression que c'est
+n'importe quoi la gestion de la pagination ! Il faut que la structure
+de la mémoire, pour le système et pour chaque tâche, soit claire. Un
+affichage en fin de creerTache pourra aider, ... 
+  
 
 
    BON, on va essayer d'être plus propre dans ce qui suit en
@@ -26,8 +43,6 @@ dans /usr.
 
    Pour ça, faire un appel système "à la fork ?"
 
-
-   Gestion des tâches (voir ci dessous)
 
    ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
 ne démarre pas car l'adresse est hard-codée dans
@@ -43,9 +58,6 @@ init-manux.nasm. Trois solutions temporaires :
    d'y suffir. Mais il faut utiliser la dernière solution, comme pour
    la taille avec tools/taille_noyau
    
-   ATTENTION, ... il va falloir être clair sur la répartition entre
-include et usr/include ! C'est (presque) une copie l'un de l'autre.
-Pas très sage/safe !!!
 
    La fonction printk() fonctionne jusqu'au lancement du scheduler !
    Peut-être un pb avec la commutation de console ?

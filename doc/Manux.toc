@@ -9,64 +9,68 @@
 \contentsline {section}{\numberline {3}Les outils de d\'eveloppement}{4}% 
 \contentsline {subsection}{\numberline {3.1}La compilation}{4}% 
 \contentsline {subsubsection}{\numberline {3.1.1}L'assembleur}{4}% 
-\contentsline {subsubsection}{\numberline {3.1.2}Le compilateur C}{4}% 
-\contentsline {subsubsection}{\numberline {3.1.3}La cr\'eation du noyau}{4}% 
+\contentsline {subsubsection}{\numberline {3.1.2}Le compilateur C}{5}% 
+\contentsline {subsubsection}{\numberline {3.1.3}La cr\'eation du noyau}{5}% 
 \contentsline {subsection}{\numberline {3.2}L'ex\'ecution}{5}% 
 \contentsline {subsubsection}{\numberline {3.2.1}L'\'emulateur Bochs}{5}% 
 \contentsline {subsubsection}{\numberline {3.2.2}L'\'emulateur QEMU}{5}% 
-\contentsline {subsection}{\numberline {3.3}Le d\'ebugage}{5}% 
-\contentsline {subsubsection}{\numberline {3.3.1}Ex\'ecution}{6}% 
-\contentsline {subsubsection}{\numberline {3.3.2}Affichage des registres}{6}% 
-\contentsline {subsubsection}{\numberline {3.3.3}Affichage des variables}{6}% 
-\contentsline {subsubsection}{\numberline {3.3.4}D\'esassemblage du code}{6}% 
-\contentsline {section}{\numberline {4}Le boot}{6}% 
-\contentsline {subsection}{\numberline {4.1}Le secteur de boot}{6}% 
+\contentsline {subsection}{\numberline {3.3}Le d\'ebugage ``interne''}{5}% 
+\contentsline {subsubsection}{\numberline {3.3.1}La fonction {\tt printk\_debug}}{5}% 
+\contentsline {subsubsection}{\numberline {3.3.2}La macro {\tt assert}}{5}% 
+\contentsline {subsubsection}{\numberline {3.3.3}Le handler {\tt handlerPanique}}{6}% 
+\contentsline {subsubsection}{\numberline {3.3.4}Le fichier {\tt noyau/symbols}}{6}% 
+\contentsline {subsection}{\numberline {3.4}Le d\'ebugage ``externe''}{6}% 
+\contentsline {subsubsection}{\numberline {3.4.1}Ex\'ecution}{6}% 
+\contentsline {subsubsection}{\numberline {3.4.2}Affichage des registres}{6}% 
+\contentsline {subsubsection}{\numberline {3.4.3}Affichage des variables}{6}% 
+\contentsline {subsubsection}{\numberline {3.4.4}D\'esassemblage du code}{7}% 
+\contentsline {section}{\numberline {4}Le boot}{7}% 
+\contentsline {subsection}{\numberline {4.1}Le secteur de boot}{7}% 
 \contentsline {subsubsection}{\numberline {4.1.1}Liens entre les trois \'el\'ements}{7}% 
-\contentsline {subsubsection}{\numberline {4.1.2}Construction du fichier de d\'emarrage}{7}% 
-\contentsline {subsubsection}{\numberline {4.1.3}\'Etat de la m\'emoire apr\`es le chargement}{7}% 
-\contentsline {subsection}{\numberline {4.2}L'initialisation}{7}% 
-\contentsline {subsubsection}{\numberline {4.2.1}Passage des informations au noyau}{7}% 
-\contentsline {subsubsection}{\numberline {4.2.2}D\'etection de la m\'emoire}{8}% 
-\contentsline {subsubsection}{\numberline {4.2.3}D\'etection du processeur}{8}% 
-\contentsline {subsubsection}{\numberline {4.2.4}D\'emarrage du noyau ({\tt noyau/main.c})}{8}% 
-\contentsline {section}{\numberline {5}L'affichage ({\tt lib/console.c lib/printk.c})}{8}% 
+\contentsline {subsubsection}{\numberline {4.1.2}Construction du fichier de d\'emarrage}{8}% 
+\contentsline {subsubsection}{\numberline {4.1.3}\'Etat de la m\'emoire apr\`es le chargement}{8}% 
+\contentsline {subsection}{\numberline {4.2}L'initialisation}{8}% 
+\contentsline {subsubsection}{\numberline {4.2.1}Passage des informations au noyau}{8}% 
+\contentsline {subsubsection}{\numberline {4.2.2}D\'etection de la m\'emoire}{9}% 
+\contentsline {subsubsection}{\numberline {4.2.3}D\'etection du processeur}{9}% 
+\contentsline {subsubsection}{\numberline {4.2.4}D\'emarrage du noyau ({\tt noyau/main.c})}{9}% 
+\contentsline {section}{\numberline {5}L'affichage ({\tt lib/console.c lib/printk.c})}{9}% 
 \contentsline {subsection}{\numberline {5.1}Gestion de l'\'ecran : la console}{9}% 
-\contentsline {subsection}{\numberline {5.2}Plus de souplesse avec les consoles virtuelles}{9}% 
-\contentsline {subsection}{\numberline {5.3}Mise en place d'un journal}{9}% 
-\contentsline {subsection}{\numberline {5.4}Un premier {\tt printk()}}{9}% 
+\contentsline {subsection}{\numberline {5.2}Plus de souplesse avec les consoles virtuelles}{10}% 
+\contentsline {subsection}{\numberline {5.3}Mise en place d'un journal}{10}% 
+\contentsline {subsection}{\numberline {5.4}Un premier {\tt printk()}}{10}% 
 \contentsline {section}{\numberline {6}Gestion des interruptions ({\tt interruptions.c interBasNiveau.nasm})}{10}% 
-\contentsline {subsection}{\numberline {6.1}D\'efinition ``bas niveau'' d'un handler}{10}% 
-\contentsline {subsection}{\numberline {6.2}D\'efinition d'un handler en C}{10}% 
+\contentsline {subsection}{\numberline {6.1}D\'efinition ``bas niveau'' d'un handler}{11}% 
+\contentsline {subsection}{\numberline {6.2}D\'efinition d'un handler en C}{11}% 
 \contentsline {subsection}{\numberline {6.3}Insertion d'un handler dans l'{\sc idt}}{11}% 
-\contentsline {subsection}{\numberline {6.4}Initialisation de la table}{11}% 
+\contentsline {subsection}{\numberline {6.4}Initialisation de la table}{12}% 
 \contentsline {subsection}{\numberline {6.5}Le timer}{12}% 
 \contentsline {subsection}{\numberline {6.6}Le clavier}{12}% 
-\contentsline {section}{\numberline {7}Gestion des t\^aches}{12}% 
-\contentsline {subsection}{\numberline {7.1}D\'efinition d'une t\^ache}{12}% 
-\contentsline {subsubsection}{\numberline {7.1.1}Champs li\'es au noyau}{12}% 
-\contentsline {subsubsection}{\numberline {7.1.2}Champs li\'es au processeur}{12}% 
-\contentsline {subsubsection}{\numberline {7.1.3}Les descripteurs de t\^ache Intel}{13}% 
-\contentsline {subsection}{\numberline {7.2}Cr\'eation d'une t\^ache}{13}% 
-\contentsline {subsection}{\numberline {7.3}Basculement vers une t\^ache}{13}% 
-\contentsline {section}{\numberline {8}Gestion de la m\'emoire}{13}% 
-\contentsline {subsection}{\numberline {8.1}La segmentation}{13}% 
-\contentsline {subsubsection}{\numberline {8.1.1}Les descripteurs de segment}{15}% 
-\contentsline {subsubsection}{\numberline {8.1.2}Les tables de descripteurs de segments {\sc ldt} et {\sc gdt}}{15}% 
-\contentsline {subsection}{\numberline {8.2}Adresse lin\'eaire et adresse physique}{16}% 
-\contentsline {subsection}{\numberline {8.3}La m\'emoire virtuelle}{16}% 
-\contentsline {subsubsection}{\numberline {8.3.1}Pagination}{16}% 
-\contentsline {subsubsection}{\numberline {8.3.2}Gestion de la m\'emoire physique}{17}% 
-\contentsline {subsubsection}{\numberline {8.3.3}Organisation de la m\'emoire virtuelle}{17}% 
-\contentsline {section}{\numberline {9}La librairie du noyau}{17}% 
-\contentsline {subsection}{\numberline {9.1}Le journal}{18}% 
-\contentsline {subsection}{\numberline {9.2}Le ramdisk}{18}% 
-\contentsline {section}{\numberline {10}Les outils de synchronisation}{18}% 
-\contentsline {subsection}{\numberline {10.1}Op\'erations atomiques}{18}% 
-\contentsline {subsection}{\numberline {10.2}Exclusions mutuelles}{18}% 
-\contentsline {section}{\numberline {11}Interface syst\`eme}{19}% 
-\contentsline {subsection}{\numberline {11.1}Les appels syst\`emes}{19}% 
-\contentsline {subsubsection}{\numberline {11.1.1}D\'efinition de l'interface}{19}% 
-\contentsline {subsubsection}{\numberline {11.1.2}\'Ecriture de l'appel syst\`eme}{19}% 
-\contentsline {subsubsection}{\numberline {11.1.3}Enregistrement de l'appel syst\`eme}{20}% 
-\contentsline {section}{\numberline {12}L'ordonnancement des t\^aches}{20}% 
-\contentsline {section}{\numberline {13}Le syst\`eme de fichiers}{20}% 
+\contentsline {section}{\numberline {7}Les appels syst\`emes}{12}% 
+\contentsline {subsection}{\numberline {7.1}D\'efinition de l'interface}{13}% 
+\contentsline {subsection}{\numberline {7.2}\'Ecriture de l'appel syst\`eme}{13}% 
+\contentsline {subsection}{\numberline {7.3}Enregistrement de l'appel syst\`eme}{13}% 
+\contentsline {section}{\numberline {8}Gestion des t\^aches}{14}% 
+\contentsline {subsection}{\numberline {8.1}D\'efinition d'une t\^ache}{14}% 
+\contentsline {subsubsection}{\numberline {8.1.1}Champs li\'es au noyau}{14}% 
+\contentsline {subsubsection}{\numberline {8.1.2}Champs li\'es au processeur}{14}% 
+\contentsline {subsubsection}{\numberline {8.1.3}Les descripteurs de t\^ache Intel}{15}% 
+\contentsline {subsection}{\numberline {8.2}Cr\'eation d'une t\^ache}{15}% 
+\contentsline {subsection}{\numberline {8.3}Basculement vers une t\^ache}{15}% 
+\contentsline {section}{\numberline {9}Gestion de la m\'emoire}{15}% 
+\contentsline {subsection}{\numberline {9.1}La segmentation}{15}% 
+\contentsline {subsubsection}{\numberline {9.1.1}Les descripteurs de segment}{16}% 
+\contentsline {subsubsection}{\numberline {9.1.2}Les tables de descripteurs de segments {\sc ldt} et {\sc gdt}}{17}% 
+\contentsline {subsection}{\numberline {9.2}Adresse lin\'eaire et adresse physique}{17}% 
+\contentsline {subsection}{\numberline {9.3}La m\'emoire virtuelle}{18}% 
+\contentsline {subsubsection}{\numberline {9.3.1}Pagination}{18}% 
+\contentsline {subsubsection}{\numberline {9.3.2}Gestion de la m\'emoire physique}{18}% 
+\contentsline {subsubsection}{\numberline {9.3.3}Organisation de la m\'emoire virtuelle}{20}% 
+\contentsline {section}{\numberline {10}La librairie du noyau}{20}% 
+\contentsline {subsection}{\numberline {10.1}Le journal}{20}% 
+\contentsline {subsection}{\numberline {10.2}Le ramdisk}{20}% 
+\contentsline {section}{\numberline {11}Les outils de synchronisation}{20}% 
+\contentsline {subsection}{\numberline {11.1}Op\'erations atomiques}{20}% 
+\contentsline {subsection}{\numberline {11.2}Exclusions mutuelles}{21}% 
+\contentsline {section}{\numberline {12}L'ordonnancement des t\^aches}{21}% 
+\contentsline {section}{\numberline {13}Le syst\`eme de fichiers}{21}% 

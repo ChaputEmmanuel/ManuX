@@ -11,6 +11,8 @@
 #include <manux/listetaches.h>
 #include <manux/atomique.h>
 
+#include <manux/appelsysteme.h>
+
 /*
  * Pour paramétrer le scheduler
  */
@@ -53,7 +55,7 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
  * son créateur.
  */
 
-void basculerTache();
+void ordonnanceur();
 /*
  * Basculer vers la prochaine tache à exécuter
  */
@@ -68,6 +70,11 @@ uint32 AS_console();
 /*
  * Obtention de la console de la tache en cours. WARNING ça n'a rien
  * à faire là ...
+ */
+
+int sys_basculerTache(ParametreAS as);
+/*
+ * Implantation de l'appel système d'invocation de l'ordonnanceur
  */
 
 #endif

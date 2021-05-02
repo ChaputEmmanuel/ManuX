@@ -37,6 +37,13 @@ BOURAGE	  = ./boot/bourage ./boot/ramdisk.ram
 TAILLE_CONF = taille.conf
 OUTILS      = ./outils/taillenoyau
 
+# Les includes de usr/include/manux qui sont des copies de include/manux
+# ils sont édités dans l'arborescence du noyau et doivent donc être
+# mis à jour dans la partie usr
+USR_INC_D   = usr/include/manux
+USR_INC_F   = appelsystemenum.h config.h types.h
+USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
+
 include make.conf
 export CFLAGS ROOTDIR
 
@@ -46,12 +53,11 @@ ASM_BIN_OPT = -f bin
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_BIN_OPT) $< -o $@
 
-manux : composants boot $(BOURAGE)
+manux : usrinc composants boot $(BOURAGE)
 	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU) $(BOURAGE) > manux
 
 run : manux
 	$(RUN_MANUX)
-
 
 .c.o :
 	gcc $(CFLAGS) -c $<
@@ -64,6 +70,11 @@ $(LIBSF) :
 
 $(LIBMANUX) :
 	(cd lib ; make)
+
+usr/include/manux/%.h : include/manux/%.h
+	cp $< $@
+
+usrinc : $(USR_INC)
 
 $(NOYAU) :
 	(cd noyau ; make)

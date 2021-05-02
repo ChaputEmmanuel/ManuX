@@ -3,8 +3,10 @@
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2002 */
 /*----------------------------------------------------------------------------*/
+#include <manux/config.h>     // Suivant la config on passe par fs ou pas
 #include <stdio.h>
-#include <unistd.h>  // ecrire
+
+#include <unistd.h>  // ecrire ou afficherConsoleAS
 
 #define NULL ((void *)0)
 #define chiffre "0123456789abcdef"
@@ -81,10 +83,11 @@ affent :          n = va_arg(argList, int);
 
    chaine[indice] = 0;
 
-   //   printk("printf va ecrire (fd = 1, ch = %d, in = %d)\n", chaine, indice);
-   //while(1){};
+#ifdef MANU_AS
    ecrire(1, chaine, indice); // WARNING : 1 à remplacer par stdout par exemple
-   //printk("printf termine\n");
+#else
+   ecrireConsole(chaine, indice);
+#endif
 
    va_end(argList);
 }

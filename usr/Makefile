@@ -10,7 +10,7 @@ ASM_EXT  = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f bin
 
-OBJETS      = stdio.o init.o
+OBJETS      = stdio.o init.o appelsysteme.o
 
 libusr.a : $(OBJETS) 
 	ar rf libusr.a $(OBJETS)

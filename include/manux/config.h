@@ -25,6 +25,18 @@
 #   define ADRESSE_DEBUT_TAS 0x1000000
 #endif
 
+
+/*
+ * Utilisation d'un système de fichiers
+ */
+//#define MANUX_FS
+
+/*
+ * Utilisation d'un RAMdisk
+ */
+//#define MANUX_RAMDISK
+
+
 /*
  * Le nombre maximal de fichiers manipulés par un processus
  * WARNING : sans aucun intéret pour le moment !
@@ -49,5 +61,10 @@
  * les assert ne produisent aucun code.
  */
 #define MANUX_ASSERT_ACTIVES
+
+/*
+ * Active-t-on la pagination ?
+ */
+//#define MANUX_PAGINATION
 
 #endif

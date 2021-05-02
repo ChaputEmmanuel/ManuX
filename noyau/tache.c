@@ -16,6 +16,7 @@
 #include <manux/fichier.h>    /* pour créer stdout WARNING, à mettre ailleurs */
 #include <manux/errno.h>      // Les codes d'erreur
 #include <manux/printk.h>
+#include <manux/debug.h>
 
 /*
  * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
@@ -84,15 +85,19 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->numero = numeroProchaineTache++;
 
    /* On lui affecte sa console */
-   //   tache->console = cons; // WARNING à virer
+   tache->console = cons; // WARNING à virer (? ou pas, pour le moment non !)
+   
    tache->fichiers[1].prive = (void*)cons;
    tache->fichiers[1].methodes = &consoleMethodesFichier;
 
    /* Zone mémoire utilisable */
    tache->tailleMemoire = (void *)(nombrePagesSysteme * TAILLE_PAGE);
 
+   printk_debug(DBG_KERNEL_PAGIN, "Tache = 0x%x\n", tache);
+   printk_debug(DBG_KERNEL_PAGIN, "Le CR3 avant = 0x%x\n", tache->tss.CR3);
+
    /* On lui affecte son PDBR */
-   creerTablePagination((PageDirectory *)&tache->tss.CR3);
+   creerTablePagination((PageDirectory *)&(tache->tss.CR3));
 
    /* On ajoute la page décrivant la tâche en début de mémoire spécifique */
    ajouterPage((PageDirectory *)&tache->tss.CR3,

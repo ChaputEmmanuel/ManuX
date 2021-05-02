@@ -16,6 +16,7 @@
 #include <manux/memoire.h>       /* NULL, allouerPage */
 #include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
 #include <manux/printk.h>        /* printk() */
+#include <manux/debug.h>         /* debug() */
 #include <manux/interruptions.h> /* nbTicks */
 #include <manux/i386.h>          /* ltr */
 #include <manux/appelsysteme.h>  /* console() */
@@ -66,14 +67,14 @@ void setFrequenceTimer(int freqHz)
    outb(0x40, (decompte >> 8) & 0xFF);
 }
 
-void basculerTache()
+void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
    do {
       if (tacheEnCours != NULL) { /* WARNING on doit pouvoir s'en passer */
 #ifdef DEBUG_MANUX_SCHEDULER
-         printk("[SCHED] On quitte la tache %d de TSS %x, ...\n",
+         printk_debug(DBG_KERNEL_ORDON, "[SCHED] On quitte la tache %d de TSS %x, ...\n",
 		tacheEnCours->numero, tacheEnCours->indiceTSSDescriptor);
 #endif
          insererCelluleTache(&listeTaches,
@@ -81,7 +82,7 @@ void basculerTache()
                              (CelluleTache*)tacheEnCours+sizeof(Tache));
 #ifdef DEBUG_MANUX_SCHEDULER
       } else {
-         printk("[SCHED] Pas de tache a quitter !\n");
+         printk_debug(DBG_KERNEL_ORDON, "[SCHED] Pas de tache a quitter !\n");
 #endif
       }
 
@@ -90,7 +91,7 @@ void basculerTache()
       //   } while ((tacheEnCours != NULL) && (tacheEnCours->etat != Tache_Prete));
 
 #ifdef DEBUG_MANUX_SCHEDULER
-   printk("[SCHED] ... pour la tache %d de TSS %x\n",
+   printk_debug(DBG_KERNEL_ORDON, "[SCHED] ... pour la tache %d de TSS %x\n",
 		tacheEnCours->numero, tacheEnCours->indiceTSSDescriptor);
 #endif
    //     while (1){};
@@ -98,7 +99,7 @@ void basculerTache()
    /* WARNING on doit pouvoir se passer du test suivant */
    if ((tacheEnCours != NULL) && (tacheEnCours != tachePrecedente)){
 #ifdef DEBUG_MANUX_SCHEDULER
-      printk("[SCHED] On passe a la tache %d de TSS %x (cs = %x)\n",
+     printk_debug(DBG_KERNEL_ORDON, "[SCHED] On passe a la tache %d de TSS %x (cs = %x)\n",
 	     tacheEnCours->numero,
 	     tacheEnCours->indiceTSSDescriptor,
 	     tacheEnCours->tss.CS);
@@ -108,7 +109,7 @@ void basculerTache()
 
 #ifdef DEBUG_MANUX_SCHEDULER
    } else {
-      printk("[SCHED] Pas de nouvelle tache !\n");
+       printk_debug(DBG_KERNEL_ORDON, "[SCHED] Pas de nouvelle tache !\n");
 #endif
    }
 }
@@ -120,7 +121,7 @@ void scheduler()
 {
    CelluleTache * celluleTache;
 
-   printk("Scheduler le mal nomme, ...\n");
+   printk_debug(DBG_KERNEL_ORDON, "Scheduler le mal nomme, ...\n");
 
    while(1) {
       if (afficheEtatSystemeDemande) {
@@ -143,11 +144,10 @@ void scheduler()
       /* WARNING, c'est sûrement pas le meilleur endroit ... */
       if (basculeConsoleDemandee) {
          basculeConsoleDemandee = FALSE;
-         printk("\n\nBascule console ...\n\n");
          basculerVersConsoleSuivante();
       }
 #endif
-      basculerTache();
+      ordonnanceur();
    }
 }
 
@@ -163,18 +163,17 @@ void initialiserScheduler()
 
    /* Initialisation de la tache scheduler */
    ordonnancerTache(scheduler, FALSE);
-
-   //while(1){};
 }
 
 void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 {
    Tache   * tache;
    
-   Console * cons = NULL;
-   void    * page;
+   Console * cons = consoleNoyau(); // WARNING, on pourrait prendre celle de la tâche en cours !
 
 #ifdef CONSOLES_VIRTUELLES
+   void    * page;
+
    //Nouvelle console ? 
    if (nouvelleConsole) {
       page = allouerPageSysteme();  // WARNING, gérer erreur
@@ -186,7 +185,8 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    
    /* Création de la tache */
    tache = creerTache(corpsTache, cons);
-      printk("Tache %d creee de TSSdesc 0x%x et tss=0x%x\n",
+
+   printk_debug(DBG_KERNEL_TACHE, "Tache %d creee de TSSdesc 0x%x et tss=0x%x\n",
 	  tache->numero,
 	  tache->indiceTSSDescriptor,
 	  &(tache->tss));
@@ -196,7 +196,7 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       insererCelluleTache(&listeTaches,
                           tache,
                           (CelluleTache*)tache+sizeof(Tache));
-      printk("Tache inseree\n");
+      printk_debug(DBG_KERNEL_TACHE, "Tache inseree\n");
 
    } else {
       /* Cas particulier de la première tâche : */
@@ -225,4 +225,14 @@ uint32 AS_console()
    } else {
       return (uint32) NULL;
    }
+}
+
+/*
+ * Implantation de l'appel système d'invocation de l'ordonnanceur
+ */
+int sys_basculerTache(ParametreAS as)
+{
+   ordonnanceur();
+
+   return 0;
 }

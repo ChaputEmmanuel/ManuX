@@ -42,12 +42,15 @@ Console * consoleInit()
    _consoleNoyau.colonne = 0;
    _consoleNoyau.nbLignes = CON_LIGNES;
    _consoleNoyau.nbColonnes = CON_COLONNES;
-   _consoleNoyau.attribut = 15;
+   _consoleNoyau.attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
 
+   //   effacerConsole(&_consoleNoyau);
+   
 #ifdef CONSOLES_VIRTUELLES
    consoleActive = &_consoleNoyau;
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
+   
 #endif
 
    return &_consoleNoyau;
@@ -211,11 +214,6 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 #endif
 }
 
-/*
-void afficherEcran(char * msg){
-   afficherConsole(&_consoleNoyau, msg);
-}
-*/
 
 void afficherConsole(Console * cons, char * msg)
 {
@@ -270,7 +268,7 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    cons->colonne = 0;
    cons->nbLignes = CON_LIGNES;
    cons->nbColonnes = CON_COLONNES;
-   cons->attribut = 15;
+   cons->attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
 
    /* Initialisation du verrou */
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
@@ -294,16 +292,16 @@ void initialiserConsole(Console * cons, char * adresseEcran)
 /*
  * Basculer vers une console virtuelle. Attention, elle doit exister.
  */
-void basculerVersConsoleSuivante()
+void basculerVersConsole(Console * suivante)
 {
    int i, l, c, a;
 
    assert(consoleActive != NULL);
    
-   if (consoleActive->suivante == consoleActive)
+   if (suivante == consoleActive)
       return;
 
-   assert(consoleActive->suivante != NULL);
+   assert(suivante != NULL);
    
    // On sauvegarde l'écran physique dans la console active
    for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
@@ -315,7 +313,7 @@ void basculerVersConsoleSuivante()
    consoleActive->adresseEcran = consoleActive->adresseEcranCopie;
    
    // On passe à la nouvelle CV 
-   consoleActive = consoleActive->suivante;
+   consoleActive = suivante;
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
    entrerExclusionMutuelle(&consolesVirtuelles[consoleCourante]->scAcces);
@@ -353,6 +351,16 @@ void basculerVersConsoleSuivante()
 #endif
 }
 
+/*
+ * Basculer vers la console suivante
+ */
+void basculerVersConsoleSuivante()
+{
+   assert(consoleActive != NULL);
+
+   basculerVersConsole(consoleActive->suivante);
+}
+
 #endif  // CONSOLES_VIRTUELLES
 
 int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
@@ -383,4 +391,20 @@ Console * consoleNoyau()
 MethodesFichier consoleMethodesFichier = {
    ecrire : consoleEcrire,
 };
+
+/*
+ * L'implatantion de l'AS ecrireConsole
+ */
+int sys_ecrireConsole(ParametreAS as, void * msg, int n)
+{
+   assert(tacheEnCours != NULL);
+   Console * cons = tacheEnCours->console;
+   
+   // printk_debug(DBG_KERNEL_ALL, "cons = 0x%x, msg=0x%x, n=%d\n", cons, msg, n);
+
+   assert(cons != NULL);
+   afficherConsoleN(cons, msg, n);
+
+   return n; // WARNING gérer les erreurs 
+}
 

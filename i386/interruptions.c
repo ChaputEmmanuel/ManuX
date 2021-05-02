@@ -169,7 +169,7 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
 +-------------+-------------------+--------32--28--24--20--16--12---8---4---0--+\
 | it : 0x--   | tss  = 0x-------- | eflags=  --------------------------------  |\
 +-------------+-------------------+-------------+---+---+---+---+---+---+---+--+\
-| cs : 0x---- | eip  = 0x-------- |                                            |\
+| cs : 0x---- | eip  = 0x-------- | cr3  = 0x                                  |\
 +-------------+-------------------+--------------------------------------------+\
 | ss : 0x---- | esp  = 0x-------- |                                            |\
 +-------------+-------------------+--------------------------------------------+\
@@ -209,6 +209,7 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
    afficherHexa(tssDuFautif, 8, 1, 25);
    //afficherBin(tssDuFautif->EFLAGS, 32, 1, 45);
    afficherBin(eFlags, 32, 1, 45);
+   afficherHexa(tssDuFautif->CR3, 8, 3, 45);
 
    // Les descripteurs de segment
    afficherHexa(cs, 4, 3, 9);

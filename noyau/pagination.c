@@ -18,7 +18,7 @@ PageDirectory repertoirePaginationSysteme;
 void creerTablePaginationDirecte(PageDirectory * repertoirePagination,
 				 int tailleMemoireEtendue)
 /*
- * Initialisation d'une table de pagination "directe", c'est à dire
+ * Initialisation d'une table de pagination "directe", c'est-à-dire
  * qui conserve les adresses physiques dans l'espace virtuel.
  */
 {

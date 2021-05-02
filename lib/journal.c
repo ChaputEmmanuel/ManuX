@@ -45,6 +45,6 @@ void journaliser(char * message)
 void afficherJournal()
 {
 #ifdef CONSOLES_VIRTUELLES
-   montrerConsole(0); // WARNING ! Pas beau le 0 hardcodé
+   basculerVersConsole(journal);
 #endif
 }

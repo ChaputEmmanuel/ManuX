@@ -6,6 +6,7 @@
 #ifndef STD_IO_DEF
 #define STD_IO_DEF
 
+#include <manux/config.h>
 #include <manux/stdarg.h>
 
 void printk(char * format, ...);
