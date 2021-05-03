@@ -6,7 +6,7 @@ noyau/symbols
 noyau/noyau.obj
 noyau/noyau.elf
 boot/bourage
-manux
+./manux
 outils/taillenoyau
 taille.conf
 **/Manux.aux
