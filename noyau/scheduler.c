@@ -16,7 +16,7 @@
 #include <manux/memoire.h>       /* NULL, allouerPage */
 #include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
 #include <manux/printk.h>        /* printk() */
-#include <manux/debug.h>         /* debug() */
+#include <manux/debug.h>         /* debug() paniqueNoyau() */
 #include <manux/interruptions.h> /* nbTicks */
 #include <manux/i386.h>          /* ltr */
 #include <manux/appelsysteme.h>  /* console() */
@@ -153,23 +153,34 @@ void scheduler()
 
 void initialiserScheduler()
 {
-   numeroProchaineTache = 0;
+  /* Les valeurs initiales */
+  
+   numeroProchaineTache = 1;
+   tacheEnCours = NULL;
    
    /* Initialisation de la liste des taches en cours */
    initialiserListeTache(&listeTaches);
    
    /* Création d'une tâche pour le fil actuel */
-   ordonnancerTache(NULL, TRUE);
+   if (ordonnancerTache(NULL, TRUE) < 0) {
+      paniqueNoyau("impossible de creer la premiere tache !\n");
+   }
 
    /* Initialisation de la tache scheduler */
-   ordonnancerTache(scheduler, FALSE);
+   if (ordonnancerTache(scheduler, FALSE)  < 0) {
+      paniqueNoyau("impossible de creer la seconde tache !\n");
+   }
 }
 
-void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
+/*
+ * Insertion d'une nouvelle tâche dans l'ordonnanceur. La valeur
+ * retournée est l'id de la tâche ou un code d'erreur.
+ */
+TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 {
    Tache   * tache;
-   
-   Console * cons = consoleNoyau(); // WARNING, on pourrait prendre celle de la tâche en cours !
+
+   Console * cons = consoleNoyau(); // En l'absence de consoles virtuelles
 
 #ifdef CONSOLES_VIRTUELLES
    void    * page;
@@ -178,14 +189,24 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    if (nouvelleConsole) {
       page = allouerPageSysteme();  // WARNING, gérer erreur
       cons = (Console *)page;
-      initialiserConsole(cons, page + sizeof(Console)); // WARNING ! il faut que ça tienne !
-      printk("Console 0x%x creee\n", cons);
+      if (page != NULL) {
+         initialiserConsole(cons, page + sizeof(Console)); // WARNING ! il faut que ça tienne !
+      } else {
+  	 printk_debug(DBG_KERNEL_ERREUR, "Impossible de creer ne nouvelle console\n");
+         assert(tacheEnCours != NULL);
+         cons = tacheEnCours->console;
+      }
+   } else {
+      assert(tacheEnCours != NULL);
+      cons = tacheEnCours->console;
    }
 #endif
    
    /* Création de la tache */
    tache = creerTache(corpsTache, cons);
-
+   if (tache == NULL) {
+      return -ENOMEM;
+   }
    printk_debug(DBG_KERNEL_TACHE, "Tache %d creee de TSSdesc 0x%x et tss=0x%x\n",
 	  tache->numero,
 	  tache->indiceTSSDescriptor,
@@ -205,6 +226,7 @@ void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       /*   . et on la déclare comme en cours.   */
       tacheEnCours = tache;
    }
+   return tache->numero;
 }
 
 int AS_numeroTache()
@@ -236,3 +258,10 @@ int sys_basculerTache(ParametreAS as)
 
    return 0;
 }
+
+TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConsole)
+{
+   assert(tacheEnCours != NULL);
+   ordonnancerTache(corpsTache, !shareConsole);
+}
+

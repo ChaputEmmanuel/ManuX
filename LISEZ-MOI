@@ -7,8 +7,8 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
 En cours
 --------
-   Faire un as ecrireConsole et l'utiliser comme exemple de doc. En profiter
-pour structure noyau vs usr.
+   Faire un AS ecrireConsole et l'utiliser comme exemple de doc. En profiter
+pour structurer noyau vs usr.
 
    ATTENTION, ... il va falloir être clair sur la répartition entre
 include et usr/include ! C'est (presque) une copie l'un de l'autre.
@@ -24,6 +24,9 @@ make qui copie de include/manux vers usr/include/manux.
    
    Un truc étrange : pourquoi avec le journal (ou après le premier
    changemet de console )je perds les messages système !?
+
+   Un petit truc à faire : mettre à droite le message qui dit dans
+   quelle console on est.
    
    Ca plante, et ça dépend du code que je commente, bref, ça sent
 la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute

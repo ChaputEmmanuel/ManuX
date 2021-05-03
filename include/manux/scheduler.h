@@ -47,7 +47,7 @@ void initialiserScheduler();
  * Déclencher le scheduler avant toute création de tache
  */
 
-void ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
+TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
 /*
  * Création d'une nouvelle tâche et mise de celle-ci dans
  * la liste du scheduler. Si nouvelleConsole est vrai, on crée une

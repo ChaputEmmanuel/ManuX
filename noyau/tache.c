@@ -1,10 +1,10 @@
 /*----------------------------------------------------------------------------*/
 /*      Implantation des sous-programmes de gestion des taches.               */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/tache.h>
-
+#include <manux/scheduler.h>  /* tacheEnCours */
 #include <manux/memoire.h>
 #include <manux/segment.h>
 #include <manux/console.h>
@@ -47,6 +47,10 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On stoque les infos en zone système */
    unePage = allouerPageSysteme();
+   if (unePage == NULL)
+      printk_debug(DBG_KERNEL_TACHES, "plus de memoire disponible\n");
+      return NULL;
+   }
 
    tache = (Tache *) unePage;
 
@@ -85,6 +89,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->numero = numeroProchaineTache++;
 
    /* On lui affecte sa console */
+   assert(cons != NULL);
    tache->console = cons; // WARNING à virer (? ou pas, pour le moment non !)
    
    tache->fichiers[1].prive = (void*)cons;

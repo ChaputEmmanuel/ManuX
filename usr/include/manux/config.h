@@ -25,7 +25,6 @@
 #   define ADRESSE_DEBUT_TAS 0x1000000
 #endif
 
-
 /*
  * Utilisation d'un système de fichiers
  */
@@ -65,6 +64,6 @@
 /*
  * Active-t-on la pagination ?
  */
-#define MANUX_PAGINATION
+//#define MANUX_PAGINATION
 
 #endif

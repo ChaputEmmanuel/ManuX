@@ -8,7 +8,7 @@
 /*      La seule fonction dans laquelle ces appels sont effectués est celle   */
 /*   permettant le basculement de console active.                             */
 /*                                                                            */
-/*                                                (C) Manu Chaput 2000 - 2020 */
+/*                                                (C) Manu Chaput 2000 - 2021 */
 /*----------------------------------------------------------------------------*/
 
 #ifndef MANUX_CONSOLE_DEF
@@ -58,15 +58,15 @@ extern MethodesFichier consoleMethodesFichier;
  * Définition des couleurs WARNING, c'est portnawak
  */
 typedef enum {
-   COUL_TXT_NOIR       = 0x00,
-   COUL_TXT_BLEU       = 0x01,
-   COUL_TXT_VERT       = 0x02,
-   COUL_TXT_CYAN       = 0x03,
-   COUL_TXT_ROUGE      = 0x04,
-   COUL_TXT_MAGENTA    = 0x05,
-   COUL_TXT_MARRON     = 0x06,
-   COUL_TXT_GRIS_CLAIR = 0x07,
-   COUL_TXT_GRIS       = 0x08,
+   COUL_TXT_NOIR             = 0x00,
+   COUL_TXT_BLEU             = 0x01,
+   COUL_TXT_VERT             = 0x02,
+   COUL_TXT_CYAN             = 0x03,
+   COUL_TXT_ROUGE            = 0x04,
+   COUL_TXT_MAGENTA          = 0x05,
+   COUL_TXT_MARRON           = 0x06,
+   COUL_TXT_GRIS_CLAIR       = 0x07,
+   COUL_TXT_GRIS             = 0x08,
    COUL_TXT_BLEU_CLAIR       = 0x09,
    COUL_TXT_VERT_CLAIR       = 0x0A,
    COUL_TXT_CYAN_CLAIR       = 0x0B,
@@ -74,15 +74,15 @@ typedef enum {
    COUL_TXT_MAGENTA_CLAIR    = 0x0D,
    COUL_TXT_JAUNE            = 0x0E,
    COUL_TXT_BLANC            = 0x0F,
-   COUL_FOND_NOIR       = 0x00,
-   COUL_FOND_BLEU       = 0x10,
-   COUL_FOND_VERT       = 0x20,
-   COUL_FOND_CYAN       = 0x30,
-   COUL_FOND_ROUGE      = 0x40,
-   COUL_FOND_MAGENTA    = 0x50,
-   COUL_FOND_MARRON     = 0x60,
-   COUL_FOND_GRIS_CLAIR = 0x70,
-   COUL_CLIGNOTANT     = 0x80
+   COUL_FOND_NOIR            = 0x00,
+   COUL_FOND_BLEU            = 0x10,
+   COUL_FOND_VERT            = 0x20,
+   COUL_FOND_CYAN            = 0x30,
+   COUL_FOND_ROUGE           = 0x40,
+   COUL_FOND_MAGENTA         = 0x50,
+   COUL_FOND_MARRON          = 0x60,
+   COUL_FOND_GRIS_CLAIR      = 0x70,
+   COUL_CLIGNOTANT           = 0x80
 } Couleur;
 
 /*
@@ -162,14 +162,11 @@ void basculerVersConsoleSuivante();
 
 #endif  // CONSOLES_VIRTUELLES
 
-#ifndef MANUX_JOURNAL
 /*
  * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
  * console afficher.
  */
 Console * consoleNoyau();
-
-#endif // MANUX_JOURNAL
 
 /*
  * Écriture sur une console

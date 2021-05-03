@@ -8,6 +8,7 @@
 
 #include <manux/config.h>
 #include <manux/printk.h>
+#include <manux/stdarg.h>
 
 #define DBG_KERNEL_START 0x00000001
 #define DBG_KERNEL_PAGIN 0x00000002
@@ -48,14 +49,18 @@
 /*
  * Affichage d'un message de panique
  */
-void paniqueNoyau(const char * funcName, const char * fileName, int lineNum, char * msg);
+#define paniqueNoyau(fmt, args...)                                        \
+   printk("\n*** PANIQUE NOYAU ***\n");                                   \
+   printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
+   printk("" fmt, ## args);                                               \
+   halt();
 
 /*
  * Ma version simplifiée de assert
  */
 #ifdef MANUX_ASSERT_ACTIVES
 #define assert(cond)(				\
-   (cond)?0:paniqueNoyau(__FUNCTION__, __FILE__, __LINE__, "L'assertion '"#cond"' n'est pas verifiee") \
+   (cond)?0:__paniqueNoyau(__FUNCTION__, __FILE__, __LINE__, "L'assertion '"#cond"' n'est pas verifiee") \
    )
 #else
 #define assert(cond) {}
