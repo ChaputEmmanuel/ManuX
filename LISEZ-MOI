@@ -27,6 +27,10 @@ make qui copie de include/manux vers usr/include/manux.
 
    Un petit truc à faire : mettre à droite le message qui dit dans
    quelle console on est.
+
+   Un truc moyen : bcopy et consort en asm (dans string.c)
+
+   A faire chiant : remplacer les uint[0-9] par uint[0-9]_t
    
    Ca plante, et ça dépend du code que je commente, bref, ça sent
 la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute

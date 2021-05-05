@@ -9,13 +9,15 @@
 #include <manux/config.h>
 #include <manux/printk.h>
 #include <manux/stdarg.h>
+#include <manux/i386.h>  // halt()
 
-#define DBG_KERNEL_START 0x00000001
-#define DBG_KERNEL_PAGIN 0x00000002
-#define DBG_KERNEL_SYSFI 0x00000004
-#define DBG_KERNEL_ORDON 0x00000008
-#define DBG_KERNEL_TACHE 0x00000010
-#define DBG_KERNEL_ALL   0xFFFFFFFF
+#define DBG_KERNEL_ERREUR 0x00000001
+#define DBG_KERNEL_START  0x00000002
+#define DBG_KERNEL_PAGIN  0x00000004
+#define DBG_KERNEL_SYSFI  0x00000008
+#define DBG_KERNEL_ORDON  0x00000010
+#define DBG_KERNEL_TACHE  0x00000020
+#define DBG_KERNEL_ALL    0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
 // Pour être plus précis, sa valeur ne change rien ... sauf lorsque
@@ -27,13 +29,14 @@
   // | DBG_KERNEL_START
   // | DBG_KERNEL_PAGIN
   // | DBG_KERNEL_FILES
-  // | 0xFFFFFFFF
+  // | DBG_KERNEL_ALL
 //  ;
 
 #define masqueDebugage (0x00000000  \
   | DBG_KERNEL_START    \
   | DBG_KERNEL_TACHE    \
-  | DBG_KERNEL_SYSFI    \
+  | DBG_KERNEL_ORDON    \
+  | DBG_KERNEL_ALL    \
 			)
 
 //  | DBG_KERNEL_FILES
@@ -44,12 +47,12 @@
  */
 #define printk_debug(lvl, fmt, args...)	 \
    if ((lvl)& masqueDebugage)                    \
-     printk("[%10d] %s line %d : " fmt, nbTicks, __FUNCTION__ , __LINE__, ## args)
+     printk("[%d] %s line %d : " fmt, nbTicks, __FUNCTION__ , __LINE__, ## args)
 
 /*
  * Affichage d'un message de panique
  */
-#define paniqueNoyau(fmt, args...)                                        \
+#define paniqueNoyau(fmt, args...)					\
    printk("\n*** PANIQUE NOYAU ***\n");                                   \
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \
@@ -59,9 +62,11 @@
  * Ma version simplifiée de assert
  */
 #ifdef MANUX_ASSERT_ACTIVES
-#define assert(cond)(				\
-   (cond)?0:__paniqueNoyau(__FUNCTION__, __FILE__, __LINE__, "L'assertion '"#cond"' n'est pas verifiee") \
-   )
+#define assert(cond)     \
+  if (!(cond)) {					      \
+    paniqueNoyau("L'assertion '"#cond"' n'est pas verifiee"); \
+  }
+
 #else
 #define assert(cond) {}
 #endif

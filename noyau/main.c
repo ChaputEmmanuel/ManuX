@@ -24,7 +24,6 @@
 #ifdef MANUX_PAGINATION
 #   include <manux/pagination.h>
 #endif
-#include <manux/string.h>        /* bcopy() */
 #ifdef MANUX_JOURNAL
 #   include <manux/journal.h>       /* initialiserJournal() */
 #endif
@@ -130,6 +129,9 @@ void _start(InfoSysteme * infoSysteme)
    autoriserIRQ(IRQTimer);
 
    /* Initialisation de la gestion des processus */
+
+   printk_debug(DBG_KERNEL_START, "Console noyau = 0x%x\n", consoleNoyau());
+   printk_debug(DBG_KERNEL_START, "A comparer a  = 0x%x\n", 0x000250a0);
 
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();

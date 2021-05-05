@@ -13,6 +13,7 @@
 
 #include <manux/appelsysteme.h>
 #include <manux/memoire.h>      /* NULL   */
+#include <manux/string.h>       /* memcpy */
 #include <manux/debug.h>        /* assert */
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
@@ -50,7 +51,6 @@ Console * consoleInit()
    consoleActive = &_consoleNoyau;
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
-   
 #endif
 
    return &_consoleNoyau;
@@ -84,25 +84,15 @@ void effacerConsole(Console * cons)
 void scrollUp(Console * cons)
 /*
  * Remonté de l'écran d'une ligne
- *
- * WARNING : à réécrire plus efficace
  */
 {
     //  static int p = '!';
-   int l, c;
+   int c;
 
    /* Remontée du contenu de l'écran */
-   /* A remplacer par bcopy(cons->adresseEcran, cons->adresseEcran+2*cons->nbColonnes, 2*((cons->nbLignes-1)*cons->nbColonnes)) */
-   for (l = 0; l < cons->nbLignes - 1; l++) {
-      for (c = 0; c < cons->nbColonnes; c++) {
-         /* Valeur du caractère */
-         cons->adresseEcran[2*(l*cons->nbColonnes+c)] =
-            cons->adresseEcran[2*((l+1)*cons->nbColonnes+c)];
-         /* Valeur de son attribut */
-         cons->adresseEcran[2*(l*cons->nbColonnes+c)+1] =
-            cons->adresseEcran[2*((l+1)*cons->nbColonnes+c)+1];
-      }
-   }
+   memcpy(cons->adresseEcran,
+	  cons->adresseEcran+2*cons->nbColonnes,
+	  2*((cons->nbLignes-1)*cons->nbColonnes));
    
    /* On place une ligne d'espaces en bas de l'écran */
    for (c = 0; c < cons->nbColonnes; c++) {
@@ -113,6 +103,8 @@ void scrollUp(Console * cons)
 
 void avancerLigne(Console * cons)
 {
+  //   assert(cons->nbLignes != 0);
+
    cons->ligne++;
    if (!(cons->ligne % cons->nbLignes)) {
       cons->ligne = cons->nbLignes - 1;
@@ -122,6 +114,8 @@ void avancerLigne(Console * cons)
 
 void avancerUnCar(Console * cons)
 {
+  //   assert(cons->nbColonnes != 0);
+   
    cons->colonne++;
    if (!(cons->colonne % cons->nbColonnes)) {
       cons->colonne = 0;
@@ -129,6 +123,11 @@ void avancerUnCar(Console * cons)
    }
 }
 
+/*
+ * L'attribut est là pour maintenir la compilation même sans
+ * optimisation (donc pour le debogage) 
+ */
+ __attribute__((always_inline))
 inline void afficherConsoleCaractere(Console * cons, char c)
 {
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2] = c;

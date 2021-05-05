@@ -10,7 +10,7 @@
 #include <manux/i386.h> // halt
 #include <manux/appelsysteme.h> // basculerTache (bof !)
 
-void calculerPremiers()
+void calculerPremiers(int q)
 /*
  * Calcul et affichage des nombres premiers. Le but est juste de faire
  * bosser le processeur, donc on ne cherche pas du tout à faire les
@@ -23,7 +23,7 @@ void calculerPremiers()
    int cpt = 1;
    
    while (TRUE) {
-      printf("C'est la boucle numero %d : \n", cpt++);
+     printf("[%d] C'est la boucle numero %d : \n", q, cpt++);
       printf("%d", 2);
       for (n = 3; n < 1024; n += 2) {
          compose = FALSE;
@@ -37,7 +37,19 @@ void calculerPremiers()
 	 }
       }
       printf("\n--------------------------------------------------------------------------------\n");
-      if (cpt %3 == 0 ) basculerTache();
+      //      if (cpt %3 == 0 ) basculerTache();
+      basculerTache();
+   }
+}
+
+void prout()
+{
+   int n;
+
+   printf("Prout\n");
+ 
+   for (n = 0; n < 10000000; n++) {
+      calculerPremiers(2);
    }
 }
 
@@ -46,7 +58,10 @@ void init()
    int n=2; // nombre de messages affichés
 
    printf("Greetings from userland !\n");
+
+   n = creerNouvelleTache(prout, FALSE);
+
    for (n = 0; n < 10000000; n++) {
-      calculerPremiers();
+      calculerPremiers(1);
    }
 }

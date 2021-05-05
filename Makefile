@@ -7,7 +7,10 @@ COMPRESS = gzip
 #
 # -fno-stack-protector permet d'éviter les "undefined references to `__stack_chk_fail'" sur les GCC récents
 #
-CFLAGS   = -g -gdwarf -fno-pie -m32 -march=i686 -Wall -I$(ROOTDIR)/include -O2 -nostdinc -fno-builtin -fno-toplevel-reorder \
+# Optimisation
+#   -O2 par défaut
+#   -O0 pour debuguer
+CFLAGS   = -g -gdwarf -fno-pie -m32 -march=i686 -Wall -I$(ROOTDIR)/include -O0 -nostdinc -fno-builtin -fno-toplevel-reorder \
            -fno-stack-protector \
          # -fomit-frame-pointer
 
@@ -41,7 +44,7 @@ OUTILS      = ./outils/taillenoyau
 # ils sont édités dans l'arborescence du noyau et doivent donc être
 # mis à jour dans la partie usr
 USR_INC_D   = usr/include/manux
-USR_INC_F   = appelsystemenum.h config.h types.h
+USR_INC_F   = appelsystemenum.h config.h types.h string.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 include make.conf

@@ -77,4 +77,6 @@ int sys_basculerTache(ParametreAS as);
  * Implantation de l'appel système d'invocation de l'ordonnanceur
  */
 
+TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConsole);
+
 #endif

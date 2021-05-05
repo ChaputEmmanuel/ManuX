@@ -13,12 +13,17 @@
 #include <manux/appelsysteme.h>
 #include <manux/memoire.h>       /* NULL */
 
+#include <manux/debug.h>
+
+#define MAX_PRINTK_LENGTH 128
+
 #define chiffre "0123456789abcdef"
 
 void printk(char * format, ...)
 {
    va_list   argList;
-   char      chaine[4096];   // WARNING, c'est nul
+   char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une getion dynamique
+                            // attention aux risques de telescopage avec la pile !
    int       indice = 0;
    int       n;             // valeur associée à un %d
    char      nombre[10];    // chaîne du nombre
@@ -26,6 +31,8 @@ void printk(char * format, ...)
    int       in;            // indice pour les boucles internes
    int       nbChiffres;    // pour les %[n]d
    int       base;          // de l'affichage entier
+
+   Console * cons = consoleNoyau();
 
    va_start(argList, format);
 
@@ -85,13 +92,15 @@ affent :          n = va_arg(argList, int);
       format++;
    }
 
+   assert(indice < MAX_PRINTK_LENGTH);
+   
    chaine[indice] = 0;
 
    /* On affiche  */
 #ifdef MANUX_JOURNAL
    journaliser(chaine);
 #else
-   afficherConsole(consoleNoyau(), chaine);
+   afficherConsoleN(cons, chaine, indice);
 #endif
    
    va_end(argList);

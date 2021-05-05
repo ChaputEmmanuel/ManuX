@@ -61,7 +61,7 @@ void * malloc(int taille)
    /* Si rien n'est plus disponible, il nous faut une page */
    if (infoMalloc->prochainBlocLibre == NULL) {
       blocLibre = tacheCourante->tailleMemoire;
-      if (obtenirPages(1) != 1) {
+      if (allouerPage() == NULL) {
          return NULL;
       }
       blocLibre->taille = TAILLE_PAGE - sizeof(BlocLibre) + sizeof(InfoGestionMemoire);

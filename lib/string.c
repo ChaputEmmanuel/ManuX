@@ -5,21 +5,23 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/string.h>
 
-void bcopy (const void *src, void *dest, int n)
-/*
- * WARNING à réécrire en assembleur
- */
+void * memcpy(void *dest, const void *src, size_t n)
 {
    char * d = dest;
    const char * s = src;
    while (n--)
       *d++ = *s++; 
 
-   /*  
-   int i;
+   return dest;
+}
 
-   for (i = 0; i < n; i++) {
-     ((char *)dest)[i] = ((char *)src)[i];
-   }
-  */
+void bcopy (const void *src, void *dest, int n)
+/*
+ * bcopy/bzero ne sont ni ISO C ni POSIX (deprecated depuis 2001 et removed en 2008)
+ */
+{
+   char * d = dest;
+   const char * s = src;
+   while (n--)
+      *d++ = *s++; 
 }

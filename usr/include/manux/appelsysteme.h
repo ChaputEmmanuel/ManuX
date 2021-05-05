@@ -50,7 +50,7 @@ int obtenirPages(int n);
   __attribute__ ((noinline))   typeRetour nom(typeArgument1 arg1, typeArgument2 arg2)                    \
    {                                                        \
       typeRetour resultat;                                  \
-      __asm__ __volatile__ ("int %2"                                      \
+      __asm__ __volatile__ ("int %2"                        \
               : "=a"(resultat)                              \
               : "0" (numero),                               \
                 "N" (MANUX_AS_INT));                        \
@@ -73,5 +73,6 @@ int obtenirPages(int n);
    }
 
 int basculerTache();
+int creerNouvelleTache(void (corps()), booleen shareCons);
 
 #endif

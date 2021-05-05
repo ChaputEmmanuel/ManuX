@@ -9,12 +9,12 @@
 #include <manux/segment.h>
 #include <manux/console.h>
 #include <manux/atomique.h>
-#include <manux/string.h>     /* bcopy */
 #include <manux/segment.h>    /* setDescripteurSegment */
 #include <manux/pagination.h> /* repertoirePaginationSysteme */
 
 #include <manux/fichier.h>    /* pour créer stdout WARNING, à mettre ailleurs */
 #include <manux/errno.h>      // Les codes d'erreur
+#include <manux/string.h>     // memcpy
 #include <manux/printk.h>
 #include <manux/debug.h>
 
@@ -47,8 +47,8 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On stoque les infos en zone système */
    unePage = allouerPageSysteme();
-   if (unePage == NULL)
-      printk_debug(DBG_KERNEL_TACHES, "plus de memoire disponible\n");
+   if (unePage == NULL) {
+      printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
       return NULL;
    }
 
@@ -98,9 +98,6 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    /* Zone mémoire utilisable */
    tache->tailleMemoire = (void *)(nombrePagesSysteme * TAILLE_PAGE);
 
-   printk_debug(DBG_KERNEL_PAGIN, "Tache = 0x%x\n", tache);
-   printk_debug(DBG_KERNEL_PAGIN, "Le CR3 avant = 0x%x\n", tache->tss.CR3);
-
    /* On lui affecte son PDBR */
    creerTablePagination((PageDirectory *)&(tache->tss.CR3));
 
@@ -121,10 +118,14 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    chargerGDT(gdtSysteme);
 
    /* Copie de la LDT, maintenant qu'elle est complète */
-   bcopy(gdtSysteme, tache->ldt, tailleGDTSysteme);
+   memcpy(tache->ldt, gdtSysteme, tailleGDTSysteme);
 
    /* Elle est prète à être exécutée */
    tache->etat = Tache_Prete;
+
+   /* On affiche quelques infos */
+   printk_debug(DBG_KERNEL_TACHE, "Tache[%d] = 0x%x\n", tache->numero, tache);
+   printk_debug(DBG_KERNEL_TACHE, "cons = 0x%x, tss=0x%x, ldt=0x%x\n", tache->console, tache->tss, tache->ldt);
 
    return tache;
 }

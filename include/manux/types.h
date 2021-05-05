@@ -18,6 +18,10 @@ typedef unsigned short uint16;
 typedef unsigned long uint32;
 #endif
 
+#ifndef size_t
+typedef uint32 size_t;
+#endif
+
 #ifndef booleen
 typedef int booleen;
 #endif

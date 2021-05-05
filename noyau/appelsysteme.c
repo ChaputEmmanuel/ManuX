@@ -33,8 +33,11 @@ void initialiserAppelsSysteme()
    definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
    definirAppelSysteme(NBAS_FORK,           sysFork);
 
+   /* Création d'une nouvelle tâche */
+   definirAppelSysteme(NBAS_CREER_TACHE, sys_creerTache);   
+
    /* Invocation explicite de l'ordonnanceur */
-   definirAppelSysteme(NBAS_BASCULER_TACHE, sys_basculerTache);   
+   definirAppelSysteme(NBAS_BASCULER_TACHE, sys_basculerTache);
 }
 
 void entrerAppelSysteme()

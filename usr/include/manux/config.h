@@ -48,7 +48,7 @@
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
-#define CONSOLES_VIRTUELLES 
+//#define CONSOLES_VIRTUELLES 
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
