@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des fonctions de base d'entrée-sortie du mode utilisateur. */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2002 */
+/*                                                  (C) Manu Chaput 2002-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef _STDIO_H
 #define _STDIO_H
@@ -14,5 +14,7 @@ void printf(char * format, ...);
  *
  *    %[n]{dxo} %s \n
  */
+
+int ecrireConsole(char * buffer, int nbBytes);
 
 #endif

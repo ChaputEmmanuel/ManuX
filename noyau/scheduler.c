@@ -40,6 +40,7 @@ Atomique schedulerEnCours = 0;
  */
 booleen basculeConsoleDemandee = FALSE;
 booleen afficheEtatSystemeDemande = TRUE;
+booleen basculerTacheDemande = TRUE;
 
 /*
  * Le scheduler est-il en cours d'exécution ?
@@ -72,6 +73,20 @@ void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
+#ifdef CONSOLES_VIRTUELLES
+   /* Basculement entre les consoles virtuelles */
+   /* WARNING, c'est sûrement pas le meilleur endroit ... */
+   if (basculeConsoleDemandee) {
+      basculeConsoleDemandee = FALSE;
+      basculerVersConsoleSuivante();
+   }
+#endif
+
+   /*
+   if (!basculerTacheDemande)
+      return;
+   basculerTacheDemande = FALSE;
+   */
    do {
       if (tacheEnCours != NULL) { /* WARNING on doit pouvoir s'en passer */
          printk_debug(DBG_KERNEL_ORDON, "On quitte la tache %d de TSS %x, ...\n",
@@ -99,45 +114,42 @@ void ordonnanceur()
    }
 }
 
+void afficherEtatTaches()
+{
+   CelluleTache * celluleTache;
+
+   printk("\n-------------------------<SCHEDULER t = %d>----------------------------\n", nbTicks);
+   printk("Num prochaine tache : %d\n", numeroProchaineTache);
+   afficheEtatSystemeDemande = FALSE;
+   printk("[num]  etat   tache      console   tss     ldt\n");
+   for (celluleTache = listeTaches.tete;
+      celluleTache != NULL;
+      celluleTache = celluleTache->suivant){
+      printk("[  %d]  %s      0x%x   0x%x  0x%x     0x%x\n",
+        celluleTache->tache->numero,
+         (celluleTache->tache->etat == Tache_En_Cours)?"c":((celluleTache->tache->etat == Tache_Prete)?"p":"b"),
+ 	  celluleTache->tache,
+          celluleTache->tache->console,
+          celluleTache->tache->tss,
+         celluleTache->tache->ldt);
+   }
+   printk("\n-------------------------------------------------------------------------------\n");
+}
+
 void scheduler()
 /*
  * Le "main" du scheduler
  */
 {
-   CelluleTache * celluleTache;
-
-   printk("Pouet\n");
+   ParametreAS foo;
    printk_debug(DBG_KERNEL_ORDON, "Scheduler le mal nomme, ...\n");
 
    while(1) {
       if (afficheEtatSystemeDemande) {
-	 printk("\n-------------------------<SCHEDULER t = %d>----------------------------\n", nbTicks);
-         printk("Num prochaine tache : %d\n", numeroProchaineTache);
-         afficheEtatSystemeDemande = FALSE;
-	    printk("[num]  etat   tache      console   tss     ldt\n");
-	 for (celluleTache = listeTaches.tete;
-	      celluleTache != NULL;
-	      celluleTache = celluleTache->suivant){
-            printk("[  %d]  %s      0x%x   0x%x  0x%x     0x%x\n",
-		  celluleTache->tache->numero,
-		   (celluleTache->tache->etat == Tache_En_Cours)?"c":((celluleTache->tache->etat == Tache_Prete)?"p":"b"),
- 		  celluleTache->tache,
-                  celluleTache->tache->console,
-		   celluleTache->tache->tss,
-		   celluleTache->tache->ldt);
-	 }
-         printk("\n-------------------------------------------------------------------------------\n");
+         afficherEtatTaches();
       }
 
-#ifdef CONSOLES_VIRTUELLES
-      /* Basculement entre les consoles virtuelles */
-      /* WARNING, c'est sûrement pas le meilleur endroit ... */
-      if (basculeConsoleDemandee) {
-         basculeConsoleDemandee = FALSE;
-         basculerVersConsoleSuivante();
-      }
-#endif
-      ordonnanceur();
+      sys_basculerTache(foo);
    }
 }
 
@@ -244,10 +256,9 @@ uint32 AS_console()
 int sys_basculerTache(ParametreAS as)
 {
    assert(tacheEnCours != NULL);
-
-   printk_debug(DBG_KERNEL_ORDON, "Num %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
+   //   printk_debug(DBG_KERNEL_ORDON, "Num %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
    ordonnanceur();
-   printk_debug(DBG_KERNEL_ORDON, "Retour d'ordo vers %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
+   //printk_debug(DBG_KERNEL_ORDON, "Retour d'ordo vers %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
    return 0;
 }
 

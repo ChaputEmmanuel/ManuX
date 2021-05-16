@@ -34,6 +34,10 @@
  * pour cette structure.
  */
 typedef struct _Console {
+#ifdef CONSOLES_VIRTUELLES
+   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
+   struct _Console   * precedente;  // doublement chaînées
+#endif
    char              * adresseEcran;      // Adresse à laquelle se trouve
                                           // le contenu affiché
    char              * adresseEcranCopie; // Une copie pour lorsque la
@@ -42,11 +46,7 @@ typedef struct _Console {
    unsigned char       attribut;
    uint8               nbLignes;
    uint8               nbColonnes;
-   ExclusionMutuelle   scAcces;
-#ifdef CONSOLES_VIRTUELLES
-   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
-   struct _Console   * precedente;  // doublement chaînées
-#endif
+  //   ExclusionMutuelle   scAcces;
 } Console;
 
 /*
@@ -55,7 +55,7 @@ typedef struct _Console {
 extern MethodesFichier consoleMethodesFichier;
 
 /*
- * Définition des couleurs WARNING, c'est portnawak
+ * Définition des couleurs utilisables pour l'affichage
  */
 typedef enum {
    COUL_TXT_NOIR             = 0x00,

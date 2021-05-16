@@ -1,14 +1,11 @@
 /*
  * Attention, ici les include sont dans usr/include !!!
  */
-//#include <manux/scheduler.h>  // basculerTache devrait être un AS !!
-//#include <manux/printk.h>
-
 #include <manux/types.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <manux/i386.h> // halt
-#include <manux/appelsysteme.h> // basculerTache (bof !)
 
 void calculerPremiers(int q)
 /*
@@ -42,11 +39,11 @@ void calculerPremiers(int q)
    }
 }
 
-void prout()
+void deuxiemeTache()
 {
    int n;
 
-   printf("Prout\n");
+   printf("Deuxieme tache\n");
  
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(2);
@@ -59,7 +56,7 @@ void init()
 
    printf("Greetings from userland !\n");
 
-   n = creerNouvelleTache(prout, FALSE);
+   n = creerNouvelleTache(deuxiemeTache, FALSE);
 
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(1);

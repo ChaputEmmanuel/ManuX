@@ -24,12 +24,6 @@
 extern void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
 /*
- * Définition des appels système. WARNING à dispatcher ...
- */
-//int numeroTache();
-//int obtenirPages(int n);
-
-/*
  * Type du premier paramètre de chaque appel système (dû au
  * séquencement des appels). WARNING a expliquer.
  */

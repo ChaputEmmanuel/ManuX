@@ -49,7 +49,7 @@ void handlerClavier()
    if (etat && 0x01) {
       inb(0x60, toucheTouche);
       toucheTouche &= 0xFF;
-      printk("[KBD-0x%x]\n", toucheTouche);
+      //      printk("[KBD-0x%x]\n", toucheTouche);
 
       if (toucheTouche == KEYCODE_ESC) {
          basculeConsoleDemandee = TRUE;
@@ -57,7 +57,11 @@ void handlerClavier()
       }
       if (toucheTouche == KEYCODE_TAB) {
  	 afficheEtatSystemeDemande = TRUE;
-	 printk("PRINTSYS\n");
+	 // printk("PRINTSYS\n");
+      }
+      if (toucheTouche == KEYCODE_F1) {
+ 	 basculerTacheDemande = TRUE;
+	 //printk("SWITCHTASK\n");
       }
    }
 }

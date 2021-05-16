@@ -9,9 +9,6 @@
 #include <manux/appelsystemenum.h>  /* Les numéros des AS définis */
 #include <manux/types.h>
 
-int numeroTache();
-int obtenirPages(int n);
-
 /*
  * Une macro permettant de définir l'interface d'un appel système
  * sans argument.
@@ -71,8 +68,5 @@ int obtenirPages(int n);
                 "N" (MANUX_AS_INT));                        \
       return resultat;                                      \
    }
-
-int basculerTache();
-int creerNouvelleTache(void (corps()), booleen shareCons);
 
 #endif

@@ -18,6 +18,8 @@
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
+unsigned int auc;
+
 #ifdef CONSOLES_VIRTUELLES
 
 /* A tout moment, il n'y a qu'une console "active" (ie visible) */
@@ -37,6 +39,9 @@ static Console _consoleNoyau;
  */
 Console * consoleInit()
 {
+
+  auc = 0;
+  
    // L'écran est une zone CON_LIGNESxCON_COLONNES d'adresse fixe
    _consoleNoyau.adresseEcran = CON_SCREEN;
    _consoleNoyau.ligne = 0; //14;
@@ -86,7 +91,6 @@ void scrollUp(Console * cons)
  * Remonté de l'écran d'une ligne
  */
 {
-    //  static int p = '!';
    int c;
 
    /* Remontée du contenu de l'écran */
@@ -103,23 +107,12 @@ void scrollUp(Console * cons)
 
 void avancerLigne(Console * cons)
 {
-  //   assert(cons->nbLignes != 0);
+   assert(cons->nbLignes != 0);
 
    cons->ligne++;
    if (!(cons->ligne % cons->nbLignes)) {
       cons->ligne = cons->nbLignes - 1;
       scrollUp(cons);
-   }
-}
-
-void avancerUnCar(Console * cons)
-{
-  //   assert(cons->nbColonnes != 0);
-   
-   cons->colonne++;
-   if (!(cons->colonne % cons->nbColonnes)) {
-      cons->colonne = 0;
-      avancerLigne(cons);
    }
 }
 
@@ -132,16 +125,27 @@ inline void afficherConsoleCaractere(Console * cons, char c)
 {
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2] = c;
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2+1] = cons->attribut;
-   avancerUnCar(cons);
+   cons->colonne++;
+
+   // On avance d'un caratère
+   assert(cons->nbColonnes != 0);
+   if (!(cons->colonne % cons->nbColonnes)) {
+      cons->colonne = 0;
+      avancerLigne(cons);
+   }
 }
 
 void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 {
-   int controle;
+  int controle;
+
+  assert(nbOctets > 0);
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
    entrerExclusionMutuelle(&cons->scAcces);
 #endif
+
+  assert(cons->nbColonnes != 0);
 
    while (nbOctets) {
       switch (*msg) {
@@ -198,10 +202,9 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
                      default:
                      break;
 		  }
-               } while (*msg == 59); // 59 = ASCII(';') 
+               } while (*msg == 59); // 59 = ASCII(';') // WARNING !!!
             }
-
-         break;
+	    break;
          default :
             afficherConsoleCaractere(cons, *msg);
          break;
@@ -223,7 +226,7 @@ void afficherConsole(Console * cons, char * msg)
 
 void afficherConsoleEntier(Console * cons, int n)
 {
-   char nombre[60];
+   char nombre[12];
    int i = 0;
 
    do {
@@ -232,21 +235,25 @@ void afficherConsoleEntier(Console * cons, int n)
       i++;
    } while (n);
    for (i--; i>=0; i--) {
+      assert(cons->nbColonnes != 0);
       afficherConsoleCaractere(cons, nombre[i]);
    }
 }
 
-void afficherConsoleRegistre(Console * cons, int nbOctets, int reg)
+void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32 reg)
 {
    char chiffre[17] = "0123456789abcdef";
-   char nombre[2*nbOctets];
+   char nombre[2*nbOctets+2];
    int i = 0;
 
    for (i = 0; i<2*nbOctets; i++) {
       nombre[i] = chiffre[reg%16];
       reg = reg / 16;
    };
-   for (i--; i>=0; i--) {
+   nombre[i++] = 'x';
+   nombre[i] = '0';
+   for (; i>=0; i--) {
+     assert(cons->nbColonnes != 0);
       afficherConsoleCaractere(cons, nombre[i]);
    }
 }
@@ -277,9 +284,13 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    // Un peu de ménage
    effacerConsole(cons);
    
-   afficherConsole(cons, "Console [%d] ");   
+   afficherConsole(cons, "Console ");   
+   afficherConsoleEntierHex(cons, 4, (int)cons);
+   afficherConsole(cons, " creee a ");   
    afficherConsoleEntier(cons, (int)cons);
-   afficherConsole(cons, " creee ...\n");   
+   afficherConsole(cons, ", ecran a ");   
+   afficherConsoleEntier(cons, (int)adresseEcran);
+   afficherConsole(cons, "\n");   
 
    /* On l'insère après la console active dans la liste des consoles gérées */
    cons->suivante = consoleActive->suivante;
@@ -332,11 +343,11 @@ void basculerVersConsole(Console * suivante)
    c = consoleActive->colonne;
    a = consoleActive->attribut;
    consoleActive->ligne = 0;
-   consoleActive->colonne = 0;
+   consoleActive->colonne = 40;
 
    consoleActive->attribut = 0x1B;
    afficherConsole(consoleActive, "Cons ");
-   afficherConsoleEntier(consoleActive, (int)consoleActive);
+   afficherConsoleEntierHex(consoleActive, 4,(uint32)consoleActive);
    afficherConsole(consoleActive, "  nbTicks ");
    //   afficherConsoleEntier(consoleActive, nbTicks);
    afficherConsole(consoleActive, "            ");
@@ -399,11 +410,9 @@ int sys_ecrireConsole(ParametreAS as, void * msg, int n)
    assert(tacheEnCours != NULL);
    Console * cons = tacheEnCours->console;
    
-   // printk_debug(DBG_KERNEL_ALL, "cons = 0x%x, msg=0x%x, n=%d\n", cons, msg, n);
-
    assert(cons != NULL);
    afficherConsoleN(cons, msg, n);
 
-   return n; // WARNING gérer les erreurs 
+   return n;
 }
 

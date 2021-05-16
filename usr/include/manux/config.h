@@ -48,12 +48,12 @@
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
-//#define CONSOLES_VIRTUELLES 
+#define CONSOLES_VIRTUELLES 
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
  */
-//#define MANUX_JOURNAL
+#define MANUX_JOURNAL
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,

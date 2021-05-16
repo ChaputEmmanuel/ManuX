@@ -23,8 +23,8 @@
  * à faire là
  */
 extern booleen basculeConsoleDemandee;
-
 extern booleen afficheEtatSystemeDemande;
+extern booleen basculerTacheDemande;
 
 /*
  * L'identification de la tâche en cours

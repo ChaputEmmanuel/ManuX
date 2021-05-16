@@ -28,7 +28,11 @@ make qui copie de include/manux vers usr/include/manux.
    Un petit truc à faire : mettre à droite le message qui dit dans
    quelle console on est.
 
-   Un truc moyen : bcopy et consort en asm (dans string.c)
+   Un truc à faire : des outils pour écrire en (x, y) sur la console
+   gérer la position du curseur.
+
+   Un truc moyen : bcopy et consort en asm (dans string.c) ou en #define
+   dans string.h ce qui permet une cohérence entre usr et noyau !
 
    A faire chiant : remplacer les uint[0-9] par uint[0-9]_t
    
@@ -42,13 +46,6 @@ n'importe quoi la gestion de la pagination ! Il faut que la structure
 de la mémoire, pour le système et pour chaque tâche, soit claire. Un
 affichage en fin de creerTache pourra aider, ... 
   
-
-
-   BON, on va essayer d'être plus propre dans ce qui suit en
-commençant à mettre des choses dans init et y faire appel à ce qui est
-dans /usr.
-
-   Pour ça, faire un appel système "à la fork ?"
 
 
    ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
@@ -65,30 +62,6 @@ init-manux.nasm. Trois solutions temporaires :
    d'y suffir. Mais il faut utiliser la dernière solution, comme pour
    la taille avec tools/taille_noyau
    
-
-   La fonction printk() fonctionne jusqu'au lancement du scheduler !
-   Peut-être un pb avec la commutation de console ?
-
-   Apparemment c'est OK maintenant !? NON
-
-   Non, apparemment c'est le scheduler qui est à revoir. Son démarrage
-entraine une boucle sans fin. Lorsque la première interruption d'horloge
-arrive, activerTache(tacheScheduler) est invoqué, elle invoque donc la
-fonction scheduler(), qui appelle  basculerTache() qui appelle 
-activerTache(tacheEnCours).
-
-   Or tacheEnCours est initialisée à la valeur décrivant le fil d'exécution
-initial ... Mais la tâche décrivant le scheduler est dans la liste des
-tâches activables ...
-
-   Bon, momentanément, le scheduler est invalidé. Le multitâche est donc
-obtenu de façon coopérative. Du coup on s'apperçoit d'un soucis au niveau
-de la console. Ca à l'air OK si on utilise moins de 25 lignes (eg 20).
-Sinon le bas de l'écran est étrange et dès que l'afichage atteint le bas,
-ça plante ! Etrangement cela fonctionne si la console est "active". Ce
-qui laisse à penser que quelquechose est niché dans la mémoire située à
-la fin de la console ... A voir !
-
 
 A faire
 -------

@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des fonctions de manipulation des chaines.                 */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef DEF_MANUX_STRING
 #define DEF_MANUX_STRING

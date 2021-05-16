@@ -101,21 +101,52 @@ que cela arrive bientôt.
 %-------------------------------------------------------------------------------
 \subsection{Structure du code}
 
+   Le code de ManuX est réparti dans quelques fichiers, eux-mêmes
+organisés dans quelques répertoires.
+
+   Au plus haut niveau, nous allons distinguer deux grandes parties
+   que sont le ``code noyau'' et le ``code utilisateur''.
+   
 %...............................................................................
 %
 %...............................................................................
 \subsubsection{Le code ``utilisateur''}
 
    Le code du monde utilisateur est confiné dans le répertoire {\tt
-usr} qui contient les répertoires suivants :
+usr}.
+  Les principaux fichiers de {\tt usr} sont les suivants
 
 \begin{description}
-   \item[{\tt include}] contient les différents fichiers à inclure
-     dans les applications écrites pour le mode utilisateur. Certains
+   \item[{\tt unistd.c}] implante les principales fonctions (décrites
+     dans {\tt include/unistd.h}) permettant l'accès aux fonctions du
+     noyau. Comme nous le verrons, ce sont donc surtout des appels
+     systèmes. 
+   \item[{\tt stdio.c}] implante les principales fonctions (décrites
+     dans {\tt include/stdio.h}) permettant de réaliser des
+     entrées/sorties.
+   \item[{\tt init.c}] implante le code de la première tâche lancée
+     automatiquement par le noyau lorsqu'il est initialisé.
+\end{description}
+
+   La compilation du code utilisateur nécessite naturellement des
+fichiers inclus. Ils se trouvent dans le répertoire {\tt
+  usr/include}. Certains
      des fichiers, situés dans le répertoire {\tt include/manux} sont
      en fait des copies depuis l'arborescence du noyau. Ils sont mis à
      jour au travers de la cible {\tt usrinc} du {\tt Makefile
-       principal}.
+       principal}. Il s'agit de 
+
+\begin{description}
+   \item[{\tt config.h}] qui décrit la configuration du noyau, il est
+     donc important de pouvoir en disposer dans le mode utilisateur
+     afin de savoir ce qui est disponible ;
+   \item[{\tt types.h}] qui définit les types utilisés dans le noyau ;
+   \item[{\tt appelsystemenum.h}] qui donne les numéros des appels
+     systèmes ;
+   \item[{\tt string.h}] est là pour offir au mode utilisateur des
+     fonctions présentes dans le noyau ({\tt memcpy()}, \ldots). Il
+     n'est pas nécessaire que ce soit le même, mais cela évite de
+     tenir à jour deux fichiers !
 \end{description}
 
 %...............................................................................
@@ -968,6 +999,29 @@ successifs à l'interface de l'appel système, à l'interruption, et à
 l'appel système lui-même d'une part, et à la sauvegarde des registres
 d'autre part.
 
+   Observons par exemple le code permettant la mise en \oe{}uve de
+l'appel système \lstinline!ecrireConsole!. Il se trouve dans le
+fichier {\tt lib/console.c} :
+
+\begin{lstlisting}{}
+/*
+ * L'implantation de l'AS ecrireConsole
+ */
+int sys_ecrireConsole(ParametreAS as, void * msg, int n)
+{
+   assert(tacheEnCours != NULL);
+   Console * cons = tacheEnCours->console;
+   
+   assert(cons != NULL);
+   afficherConsoleN(cons, msg, n);
+
+   return n; 
+}
+\end{lstlisting}
+
+   Bien sûr, cette fonction utilise le code de manipulation de la
+console déjà écrit.   
+
 %-------------------------------------------------------------------------------
 %      Enregistrement de l'appel système
 %-------------------------------------------------------------------------------
@@ -995,6 +1049,24 @@ fonction de traitement de cet appel système.
 
    C'est donc ici la ``partie noyau'' qui est réalisée, c'est-à-dire
 la définition des actions à mener lorsque l'appel système est invoqué.
+
+   Nous trouvons par exemple dans la fonction
+\lstinline!initialiserAppelsSysteme()! du fichier {\tt
+  noyau/appelsysteme.c} la ligne de déclaration de notre appel système
+\lstinline!ecrireConsole! :
+
+\begin{lstlisting}{}
+void initialiserAppelsSysteme()
+{
+   ...
+  
+   /* Envoyer une chaîne de caractères sur la console */
+   definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
+
+   ...
+}
+\end{lstlisting}{}
+
 
 %===============================================================================
 %
@@ -1539,8 +1611,35 @@ liste des tâches actives du système.
 %===============================================================================
 \section{Le système de fichiers}
 
+%===============================================================================
+%
+%===============================================================================
+\appendix
 
 %-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\section{Les appels système de ManuX}
+
+   Voici la liste des appels système de ManuX
+
+%...............................................................................
+%
+%...............................................................................
+\subsection{creerNouvelleTache}
+
+%...............................................................................
+%
+%...............................................................................
+\subsection{basculerTache}
+
+%...............................................................................
+%
+%...............................................................................
+\subsection{ecrireConsole}
+
+%-------------------------------------------------------------------------------
+
 \printindex
 \end{document}
 

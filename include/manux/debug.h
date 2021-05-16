@@ -52,11 +52,11 @@
 /*
  * Affichage d'un message de panique
  */
-#define paniqueNoyau(fmt, args...)					\
-   printk("\n*** PANIQUE NOYAU ***\n");                                   \
+#define paniqueNoyau(fmt, args...)	                                  \
+   printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero);  \
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \
-   halt();
+   asm( "hlt" );
 
 /*
  * Ma version simplifiée de assert

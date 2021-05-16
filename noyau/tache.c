@@ -44,7 +44,8 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 {
    void  * unePage;
    Tache * tache;
-
+   void  * pile ; // Elle a sa propre pile
+   
    /* On stoque les infos en zone système */
    unePage = allouerPageSysteme();
    if (unePage == NULL) {
@@ -54,6 +55,13 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    tache = (Tache *) unePage;
 
+   pile = (void*) allouerPageSysteme();
+   if (pile == NULL) {
+      printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
+      // WARNING : libérer unePage
+      return NULL;
+   }
+   
    /* Initialisation du descripteur de tache */
    tache->tss.Reserve1 = (uint16) 0;
    tache->tss.Reserve2 = (uint16) 0;
@@ -73,7 +81,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->tss.FS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.GS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.SS = 0x18;  /* WARNING, hardcodé pas beau ! */
-   tache->tss.ESP = (uint32)unePage + 4092;  /* WARNING !! */
+   tache->tss.ESP = (uint32)pile + 4092;  /* WARNING !! */
    tache->tss.EIP = (uint32)corpsTache;
    tache->tss.EFLAGS = (uint32)0x200;
 
@@ -90,7 +98,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On lui affecte sa console */
    assert(cons != NULL);
-   tache->console = cons; // WARNING à virer (? ou pas, pour le moment non !)
+   tache->console = cons;
    
    tache->fichiers[1].prive = (void*)cons;
    tache->fichiers[1].methodes = &consoleMethodesFichier;
@@ -130,7 +138,3 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    return tache;
 }
 
-TacheID sysFork()
-{
-   return -ENOMEM;   // WARNING : gestion des erreurs
-}

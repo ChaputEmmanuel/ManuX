@@ -1,16 +1,26 @@
 /*----------------------------------------------------------------------------*/
 /*      Implantion des fonctions de base d'entrée-sortie du mode utilisateur. */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2002 */
+/*                                                  (C) Manu Chaput 2002-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>     // Suivant la config on passe par fs ou pas
+#include <manux/appelsysteme.h>
 #include <stdio.h>
-
-#include <unistd.h>  // ecrire ou afficherConsoleAS
 
 #define NULL ((void *)0)
 #define chiffre "0123456789abcdef"
 
+appelSysteme3(NBAS_ECRIRE, int, ecrire, int, void *, int);
+
+/*
+ * ecrireConsole est un appel système. Son "implantation" côté
+ * utilisateur passe donc par une macro.
+ */
+appelSysteme2(NBAS_ECRIRE_CONS, int, ecrireConsole, char *, int);
+
+/*
+ * Un premier printf qui méritera bien des améliorations !
+ */
 void printf(char * format, ...)
 {
    va_list   argList;
@@ -86,7 +96,8 @@ affent :          n = va_arg(argList, int);
 #ifdef MANU_AS
    ecrire(1, chaine, indice); // WARNING : 1 à remplacer par stdout par exemple
 #else
-   ecrireConsole(chaine, indice);
+   // C'est exactement le but de l'AS ecrireConsole
+   ecrireConsole(chaine, indice); 
 #endif
 
    va_end(argList);

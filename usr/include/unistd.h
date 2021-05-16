@@ -1,11 +1,30 @@
+/*----------------------------------------------------------------------------*/
+/*      Définition des fonctions de base du mode utilisateur de ManuX.        */
+/*                                                                            */
+/*                                                  (C) Manu Chaput 2002-2021 */
+/*----------------------------------------------------------------------------*/
 #ifndef _UNISTD_H
 #define _UNISTD_H
 
 #include <manux/types.h>
-#include <manux/appelsysteme.h>
 
-appelSysteme2(NBAS_ECRIRE_CONS, int, ecrireConsole, void *, int);
-appelSysteme3(NBAS_ECRIRE, int, ecrire, int, void *, int);
-appelSysteme0(NBAS_FORK, TacheID, fork);
+int creerNouvelleTache(void (corps()), booleen shareCons);
+/*
+ * Création d"une nouvelle tâche 
+ *   corps : fonction à exécuter
+ *   shareCons : partage-t-on la console de la tâche actuelle ?
+ *   retour : le numéro de la tâche créée.
+ */
+
+int basculerTache();
+/*
+ * Basculer vers une autre tâche. On rend simplement la main, c'est du
+ * collaboratif.
+ */
+
+/*
+int numeroTache();
+int obtenirPages(int n);
+*/
 
 #endif
