@@ -18,29 +18,30 @@
 #include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
 #include <manux/printk.h>        /* printk() */
 #include <manux/debug.h>         /* debug() paniqueNoyau() */
-#include <manux/interruptions.h> /* nbTicks */
+#include <manux/interruptions.h> /* nbTopHorloge */
 #include <manux/i386.h>          /* ltr */
 #include <manux/appelsysteme.h>  /* console() */
+#include <manux/temps.h>         /* secondesDansTemps */
 
 extern void lanceTacheInitiale();
 extern TacheID numeroProchaineTache ;
-/*
- * Lancement d'une tâche dont l'index du TSS est passé en paramètre
- */
 
 /*
  * Une variable globale permettant d'identifier la tache du scheduler
  */
 Tache * tacheScheduler;
 
+Temps dateDernierOrdonnancement;  // En nbTopHorloge
 Atomique schedulerEnCours = 0;
 
 /*
  * Ce qui suit n'est pas trés joli, mais ça ne devrait pas rester.
  */
 booleen basculeConsoleDemandee = FALSE;
-booleen afficheEtatSystemeDemande = TRUE;
-booleen basculerTacheDemande = TRUE;
+booleen afficheEtatSystemeDemande = FALSE;
+
+booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
+				     // faire du "pas à pas"
 
 /*
  * Le scheduler est-il en cours d'exécution ?
@@ -57,120 +58,128 @@ ListeTache listeTaches;
  */
 Tache * tacheEnCours = NULL;
 
-void setFrequenceTimer(int freqHz)
+void setFrequenceTimer(uint16 freqHz)
 {
    uint16 decompte;
 
    decompte = 1193200 / freqHz;
 
    /* On initialise la fréquence du timer 0 WARNING a rendre plus propre */
-   outb(0x43, 0x36);
+   outb(0x43, 0x34); // wAS 36
    outb(0x40, decompte & 0xFF);
    outb(0x40, (decompte >> 8) & 0xFF);
 }
 
+/*
+ * Le coeur de l'ordonnanceur. C'est cette fonction qui détermine la
+ * prochaine tâche à exécuter.
+ */
 void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
 #ifdef CONSOLES_VIRTUELLES
    /* Basculement entre les consoles virtuelles */
-   /* WARNING, c'est sûrement pas le meilleur endroit ... */
    if (basculeConsoleDemandee) {
       basculeConsoleDemandee = FALSE;
       basculerVersConsoleSuivante();
    }
 #endif
 
-   /*
-   if (!basculerTacheDemande)
-      return;
-   basculerTacheDemande = FALSE;
-   */
+   /* (1) On suspend la tâche en cours */
+   assert(tacheEnCours != NULL);
+   insererCelluleTache(&listeTaches,
+                       tacheEnCours,
+                       (CelluleTache*)tacheEnCours+sizeof(Tache));
+   tacheEnCours->tempsExecution += (nbTopHorloge - dateDernierOrdonnancement);
+   tacheEnCours->etat = Tache_Prete;    // On n'est pas là volontairement
+                                        // WARNING : il faudra faire gaffe en cas de pause
+
+   /* (2) on cherche la tâche suivante */
+   /* On prend la première tâche prête, il y en a au moins une : la dummy */
    do {
-      if (tacheEnCours != NULL) { /* WARNING on doit pouvoir s'en passer */
-         printk_debug(DBG_KERNEL_ORDON, "On quitte la tache %d de TSS %x, ...\n",
-		tacheEnCours->numero, tacheEnCours->indiceTSSDescriptor);
-         insererCelluleTache(&listeTaches,
-	                     tacheEnCours,
-                             (CelluleTache*)tacheEnCours+sizeof(Tache));
-      } else {
-         printk_debug(DBG_KERNEL_ORDON, "Pas de tache a quitter !\n");
-      }
-
       tacheEnCours = extraireTache(&listeTaches);
-   } while ((tacheEnCours == NULL) || (tacheEnCours->etat != Tache_Prete));
+   } while (tacheEnCours->etat != Tache_Prete); 
 
-   /* WARNING on doit pouvoir se passer du test suivant */
-   if ((tacheEnCours != NULL) && (tacheEnCours != tachePrecedente)){
+   tacheEnCours->etat = Tache_En_Cours;
+
+   if (tacheEnCours != tachePrecedente){
       printk_debug(DBG_KERNEL_ORDON, "On passe a la tache %d de TSS 0x%x \n",
 	     tacheEnCours->numero,
 	     tacheEnCours->indiceTSSDescriptor);
-
+      tacheEnCours->nbActivations++;
+      dateDernierOrdonnancement = nbTopHorloge;
       basculerVersTache(tacheEnCours);
-
-   } else {
-      printk_debug(DBG_KERNEL_ORDON, "Pas de nouvelle tache !\n");
    }
+}
+
+void afficherEtatUneTache(Tache * tache)
+{
+   printk("[  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x \n",
+       tache->numero,
+         (tache->etat == Tache_En_Cours)?"c":((tache->etat == Tache_Prete)?"p":"b"),
+          tache->nbActivations,
+	  totalMinutesDansTemps(tache->tempsExecution),
+	  secondesDansTemps(tache->tempsExecution),
+          tache,
+          tache->console,
+          tache->ldt);
 }
 
 void afficherEtatTaches()
 {
    CelluleTache * celluleTache;
 
-   printk("\n-------------------------<SCHEDULER t = %d>----------------------------\n", nbTicks);
+   printk("\n-------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
+	  totalMinutesDansTemps(nbTopHorloge),
+	  secondesDansTemps(nbTopHorloge),
+	  nbTopHorloge);
    printk("Num prochaine tache : %d\n", numeroProchaineTache);
    afficheEtatSystemeDemande = FALSE;
-   printk("[num]  etat   tache      console   tss     ldt\n");
+   printk("[num] et   nbAc  tpsEx     tache    console       ldt\n");
+   afficherEtatUneTache(tacheEnCours);
    for (celluleTache = listeTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
-      printk("[  %d]  %s      0x%x   0x%x  0x%x     0x%x\n",
-        celluleTache->tache->numero,
-         (celluleTache->tache->etat == Tache_En_Cours)?"c":((celluleTache->tache->etat == Tache_Prete)?"p":"b"),
- 	  celluleTache->tache,
-          celluleTache->tache->console,
-          celluleTache->tache->tss,
-         celluleTache->tache->ldt);
+        afficherEtatUneTache(celluleTache->tache);
    }
    printk("\n-------------------------------------------------------------------------------\n");
 }
 
-void scheduler()
+void aDummyKernelTask()
 /*
- * Le "main" du scheduler
+ * Le corps d'une tâche à exéctuer lorsqu'on n'a que ça à faire, ...
  */
 {
-   ParametreAS foo;
-   printk_debug(DBG_KERNEL_ORDON, "Scheduler le mal nomme, ...\n");
+   printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
    while(1) {
       if (afficheEtatSystemeDemande) {
          afficherEtatTaches();
       }
-
-      sys_basculerTache(foo);
+ for (int i = 0; i<10000000; i+=1){asm("");};
+ //      ordonnanceur();
    }
 }
 
 void initialiserScheduler()
 {
-  /* Les valeurs initiales */
-  
+   /* Les valeurs initiales */
    numeroProchaineTache = 1;
    tacheEnCours = NULL;
+   dateDernierOrdonnancement = nbTopHorloge;
    
    /* Initialisation de la liste des taches en cours */
    initialiserListeTache(&listeTaches);
 
-   /* Initialisation de la tache "scheduler" */
-   if (ordonnancerTache(scheduler, FALSE)  < 0) {
-      paniqueNoyau("impossible de creer la seconde tache !\n");
-   }
-   
    /* Création d'une tâche pour le fil actuel */
    if (ordonnancerTache(NULL, TRUE) < 0) {
       paniqueNoyau("impossible de creer la premiere tache !\n");
+   }
+
+   /* Initialisation de la tache "aDummyKernelTask" */
+   if (ordonnancerTache(aDummyKernelTask, FALSE)  < 0) {
+      paniqueNoyau("impossible de creer la seconde tache !\n");
    }
 }
 
@@ -256,9 +265,8 @@ uint32 AS_console()
 int sys_basculerTache(ParametreAS as)
 {
    assert(tacheEnCours != NULL);
-   //   printk_debug(DBG_KERNEL_ORDON, "Num %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
    ordonnanceur();
-   //printk_debug(DBG_KERNEL_ORDON, "Retour d'ordo vers %d, tache = 0x%x\n", tacheEnCours->numero, tacheEnCours);
+
    return 0;
 }
 

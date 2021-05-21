@@ -80,9 +80,9 @@ void initialiserIDT();
  * WARNING : ce n'est peut être pas le meilleur endroit où le définir
  */
 
-extern uint32 nbTicks;
+extern Temps nbTopHorloge;
 /*
- * Nombre de tics horloge depuis le boot
+ * Nombre de tops d'horloge depuis le boot
  */
 
 #endif

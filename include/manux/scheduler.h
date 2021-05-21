@@ -37,7 +37,7 @@ extern Tache * tacheEnCours;
  */
 //ExclusionMutuelle verrouNoyau;
 
-void setFrequenceTimer(int freqHz);
+void setFrequenceTimer(uint16 freqHz);
 /*
  * Positionne la fréquence du timer 0
  */

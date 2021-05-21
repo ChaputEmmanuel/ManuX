@@ -1,6 +1,7 @@
 /*
  * Attention, ici les include sont dans usr/include !!!
  */
+#include <manux/config.h>
 #include <manux/types.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -20,7 +21,7 @@ void calculerPremiers(int q)
    int cpt = 1;
    
    while (TRUE) {
-     printf("[%d] C'est la boucle numero %d : \n", q, cpt++);
+      printf("[%d] C'est la boucle numero %d : \n", q, cpt++);
       printf("%d", 2);
       for (n = 3; n < 1024; n += 2) {
          compose = FALSE;
@@ -30,12 +31,13 @@ void calculerPremiers(int q)
             d += 2;
          }
          if (!compose) {
-    	   printf(", %d", n); for (int i = 0; i<10000000; i+=2){asm("");};
+            printf(", %d", n); for (int i = 0; i<10000000; i+=2){asm("");};
 	 }
       }
       printf("\n--------------------------------------------------------------------------------\n");
-      //      if (cpt %3 == 0 ) basculerTache();
+#ifndef MANUX_PREEMPTIF
       basculerTache();
+#endif
    }
 }
 

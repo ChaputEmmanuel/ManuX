@@ -28,13 +28,22 @@
 /*
  * Utilisation d'un système de fichiers
  */
-//#define MANUX_FS
+#define MANUX_FS
 
 /*
  * Utilisation d'un RAMdisk
  */
 //#define MANUX_RAMDISK
 
+/*
+ * La fréquence du timer
+ */
+#define MANUX_FREQUENCE_TIMER 100
+
+/*
+ * Ordonnancement préemptif ?
+ */
+#define MANUX_PREEMPTIF
 
 /*
  * Le nombre maximal de fichiers manipulés par un processus

@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des types de base.                                         */
 /*                                                                            */ 
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_TYPES
 #define MANUX_TYPES
@@ -16,6 +16,10 @@ typedef unsigned short uint16;
 
 #ifndef uint32
 typedef unsigned long uint32;
+#endif
+
+#ifndef int32
+typedef unsigned long int32;
 #endif
 
 #ifndef size_t
@@ -58,5 +62,18 @@ typedef uint16 TacheID;
  * Une page mémoire est simplement vue comme une adresse.
  */
 typedef void * Page;
+
+/*
+ * Un nombre de secondes écoulées
+ */
+typedef int32 Temps;
+
+/* 
+ * Une structure permettant de décrire des dates/durées plus précisément
+ */
+typedef struct _ValTemps {
+  Temps  secondes;
+  uint32 microSecondes;
+} ValTemps;
 
 #endif

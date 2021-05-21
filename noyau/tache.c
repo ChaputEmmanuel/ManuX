@@ -37,14 +37,16 @@ void basculerVersTache(Tache * tache)
 {
    volatile uint32 selecteur[2] = {0 , tache->indiceTSSDescriptor};
 
+   printk_debug(DBG_KERNEL_ORDON, "t 0x%x %d\n", tache, tache->nbActivations);
    __asm__ __volatile__ ("ljmp %0"::"m" (*selecteur));
+
 }
 
 Tache * creerTache(CorpsTache corpsTache, Console * cons)
 {
    void  * unePage;
    Tache * tache;
-   void  * pile ; // Elle a sa propre pile
+   void  * pile;      // Elle a sa propre pile
    
    /* On stoque les infos en zone système */
    unePage = allouerPageSysteme();
@@ -99,10 +101,16 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    /* On lui affecte sa console */
    assert(cons != NULL);
    tache->console = cons;
-   
+
+#ifdef MANUX_FS   
    tache->fichiers[1].prive = (void*)cons;
    tache->fichiers[1].methodes = &consoleMethodesFichier;
+#endif
 
+   /* Elle n'a pas encore été activée */
+   tache->nbActivations = 0;
+   tache->tempsExecution = (Temps)0;
+   
    /* Zone mémoire utilisable */
    tache->tailleMemoire = (void *)(nombrePagesSysteme * TAILLE_PAGE);
 

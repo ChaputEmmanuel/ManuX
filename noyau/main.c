@@ -125,7 +125,7 @@ void _start(InfoSysteme * infoSysteme)
    printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
 
    /* Initialisation de la fréquence du timer */
-   setFrequenceTimer(18);
+   setFrequenceTimer(MANUX_FREQUENCE_TIMER);
    autoriserIRQ(IRQTimer);
 
    /* Initialisation de la gestion des processus */
@@ -137,9 +137,9 @@ void _start(InfoSysteme * infoSysteme)
    initialiserScheduler();
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 
-   printk_debug(DBG_KERNEL_START, "C'est parti mon kiki, ...\n");
    printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
-   //   halt();
+
+   //   printk("[0x%5x]\n", 42); halt();
    init();
 }   /* main */
 

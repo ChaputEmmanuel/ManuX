@@ -15,6 +15,7 @@
 #include <manux/memoire.h>      /* NULL   */
 #include <manux/string.h>       /* memcpy */
 #include <manux/debug.h>        /* assert */
+#include <manux/temps.h>
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
@@ -348,8 +349,8 @@ void basculerVersConsole(Console * suivante)
    consoleActive->attribut = 0x1B;
    afficherConsole(consoleActive, "Cons ");
    afficherConsoleEntierHex(consoleActive, 4,(uint32)consoleActive);
-   afficherConsole(consoleActive, "  nbTicks ");
-   //   afficherConsoleEntier(consoleActive, nbTicks);
+   afficherConsole(consoleActive, "  t= ");
+   afficherConsoleEntier(consoleActive, secondesDansTemps(nbTopHorloge));
    afficherConsole(consoleActive, "            ");
 
    consoleActive->ligne = l;
@@ -377,11 +378,7 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    Console * con = f->prive;
 
-   //   printk("Coucou on va balancer sur la console 0x%x (e=0x%x)\n", con, con->adresseEcran);
    afficherConsoleN(con, buffer, nbOctets);
-   //printk("Ca y est !");
-
-   //while(1){};
 
    return nbOctets; // WARNING
 }

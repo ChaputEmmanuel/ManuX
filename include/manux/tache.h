@@ -82,8 +82,12 @@ typedef struct _Tache {
    TacheID            numero;
    EtatTache          etat;
    void             * tailleMemoire;             /* en octets */
-   struct _Console  * console;                   /* WARNING à virer ? */
+   struct _Console  * console;
+#ifdef MANUX_FS
    Fichier            fichiers[NB_MAX_FICHIERS]; /* WARNING à généraliser */
+#endif
+   uint32             nbActivations;   // Décompte du nombre d'activations
+   Temps              tempsExecution;  // Cumul du temps d'exécution
 } Tache;
 
 /*

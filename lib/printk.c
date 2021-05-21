@@ -32,8 +32,6 @@ void printk(char * format, ...)
    int       nbChiffres;    // pour les %[n]d
    int       base;          // de l'affichage entier
 
-   Console * cons = consoleNoyau();
-
    va_start(argList, format);
 
    while (*format) {
@@ -100,7 +98,7 @@ affent :          n = va_arg(argList, int);
 #ifdef MANUX_JOURNAL
    journaliser(chaine);
 #else
-   afficherConsoleN(cons, chaine, indice);
+   afficherConsoleN(consoleNoyau(), chaine, indice);
 #endif
    
    va_end(argList);

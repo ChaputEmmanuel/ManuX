@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/listetaches.h>
 #include <manux/tache.h>
-
+#include <manux/debug.h>         /* assert */
 #include <manux/memoire.h>       /* NULL */
 
 void initialiserListeTache(ListeTache * listeTache)
@@ -18,6 +18,10 @@ void insererCelluleTache(ListeTache   * listeTaches,
 			 Tache        * tache,
                          CelluleTache * celluleTache)
 {
+   assert(listeTaches != NULL);
+   assert(tache != NULL);
+   assert(celluleTache != NULL);
+
    celluleTache->tache = tache;
 
    celluleTache->suivant = NULL;
@@ -34,6 +38,9 @@ void insererCelluleTache(ListeTache   * listeTaches,
    if (listeTaches->tete == NULL) {
       listeTaches->tete = celluleTache;
    }
+
+   assert(listeTaches->tete != NULL);
+   assert(listeTaches->queue->tache == tache);
 }
 
 Tache * extraireTache(ListeTache * listeTaches)
@@ -46,6 +53,7 @@ Tache * extraireTache(ListeTache * listeTaches)
    if (celluleTache == listeTaches->queue) {
       listeTaches->queue = NULL;
    }
+
    /* On sort la cellule de la liste et on la renvoie */
    if (celluleTache != NULL) {
       listeTaches->tete = celluleTache->suivant;

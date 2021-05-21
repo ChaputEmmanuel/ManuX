@@ -7,8 +7,14 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
 En cours
 --------
-   Faire un AS ecrireConsole et l'utiliser comme exemple de doc. En profiter
-pour structurer noyau vs usr.
+
+   Définition du type Temps (ressemblant à time_t) et création de
+fonctions pour afficher la "date" (depuis le boot pour le moment).
+Définition d'une structure TempsVal (proche de timeval) pour compter
+le temps d'exécution d'une tâche.
+
+   Ajout à la structure tache de chmpas permettant de compte le nombe
+   d'activation et le temps d'usage (sur la base de ces types)
 
    ATTENTION, ... il va falloir être clair sur la répartition entre
 include et usr/include ! C'est (presque) une copie l'un de l'autre.
@@ -21,12 +27,14 @@ make qui copie de include/manux vers usr/include/manux.
    
    D'ailleurs, il faudra probablement changer include/manux en
    include
+
+   A faire : mon out() utilise l'ordre inverse des paramètres usuel !
    
    Un truc étrange : pourquoi avec le journal (ou après le premier
    changemet de console )je perds les messages système !?
 
    Un petit truc à faire : mettre à droite le message qui dit dans
-   quelle console on est.
+   quelle console on est et quelle heure il est.
 
    Un truc à faire : des outils pour écrire en (x, y) sur la console
    gérer la position du curseur.
@@ -34,6 +42,9 @@ make qui copie de include/manux vers usr/include/manux.
    Un truc moyen : bcopy et consort en asm (dans string.c) ou en #define
    dans string.h ce qui permet une cohérence entre usr et noyau !
 
+   A faire un jour : renommer le scheduler en "tacheNoyau" et séparer
+   plus clairement encore tache/fileTache/gestionTache/ordonnanceur
+   
    A faire chiant : remplacer les uint[0-9] par uint[0-9]_t
    
    Ca plante, et ça dépend du code que je commente, bref, ça sent

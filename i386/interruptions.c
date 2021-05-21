@@ -25,7 +25,10 @@ extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
 extern Tache * tacheScheduler ;
 extern Atomique schedulerEnCours;
 
-uint32 nbTicks = 0;
+/*
+ * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
+ */
+Temps nbTopHorloge = 0;
 
 void exDivisionParZero(TousRegistres registres,
                        uint32 eip, uint32 cs, uint32 eFlags)
@@ -38,14 +41,13 @@ void exDivisionParZero(TousRegistres registres,
 void handlerTimer(TousRegistres registres,
                   uint32 eip, uint32 cs, uint32 eFlags)
 {
-   nbTicks++;
+   nbTopHorloge++;
 
    outb(0x20, 0x20);
 
-   /* Si le scheduler n'est pas déjà en cours, on l'active */
-   /*   if (atomiqueTestInit(&schedulerEnCours, 1, 0)) {
-      activerTache(tacheScheduler);
-      }*/
+#ifdef MANUX_PREEMPTIF
+   ordonnanceur();
+#endif
 }
 
 void positionnerHandlerInterruption(IDT idt, int i, Handler handler)

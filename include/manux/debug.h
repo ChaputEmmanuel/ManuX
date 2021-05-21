@@ -9,7 +9,8 @@
 #include <manux/config.h>
 #include <manux/printk.h>
 #include <manux/stdarg.h>
-#include <manux/i386.h>  // halt()
+#include <manux/i386.h>       // halt()
+#include <manux/scheduler.h>  // tacheEnCours
 
 #define DBG_KERNEL_ERREUR 0x00000001
 #define DBG_KERNEL_START  0x00000002
@@ -33,12 +34,12 @@
 //  ;
 
 #define masqueDebugage (0x00000000  \
-  | DBG_KERNEL_START    \
-  | DBG_KERNEL_TACHE    \
-  | DBG_KERNEL_ORDON    \
-  | DBG_KERNEL_ALL    \
 			)
 
+//  | DBG_KERNEL_START
+//  | DBG_KERNEL_TACHE
+//  | DBG_KERNEL_ORDON
+//  | DBG_KERNEL_ALL
 //  | DBG_KERNEL_FILES
 
 /*
@@ -47,7 +48,7 @@
  */
 #define printk_debug(lvl, fmt, args...)	 \
    if ((lvl)& masqueDebugage)                    \
-     printk("[%d] %s line %d : " fmt, nbTicks, __FUNCTION__ , __LINE__, ## args)
+     printk("[%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args)
 
 /*
  * Affichage d'un message de panique

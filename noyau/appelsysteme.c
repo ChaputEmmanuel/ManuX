@@ -27,12 +27,6 @@ int definirAppelSysteme(int num, void * appel)
 
 void initialiserAppelsSysteme()
 {
-   /* Les 4 suivants sont à vérifier */
-   definirAppelSysteme(NBAS_NUMERO_TACHE,   AS_numeroTache);
-   definirAppelSysteme(NBAS_CONSOLE,        AS_console);
-   definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
-   //   definirAppelSysteme(NBAS_FORK,           sysFork);
-
    /* Envoyer une chaîne de caractères sur la console */
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
 
@@ -41,6 +35,13 @@ void initialiserAppelsSysteme()
 
    /* Invocation explicite de l'ordonnanceur */
    definirAppelSysteme(NBAS_BASCULER_TACHE, sys_basculerTache);
+
+   /* Les 4 suivants sont à vérifier */
+   //definirAppelSysteme(NBAS_NUMERO_TACHE,   AS_numeroTache);
+   //definirAppelSysteme(NBAS_CONSOLE,        AS_console);
+   //definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
+   //   definirAppelSysteme(NBAS_FORK,           sysFork);
+
 }
 
 void entrerAppelSysteme()
