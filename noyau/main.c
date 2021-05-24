@@ -38,11 +38,11 @@ extern void init(); // Faire un init.h
  * (cf init-manux.nasm)
  */
 typedef struct _InfoSysteme {
-   uint16 memoireDeBase;   // En Ko
-   uint16 memoireEtendue;  // En Ko
-   uint16 tailleRamdisk;   // En Ko (0 si pas de ramdisk)
-   uint16 adresseRamdiskLo;// WARNING, pourquoi cet entremellage ?
-   uint16 adresseRamdiskHi;
+   uint16_t memoireDeBase;   // En Ko
+   uint16_t memoireEtendue;  // En Ko
+   uint16_t tailleRamdisk;   // En Ko (0 si pas de ramdisk)
+   uint16_t adresseRamdiskLo;// WARNING, pourquoi cet entremellage ?
+   uint16_t adresseRamdiskHi;
 } InfoSysteme;
 
 Console * console; // La console système
@@ -50,7 +50,7 @@ Console * console; // La console système
 void _start(InfoSysteme * infoSysteme)
 {
 #ifdef MANUX_RAMDISK
-   uint32 adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
+   uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
                          + infoSysteme->adresseRamdiskLo;
 #endif
    
@@ -78,7 +78,7 @@ void _start(InfoSysteme * infoSysteme)
 
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
-   initialiserMemoire(infoSysteme->memoireEtendue);
+   initialiserMemoire(infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
    printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
 
    /* Initialisation de la pagination */
@@ -139,7 +139,7 @@ void _start(InfoSysteme * infoSysteme)
 
    printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
 
-   //   printk("[0x%5x]\n", 42); halt();
+   //   printk("[b = %d, e = %d]\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue); halt();
    init();
 }   /* main */
 

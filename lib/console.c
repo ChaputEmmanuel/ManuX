@@ -241,7 +241,7 @@ void afficherConsoleEntier(Console * cons, int n)
    }
 }
 
-void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32 reg)
+void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
 {
    char chiffre[17] = "0123456789abcdef";
    char nombre[2*nbOctets+2];
@@ -344,14 +344,16 @@ void basculerVersConsole(Console * suivante)
    c = consoleActive->colonne;
    a = consoleActive->attribut;
    consoleActive->ligne = 0;
-   consoleActive->colonne = 40;
+   consoleActive->colonne = 55;
 
    consoleActive->attribut = 0x1B;
    afficherConsole(consoleActive, "Cons ");
-   afficherConsoleEntierHex(consoleActive, 4,(uint32)consoleActive);
+   afficherConsoleEntierHex(consoleActive, 4,(uint32_t)consoleActive);
    afficherConsole(consoleActive, "  t= ");
+   afficherConsoleEntier(consoleActive, totalMinutesDansTemps(nbTopHorloge));
+   afficherConsole(consoleActive, ":");
    afficherConsoleEntier(consoleActive, secondesDansTemps(nbTopHorloge));
-   afficherConsole(consoleActive, "            ");
+   afficherConsole(consoleActive, " ");
 
    consoleActive->ligne = l;
    consoleActive->colonne = c;

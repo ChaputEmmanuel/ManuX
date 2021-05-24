@@ -12,24 +12,24 @@
  * Un descripteur de segment
  */
 typedef struct _DescSegment {
-   uint16 limiteFaible;
-   uint16 baseFaible;
-   uint8  baseInter;
-   uint8  type;
-   uint8  limiteFort;
-   uint8  baseFort;
+   uint16_t limiteFaible;
+   uint16_t baseFaible;
+   uint8_t  baseInter;
+   uint8_t  type;
+   uint8_t  limiteFort;
+   uint8_t  baseFort;
 } DescSegment;
 
 /*
  * Un descripteur de TSS ([1] p 6-7)
  */
 typedef struct _DescTSS {
-   uint16 limiteFaible;
-   uint16 baseFaible;
-   uint8  baseInter;  
-   uint8  type;       /* P,DPL,010B1 */
-   uint8  limiteFort; /* G,00,AVL,lim */
-   uint8  baseFort;
+   uint16_t limiteFaible;
+   uint16_t baseFaible;
+   uint8_t  baseInter;  
+   uint8_t  type;       /* P,DPL,010B1 */
+   uint8_t  limiteFort; /* G,00,AVL,lim */
+   uint8_t  baseFort;
 } DescTSS;
 
 typedef union _Descripteur {
@@ -69,7 +69,7 @@ void chargerLDT(DescriptorTable * ldt);
  */
 
 int ajouterDescTSS(DescriptorTable * dt,
-		   void * adresse, uint32 limite,
+		   void * adresse, uint32_t limite,
 		   booleen busyTask);
 /*
  * Ajout d'un descripteur de TSS à la DescriptorTable
@@ -80,9 +80,9 @@ int ajouterDescTSS(DescriptorTable * dt,
  */
 
 int setDescripteurSegment(DescriptorTable * dt,
-                          uint32 adresse, uint32 limite,
-                          uint8 type,
-                          uint8 gd0a);
+                          uint32_t adresse, uint32_t limite,
+                          uint8_t type,
+                          uint8_t gd0a);
 /*
  * Initialisation d'un  descripteur de segment dans une table de descripteur
  * gd0a doit contenir dans son quadret de poids fort les bits G, D/B, 0

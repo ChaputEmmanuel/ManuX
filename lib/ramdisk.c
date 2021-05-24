@@ -7,7 +7,7 @@
 
 #include <manux/console.h>
 
-void initialiserRamDisk(uint32 adresse, uint16 tailleKo)
+void initialiserRamDisk(uint32_t adresse, uint16_t tailleKo)
 {
 
 }

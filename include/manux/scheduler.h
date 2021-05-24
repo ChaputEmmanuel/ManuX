@@ -37,7 +37,7 @@ extern Tache * tacheEnCours;
  */
 //ExclusionMutuelle verrouNoyau;
 
-void setFrequenceTimer(uint16 freqHz);
+void setFrequenceTimer(uint16_t freqHz);
 /*
  * Positionne la fréquence du timer 0
  */
@@ -66,7 +66,7 @@ int AS_numeroTache();
  * à faire là ...
  */
 
-uint32 AS_console();
+uint32_t AS_console();
 /*
  * Obtention de la console de la tache en cours. WARNING ça n'a rien
  * à faire là ...

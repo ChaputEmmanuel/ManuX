@@ -8,13 +8,12 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 En cours
 --------
 
-   Définition du type Temps (ressemblant à time_t) et création de
+   
+   (A dcoumenter) Définition du type Temps (ressemblant à time_t) et création de
 fonctions pour afficher la "date" (depuis le boot pour le moment).
 Définition d'une structure TempsVal (proche de timeval) pour compter
 le temps d'exécution d'une tâche.
 
-   Ajout à la structure tache de chmpas permettant de compte le nombe
-   d'activation et le temps d'usage (sur la base de ces types)
 
    ATTENTION, ... il va falloir être clair sur la répartition entre
 include et usr/include ! C'est (presque) une copie l'un de l'autre.
@@ -28,14 +27,31 @@ make qui copie de include/manux vers usr/include/manux.
    D'ailleurs, il faudra probablement changer include/manux en
    include
 
-   A faire : mon out() utilise l'ordre inverse des paramètres usuel !
+   Idée : utiliser les outils d'allocation mémoire pour ajouter
+   (enfin) une mémoire au journal : liste datée/taguée de messages.
    
+   A faire : mon out() utilise l'ordre inverse des paramètres usuel !
+
+   A faire : changer un peu la getion de tacheEnCours de sorte à
+   pouvoir faire la compta du temps de chaque tache dans
+   basculerTache. C'est par exemple à basculerVersTache(t) de faire
+   tacheEncours = t ce qui lu ipermet de m,ipuler les deux et donc
+   pouvoir faire le décompte.
+
+   A voir : Pourquoi lib/clavier est traité à part dans noyau/Makefile !?
+   
+   A faire : profiter de la disponibilité des mcros dans Makefile (via
+   makeconfig) pour ne pas compiler fs si pas utiliser. Idem pour
+   ramdisk, ...
+
    Un truc étrange : pourquoi avec le journal (ou après le premier
    changemet de console )je perds les messages système !?
 
    Un petit truc à faire : mettre à droite le message qui dit dans
    quelle console on est et quelle heure il est.
 
+   Un petit truc à faire : un doc/Makefile
+   
    Un truc à faire : des outils pour écrire en (x, y) sur la console
    gérer la position du curseur.
 
@@ -44,8 +60,6 @@ make qui copie de include/manux vers usr/include/manux.
 
    A faire un jour : renommer le scheduler en "tacheNoyau" et séparer
    plus clairement encore tache/fileTache/gestionTache/ordonnanceur
-   
-   A faire chiant : remplacer les uint[0-9] par uint[0-9]_t
    
    Ca plante, et ça dépend du code que je commente, bref, ça sent
 la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute
@@ -122,3 +136,21 @@ Les Makefile
 ### Qemu
 
    apt-get install qemu-system-i386
+
+
+
+FAIT
+
+     EN COURS :   A voir : la définition des macros est un soucis. Certaines sont
+   constantes, d'autres calculées par des outils, ... Certaines sont
+   utilisées en C, d'autres avec NASM, voire en ligne de commande. Il
+   faut clarifier ça, surtout qu'il y a des doublons (comme
+   MANUX_TEXT_SEGMENT et  MANUX_KERNEL_SEG_16 par exemple)
+
+   je suis en train de modifier outil/taille_noyau qui devra donc être
+   renommé. Il génère des macro Makefile dans taille.conf (à renommer
+   aussi) en fonction de config.h Je propose donc que make.conf
+   disparaisse (ou plutôt intègre ce qui était dans taille.conf) sauf
+   que attention, c'est en 2 phases : l'une doit être faite en tout
+   début (la génération des macrs en fonction de config.h) l'autre à
+   la fin (la taille !). Donc il faut sûrement laisser les deux, ... 

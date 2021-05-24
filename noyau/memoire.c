@@ -9,6 +9,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
 #include <manux/types.h>      /* TacheID */
+#include <manux/debug.h>      /* assert */
 #include <manux/memoire.h>
 #include <manux/atomique.h>
 #include <manux/pagination.h> /* ajouterPage() */
@@ -19,7 +20,7 @@
  * des pages
  */
 #ifndef AFFECTATION_PAGES
-#   define AFFECTATION_PAGES 0x40000
+#   define AFFECTATION_PAGES 0x1000
 #endif
 
 /*
@@ -39,16 +40,25 @@ TacheID * proprietairePage = (TacheID *)AFFECTATION_PAGES ;
  */
 static int nombrePages = 0;
 
-void initialiserMemoire(unsigned int tailleMemoireEtendue)
+void initialiserMemoire(uint32_t tailleMemoireDeBase,
+			uint32_t tailleMemoireEtendue)
 {
-   int i;                     /* Pour compter les pages initialisées */
+   int i;                      // Pour compter les pages initialisées 
+   uint32_t taillePropietaire; // Taille nécessaire pour les gérer
+   
+   /* Les tailles sont données en Ko */
+   nombrePages = (tailleMemoireDeBase + tailleMemoireEtendue) / 4;
 
-   nombrePages = tailleMemoireEtendue / 4; // WARNING c'est le nombre depages total ou étendu ?
-
+   /* De combien de pages a-t-on besoin pour les gérer ? */
+   taillePropietaire = (nombrePages + TAILLE_PAGE - 1) / TAILLE_PAGE; 
+   
 #ifdef DEBUG_MEMOIRE
-   printk("%d pages de %d octets\n",  nombrePages, TAILLE_PAGE);
+   printk("%d pages de %d octets : %d pages de gestion\n",  nombrePages, TAILLE_PAGE, tailleProprietaire);
 #endif
 
+   /* Le tableau d'allocation des pages ne doit pas télescoper le noyau !*/
+   assert((void*)(proprietairePage + taillePropietaire*TAILLE_PAGE) < (void *)KERNEL_START_ADDRESS);
+   
    /* On considère le 1er méga occupé par le noyau */
    for (i = 0; i < DEBUT_MEMOIRE_ETENDUE/TAILLE_PAGE; i++) {
       proprietairePage[i] = (TacheID) 1;

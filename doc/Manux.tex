@@ -170,14 +170,17 @@ fichiers inclus. Ils se trouvent dans le répertoire {\tt
 %-------------------------------------------------------------------------------
 \subsection{Configuration}
 
-   La configuration se fait au travers de quelques fichiers de
-base. Idéalement, tout devrait être dans le même, mais il faudrait le
-pré-traiter.
+   La configuration se fait essentiellement au travers du fichier {\tt manux/config.h}.
 
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{Le fichier {\tt make.conf}}
+   Certaines valeurs sont utilisées ailleurs que dans du C (dans du NASM,
+ou directement dans le {\tt Makefile}) et le programme {\tt
+  outils/makeconfig} est là pour générer un fichier {\tt make.conf}
+qui contient ces variables.
+
+   D'autres valeurs doivent être déterminées durant la phase de
+compilation (par exemple la taille du noyau). Elles sont donc
+calculées par le programme {\tt outils/taillenoyau} et placées dans le
+fichier {\tt taille.conf}.
 
 %...............................................................................
 %
@@ -187,6 +190,11 @@ pré-traiter.
    Il permet de choisir l'inclusion, ou non, de certines parties du
 noyau, et parfois de les paramétrer.
 
+%
+%
+%
+\paragraph{Configuration du fichier de boot}
+
 \begin{description}
    \item[{\tt TAILLE\_PAGE}]
    \item[{\tt NOMBRE\_PAGES\_SYSTEME}]
@@ -195,6 +203,46 @@ noyau, et parfois de les paramétrer.
    \item[{\tt CONSOLES\_VIRTUELLES}]
    \item[{\tt MANUX\_JOURNAL}]
 \end{description}
+
+%
+%
+%
+\paragraph{Configuration de l'adressage du noyau}
+\begin{description}
+   \item[{\tt TAILLE\_PAGE}]
+   \item[{\tt NOMBRE\_PAGES\_SYSTEME}]
+   \item[{\tt ADRESSE\_DEBUT\_TAS}]
+\end{description}
+
+%
+%
+%
+\paragraph{Configuration de l'affichage}
+
+\begin{description}
+   \item[{\tt CONSOLES\_VIRTUELLES}]
+   \item[{\tt MANUX\_JOURNAL}]
+\end{description}
+
+%
+%
+%
+\paragraph{Configuration du système de fichiers}
+
+\begin{description}
+   \item[{\tt NB\_MAX\_FICHIERS}]
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le fichier {\tt make.conf}}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le fichier {\tt taille.conf}}
+
 
 %-------------------------------------------------------------------------------
 %   
@@ -449,11 +497,76 @@ compilateur :
 %===============================================================================
 \section{Le boot}
 
-   Ce que j'appelle ici le boot du système se passe en deux temps. D'abord le
-secteur de boot est chargé en mémoire par le {\sc bios} qui lui donne la
-main. Il s'occupe alors de charger en mémoire le code d'initialisation et
-le code du noyau. Il donne alors à son tour la main à l'initialisation.
+   Nous allons ici voir comment en arriver à un noyau présent dans la
+mémoire de la machine, prêt à être exécuter. Nous allons ici nous
+fonder sur une situation ``à l'ancienne'' avec un {\sc pc} doté d'un
+lecteur de disquettes.
 
+   Nous allons donc devoir mettre en \oe{}uvre le boot du noyau dans
+cette configuration. Pour cela, nous allons construire un fichier qui
+sera placé sur une disquette à partir de laquelle notre système pourra
+démarrer. Ntons que nous utiliserons ici un émulateur comme Qemu
+auquel nous donnerons le chemin vers ce fichier et à qui nous
+demanderons de démarrer depuis cette disquette.
+
+   Observons la structure de ce fichier puis regardons comment en
+construire chaque partie.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Construction du fichier de démarrage}
+
+   Afin de permettre un démarrage ``à l'ancienne'' par un boot sur
+disquette du {\sc pc}, nous allons donc construire une image de disquette
+dont la structure est décrite par la figure \ref{fig:image-disquette}.
+
+\begin{figure}[htbp]
+$$
+\includegraphics[width=0.8\textwidth]{image-disquette}
+$$
+\caption{\label{fig:image-disquette}Le fichier de démarage}
+\end{figure} 
+
+   Ce que j'appelle ici le boot du système se passera donc en deux temps. D'abord le
+secteur de boot est chargé en mémoire par le {\sc bios} qui lui donne la
+main.
+
+   Le secteur de boot  s'occupe alors de charger en mémoire le code
+d'initialisation ainsi que le code du noyau. Il donne alors à son tour
+la main à l'initialisation. Ce second élément réalise quelques
+opération puis démarre enfin le noyau.
+
+   Si le secteur de boot et le code d'initialisation sont deux
+   éléments distincts, c'est pour deux raisons principales
+
+\begin{itemize}
+   \item d'une part le secteur de boot ne dispose que de 512 octets,
+     si bien qu'il doit être réduit au  minimum ;
+   \item chacun de ces deux éléments à un rôle bien spécifique
+     (charger le code en mémoire et initialiser le système).
+\end{itemize}
+    
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Liens entre les trois éléments}
+
+   Les trois parties de codes évoquées ici (le secteur de boot, le
+code d'initialisation et le noyau) ne sont pas liées entre elles (par
+une édition de liens). Les appels de fonction, partages de variables,
+\ldots {} sont alors à éviter car peu pratiques !
+
+   Concrètement, il y a surtout deux ``appels de fonction'' à réaliser : 
+
+\begin{itemize}
+   \item le secteur de boot doit lancer le code d'initialisation ;
+   \item le code d'initialisation doit démarrer le noyau.
+\end{itemize}
+
+   Pour cela, on va utiliser le fait que tous les éléments sont
+placés à des adresses connues et faire un saut à ces adresses.
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
@@ -463,7 +576,7 @@ le code du noyau. Il donne alors à son tour la main à l'initialisation.
 le premier lecteur, le {\sc bios} charge le premier secteur de la diquette en
 mémoire et l'exécute. En fait, il ne fait cela que si les deux derniers octets
 de ce secteur contien\-nent la valeur magique {\tt 0xAA55}. Pour être
-plus précis, c'est à l'aresse {\tt 0x7C00} que ce secteur est chargé.
+plus précis, c'est à l'adresse {\tt 0x7C00} que ce secteur est chargé.
 
    Un secteur étant composé traditionnellement de 512 octets, on ne
 peut pas faire des folies avec le secteur de boot ! On va donc se
@@ -494,36 +607,27 @@ noyau et sur l'adresse à laquelle le placer !
    Après ces deux chargements, le code du secteur de boot exécute le
 code d'initialisation.
 
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{Liens entre les trois éléments}
-
-   Les trois parties de codes évoquées ici (le secteur de boot, le
-code d'initialisation et le noyau) ne sont pas liées entre elles (par
-une édition de liens). Les appels de fonction, partages de variables,
-\ldots {} sont alors à éviter car peu pratiques !
-
-   Concrètement, il y a surtout deux ``appels de fonction'' à réaliser : 
-
-\begin{itemize}
-   \item le secteur de boot doit lancer le code d'initialisation ;
-   \item le code d'initialisation doit démarrer le noyau.
-\end{itemize}
-
-   Pour cela, on va utiliser le fait que tous les éléments sont
-placés à des adresses connues et faire un saut à ces adresses.
+   Je ne décris pas plus ce code qui ne présente pas un intérêt
+profond, les plus curieuses et curieux n'ont qu'à lire le code !
    
-%...............................................................................
+%-------------------------------------------------------------------------------
 %
-%...............................................................................
-\subsubsection{Construction du fichier de démarrage}
+%-------------------------------------------------------------------------------
+\subsection{État de la mémoire après le chargement}
 
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{État de la mémoire après le chargement}
+   L'état de la mémoire à la fin du boot est décrite par la figure
+\ref{etat-memoire-boot}.
 
+\begin{figure}[htbp]
+$$
+\includegraphics[width=\textwidth]{etat-memoire-boot}
+$$
+\caption{\label{fig:etat-memoire-boot}État de la mémoire après le boot}
+\end{figure} 
+
+   Une fois qu'il a terminé son travail, le code du secteur de boot
+donne la main au code d'initialisation.
+   
 %-------------------------------------------------------------------------------
 %      L'initialisation
 %-------------------------------------------------------------------------------
@@ -618,7 +722,16 @@ cohérente la structure C et la zone mémoire gérée en assembleur.
 %...............................................................................
 \subsubsection{Démarrage du noyau ({\tt noyau/main.c})}
 
-   Exécution de la fonction \lstinline!_start()!.
+   La dernière action du programme d'initalisation est donc l'xécution
+de la fonction \lstinline!_start()!. Comme je l'ai dit précédemment,
+il ne s'agit pas d'un appel de foncion C classique, puisque les deux
+morceaux de code ne sont pas liés entre eux, mais d'un saut à
+l'adresse de la fonction (le tout après avoir empilé les paramètres).
+
+   Ceci termine donc la description de toute la quincailleire qui nous
+permet d'arriver au début de l'exécution du code du noyau. Nous allons
+commencer la description de ce dernier par la mise en place des outils
+de base dont il aura besoin.
 
 %===============================================================================
 %      L'affichage
@@ -1442,7 +1555,7 @@ répertoire de pagination} \index{Pagination!Répertoire de \ldots}.
 %...............................................................................
 %      Gestion de la mémoire physique
 %...............................................................................
-\subsubsection{Gestion de la mémoire physique}
+\subsubsection{Gestion de la mémoire physique dans ManuX}
 
    La mémoire physique est partagée entre une partie système et une
 partie application. La première partie est dédiée à la gestion du
@@ -1457,8 +1570,65 @@ $$
 \end{figure} 
 
    Au niveau système, la mémoire est gérée par page (une gestion plus
-fine doit donc être implémentée au niveau application, par le biais
+fine doit donc être implantée au niveau application, par le biais
 des librairies).
+
+%
+%
+%
+\paragraph{Organisation de la mémoire physique}
+
+   Traditionnellement, sur un PC, la mémoire physique est organisée
+comme décrit par la figure \ref{etat-memoire-base}.
+
+\begin{figure}[htbp]
+$$
+\includegraphics[width=\textwidth]{etat-memoire-base}
+$$
+\caption{\label{fig:etat-memoire-boot}État de la mémoire au démarage}
+\end{figure} 
+
+   Une partie est réservée pour le {\sc bios} et la vidéo, nous nous
+garderons bien d'aller y lire ou écrire pour autre chose !
+   
+   L'état de cette mémoire à la fin du boot (décrit plus haut) est
+donné  par la figure \ref{etat-memoire-boot-2} que nous redonnons ici.
+
+\begin{figure}[htbp]
+$$
+\includegraphics[width=\textwidth]{etat-memoire-boot}
+$$
+\caption{\label{fig:etat-memoire-boot-2}État de la mémoire après le boot}
+\end{figure} 
+
+   Il est important de l'avoir en tête pour la suite afin de
+déterminer quelles sont les zones que nous pouvos allouer et celles
+qui ne doivent pas être utilisées.
+
+%
+%
+%
+\paragraph{Allocation de la mémoire}
+
+   Chaque page mémoire peut être allouée à une tâche (ou au noyau) ou
+libre (non allouée). C'est le tableau \lstinline!proprietairePage!
+défini dans le fichier {\tt noyau/memoire.c} qui définit cela comme illustré par la figure
+\ref{Figure:ProprietairePage}. Une page libre sera associée à un
+propriétaire nul et une page allouée au système à la tâche 1.
+
+\begin{figure}[htbp]
+$$
+\includegraphics[width=0.5\textwidth]{proprietaire-page}
+$$
+\caption{\label{Figure:ProprietairePage}Définition de l'allocation des
+  pages mémoire}
+\end{figure} 
+
+\subparagraph{Initialisation}
+
+
+
+\subparagraph{Allocation}
 
    Deux fonctions permettent d'allouer une page mémoire, ce sont
 
@@ -1469,11 +1639,6 @@ void * allouerPage();
 
    qui permettent d'obtenir respectivement une page mémoire système et
 une page mémoire application.
-
-   L'allocation des pages est gérée dans le fichier {\tt
-noyau/memoire.c} et se base une table définissant la tâche
-propriétaire de chaque page (une page libre étant identifiée par un
-propriétaire nul).
 
 %...............................................................................
 %      Organisation de la mémoire virtuelle

@@ -2,12 +2,10 @@
 ;      Initialisation de ManuX
 ;                                                           (C) Manu Chaput 2000
 ;-------------------------------------------------------------------------------
-%include "commun.nasm"
-
 global InitManuX
 
 InitManuX :
-        mov ax, MANUX_INIT_SEG_16   ; C'est à cette adresse qu'est chargé l'init
+        mov ax, INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
         mov ds, ax
         mov es, ax
         mov si, MsgChargement       ; AfficheBIOS le message de chargement
@@ -63,20 +61,20 @@ ModeReelOK :
 
         ; Chargement du RamDisk, si nécessaire
         ;-------------------------------------
-        mov ax, NB_SECTEURS_RAMDISK
+        mov ax, NB_SECT_RAMDISK
         cmp ax, 0h
         je PasDeRamdisk
 
         mov si, MsgLoadRamDisk
         call AfficheBIOS
 
-        mov ax, NB_SECTEURS_RAMDISK
+        mov ax, NB_SECT_RAMDISK
         shr ax, 1
         mov [TailleRamdisk], ax
         xor ebx, ebx
         mov bx, [MemoireEtendue]    ; OK, bx = taille de la mémoire étendue
         add bx, 0400h               ; on lui ajoute le Méga de base ...
-        mov ax, NB_SECTEURS_RAMDISK ; ... et on lui enlève la taille du ramdisk
+        mov ax, NB_SECT_RAMDISK     ; ... et on lui enlève la taille du ramdisk
         shr ax, 1                   ; 1 secteur = 1/2 Ko
         sub bx, ax
         shl ebx, 10                 ; 1 Ko = 2^10 Octets ...
@@ -88,8 +86,8 @@ ModeReelOK :
         mov bx, 0
 
         mov ah, 2                 ; Lecture = fonction 2
-        mov al, NB_SECTEURS_RAMDISK
-        mov cx, NB_SECT_INIT + MANUX_KERNEL_SECT + 2
+        mov al, NB_SECT_RAMDISK
+        mov cx, NB_SECT_INIT + NB_SECT_KERNEL + 2
         mov dx, 0                 ; head=0, drive=0
         int 13h                   ; On place ça en ES:BX
 
@@ -160,12 +158,12 @@ VidageTer:
         shl eax, 0x4                     ; ... du transit du ramdisk.
         mov esi, eax
 
-        mov eax, MANUX_INIT_SEG_16    ; Calcul de l'adresse "flat" ...
+        mov eax, INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
         shl eax, 0x4                  ; ... de la variable ...
         add eax, AdresseRamdisk       ; ... AdresseRamdisk .
         mov edi, [eax]
 
-        mov eax, MANUX_INIT_SEG_16    ; Calcul de l'adresse "flat" ...
+        mov eax, INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
         shl eax, 0x4                  ; ... de la variable ...
         add eax, TailleRamdisk        ; ... TailleRamdisk .
 
@@ -178,7 +176,7 @@ VidageTer:
         ; Calcul de l'adresse des infos Système
         ;--------------------------------------
         mov eax, 0                   ; C'est à cette adresse que
-        mov ax, MANUX_INIT_SEG_16    ; sont actuellement les infos
+        mov ax, INIT_START_ADDRESS   ; sont actuellement les infos
         shl eax, 4                   ; Il faut transformer
         add eax, InfoSysteme         ; en adresse "flat"
         push eax
@@ -190,8 +188,8 @@ VidageTer:
 
         ; Et c'est parti, on saute sur le noyau !
         ;----------------------------------------
-        mov eax, MANUX_KERNEL_SEG_16 
-        shl eax, 4
+        mov eax, KERNEL_START_ADDRESS 
+        ;shl eax, 4
         call eax
 
 [bits 16]

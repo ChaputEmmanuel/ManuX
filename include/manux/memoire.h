@@ -20,7 +20,8 @@
  */
 extern int nombrePagesSysteme;
 
-void initialiserMemoire(unsigned int tailleMemoireEtendue);
+void initialiserMemoire(uint32_t tailleMemoireDeBase,
+			uint32_t tailleMemoireEtendue);
 /*
  * Initialisation de la mémoire. Nécessaire avant toute
  * demande d'allocation.

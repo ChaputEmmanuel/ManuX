@@ -1,10 +1,15 @@
+/*----------------------------------------------------------------------------*/
+/*      Outils permettant de générer un taille.conf pour la compilation de    */
+/* ManuX                                                                      */
+/*                                                  (C) Manu Chaput 2000-2021 */
+/*----------------------------------------------------------------------------*/
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <error.h>
 
 #define TAILLE_BLOC 512
-
+  
 int main(int argc,char * argv[])
 {
    int nbBlocs ;              // Nombre de blocs du noyau
@@ -29,7 +34,7 @@ int main(int argc,char * argv[])
    premierSecteurRamDisk = nbBlocs + ((int) statInit.st_size)/TAILLE_BLOC;
    */
 
-   printf("# Fichier généré automatiquement, ne pas modifier\nMANUX_KERNEL_SECT = %d\nMANUX_TAILLE_BOURAGE = %d\n",
+   printf("# Fichier généré automatiquement, ne pas modifier\nNB_SECT_KERNEL = %d\nMANUX_TAILLE_BOURAGE = %d\n",
           nbBlocs,
           tailleBourage);
 

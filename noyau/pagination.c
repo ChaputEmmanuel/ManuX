@@ -47,21 +47,21 @@ void creerTablePaginationDirecte(PageDirectory * repertoirePagination,
    for (i = 1; i < nombrePages; i++) {
 
       /* Calcul des indices de la page courante */
-      indiceTable = ((uint32)pageCourante >> 12) & 1023;
-      indiceDirectory = ((uint32)pageCourante >> 22) & 1023;
+      indiceTable = ((uint32_t)pageCourante >> 12) & 1023;
+      indiceDirectory = ((uint32_t)pageCourante >> 22) & 1023;
 
       /* Construction d'une nouvelle PageTable */
       if (!indiceTable) {
          /* On met les tables les unes derrière les autres */
          /* Attention à l'arithmétique des pointeurs ! Pas de * sizeof(PDE) */
          tableCourante += 1024;
-         PDECourante = ((uint32)tableCourante & 0xFFFFF000)
+         PDECourante = ((uint32_t)tableCourante & 0xFFFFF000)
                        |0x003;
          (*repertoirePagination)[indiceDirectory] = PDECourante;
       }
 
       /* Calcul et enregistrement de la PTE */
-      PTECourante = ((uint32)pageCourante & 0xFFFFF000)
+      PTECourante = ((uint32_t)pageCourante & 0xFFFFF000)
                     |0x003;
       tableCourante[indiceTable] = PTECourante;
 
@@ -104,8 +104,8 @@ void creerTablePagination(PageDirectory * repertoirePagination)
         numeroPage < nombrePagesSysteme;
         numeroPage++) {
       /* Calcul des indices de la page courante */
-      indiceTable = ((uint32)pageCourante >> 12) & 1023;
-      indiceDirectory = ((uint32)pageCourante >> 22) & 1023;
+      indiceTable = ((uint32_t)pageCourante >> 12) & 1023;
+      indiceDirectory = ((uint32_t)pageCourante >> 22) & 1023;
 
       /* Construction d'une nouvelle PageTable */
       if (!indiceTable) {
@@ -114,13 +114,13 @@ void creerTablePagination(PageDirectory * repertoirePagination)
          for (i = 0; i < 1024; i++) {
             tableCourante[i] = (PTE)0;
 	 }
-         PDECourante = ((uint32)tableCourante & 0xFFFFF000)
+         PDECourante = ((uint32_t)tableCourante & 0xFFFFF000)
                        |0x003;
          (*repertoirePagination)[indiceDirectory] = PDECourante;
       }
 
       /* Calcul et enregistrement de la PTE */
-      PTECourante = ((uint32)pageCourante & 0xFFFFF000)
+      PTECourante = ((uint32_t)pageCourante & 0xFFFFF000)
                     |0x003;
       tableCourante[indiceTable] = PTECourante;
 
@@ -143,13 +143,13 @@ int ajouterPage(PageDirectory * repertoirePagination,
    PageTable tableCourante;
 
    /* Calcul des indices de la page courante */
-   indiceTable = ((uint32)adresseVirtuelle >> 12) & 1023;
-   indiceDirectory = ((uint32)adresseVirtuelle >> 22) & 1023;
+   indiceTable = ((uint32_t)adresseVirtuelle >> 12) & 1023;
+   indiceDirectory = ((uint32_t)adresseVirtuelle >> 22) & 1023;
 
    /* Création d'une nouvelle table si nécessaire */
    if ((*repertoirePagination)[indiceDirectory] == 0) {
       (*repertoirePagination)[indiceDirectory] =
-                            (((uint32)allouerPageSysteme()) & 0xFFFFF000)
+                            (((uint32_t)allouerPageSysteme()) & 0xFFFFF000)
                             | 0x003;
    }
 
@@ -158,7 +158,7 @@ int ajouterPage(PageDirectory * repertoirePagination,
                                & 0xFFFFF000);
 
    /* Placement de l'adresse dans la table */
-   tableCourante[indiceTable] = ((uint32)adressePhysique & 0xFFFFF000)
+   tableCourante[indiceTable] = ((uint32_t)adressePhysique & 0xFFFFF000)
                     |0x003;
 
    return 0 ; 

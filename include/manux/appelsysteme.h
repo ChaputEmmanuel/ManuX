@@ -28,17 +28,17 @@ extern void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
  * séquencement des appels). WARNING a expliquer.
  */
 typedef struct _ParametreAS {
-   uint32 ecx;
-   uint32 edx;
-   uint32 ebx;
-   uint32 esp;
-   uint32 ebp;
-   uint32 esi;
-   uint32 edi;
-   uint32 adresseRetourInterruption; // retour DE l'IT
-   uint32 eflags;
-   uint32 csretour;                  // retour DE l'interface
-   uint32 adresseRetourInterface;    // retour DE l'interface
+   uint32_t ecx;
+   uint32_t edx;
+   uint32_t ebx;
+   uint32_t esp;
+   uint32_t ebp;
+   uint32_t esi;
+   uint32_t edi;
+   uint32_t adresseRetourInterruption; // retour DE l'IT
+   uint32_t eflags;
+   uint32_t csretour;                  // retour DE l'interface
+   uint32_t adresseRetourInterface;    // retour DE l'interface
 } ParametreAS;
 
 

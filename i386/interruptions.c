@@ -31,7 +31,7 @@ extern Atomique schedulerEnCours;
 Temps nbTopHorloge = 0;
 
 void exDivisionParZero(TousRegistres registres,
-                       uint32 eip, uint32 cs, uint32 eFlags)
+                       uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
 }
 
@@ -39,7 +39,7 @@ void exDivisionParZero(TousRegistres registres,
  * Le handler du timer (irq 8)
  */
 void handlerTimer(TousRegistres registres,
-                  uint32 eip, uint32 cs, uint32 eFlags)
+                  uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    nbTopHorloge++;
 
@@ -55,8 +55,8 @@ void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
  * Affectation du handler de l'interruption i
  */
 {
-   idt[i].itg.offsetFaible = ((uint32)handler & 0xFFFF);
-   idt[i].itg.offsetFort = ((uint32)handler >> 16);
+   idt[i].itg.offsetFaible = ((uint32_t)handler & 0xFFFF);
+   idt[i].itg.offsetFort = ((uint32_t)handler >> 16);
    idt[i].itg.parametres = 0x8E00;
    idt[i].itg.selSegment = SELECTEUR_SEGMENT_CODE;
 }
@@ -67,14 +67,14 @@ void chargerIDT(IDT idt)
  * d'une zone contenant la taille puis l'adresse de l'IDT.
  */
 {
-   volatile uint8 argument[6];
+   volatile uint8_t argument[6];
 
    argument[0] = 0xFF;
    argument[1] = 0x07;
-   argument[2] = ( (uint32)idt      & 0xFF);
-   argument[3] = (((uint32)idt>>8)  & 0xFF);
-   argument[4] = (((uint32)idt>>16) & 0xFF); 
-   argument[5] = (((uint32)idt>>24) & 0xFF);
+   argument[2] = ( (uint32_t)idt      & 0xFF);
+   argument[3] = (((uint32_t)idt>>8)  & 0xFF);
+   argument[4] = (((uint32_t)idt>>16) & 0xFF); 
+   argument[5] = (((uint32_t)idt>>24) & 0xFF);
 
    __asm__ __volatile__ ("lidt (%0)"
                          : /* Pas de sortie */
@@ -148,7 +148,7 @@ void initialiserIDT()
  */
 #define afficherHexa(v, n, l, c)		                        \
 {                                                                       \
-   uint32 __val = (uint32) v;						\
+   uint32_t __val = (uint32_t) v;						\
    for (int __i = CON_COLONNES*l+c+n-1; __i>=CON_COLONNES*l+c; __i--) { \
       ecran[2*__i] = chiffre[__val&15] ;                                \
       __val /=16 ;			                                \
@@ -156,15 +156,15 @@ void initialiserIDT()
 }
 #define afficherBin(v, n, l, c)		                                \
 {                                                                       \
-   uint32 __val = (uint32) v;						\
+   uint32_t __val = (uint32_t) v;						\
    for (int __i = CON_COLONNES*l+c+n-1; __i>=CON_COLONNES*l+c; __i--) { \
       ecran[2*__i] = chiffre[__val&1] ;                                 \
       __val /=2 ;			                                \
    }                                                                    \
 }
 
-void handlerPanique(uint32 itNum, TousRegistres registres,
-		    uint32 eip, uint32 cs, uint32 eFlags)
+void handlerPanique(uint32_t itNum, TousRegistres registres,
+		    uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    /* A définir ailleurs lorsque ce sera au point */
    char *ecranPanique ="\
@@ -183,7 +183,7 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
    char chiffre[16] = "0123456789ABCDEF";
    char * ecran = CON_SCREEN;
    int i;
-   uint32 indice;
+   uint32_t indice;
    
    // On fait un peu de place en haut de l'écran
    for (i=0; i<11*2*CON_COLONNES; i+=2) {
@@ -194,15 +194,15 @@ void handlerPanique(uint32 itNum, TousRegistres registres,
    
    Descripteur desc = gdtSysteme->descripteur[indice>>3];
    IntelTSS * tssDuFautif = (IntelTSS *)(
-         (((uint32)desc.dt.baseFort) << 24)
-       + (((uint32)desc.dt.baseInter) << 16)
+         (((uint32_t)desc.dt.baseFort) << 24)
+       + (((uint32_t)desc.dt.baseInter) << 16)
        + desc.dt.baseFaible
      );
    /*
    Descripteur descP = gdtSysteme->descripteur[tssDuFautif->TSSPrecedent >> 3];
    tssDuFautif = (IntelTSS *)(
-         (((uint32)descP.dt.baseFort) << 24)
-       + (((uint32)descP.dt.baseInter) << 16)
+         (((uint32_t)descP.dt.baseFort) << 24)
+       + (((uint32_t)descP.dt.baseInter) << 16)
        + descP.dt.baseFaible
      );
    */

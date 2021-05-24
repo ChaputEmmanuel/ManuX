@@ -22,7 +22,7 @@
 /*
  * Caractéristiques de l'écran physique
  */
-#define CON_SCREEN   (char *)0x000B8000
+#define CON_SCREEN   (char *)ADRESSE_ECRAN
 #define CON_COLONNES 80
 #define CON_LIGNES   25
 
@@ -44,8 +44,8 @@ typedef struct _Console {
                                           // console est active
    int                 ligne, colonne ;
    unsigned char       attribut;
-   uint8               nbLignes;
-   uint8               nbColonnes;
+   uint8_t             nbLignes;
+   uint8_t             nbColonnes;
   //   ExclusionMutuelle   scAcces;
 } Console;
 

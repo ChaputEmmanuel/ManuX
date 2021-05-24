@@ -13,13 +13,13 @@
  * Type d'une entrée dans un répertoire de pages (PDE pour
  * "Page Directory Entry").
  */
-typedef uint32 PDE;
+typedef uint32_t PDE;
 
 /*
  * Type d'une entrée dans un répertoire de tables (PTE pour
  * "Page Table Entry").
  */
-typedef uint32 PTE;
+typedef uint32_t PTE;
 
 /*
  * Un répertoire de pages est simplement un tableau de PDE

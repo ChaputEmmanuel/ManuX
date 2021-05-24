@@ -38,7 +38,7 @@ LIBUSR    = ./usr/libusr.a
 NOYAU     = ./noyau/noyau.obj
 BOURAGE	  = ./boot/bourage ./boot/ramdisk.ram
 TAILLE_CONF = taille.conf
-OUTILS      = ./outils/taillenoyau
+OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 
 # Les includes de usr/include/manux qui sont des copies de include/manux
 # ils sont édités dans l'arborescence du noyau et doivent donc être
@@ -78,6 +78,9 @@ usr/include/manux/%.h : include/manux/%.h
 	cp $< $@
 
 usrinc : $(USR_INC)
+
+make.conf : include/manux/config.h outils/makeconfig
+	./outils/makeconfig > make.conf
 
 $(NOYAU) :
 	(cd noyau ; make)

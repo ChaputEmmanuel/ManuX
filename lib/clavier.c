@@ -43,7 +43,7 @@ void initialiserClavier()
 
 void handlerClavier()
 {
-   uint8 etat;
+   uint8_t etat;
 
    inb(0x64, etat);
    if (etat && 0x01) {

@@ -35,9 +35,8 @@ void basculerVersTache(Tache * tache)
  * Activation d'une tâche
  */
 {
-   volatile uint32 selecteur[2] = {0 , tache->indiceTSSDescriptor};
+   volatile uint32_t selecteur[2] = {0 , tache->indiceTSSDescriptor};
 
-   printk_debug(DBG_KERNEL_ORDON, "t 0x%x %d\n", tache, tache->nbActivations);
    __asm__ __volatile__ ("ljmp %0"::"m" (*selecteur));
 
 }
@@ -65,27 +64,27 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    }
    
    /* Initialisation du descripteur de tache */
-   tache->tss.Reserve1 = (uint16) 0;
-   tache->tss.Reserve2 = (uint16) 0;
-   tache->tss.Reserve3 = (uint16) 0;
-   tache->tss.Reserve4 = (uint16) 0;
-   tache->tss.Reserve5 = (uint16) 0;
-   tache->tss.Reserve6 = (uint16) 0;
-   tache->tss.Reserve7 = (uint16) 0;
-   tache->tss.Reserve8 = (uint16) 0;
-   tache->tss.Reserve9 = (uint16) 0;
-   tache->tss.Reserve10 = (uint16) 0;
-   tache->tss.Reserve11 = (uint16) 0;
-   tache->tss.Reserve12 = (uint16) 0;
+   tache->tss.Reserve1 = (uint16_t) 0;
+   tache->tss.Reserve2 = (uint16_t) 0;
+   tache->tss.Reserve3 = (uint16_t) 0;
+   tache->tss.Reserve4 = (uint16_t) 0;
+   tache->tss.Reserve5 = (uint16_t) 0;
+   tache->tss.Reserve6 = (uint16_t) 0;
+   tache->tss.Reserve7 = (uint16_t) 0;
+   tache->tss.Reserve8 = (uint16_t) 0;
+   tache->tss.Reserve9 = (uint16_t) 0;
+   tache->tss.Reserve10 = (uint16_t) 0;
+   tache->tss.Reserve11 = (uint16_t) 0;
+   tache->tss.Reserve12 = (uint16_t) 0;
    tache->tss.CS = 0x08;  /* WARNING, hardcodé pas beau ! */
    tache->tss.DS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.ES = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.FS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.GS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.SS = 0x18;  /* WARNING, hardcodé pas beau ! */
-   tache->tss.ESP = (uint32)pile + 4092;  /* WARNING !! */
-   tache->tss.EIP = (uint32)corpsTache;
-   tache->tss.EFLAGS = (uint32)0x200;
+   tache->tss.ESP = (uint32_t)pile + 4092;  /* WARNING !! */
+   tache->tss.EIP = (uint32_t)corpsTache;
+   tache->tss.EFLAGS = (uint32_t)0x200;
 
    /* Ajout de la tâche dans la GDT */
    tache->indiceTSSDescriptor = ajouterDescTSS(gdtSysteme,
@@ -125,8 +124,8 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On lui affecte sa LDT */
    tache->ldt = (DescriptorTable *)(unePage + sizeof(Tache));
-   tache->tss.LDT = (uint16)setDescripteurSegment(gdtSysteme,
-					  (uint32)&(tache->ldt->taille),
+   tache->tss.LDT = (uint16_t)setDescripteurSegment(gdtSysteme,
+					  (uint32_t)&(tache->ldt->taille),
 					  LDT_NB_BYTES,
                                           0x82, 0xC0);
 

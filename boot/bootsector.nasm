@@ -6,7 +6,6 @@
 ;   saut à l'adrese de init.
 ;                                                           (C) Manu Chaput 2000
 ;-------------------------------------------------------------------------------
-%include "commun.nasm"
 
         org 0x7C00                 ; Le secteur de boot est chargé à cette adresse
 
@@ -20,7 +19,7 @@
         ; Chargement de l'init depuis le disque 
         ;--------------------------------------
 ChargeInit :
-        mov ax, MANUX_INIT_SEG_16 ; Adresse de destination
+        mov ax, INIT_START_ADDRESS ; Adresse de destination
         mov es,ax                 ; es:bx
         mov bx, 0
 
@@ -32,14 +31,18 @@ ChargeInit :
 
         jc InitDisquette
 
-        ; Chargement du noyau depuis le disque
+        ; Chargement du noyau depuis le disque. Attention, l'adresse est
+	; probablement exprimée sur plus de 16 bits, d'où le décalage à
+	; droite. On pert les 4 bits de poids faible. On pourrait les
+	; récpérer dans bx, mais est-ce bien utile ? On va partir du fait
+	; qu'ils sont nuls.
         ;-------------------------------------
-        mov ax, MANUX_KERNEL_SEG_16 ; Adresse de destination 
-        mov es,ax                   ; es:bx 
-        mov bx, 0
+        mov ax, KERNEL_START_ADDRESS>>4 ; Adresse de destination 
+        mov es,ax                       ; es:bx 
+        mov bx, 0                       ; cf 3 lignes plus haut
 
         mov ah, 2                   ; On veut lire
-        mov al, MANUX_KERNEL_SECT   ; x secteurs (taille du noyau)
+        mov al, NB_SECT_KERNEL      ; x secteurs (taille du noyau)
         mov cx, 4                   ; à partir du secteur 4
         mov dx, 0                   ; head=0, drive=0
         int 13h                     ; On place ça en ES:BX
@@ -55,7 +58,7 @@ ChargeInit :
 
         ; On saute à l'adresse de l'init
         ;-------------------------------
-        mov ax, MANUX_INIT_SEG_16
+        mov ax, INIT_START_ADDRESS
         mov es,ax
         mov ds,ax
         push ax

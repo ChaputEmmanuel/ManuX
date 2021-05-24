@@ -9,9 +9,9 @@
 DescriptorTable * gdtSysteme;
 
 int setDescripteurSegment(DescriptorTable * dt,
-                          uint32 adresse, uint32 limite,
-                          uint8 type,
-                          uint8 gd0a)
+                          uint32_t adresse, uint32_t limite,
+                          uint8_t type,
+                          uint8_t gd0a)
 /*
  * gd0a doit contenir dans son quadret de poids fort les bits G, D/B, 0
  * et AVL ([1] p 3-11)
@@ -20,20 +20,20 @@ int setDescripteurSegment(DescriptorTable * dt,
    if (dt->taille >= dt->capacite) {
       return -1;
    }
-   dt->descripteur[dt->taille].ds.limiteFaible = (uint16)((limite)&0xFFFF);
-   dt->descripteur[dt->taille].ds.baseFaible = (uint16)((adresse)&0xFFFF); 
-   dt->descripteur[dt->taille].ds.baseInter = (uint8)((adresse>>16)&0xFF);
+   dt->descripteur[dt->taille].ds.limiteFaible = (uint16_t)((limite)&0xFFFF);
+   dt->descripteur[dt->taille].ds.baseFaible = (uint16_t)((adresse)&0xFFFF); 
+   dt->descripteur[dt->taille].ds.baseInter = (uint8_t)((adresse>>16)&0xFF);
    dt->descripteur[dt->taille].ds.type = type;
-   dt->descripteur[dt->taille].ds.limiteFort = (uint8)((limite>>16)&0x0F)|gd0a;
-   dt->descripteur[dt->taille].ds.baseFort = (uint8)((adresse>>24)&0xFF);
+   dt->descripteur[dt->taille].ds.limiteFort = (uint8_t)((limite>>16)&0x0F)|gd0a;
+   dt->descripteur[dt->taille].ds.baseFort = (uint8_t)((adresse>>24)&0xFF);
 
    return (dt->taille++)<<3;
 }
 
 int setDescripteurTSS(DescriptorTable * dt,
-		      uint32 adresse, uint32 limite,
-		      uint8 type,
-		      uint8 g00a)
+		      uint32_t adresse, uint32_t limite,
+		      uint8_t type,
+		      uint8_t g00a)
 /*
  * g00a doit contenir dans son quadret de poids fort les bits G, 0, 0
  * et AVL ([1] p 6-7)
@@ -42,12 +42,12 @@ int setDescripteurTSS(DescriptorTable * dt,
    if (dt->taille >= dt->capacite) {
       return -1;
    }
-   dt->descripteur[dt->taille].dt.limiteFaible = (uint16)((limite)&0xFFFF);
-   dt->descripteur[dt->taille].dt.baseFaible = (uint16)((adresse)&0xFFFF); 
-   dt->descripteur[dt->taille].dt.baseInter = (uint8)((adresse>>16)&0xFF);
+   dt->descripteur[dt->taille].dt.limiteFaible = (uint16_t)((limite)&0xFFFF);
+   dt->descripteur[dt->taille].dt.baseFaible = (uint16_t)((adresse)&0xFFFF); 
+   dt->descripteur[dt->taille].dt.baseInter = (uint8_t)((adresse>>16)&0xFF);
    dt->descripteur[dt->taille].dt.type = type;
-   dt->descripteur[dt->taille].dt.limiteFort = (uint8)((limite>>16)&0x0F)|g00a;
-   dt->descripteur[dt->taille].dt.baseFort = (uint8)((adresse>>24)&0xFF);
+   dt->descripteur[dt->taille].dt.limiteFort = (uint8_t)((limite>>16)&0x0F)|g00a;
+   dt->descripteur[dt->taille].dt.baseFort = (uint8_t)((adresse>>24)&0xFF);
 
    return (dt->taille++)<<3;
 }
@@ -58,15 +58,15 @@ void chargerGDT(DescriptorTable * gdt)
  * d'une zone contenant la taille puis l'adresse de la GDT.
  */
 {
-   uint16 limite = 8*gdt->taille - 1;
-   volatile uint8 argument[6];
+   uint16_t limite = 8*gdt->taille - 1;
+   volatile uint8_t argument[6];
 
    argument[0] = (limite) & 0xFF;
    argument[1] = (limite>>8) & 0xFF;
-   argument[2] = ((uint32)(&gdt->descripteur[0]) & 0xFF);
-   argument[3] = (((uint32)(&gdt->descripteur[0])>>8) & 0xFF);
-   argument[4] = (((uint32)(&gdt->descripteur[0])>>16) & 0xFF);
-   argument[5] = (((uint32)(&gdt->descripteur[0])>>24) & 0xFF);
+   argument[2] = ((uint32_t)(&gdt->descripteur[0]) & 0xFF);
+   argument[3] = (((uint32_t)(&gdt->descripteur[0])>>8) & 0xFF);
+   argument[4] = (((uint32_t)(&gdt->descripteur[0])>>16) & 0xFF);
+   argument[5] = (((uint32_t)(&gdt->descripteur[0])>>24) & 0xFF);
 
    __asm__ __volatile__ ("lgdt (%0)": :"a" ((char *)argument));// + sti ?
 //   return argument[0] +  argument[1]+argument[2]+argument[3]+ argument[4]+argument[5];
@@ -78,15 +78,15 @@ void chargerLDT(DescriptorTable * ldt)
  * d'une zone contenant la taille puis l'adresse de la LDT.
  */
 {
-   uint16 limite = 8*ldt->taille - 1;
-   volatile uint8 argument[6];
+   uint16_t limite = 8*ldt->taille - 1;
+   volatile uint8_t argument[6];
 
    argument[0] = (limite) & 0xFF;
    argument[1] = (limite>>8) & 0xFF;
-   argument[2] = ((uint32)(&ldt->descripteur[0]) & 0xFF);
-   argument[3] = (((uint32)(&ldt->descripteur[0])>>8) & 0xFF);
-   argument[4] = (((uint32)(&ldt->descripteur[0])>>16) & 0xFF);
-   argument[5] = (((uint32)(&ldt->descripteur[0])>>24) & 0xFF);
+   argument[2] = ((uint32_t)(&ldt->descripteur[0]) & 0xFF);
+   argument[3] = (((uint32_t)(&ldt->descripteur[0])>>8) & 0xFF);
+   argument[4] = (((uint32_t)(&ldt->descripteur[0])>>16) & 0xFF);
+   argument[5] = (((uint32_t)(&ldt->descripteur[0])>>24) & 0xFF);
 
    __asm__ __volatile__ ("lldt (%0)": :"a" ((char *)argument));// + sti ?
 }
@@ -141,26 +141,26 @@ void initialiserGDT()
 }
 
 int ajouterDescTSS(DescriptorTable * dt,
-		   void * adresse, uint32 limite,
+		   void * adresse, uint32_t limite,
 		   booleen busyTask)
 {
    int resultat;
 
    if (busyTask) {
-      resultat = setDescripteurTSS(dt, (uint32)adresse, limite, 0x8B, 0x90);
+      resultat = setDescripteurTSS(dt, (uint32_t)adresse, limite, 0x8B, 0x90);
    } else {
-      resultat = setDescripteurTSS(dt, (uint32)adresse, limite, 0x89, 0x90);
+      resultat = setDescripteurTSS(dt, (uint32_t)adresse, limite, 0x89, 0x90);
    }
 
    return resultat;
 }
 
-void busifier(uint16 offsetTSS)
+void busifier(uint16_t offsetTSS)
 {
    gdtSysteme->descripteur[offsetTSS>>3].dt.type |= 0x02;
 }
 
-void debusifier(uint16 offsetTSS)
+void debusifier(uint16_t offsetTSS)
 {
    gdtSysteme->descripteur[offsetTSS>>3].dt.type &= 0xFD;
 }

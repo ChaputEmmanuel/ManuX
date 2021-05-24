@@ -32,10 +32,10 @@
  * Le superbloc
  */
 typedef struct _SFMSuperBloc {
-   uint32 magic;
-   uint8  version;
-   uint32 offsetPremierBlocLibre;
-   uint32 offsetInodeRacine;
+   uint32_t magic;
+   uint8_t  version;
+   uint32_t offsetPremierBlocLibre;
+   uint32_t offsetInodeRacine;
 } SFMSuperBloc;
 
 /*
@@ -50,16 +50,16 @@ typedef enum _SFMTypeFichier {
  * Structure d'un inode
  */
 typedef struct _SFMInode {
-   uint32 taille;
+   uint32_t taille;
    SFMTypeFichier type;   
-   uint32 blocsDirects[SFM_NB_BLOCS_DIRECTS];
+   uint32_t blocsDirects[SFM_NB_BLOCS_DIRECTS];
 } SFMInode;
 
 /*
  * Structure d'une entrée dans un répertoire
  */
 typedef struct _SFMEntreeRepertoire {
-   uint32 offsetInode
+   uint32_t offsetInode
    char nomFichier[SFM_LONGUEUR_NOM];
 } SFMEntreeRepertoire;
 
@@ -67,7 +67,7 @@ typedef struct _SFMEntreeRepertoire {
  * Structure d'un répertoire
  */
 typedef struct _SFMRepertoire {
-   uint32 nombreEntrees;
+   uint32_t nombreEntrees;
    SFMEntreeRepertoire entrees[0];
 } SFMRepertoire;
 

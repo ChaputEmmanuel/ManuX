@@ -19,17 +19,17 @@ include ../make.conf
 all : noyau.obj symbols
 
 noyau.obj : $(OBJETS) $(LIBI386) $(LIBMANUX) $(LIBSF) $(LIBUSR)
-	ld -m elf_i386 -N -Ttext $(MANUX_TEXT_SEGMENT) --oformat binary  $(OBJETS) $(KERN_O) $(LIBMANUX) $(LIBI386) $(LIBSF) $(LIBUSR) ../lib/clavier.o ../i386/irq.bin -o $@
+	ld -m elf_i386 -N --section-start=.text=$(KERNEL_START_ADDRESS) --oformat binary  $(OBJETS) $(KERN_O) $(LIBMANUX) $(LIBI386) $(LIBSF) $(LIBUSR) ../lib/clavier.o ../i386/irq.bin -o $@
 
 symbols : $(OBJETS) $(LIBI386) $(LIBMANUX)
-	ld -m elf_i386 -N -Ttext $(MANUX_TEXT_SEGMENT) $(OBJETS) $(KERN_O) $(LIBMANUX) $(LIBI386) $(LIBSF)  $(LIBUSR) ../lib/clavier.o ../i386/irq.bin -o noyau.elf
+	ld -m elf_i386 -N --section-start=.text=$(KERNEL_START_ADDRESS) $(OBJETS) $(KERN_O) $(LIBMANUX) $(LIBI386) $(LIBSF)  $(LIBUSR) ../lib/clavier.o ../i386/irq.bin -o noyau.elf
 	nm noyau.elf | sort > symbols
 
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_BIN_OPT) $< -o $@
 
 .c.o :
-	gcc $(CFLAGS) -c $<
+	gcc $(CFLAGS) -DKERNEL_START_ADDRESS=$(KERNEL_START_ADDRESS) -c $<
 
 
 clean :

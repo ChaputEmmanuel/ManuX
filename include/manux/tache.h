@@ -36,39 +36,39 @@ typedef void (CorpsTache());
  * WARNING : à mettre dans i386/processeur.h
  */
 typedef struct _IntelTSS {
-   uint16 TSSPrecedent;  /* Pour le chaînage */
-   uint16 Reserve1;
-   uint32 ESP0;
-   uint16 SS0;
-   uint16 Reserve2;
-   uint32 ESP1;
-   uint16 SS1;
-   uint16 Reserve3;
-   uint32 ESP2;
-   uint16 SS2;
-   uint16 Reserve4;
-   uint32 CR3;           /* Page Directory Base Register */
-   uint32 EIP;
-   uint32 EFLAGS;
-   uint32 EAX, ECX, EDX,
+   uint16_t TSSPrecedent;  /* Pour le chaînage */
+   uint16_t Reserve1;
+   uint32_t ESP0;
+   uint16_t SS0;
+   uint16_t Reserve2;
+   uint32_t ESP1;
+   uint16_t SS1;
+   uint16_t Reserve3;
+   uint32_t ESP2;
+   uint16_t SS2;
+   uint16_t Reserve4;
+   uint32_t CR3;           /* Page Directory Base Register */
+   uint32_t EIP;
+   uint32_t EFLAGS;
+   uint32_t EAX, ECX, EDX,
           EBX, ESP, EBP,
           ESI, EDI;      /* Les registres ! */
-   uint16 ES;            /* Le sélecteur de segment */
-   uint16 Reserve5;
-   uint16 CS;            /* Le sélecteur de segment */ 
-   uint16 Reserve6;
-   uint16 SS;            /* Le sélecteur de segment */ 
-   uint16 Reserve7;
-   uint16 DS;            /* Le sélecteur de segment */ 
-   uint16 Reserve8;
-   uint16 FS;            /* Le sélecteur de segment */ 
-   uint16 Reserve9;
-   uint16 GS;            /* Le sélecteur de segment */ 
-   uint16 Reserve10;
-   uint16 LDT;           /* La Local Descriptor Table */
-   uint16 Reserve11;
-   uint16 Reserve12;
-   uint16 IOMBA;
+   uint16_t ES;            /* Le sélecteur de segment */
+   uint16_t Reserve5;
+   uint16_t CS;            /* Le sélecteur de segment */ 
+   uint16_t Reserve6;
+   uint16_t SS;            /* Le sélecteur de segment */ 
+   uint16_t Reserve7;
+   uint16_t DS;            /* Le sélecteur de segment */ 
+   uint16_t Reserve8;
+   uint16_t FS;            /* Le sélecteur de segment */ 
+   uint16_t Reserve9;
+   uint16_t GS;            /* Le sélecteur de segment */ 
+   uint16_t Reserve10;
+   uint16_t LDT;           /* La Local Descriptor Table */
+   uint16_t Reserve11;
+   uint16_t Reserve12;
+   uint16_t IOMBA;
 } IntelTSS;
 
 /*
@@ -77,7 +77,7 @@ typedef struct _IntelTSS {
 typedef struct _Tache {
    IntelTSS           tss;
    DescriptorTable *  ldt;
-   uint16             indiceTSSDescriptor; /* Indice du TSS dans la GDT */
+   uint16_t           indiceTSSDescriptor; /* Indice du TSS dans la GDT */
 
    TacheID            numero;
    EtatTache          etat;
@@ -86,7 +86,7 @@ typedef struct _Tache {
 #ifdef MANUX_FS
    Fichier            fichiers[NB_MAX_FICHIERS]; /* WARNING à généraliser */
 #endif
-   uint32             nbActivations;   // Décompte du nombre d'activations
+   uint32_t           nbActivations;   // Décompte du nombre d'activations
    Temps              tempsExecution;  // Cumul du temps d'exécution
 } Tache;
 

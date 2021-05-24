@@ -58,9 +58,9 @@ ListeTache listeTaches;
  */
 Tache * tacheEnCours = NULL;
 
-void setFrequenceTimer(uint16 freqHz)
+void setFrequenceTimer(uint16_t freqHz)
 {
-   uint16 decompte;
+   uint16_t decompte;
 
    decompte = 1193200 / freqHz;
 
@@ -91,7 +91,10 @@ void ordonnanceur()
    insererCelluleTache(&listeTaches,
                        tacheEnCours,
                        (CelluleTache*)tacheEnCours+sizeof(Tache));
+
+   /* On cumule le temps d'écution dont elle vient de profiter */
    tacheEnCours->tempsExecution += (nbTopHorloge - dateDernierOrdonnancement);
+
    tacheEnCours->etat = Tache_Prete;    // On n'est pas là volontairement
                                         // WARNING : il faudra faire gaffe en cas de pause
 
@@ -102,12 +105,16 @@ void ordonnanceur()
    } while (tacheEnCours->etat != Tache_Prete); 
 
    tacheEnCours->etat = Tache_En_Cours;
-
+ 
    if (tacheEnCours != tachePrecedente){
       printk_debug(DBG_KERNEL_ORDON, "On passe a la tache %d de TSS 0x%x \n",
 	     tacheEnCours->numero,
 	     tacheEnCours->indiceTSSDescriptor);
+
+      /* Une activation de plus pour elle */
       tacheEnCours->nbActivations++;
+
+      /* On note la date pour pouvoir mesurer le temps dont elle va profiter */
       dateDernierOrdonnancement = nbTopHorloge;
       basculerVersTache(tacheEnCours);
    }
@@ -248,14 +255,14 @@ int AS_numeroTache()
  * Le nom de la fonction suivante est probablement à changer, comme celui
  * de la précédente d'ailleurs.
  */
-uint32 AS_console()
+uint32_t AS_console()
 {
    if (schedulerEnCours) {
-      return (uint32)tacheScheduler->console;
+      return (uint32_t)tacheScheduler->console;
    } else if (tacheEnCours) {
-      return (uint32)tacheEnCours->console;
+      return (uint32_t)tacheEnCours->console;
    } else {
-      return (uint32) NULL;
+      return (uint32_t) NULL;
    }
 }
 

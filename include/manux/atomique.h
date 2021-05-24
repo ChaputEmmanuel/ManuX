@@ -14,7 +14,7 @@
 /*
  * Type des données manipulées de façon atomique
  */
-typedef uint32 Atomique;
+typedef uint32_t Atomique;
 
 #define atomiqueInit(atom, val)\
    *(atom) = (val);
@@ -22,14 +22,14 @@ typedef uint32 Atomique;
 #define atomiqueLire(atom) \
    (atom)
 
-static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32 val, uint32 cond)
+static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32_t cond)
 /*
  * La valeur de l'Atomique est comparée à la valeur cond ; en cas d'égalité,
  * l'Atomique prend la valeur val et le retour est 1. Sinon rien n'est fait
  * et le retour est 0.
  */
 {
-   uint8 resultat;
+   uint8_t resultat;
 
    __asm__ ("cmpxchg %3, %2 \n\t"
             "sete %0 \n\t"
