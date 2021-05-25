@@ -18,14 +18,13 @@
 /*
  * Liste des appels système prédéfinis
  */
+#define NBAS_NUMERO_TACHE      0
+#define NBAS_ECRIRE_CONS       1
 #define NBAS_BASCULER_TACHE    6
 #define NBAS_CREER_TACHE       7
-#define NBAS_ECRIRE_CONS       1
-
-#define NBAS_ECRIRE            3
-#define NBAS_NUMERO_TACHE      0
 #define NBAS_OBTENIR_PAGES     2
+#define NBAS_ECRIRE            3
 #define NBAS_CONSOLE           5
-
+#define NBAS_FORK              4
 
 #endif

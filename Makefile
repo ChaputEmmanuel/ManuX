@@ -44,7 +44,7 @@ OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 # ils sont édités dans l'arborescence du noyau et doivent donc être
 # mis à jour dans la partie usr
 USR_INC_D   = usr/include/manux
-USR_INC_F   = appelsystemenum.h config.h types.h string.h
+USR_INC_F   = appelsystemenum.h config.h types.h string.h i386.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 include make.conf

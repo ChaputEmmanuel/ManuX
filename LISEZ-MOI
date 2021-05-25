@@ -7,25 +7,18 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
 En cours
 --------
-
+   EN COURS : allocation mémoire (dont doc à restructurer).
+   Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
+   de place et peut utiliser bsf comme ffsl
    
-   (A dcoumenter) Définition du type Temps (ressemblant à time_t) et création de
+   (Fait, à documenter) Définition du type Temps (ressemblant à time_t) et création de
 fonctions pour afficher la "date" (depuis le boot pour le moment).
 Définition d'une structure TempsVal (proche de timeval) pour compter
 le temps d'exécution d'une tâche.
 
 
-   ATTENTION, ... il va falloir être clair sur la répartition entre
-include et usr/include ! C'est (presque) une copie l'un de l'autre.
-Pas très sage/safe !!! Peut-être faut-il partir du code de init.c et
-voir ce qui est utile. Si ça l'est vraiment, on ajoute à une cible de
-make qui copie de include/manux vers usr/include/manux.
-
-   En cours, voir quels fichiers on peut virer de usr/include et finir
-   la doc
    
-   D'ailleurs, il faudra probablement changer include/manux en
-   include
+   Il faudra probablement changer include/manux en include
 
    Idée : utiliser les outils d'allocation mémoire pour ajouter
    (enfin) une mémoire au journal : liste datée/taguée de messages.
@@ -154,3 +147,12 @@ FAIT
    que attention, c'est en 2 phases : l'une doit être faite en tout
    début (la génération des macrs en fonction de config.h) l'autre à
    la fin (la taille !). Donc il faut sûrement laisser les deux, ... 
+
+   , ... il va falloir être clair sur la répartition entre
+include et usr/include ! C'est (presque) une copie l'un de l'autre.
+Pas très sage/safe !!! Peut-être faut-il partir du code de init.c et
+voir ce qui est utile. Si ça l'est vraiment, on ajoute à une cible de
+make qui copie de include/manux vers usr/include/manux.
+
+   En cours, voir quels fichiers on peut virer de usr/include et finir
+   la doc
