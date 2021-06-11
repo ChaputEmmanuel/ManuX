@@ -1,4 +1,4 @@
-BINAIRES = taillenoyau makeconfig
+BINAIRES = taillenoyau
 
 CFLAGS = -I ../include
 

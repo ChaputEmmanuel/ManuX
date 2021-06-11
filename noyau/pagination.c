@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/pagination.h>
 
-#include <manux/config.h>     /* TAILLE_PAGE */
+#include <manux/config.h>     /* MANUX_TAILLE_PAGE */
 #include <manux/memoire.h>
 
 /*
@@ -67,7 +67,7 @@ void creerTablePaginationDirecte(PageDirectory * repertoirePagination,
 
       /* On passe à la page suivante */
       /* Attention à l'arithmétique des pointeurs ! */
-      pageCourante += TAILLE_PAGE / sizeof(void *);
+      pageCourante += MANUX_TAILLE_PAGE / sizeof(void *);
    }
 }
 
@@ -126,7 +126,7 @@ void creerTablePagination(PageDirectory * repertoirePagination)
 
       /* On passe à la page suivante */
       /* Attention à l'arithmétique des pointeurs ! */
-      pageCourante += TAILLE_PAGE / sizeof(void *);
+      pageCourante += MANUX_TAILLE_PAGE / sizeof(void *);
    }
 }
 

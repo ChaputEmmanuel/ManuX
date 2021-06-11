@@ -16,7 +16,7 @@
 /*
  * Pour paramétrer le scheduler
  */
-#define KHZ * 1000
+//#define KHZ * 1000
 
 /*
  * Pour permettre la gestion des consoles virtuelles. WARNING n'a rien
@@ -36,11 +36,6 @@ extern Tache * tacheEnCours;
  * est en mode noyau à un instant donné.
  */
 //ExclusionMutuelle verrouNoyau;
-
-void setFrequenceTimer(uint16_t freqHz);
-/*
- * Positionne la fréquence du timer 0
- */
 
 void initialiserScheduler();
 /*

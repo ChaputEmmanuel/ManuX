@@ -22,9 +22,9 @@
 /*
  * Caractéristiques de l'écran physique
  */
-#define CON_SCREEN   (char *)ADRESSE_ECRAN
-#define CON_COLONNES 80
-#define CON_LIGNES   25
+#define MANUX_CON_SCREEN   (char *)MANUX_ADRESSE_ECRAN
+#define MANUX_CON_COLONNES 80
+#define MANUX_CON_LIGNES   25
 
 /*
  * Structure d'une console. Attention, en cas de consoles virtuelles,
@@ -34,7 +34,7 @@
  * pour cette structure.
  */
 typedef struct _Console {
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
    struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
    struct _Console   * precedente;  // doublement chaînées
 #endif
@@ -141,7 +141,7 @@ void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
  * Les consoles sont stoquées dans un tableau et repérées par leur
  * indice dans ce tableau.
  */
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
 
 /*
  * Initialisation d'une console virtuelle. Nécessaire avant toute
@@ -160,7 +160,7 @@ void basculerVersConsole(Console * cons);
  */
 void basculerVersConsoleSuivante();
 
-#endif  // CONSOLES_VIRTUELLES
+#endif  // MANUX_CONSOLES_VIRTUELLES
 
 /*
  * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle

@@ -21,12 +21,12 @@
 
 unsigned int auc;
 
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
 
 /* A tout moment, il n'y a qu'une console "active" (ie visible) */
 Console * consoleActive;
 
-#endif // CONSOLES_VIRTUELLES
+#endif // MANUX_CONSOLES_VIRTUELLES
 
 /*
  * La console du noyau est celle "par défaut", sur laquelle seront
@@ -44,16 +44,16 @@ Console * consoleInit()
   auc = 0;
   
    // L'écran est une zone CON_LIGNESxCON_COLONNES d'adresse fixe
-   _consoleNoyau.adresseEcran = CON_SCREEN;
+   _consoleNoyau.adresseEcran = MANUX_CON_SCREEN;
    _consoleNoyau.ligne = 0; //14;
    _consoleNoyau.colonne = 0;
-   _consoleNoyau.nbLignes = CON_LIGNES;
-   _consoleNoyau.nbColonnes = CON_COLONNES;
+   _consoleNoyau.nbLignes = MANUX_CON_LIGNES;
+   _consoleNoyau.nbColonnes = MANUX_CON_COLONNES;
    _consoleNoyau.attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
 
    //   effacerConsole(&_consoleNoyau);
    
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
    consoleActive = &_consoleNoyau;
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
@@ -259,7 +259,7 @@ void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
    }
 }
 
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
 /*
  * Initialisation d'une nouvelle console virtuelle. Les espaces
  * mémoire doivent avoir été alloués par ailleurs.
@@ -273,8 +273,8 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    // La configuration de base
    cons->ligne = 0; 
    cons->colonne = 0;
-   cons->nbLignes = CON_LIGNES;
-   cons->nbColonnes = CON_COLONNES;
+   cons->nbLignes = MANUX_CON_LIGNES;
+   cons->nbColonnes = MANUX_CON_COLONNES;
    cons->attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
 
    /* Initialisation du verrou */
@@ -315,7 +315,7 @@ void basculerVersConsole(Console * suivante)
    assert(suivante != NULL);
    
    // On sauvegarde l'écran physique dans la console active
-   for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
+   for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bopy
       consoleActive->adresseEcranCopie[i] = consoleActive->adresseEcran[i];
    }
 
@@ -332,10 +332,10 @@ void basculerVersConsole(Console * suivante)
 
    // On l'active (à partir de maintenant, ce qui y est écrit apparaît
    // directement à l'écran).
-   consoleActive->adresseEcran = CON_SCREEN;
+   consoleActive->adresseEcran = MANUX_CON_SCREEN;
 
    // On copie son état actuel sur l'écran
-   for (i=0; i < CON_LIGNES*CON_COLONNES*2; i++) { // WARNING utiliser bopy
+   for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bopy
       consoleActive->adresseEcran[i] = consoleActive->adresseEcranCopie[i];
    }
 
@@ -394,24 +394,31 @@ Console * consoleNoyau()
    return &_consoleNoyau;
 };
 
+#ifdef MANUX_FS
 /*
  * Les méthodes permettant de traiter une console comme un fichier
  */
 MethodesFichier consoleMethodesFichier = {
    ecrire : consoleEcrire,
 };
+#endif // MANUX_FS
 
+#ifdef MANUX_APPELS_SYSTEME
 /*
  * L'implatantion de l'AS ecrireConsole
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 {
+#ifdef MANUX_TACHES
    assert(tacheEnCours != NULL);
    Console * cons = tacheEnCours->console;
+#else
+   Console * cons = consoleNoyau();
+#endif
    
    assert(cons != NULL);
    afficherConsoleN(cons, msg, n);
 
    return n;
 }
-
+#endif // MANUX_APPELS_SYSTEMES

@@ -38,48 +38,48 @@ extern void init(); // Faire un init.h
  * (cf init-manux.nasm)
  */
 typedef struct _InfoSysteme {
-   uint16_t memoireDeBase;   // En Ko
-   uint16_t memoireEtendue;  // En Ko
-   uint16_t tailleRamdisk;   // En Ko (0 si pas de ramdisk)
-   uint16_t adresseRamdiskLo;// WARNING, pourquoi cet entremellage ?
-   uint16_t adresseRamdiskHi;
+   uint32_t flags;           // Pour compatibilité avec multiboot
+   uint32_t memoireDeBase;   // En Ko
+   uint32_t memoireEtendue;  // En Ko
+   uint32_t tailleRamdisk;   // En Ko (0 si pas de ramdisk)
+   uint32_t adresseRamdisk;
 } InfoSysteme;
 
 Console * console; // La console système
- 
+
 void _start(InfoSysteme * infoSysteme)
 {
 #ifdef MANUX_RAMDISK
    uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
                          + infoSysteme->adresseRamdiskLo;
 #endif
-   
-   /*
-    * Ici, c'est surtout pour le côté artistique car si l'assertion
-    * est fausse, le co de ne sera pas exécuté :-/
-    */
-   assert(_start == (void *)0x20000);
-   
+
    interdireIRQ(IRQTimer);
 
+   initialiserGDT();
+   initialiserIDT();
+   
    /* Initialisation de la console noyau */
    console = consoleInit();
-   
+
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
    initialiserJournal(console);
 #endif
-   
+
    //basculerConsole();
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running ...\n");
 
+#ifdef MANUX_GESTION_MEMOIRE
    /* Affichage de la mémoire disponible */
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
 
+   //   while(1){};
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
    printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
+#endif
 
    /* Initialisation de la pagination */
 #ifdef MANUX_PAGINATION
@@ -90,19 +90,22 @@ void _start(InfoSysteme * infoSysteme)
    
    /* Initilisation des descripteurs de segments */
    printk_debug(DBG_KERNEL_START, "Chargement GDT, ...\n");
-   initialiserGDT();
+   //   initialiserGDT();
    printk_debug(DBG_KERNEL_START, "GDT chargee\n");
 
    /* Initialisation de la table des interruptions */
    printk_debug(DBG_KERNEL_START, "Chargement IDT ...\n");
-   initialiserIDT();
+   //   initialiserIDT();
    printk_debug(DBG_KERNEL_START, "IDT chargee\n");
 
    /* Initialisation de la table des appels système*/
+#ifdef MANUX_APPELS_SYSTEME
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
    printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
+#endif
 
+   /* Initialisation de la gestion des systèmes de fichiers */
 #ifdef MANUX_FS
    printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers : ");
    sfInitialiser();
@@ -118,12 +121,14 @@ void _start(InfoSysteme * infoSysteme)
       printk_debug(DBG_KERNEL_START, "Ramdisk initilise\n");
    }
 #endif
-   
+
+#ifdef MANUX_CLAVIER
    /* Initialisation du clavier */
    printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
    printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
-
+#endif
+   
    /* Initialisation de la fréquence du timer */
    setFrequenceTimer(MANUX_FREQUENCE_TIMER);
    autoriserIRQ(IRQTimer);
@@ -133,13 +138,14 @@ void _start(InfoSysteme * infoSysteme)
    printk_debug(DBG_KERNEL_START, "Console noyau = 0x%x\n", consoleNoyau());
    printk_debug(DBG_KERNEL_START, "A comparer a  = 0x%x\n", 0x000250a0);
 
+#ifdef MANUX_TACHES
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
+#endif
+   
+   printk_debug(DBG_KERNEL_START, "Adresse de __start : 0x%x\n", _start);
 
-   printk_debug(DBG_KERNEL_START, "Adresse de __start : %x\n", _start);
-
-   //   printk("[b = %d, e = %d]\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue); halt();
    init();
-}   /* main */
+}   /* _start */
 

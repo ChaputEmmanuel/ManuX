@@ -19,12 +19,12 @@
         ; Chargement de l'init depuis le disque 
         ;--------------------------------------
 ChargeInit :
-        mov ax, INIT_START_ADDRESS ; Adresse de destination
+        mov ax, MANUX_INIT_START_ADDRESS ; Adresse de destination
         mov es,ax                 ; es:bx
         mov bx, 0
 
         mov ah, 2                 ; Lecture = fonction 2
-        mov al, NB_SECT_INIT      ; taille d'init
+        mov al, MANUX_NB_SECT_INIT      ; taille d'init
         mov cx, 2                 ; à partir du secteur 2
         mov dx, 0                 ; head=0, drive=0
         int 13h                   ; On place ça en ES:BX
@@ -37,12 +37,12 @@ ChargeInit :
 	; récpérer dans bx, mais est-ce bien utile ? On va partir du fait
 	; qu'ils sont nuls.
         ;-------------------------------------
-        mov ax, KERNEL_START_ADDRESS>>4 ; Adresse de destination 
+        mov ax, MANUX_KERNEL_START_ADDRESS>>4 ; Adresse de destination 
         mov es,ax                       ; es:bx 
         mov bx, 0                       ; cf 3 lignes plus haut
 
         mov ah, 2                   ; On veut lire
-        mov al, NB_SECT_KERNEL      ; x secteurs (taille du noyau)
+        mov al, MANUX_NB_SECT_KERNEL      ; x secteurs (taille du noyau)
         mov cx, 4                   ; à partir du secteur 4
         mov dx, 0                   ; head=0, drive=0
         int 13h                     ; On place ça en ES:BX
@@ -58,7 +58,7 @@ ChargeInit :
 
         ; On saute à l'adresse de l'init
         ;-------------------------------
-        mov ax, INIT_START_ADDRESS
+        mov ax, MANUX_INIT_START_ADDRESS
         mov es,ax
         mov ds,ax
         push ax

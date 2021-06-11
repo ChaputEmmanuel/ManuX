@@ -7,28 +7,29 @@
 #include <stdio.h>
 
 #define addMacro(m)   \
-   printf(#m " = 0x%x\n", m); \
+   printf(#m " = 0x%x\n", m);
+  
   
 int main(int argc,char * argv[])
 {
    printf("# Fichier généré automatiquement, ne pas modifier\n");
 
-   addMacro(TAILLE_PAGE);
-   addMacro(NOMBRE_PAGES_SYSTEME);
-   addMacro(KERNEL_START_ADDRESS);
+   addMacro(MANUX_TAILLE_PAGE);
+   addMacro(MANUX_NOMBRE_PAGES_SYSTEME);
+   addMacro(MANUX_KERNEL_START_ADDRESS);
 
-   addMacro(INIT_START_ADDRESS);
+   addMacro(MANUX_INIT_START_ADDRESS);
    addMacro(MANUX_STACK_SEG_16);
 
-   addMacro(ELF_HEADER_SIZE);
-   addMacro(ADRESSE_ECRAN);
-   addMacro(NB_SECT_INIT);
-   addMacro(NB_SECT_RAMDISK);
-   addMacro(SEGMENT_TRANSIT_RAMDISK);
-   addMacro(PREMIER_SECT_RAMDISK);
+   addMacro(MANUX_ELF_HEADER_SIZE);
+   addMacro(MANUX_ADRESSE_ECRAN);
+   addMacro(MANUX_NB_SECT_INIT);
+   addMacro(MANUX_NB_SECT_RAMDISK);
+   addMacro(MANUX_SEGMENT_TRANSIT_RAMDISK);
+   addMacro(MANUX_PREMIER_SECT_RAMDISK);
 
-   addMacro(portDonneesClavier);
-   addMacro(portCmdClavier);
-   
+   addMacro(MANUX_portDonneesClavier);
+   addMacro(MANUX_portCmdClavier);
+
    return 0;
 }

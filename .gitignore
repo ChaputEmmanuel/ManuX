@@ -9,7 +9,7 @@ boot/bourage
 ./manux
 outils/taillenoyau
 taille.conf
-**/Manux.aux
+**/*.aux
 **/Manux.idx
-**/Manux.log
+**/*.log
 **/Manux.pdf

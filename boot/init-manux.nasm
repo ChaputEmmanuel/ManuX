@@ -5,7 +5,7 @@
 global InitManuX
 
 InitManuX :
-        mov ax, INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
+        mov ax, MANUX_INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
         mov ds, ax
         mov es, ax
         mov si, MsgChargement       ; AfficheBIOS le message de chargement
@@ -59,35 +59,36 @@ ModeReelOK :
         call ValideA20
         sti
 
+%ifdef MANUX_RAMDISK
         ; Chargement du RamDisk, si nécessaire
         ;-------------------------------------
-        mov ax, NB_SECT_RAMDISK
+        mov ax, MANUX_NB_SECT_RAMDISK
         cmp ax, 0h
         je PasDeRamdisk
 
         mov si, MsgLoadRamDisk
         call AfficheBIOS
 
-        mov ax, NB_SECT_RAMDISK
+        mov ax, MANUX_NB_SECT_RAMDISK
         shr ax, 1
         mov [TailleRamdisk], ax
         xor ebx, ebx
         mov bx, [MemoireEtendue]    ; OK, bx = taille de la mémoire étendue
         add bx, 0400h               ; on lui ajoute le Méga de base ...
-        mov ax, NB_SECT_RAMDISK     ; ... et on lui enlève la taille du ramdisk
+        mov ax, MANUX_NB_SECT_RAMDISK     ; ... et on lui enlève la taille du ramdisk
         shr ax, 1                   ; 1 secteur = 1/2 Ko
         sub bx, ax
         shl ebx, 10                 ; 1 Ko = 2^10 Octets ...
         mov [AdresseRamdisk], ebx    ; On stoque l'adresse de début du RamDisk
 
         ; Chargement effectif
-        mov ax, SEGMENT_TRANSIT_RAMDISK ; Adresse de destination ...
+        mov ax, MANUX_SEGMENT_TRANSIT_RAMDISK ; Adresse de destination ...
         mov es,ax                       ; ... dans es:bx
         mov bx, 0
 
         mov ah, 2                 ; Lecture = fonction 2
-        mov al, NB_SECT_RAMDISK
-        mov cx, NB_SECT_INIT + NB_SECT_KERNEL + 2
+        mov al, MANUX_NB_SECT_RAMDISK
+        mov cx, MANUX_NB_SECT_INIT + MANUX_NB_SECT_KERNEL + 2
         mov dx, 0                 ; head=0, drive=0
         int 13h                   ; On place ça en ES:BX
 
@@ -104,6 +105,7 @@ PasDeRamdisk :
         call AfficheBIOS
 
 SuiteRamdisk:
+%endif
 
         ; Passage en mode protégé
         ;------------------------
@@ -152,18 +154,20 @@ VidageTer:
         mov eax, 90000h - 4
         mov esp, eax
 
+%ifdef MANUX_RAMDISK
+
         ; On déplace ensuite le RamDisk vers le haut de la mémoire
 
-        mov eax, SEGMENT_TRANSIT_RAMDISK ; Calcul de l'adresse "flat" ...
+        mov eax, MANUX_SEGMENT_TRANSIT_RAMDISK ; Calcul de l'adresse "flat" ...
         shl eax, 0x4                     ; ... du transit du ramdisk.
         mov esi, eax
 
-        mov eax, INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
+        mov eax, MANUX_INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
         shl eax, 0x4                  ; ... de la variable ...
         add eax, AdresseRamdisk       ; ... AdresseRamdisk .
         mov edi, [eax]
 
-        mov eax, INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
+        mov eax, MANUX_INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
         shl eax, 0x4                  ; ... de la variable ...
         add eax, TailleRamdisk        ; ... TailleRamdisk .
 
@@ -172,11 +176,12 @@ VidageTer:
 
         cld
         rep movsb                     ; [ES:ESI]->[DS:EDI] ECX fois
+%endif
 
         ; Calcul de l'adresse des infos Système
         ;--------------------------------------
         mov eax, 0                   ; C'est à cette adresse que
-        mov ax, INIT_START_ADDRESS   ; sont actuellement les infos
+        mov ax, MANUX_INIT_START_ADDRESS   ; sont actuellement les infos
         shl eax, 4                   ; Il faut transformer
         add eax, InfoSysteme         ; en adresse "flat"
         push eax
@@ -188,7 +193,7 @@ VidageTer:
 
         ; Et c'est parti, on saute sur le noyau !
         ;----------------------------------------
-        mov eax, KERNEL_START_ADDRESS 
+        mov eax, MANUX_KERNEL_START_ADDRESS 
         ;shl eax, 4
         call eax
 
@@ -204,12 +209,12 @@ ValideA20 :
         call AttenteClavierPret
         jnz ValideA20Fin          ; Si pas pret, on arrète
         mov al, 0d1h              ; On veut écrire dans le port de sortie
-        out portCmdClavier, al
+        out MANUX_portCmdClavier, al
 
         call AttenteClavierPret
         jnz ValideA20Fin           ; Si pas pret, on arrète
         mov al, 0dfh               ; Activation ligne A20
-        out portDonneesClavier, al ;
+        out MANUX_portDonneesClavier, al ;
 
 ValideA20Fin :
         ret
@@ -219,7 +224,7 @@ ValideA20Fin :
 AttenteClavierPret :
         mov ecx, 0ffffffffh
 AttenteClavierBcle :
-        in al, portCmdClavier     ;  On attend que la mémoire du contrôleur
+        in al, MANUX_portCmdClavier     ;  On attend que la mémoire du contrôleur
         test al, 2                ; ne soit pas pleine.
         loopnz AttenteClavierBcle ;
         ret
@@ -253,14 +258,18 @@ BoucleFolle :
 ; Les infos sur le système pour passer au noyau
 ;----------------------------------------------
 InfoSysteme :
-   MemoireDeBase :
-        dw 0h
-   MemoireEtendue :
-        dw 0h
+   PourFlagsMB :        ; Attention 
+        dd 0h           ;
+   MemoireDeBase :      ; seuls les deux premiers sont
+        dd 0h           ; compatibles avec multiboot
+   MemoireEtendue :     ; mais la suite (ramdisk) ne l'est
+        dd 0h           ; absolument pas
+%ifdef MANUX_RAMDISK
    TailleRamdisk :
-        dw 0
+        dd 0
    AdresseRamdisk :
         dd 0
+%endif
 [bits 16]
 
 ; La GDT ( [1] p 3-11, [2] )
@@ -327,9 +336,11 @@ MsgPassageProtege db      'Allez zou, on passe en mode protege ...', 13, 10, 0
 MsgModeReel       db      'OK, on est en mode reel !', 13, 10, 0
 MsgPasEnModeReel  db      'ERREUR, on n est pas en mode reel ...', 13, 10, 0
 MsgValideA20      db      'Validation de la ligne A20 ...', 13, 10, 0
+%ifdef MANUX_RAMDISK
 MsgLoadRamDisk    db      'Chargement du RamDisk ...', 13, 10, 0
 MsgNoRamDisk      db      'Pas de RamDisk ...', 13, 10, 0
 MsgErreurRamDisk  db      'Erreur de chargement RamDisk ...', 13, 10, 0
+%endif
 MsgRunningManux   db      'On lance ManuX, ...', 13, 10, 0
 
 ; Le bourrage (pour faire 2 blocs)

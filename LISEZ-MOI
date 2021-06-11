@@ -3,118 +3,148 @@
 
    Le but de ce document est de stocker quelques informations sur Manux-32.
 Je ne stockerai ici que les informations concernant les points instables.
-Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
+DÃ¨s qu'un Ã©lÃ©ment se stabilise Ã  peu prÃ¨s, il est documentÃ© dans la doc.
 
 En cours
 --------
-   EN COURS : allocation mémoire (dont doc à restructurer).
+   Finir d'Ã©claircir les makefile. Voire en particulier la cible "bootage"
+A faire : remplacer les .bin par des .elf  et ramener un max de choses
+dans make.conf make.commons make.rules, ...
+
+
+   EN COURS : allocation mÃ©moire (dont doc Ã  restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
    de place et peut utiliser bsf comme ffsl
+
+   A FAIRE :
+
+   . utilisation de pandoc, par exemple
+
+pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
+
+   donne une bonne base !
+
+   Il va falloir nettoyer un peu le code, et automatiser Ã§a avec make
+    
+   . L'iso "fonctionne" mais je pense qu'il y a encore des soucis de gestion
+   de la mÃ©moire :
+
+   mkdir ~/tmp/isodir
+   mkdir ~/tmp/isodir/boot
+   mkdir ~/tmp/isodir/boot/grub
+   cat << EOF > ~/tmp/isodir/boot/grub/grub.cfg
+   menuentry "ManuX-31" {
+    multiboot /boot/manux
+   }
+   EOF
+   cp ./noyau/noyau.elf ~/tmp/isodir/boot/manux
+   grub-mkrescue -o manux.iso ~/tmp/isodir
+   qemu-system-i386 -cdrom manux.iso
    
-   (Fait, à documenter) Définition du type Temps (ressemblant à time_t) et création de
+   (Fait, Ã  documenter) DÃ©finition du type Temps (ressemblant Ã  time_t) et crÃ©ation de
 fonctions pour afficher la "date" (depuis le boot pour le moment).
-Définition d'une structure TempsVal (proche de timeval) pour compter
-le temps d'exécution d'une tâche.
+DÃ©finition d'une structure TempsVal (proche de timeval) pour compter
+le temps d'exÃ©cution d'une tÃ¢che.
 
 
    
    Il faudra probablement changer include/manux en include
 
-   Idée : utiliser les outils d'allocation mémoire pour ajouter
-   (enfin) une mémoire au journal : liste datée/taguée de messages.
+   IdÃ©e : utiliser les outils d'allocation mÃ©moire pour ajouter
+   (enfin) une mÃ©moire au journal : liste datÃ©e/taguÃ©e de messages.
    
-   A faire : mon out() utilise l'ordre inverse des paramètres usuel !
+   A faire : mon out() utilise l'ordre inverse des paramÃ¨tres usuel !
 
-   A faire : changer un peu la getion de tacheEnCours de sorte à
+   A faire : changer un peu la getion de tacheEnCours de sorte Ã 
    pouvoir faire la compta du temps de chaque tache dans
-   basculerTache. C'est par exemple à basculerVersTache(t) de faire
+   basculerTache. C'est par exemple Ã  basculerVersTache(t) de faire
    tacheEncours = t ce qui lu ipermet de m,ipuler les deux et donc
-   pouvoir faire le décompte.
+   pouvoir faire le dÃ©compte.
 
-   A voir : Pourquoi lib/clavier est traité à part dans noyau/Makefile !?
+   A voir : Pourquoi lib/clavier est traitÃ© Ã  part dans noyau/Makefile !?
    
-   A faire : profiter de la disponibilité des mcros dans Makefile (via
+   A faire : profiter de la disponibilitÃ© des mcros dans Makefile (via
    makeconfig) pour ne pas compiler fs si pas utiliser. Idem pour
    ramdisk, ...
 
-   Un truc étrange : pourquoi avec le journal (ou après le premier
-   changemet de console )je perds les messages système !?
+   Un truc Ã©trange : pourquoi avec le journal (ou aprÃ¨s le premier
+   changemet de console )je perds les messages systÃ¨me !?
 
-   Un petit truc à faire : mettre à droite le message qui dit dans
+   Un petit truc Ã  faire : mettre Ã  droite le message qui dit dans
    quelle console on est et quelle heure il est.
 
-   Un petit truc à faire : un doc/Makefile
+   Un petit truc Ã  faire : un doc/Makefile
    
-   Un truc à faire : des outils pour écrire en (x, y) sur la console
-   gérer la position du curseur.
+   Un truc Ã  faire : des outils pour Ã©crire en (x, y) sur la console
+   gÃ©rer la position du curseur.
 
    Un truc moyen : bcopy et consort en asm (dans string.c) ou en #define
-   dans string.h ce qui permet une cohérence entre usr et noyau !
+   dans string.h ce qui permet une cohÃ©rence entre usr et noyau !
 
-   A faire un jour : renommer le scheduler en "tacheNoyau" et séparer
+   A faire un jour : renommer le scheduler en "tacheNoyau" et sÃ©parer
    plus clairement encore tache/fileTache/gestionTache/ordonnanceur
    
-   Ca plante, et ça dépend du code que je commente, bref, ça sent
-la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute
-évidence le moment des'attaquer à la mémoire ... est-il normal que la
-même page serve pour les données et la pile (cf tache.c) alors que
-ce n'est pas le même sélecteur de segment ? Il faut faire la doc, ...
+   Ca plante, et Ã§a dÃ©pend du code que je commente, bref, Ã§a sent
+la fuite mÃ©moire et Ã§a pourrait Ãªtre chaud Ã  dÃ©buguer. C'est de toute
+Ã©vidence le moment des'attaquer Ã  la mÃ©moire ... est-il normal que la
+mÃªme page serve pour les donnÃ©es et la pile (cf tache.c) alors que
+ce n'est pas le mÃªme sÃ©lecteur de segment ? Il faut faire la doc, ...
 Il faut aller voir notemment dans tache.c, j'ai l'impression que c'est
 n'importe quoi la gestion de la pagination ! Il faut que la structure
-de la mémoire, pour le système et pour chaque tâche, soit claire. Un
+de la mÃ©moire, pour le systÃ¨me et pour chaque tÃ¢che, soit claire. Un
 affichage en fin de creerTache pourra aider, ... 
   
 
 
-   ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
-ne démarre pas car l'adresse est hard-codée dans
+   ATTENTION : si _start ne finit pas Ã  l'adresse 0x20000, le systÃ¨me
+ne dÃ©marre pas car l'adresse est hard-codÃ©e dans
 init-manux.nasm. Trois solutions temporaires :
    . Mettre des gros warning dans main.c pour ne pas placer de code
    avant _start (bof)
-   . Tester noyau/symbols pour l'adresse de _start et arréter la
+   . Tester noyau/symbols pour l'adresse de _start et arrÃ©ter la
    compil si ce n'est pas la bonne valeur
    . Tester noyau/symbols et modifier MANUX_KERNEL_SEG_16 dans
    init-manux.asm
    
    SOLUTION : pour le moment, l'option -fno-toplevel-reorder a l'air
-   d'y suffir. Mais il faut utiliser la dernière solution, comme pour
+   d'y suffir. Mais il faut utiliser la derniÃ¨re solution, comme pour
    la taille avec tools/taille_noyau
    
 
 A faire
 -------
 
-   Gestion des Makefile : il faut définir le maximum dans le Makefile
-de plus haut niveau, et hériter dans les autres. C'est en gros ce qui
-est déjà fait, sauf usr (à revoir) qui n'a pas les mêmes include, et
-outils, mais c'est moins génant, il n'utilise rien !
+   Gestion des Makefile : il faut dÃ©finir le maximum dans le Makefile
+de plus haut niveau, et hÃ©riter dans les autres. C'est en gros ce qui
+est dÃ©jÃ  fait, sauf usr (Ã  revoir) qui n'a pas les mÃªmes include, et
+outils, mais c'est moins gÃ©nant, il n'utilise rien !
 
-   . Différents "main" pour les tests. En fait, le mieux serait sûrement de
-   procéder à une compilation séparée du code en mode utilisateur. Sans pour
-   autant introduire déjà la notion de de format d'exécution, cela permet
-   de bien établir la coupure entre les modes noyau et utilisateur. ON AIR
-   . Créer tous les appels systèmes possibles afin de reporter les tests en
+   . DiffÃ©rents "main" pour les tests. En fait, le mieux serait sÃ»rement de
+   procÃ©der Ã  une compilation sÃ©parÃ©e du code en mode utilisateur. Sans pour
+   autant introduire dÃ©jÃ  la notion de de format d'exÃ©cution, cela permet
+   de bien Ã©tablir la coupure entre les modes noyau et utilisateur. ON AIR
+   . CrÃ©er tous les appels systÃ¨mes possibles afin de reporter les tests en
    mode utilisateur : fork, alloc/brk, ... ON AIR
 
    . Utiliser un loader classique (LILO, GRUB, ...)
-   . Une terminaison propre des tâches
-   . Une gestion mémoire réaliste
+   . Une terminaison propre des tÃ¢ches
+   . Une gestion mÃ©moire rÃ©aliste
    . De ce fait, passer malloc en librairie
    . Un ramdisk pour pouvoir faire un FS sans disque ...
-   . Mettre le code des tâches au niveau 2
-   . Décider d'une arborescence correcte. Dispatcher en particulier les fichiers
-   inclus dans des sous-répertoires de include, pas uniquement dans manux
-   . Déterminer des règles de nommage des identifiants
-   . Des makefiles propres avec des constantes factorisées
+   . Mettre le code des tÃ¢ches au niveau 2
+   . DÃ©cider d'une arborescence correcte. Dispatcher en particulier les fichiers
+   inclus dans des sous-rÃ©pertoires de include, pas uniquement dans manux
+   . DÃ©terminer des rÃ¨gles de nommage des identifiants
+   . Des makefiles propres avec des constantes factorisÃ©es
    . Etendre print[kf] ...
 
 
 Les Makefile
 ------------
 
-   -fno-builtin  pour éviter les prédéfinitions de printf et autres
+   -fno-builtin  pour Ã©viter les prÃ©dÃ©finitions de printf et autres
 
-# Les outils nécessaires
+# Les outils nÃ©cessaires
 
 ## Compilation
 
@@ -134,25 +164,36 @@ Les Makefile
 
 FAIT
 
-     EN COURS :   A voir : la définition des macros est un soucis. Certaines sont
-   constantes, d'autres calculées par des outils, ... Certaines sont
-   utilisées en C, d'autres avec NASM, voire en ligne de commande. Il
-   faut clarifier ça, surtout qu'il y a des doublons (comme
+     EN COURS :   A voir : la dÃ©finition des macros est un soucis. Certaines sont
+   constantes, d'autres calculÃ©es par des outils, ... Certaines sont
+   utilisÃ©es en C, d'autres avec NASM, voire en ligne de commande. Il
+   faut clarifier Ã§a, surtout qu'il y a des doublons (comme
    MANUX_TEXT_SEGMENT et  MANUX_KERNEL_SEG_16 par exemple)
 
-   je suis en train de modifier outil/taille_noyau qui devra donc être
-   renommé. Il génère des macro Makefile dans taille.conf (à renommer
+   je suis en train de modifier outil/taille_noyau qui devra donc Ãªtre
+   renommÃ©. Il gÃ©nÃ¨re des macro Makefile dans taille.conf (Ã  renommer
    aussi) en fonction de config.h Je propose donc que make.conf
-   disparaisse (ou plutôt intègre ce qui était dans taille.conf) sauf
-   que attention, c'est en 2 phases : l'une doit être faite en tout
-   début (la génération des macrs en fonction de config.h) l'autre à
-   la fin (la taille !). Donc il faut sûrement laisser les deux, ... 
+   disparaisse (ou plutÃ´t intÃ¨gre ce qui Ã©tait dans taille.conf) sauf
+   que attention, c'est en 2 phases : l'une doit Ãªtre faite en tout
+   dÃ©but (la gÃ©nÃ©ration des macrs en fonction de config.h) l'autre Ã 
+   la fin (la taille !). Donc il faut sÃ»rement laisser les deux, ... 
 
-   , ... il va falloir être clair sur la répartition entre
+   , ... il va falloir Ãªtre clair sur la rÃ©partition entre
 include et usr/include ! C'est (presque) une copie l'un de l'autre.
-Pas très sage/safe !!! Peut-être faut-il partir du code de init.c et
-voir ce qui est utile. Si ça l'est vraiment, on ajoute à une cible de
+Pas trÃ¨s sage/safe !!! Peut-Ãªtre faut-il partir du code de init.c et
+voir ce qui est utile. Si Ã§a l'est vraiment, on ajoute Ã  une cible de
 make qui copie de include/manux vers usr/include/manux.
 
    En cours, voir quels fichiers on peut virer de usr/include et finir
    la doc
+
+  
+   Apparemment l'erreur "Error loading uncompressed kernel without PVH
+   ELF Note"  n'est pas liÃ©e aux sections puisque l'ajout de debug ne
+   semble rien changer sur les sections ou les symbols (Ã  vÃ©rifier
+   plus formellement) mais induit cette erreur. Je ne sais plus comment
+   je l'ai corrigÃ©e ! 
+   Soucis d'exÃ©cution du kernel : grosse avancÃ©e en virant les options
+   de qemu ! Et deuxiÃ¨me avec un bon postionnement en mÃ©moire (le soucis
+   venait d'uneincohÃ©rence de la position avec la gestin de la mÃ©moire)
+   

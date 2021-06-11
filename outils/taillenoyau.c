@@ -34,7 +34,7 @@ int main(int argc,char * argv[])
    premierSecteurRamDisk = nbBlocs + ((int) statInit.st_size)/TAILLE_BLOC;
    */
 
-   printf("# Fichier généré automatiquement, ne pas modifier\nNB_SECT_KERNEL = %d\nMANUX_TAILLE_BOURAGE = %d\n",
+   printf("# Fichier généré automatiquement, ne pas modifier\nMANUX_NB_SECT_KERNEL = %d\nMANUX_TAILLE_BOURAGE = %d\n",
           nbBlocs,
           tailleBourage);
 

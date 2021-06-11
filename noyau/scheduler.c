@@ -58,18 +58,6 @@ ListeTache listeTaches;
  */
 Tache * tacheEnCours = NULL;
 
-void setFrequenceTimer(uint16_t freqHz)
-{
-   uint16_t decompte;
-
-   decompte = 1193200 / freqHz;
-
-   /* On initialise la fréquence du timer 0 WARNING a rendre plus propre */
-   outb(0x43, 0x34); // wAS 36
-   outb(0x40, decompte & 0xFF);
-   outb(0x40, (decompte >> 8) & 0xFF);
-}
-
 /*
  * Le coeur de l'ordonnanceur. C'est cette fonction qui détermine la
  * prochaine tâche à exécuter.
@@ -78,7 +66,7 @@ void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
    /* Basculement entre les consoles virtuelles */
    if (basculeConsoleDemandee) {
       basculeConsoleDemandee = FALSE;
@@ -175,7 +163,7 @@ void initialiserScheduler()
    numeroProchaineTache = 1;
    tacheEnCours = NULL;
    dateDernierOrdonnancement = nbTopHorloge;
-   
+
    /* Initialisation de la liste des taches en cours */
    initialiserListeTache(&listeTaches);
 
@@ -200,7 +188,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 
    Console * cons = consoleNoyau(); // En l'absence de consoles virtuelles
 
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
    void    * page;
 
    //Nouvelle console ? 
@@ -222,7 +210,6 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       }
    }
 #endif
-   
    /* Création de la tache */
    tache = creerTache(corpsTache, cons);
    if (tache == NULL) {
@@ -243,6 +230,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       /*   . et on la déclare comme en cours.   */
       tacheEnCours = tache;
    }
+   
    return tache->numero;
 }
 

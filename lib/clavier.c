@@ -51,17 +51,21 @@ void handlerClavier()
       toucheTouche &= 0xFF;
       //      printk("[KBD-0x%x]\n", toucheTouche);
 
+#ifdef MANUX_CONSOLES_VIRTUELLES
       if (toucheTouche == KEYCODE_ESC) {
          basculeConsoleDemandee = TRUE;
 	 printk("BASCON\n");
       }
+#endif
       if (toucheTouche == KEYCODE_TAB) {
  	 afficheEtatSystemeDemande = TRUE;
 	 // printk("PRINTSYS\n");
       }
+#ifdef MANUX_TACHES
       if (toucheTouche == KEYCODE_F1) {
  	 basculerTacheDemande = TRUE;
 	 //printk("SWITCHTASK\n");
       }
+#endif
    }
 }

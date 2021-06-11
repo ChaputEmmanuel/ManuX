@@ -26,7 +26,7 @@ TacheID numeroProchaineTache;
 /*
  * Chaque tâche pourra voir les infos la concernant à cette adresse
  */
-Tache * tacheCourante = (Tache*)(TAILLE_PAGE * NOMBRE_PAGES_SYSTEME);
+Tache * tacheCourante = (Tache*)(MANUX_TAILLE_PAGE * MANUX_NOMBRE_PAGES_SYSTEME);
 
 unsigned int nbActivations = 0; //  Nombre d'appels à activerTache
 
@@ -111,7 +111,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->tempsExecution = (Temps)0;
    
    /* Zone mémoire utilisable */
-   tache->tailleMemoire = (void *)(nombrePagesSysteme * TAILLE_PAGE);
+   tache->tailleMemoire = (void *)(nombrePagesSysteme * MANUX_TAILLE_PAGE);
 
    /* On lui affecte son PDBR */
    creerTablePagination((PageDirectory *)&(tache->tss.CR3));
@@ -120,7 +120,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    ajouterPage((PageDirectory *)&tache->tss.CR3,
 	       tache,
 	       tache->tailleMemoire);
-   tache->tailleMemoire += TAILLE_PAGE;
+   tache->tailleMemoire += MANUX_TAILLE_PAGE;
 
    /* On lui affecte sa LDT */
    tache->ldt = (DescriptorTable *)(unePage + sizeof(Tache));

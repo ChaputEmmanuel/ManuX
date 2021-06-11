@@ -30,12 +30,14 @@ void initialiserAppelsSysteme()
    /* Envoyer une chaîne de caractères sur la console */
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
 
+#ifdef MANUX_TACHES
    /* Création d'une nouvelle tâche */
    definirAppelSysteme(NBAS_CREER_TACHE, sys_creerTache);   
 
    /* Invocation explicite de l'ordonnanceur */
    definirAppelSysteme(NBAS_BASCULER_TACHE, sys_basculerTache);
-
+#endif
+   
    /* Les 4 suivants sont à vérifier */
    //definirAppelSysteme(NBAS_NUMERO_TACHE,   AS_numeroTache);
    //definirAppelSysteme(NBAS_CONSOLE,        AS_console);

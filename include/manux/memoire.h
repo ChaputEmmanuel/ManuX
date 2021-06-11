@@ -13,7 +13,7 @@
 #   define NULL 0
 #endif
 
-#define DEBUT_MEMOIRE_ETENDUE 0x100000
+#define MANUX_DEBUT_MEMOIRE_ETENDUE 0x100000
 
 /*
  * Nombre de pages communes à toutes les tâches.

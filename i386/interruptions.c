@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/interruptions.h>
 
+#include <manux/config.h>
 #include <manux/interBasNiveau.h>
 #include <manux/io.h>
 #include <manux/i386.h>           /* str */
@@ -15,9 +16,11 @@
 #include <manux/console.h>        /* Caractéristiques de l'écran */
 #include <manux/tache.h>          /* IntelTSS */
 
-#define SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
+#define MANUX_SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
 
+#ifdef MANUX_APPELS_SYSTEME
 extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
+#endif
 
 /*
  * Pour basculer vers le scheduler //WARNING beurk !
@@ -50,6 +53,18 @@ void handlerTimer(TousRegistres registres,
 #endif
 }
 
+void setFrequenceTimer(uint16_t freqHz)
+{
+   uint16_t decompte;
+
+   decompte = 1193200 / freqHz;
+
+   /* On initialise la fréquence du timer 0 WARNING a rendre plus propre */
+   outb(0x43, 0x34); // wAS 36
+   outb(0x40, decompte & 0xFF);
+   outb(0x40, (decompte >> 8) & 0xFF);
+}
+
 void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
 /*
  * Affectation du handler de l'interruption i
@@ -58,7 +73,7 @@ void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
    idt[i].itg.offsetFaible = ((uint32_t)handler & 0xFFFF);
    idt[i].itg.offsetFort = ((uint32_t)handler >> 16);
    idt[i].itg.parametres = 0x8E00;
-   idt[i].itg.selSegment = SELECTEUR_SEGMENT_CODE;
+   idt[i].itg.selSegment = MANUX_SELECTEUR_SEGMENT_CODE;
 }
 
 void chargerIDT(IDT idt)
@@ -87,7 +102,7 @@ void chargerIDT(IDT idt)
 void initialiserIDT()
 {
    int i;
-   IDT idt = (IDT) 0x30000; /* WARNING pas terrible ! */
+   IDT idt = (IDT) 0x30000; /* WARNING 0x30000 pas terrible ! */
 
    /* Comportement par défaut : on ne fait rien ! */
    for (i = 0; i < 256; i++) {
@@ -130,12 +145,16 @@ void initialiserIDT()
    /* Le handler du Timer */
    positionnerHandlerInterruption(idt, intTimer, stubHandlerTimer);
 
+#ifdef MANUX_APPELS_SYSTEME
    /* Le handler de l'interruption utilisée pour les appels système */
    positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
-
+#endif
+   
+#ifdef MANUX_CLAVIER
    /* Le handler du clavier */
    positionnerHandlerInterruption(idt, intClavier, stubHandlerClavier);
-
+#endif
+   
    /* On charge l'IDT */
    chargerIDT(idt);
 
@@ -149,7 +168,7 @@ void initialiserIDT()
 #define afficherHexa(v, n, l, c)		                        \
 {                                                                       \
    uint32_t __val = (uint32_t) v;						\
-   for (int __i = CON_COLONNES*l+c+n-1; __i>=CON_COLONNES*l+c; __i--) { \
+   for (int __i = MANUX_CON_COLONNES*l+c+n-1; __i>=MANUX_CON_COLONNES*l+c; __i--) { \
       ecran[2*__i] = chiffre[__val&15] ;                                \
       __val /=16 ;			                                \
    }                                                                    \
@@ -157,7 +176,7 @@ void initialiserIDT()
 #define afficherBin(v, n, l, c)		                                \
 {                                                                       \
    uint32_t __val = (uint32_t) v;						\
-   for (int __i = CON_COLONNES*l+c+n-1; __i>=CON_COLONNES*l+c; __i--) { \
+   for (int __i = MANUX_CON_COLONNES*l+c+n-1; __i>=MANUX_CON_COLONNES*l+c; __i--) { \
       ecran[2*__i] = chiffre[__val&1] ;                                 \
       __val /=2 ;			                                \
    }                                                                    \
@@ -181,12 +200,12 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
 +-------------+-------------------+--------------------------------------------+";
    
    char chiffre[16] = "0123456789ABCDEF";
-   char * ecran = CON_SCREEN;
+   char * ecran = MANUX_CON_SCREEN;
    int i;
    uint32_t indice;
    
    // On fait un peu de place en haut de l'écran
-   for (i=0; i<11*2*CON_COLONNES; i+=2) {
+   for (i=0; i<11*2*MANUX_CON_COLONNES; i+=2) {
       ecran[i]   = ecranPanique[i/2];
       ecran[i+1] = COUL_FOND_BLEU | COUL_TXT_JAUNE;
    }

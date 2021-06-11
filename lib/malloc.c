@@ -7,7 +7,7 @@
 #include <manux/malloc.h>
 
 #include <manux/config.h>
-#include <manux/memoire.h>      /* TAILLE_PAGE  */
+#include <manux/memoire.h>      /* MANUX_TAILLE_PAGE  */
 #include <manux/scheduler.h>    /* tacheEnCours */
 #include <manux/appelsysteme.h> /* numeroTache  */
 
@@ -42,14 +42,14 @@ typedef struct _BlocAlloue {
  * le premier segment, juste aprés les infos de la tâche.
  */
 InfoGestionMemoire * infoMalloc
-   = (InfoGestionMemoire * )(NOMBRE_PAGES_SYSTEME * TAILLE_PAGE + sizeof(Tache));
+   = (InfoGestionMemoire * )(MANUX_NOMBRE_PAGES_SYSTEME * MANUX_TAILLE_PAGE + sizeof(Tache));
 
 void * malloc(int taille)
 {
    BlocLibre * blocLibre;
 
    /* Pas plus d'une page (moins la place des infos) */
-   if (taille > TAILLE_PAGE - sizeof(BlocLibre) + sizeof(InfoGestionMemoire)) {
+   if (taille > MANUX_TAILLE_PAGE - sizeof(BlocLibre) + sizeof(InfoGestionMemoire)) {
       return NULL;
    }
 
@@ -64,7 +64,7 @@ void * malloc(int taille)
       if (allouerPage() == NULL) {
          return NULL;
       }
-      blocLibre->taille = TAILLE_PAGE - sizeof(BlocLibre) + sizeof(InfoGestionMemoire);
+      blocLibre->taille = MANUX_TAILLE_PAGE - sizeof(BlocLibre) + sizeof(InfoGestionMemoire);
       blocLibre->igm.prochainBlocLibre = NULL;
    }
 

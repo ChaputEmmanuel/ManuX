@@ -12,13 +12,14 @@
 #include <manux/i386.h>       // halt()
 #include <manux/scheduler.h>  // tacheEnCours
 
-#define DBG_KERNEL_ERREUR 0x00000001
-#define DBG_KERNEL_START  0x00000002
-#define DBG_KERNEL_PAGIN  0x00000004
-#define DBG_KERNEL_SYSFI  0x00000008
-#define DBG_KERNEL_ORDON  0x00000010
-#define DBG_KERNEL_TACHE  0x00000020
-#define DBG_KERNEL_ALL    0xFFFFFFFF
+#define DBG_KERNEL_ERREUR   0x00000001
+#define DBG_KERNEL_START    0x00000002
+#define DBG_KERNEL_PAGIN    0x00000004
+#define DBG_KERNEL_SYSFI    0x00000008
+#define DBG_KERNEL_ORDON    0x00000010
+#define DBG_KERNEL_TACHE    0x00000020
+#define DBG_KERNEL_MEMOIRE  0x00000040
+#define DBG_KERNEL_ALL      0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
 // Pour être plus précis, sa valeur ne change rien ... sauf lorsque
@@ -34,6 +35,10 @@
 //  ;
 
 #define masqueDebugage (0x00000000  \
+ | DBG_KERNEL_START \
+ | DBG_KERNEL_TACHE \
+ | DBG_KERNEL_MEMOIRE \
+| DBG_KERNEL_ALL \
 			)
 
 //  | DBG_KERNEL_START
@@ -53,11 +58,19 @@
 /*
  * Affichage d'un message de panique
  */
+#ifdef MANUX_TACHES
 #define paniqueNoyau(fmt, args...)	                                  \
    printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero);  \
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \
    asm( "hlt" );
+#else
+#define paniqueNoyau(fmt, args...)	                                  \
+  printk("\n*** PANIQUE NOYAU  ***\n");                                   \
+   printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
+   printk("" fmt, ## args);                                               \
+   asm( "hlt" );
+#endif
 
 /*
  * Ma version simplifiée de assert

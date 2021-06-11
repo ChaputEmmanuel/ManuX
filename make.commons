@@ -1,0 +1,29 @@
+# Quelques éléments globaux qui n'ont pas trop de raison d'être modifiés.
+# Je les place ici pour alléger un peu les Makefile
+#
+
+# Position des librairies
+LIBI386   = $(ROOTDIR)/i386/libi386.a
+LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
+LIBSF     = $(ROOTDIR)/sf/libsf.a
+LIBUSR    = $(ROOTDIR)/usr/libusr.a
+
+# Une version du noyau linké en format binaire pour le boot floppy (voir si l'ELF ne fonctionnerait pas !)
+# et une en ELF
+NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.bin
+NOYAU_ELF     = $(ROOTDIR)/noyau/noyau.elf
+
+# Le script de link pour ld
+LD_SCRIPT     = manux.lds
+
+# Le fichier de boot pour multiboot
+MB_MANUX_ELF  = $(ROOTDIR)/boot/mb-manux.elf
+
+# Gestion de l'assembleur
+ASM_EXT     = nasm
+ASM         = nasm
+
+TAILLE_CONF = taille.conf
+
+COMPRESS = gzip
+

@@ -19,21 +19,21 @@
  * Début de la zone mémoire dans laquelle on mémorise l'occupation
  * des pages
  */
-#ifndef AFFECTATION_PAGES
-#   define AFFECTATION_PAGES 0x1000
+#ifndef MANUX_AFFECTATION_PAGES
+#   define MANUX_AFFECTATION_PAGES 0x1000
 #endif
 
 /*
  * Nombre de pages communes à toutes les tâches.
  */
-int nombrePagesSysteme = NOMBRE_PAGES_SYSTEME;
+int nombrePagesSysteme = MANUX_NOMBRE_PAGES_SYSTEME;
 
 /*
  * Le propriétaire de chaque page mémoire est identifié dans le
  * tableau suivant (0 <=> page libre). WARNING, pour le moment,
  * c'est 1 ou 0 (utilisé ou libre).
  */
-TacheID * proprietairePage = (TacheID *)AFFECTATION_PAGES ;
+TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
 
 /*
  * Le nombre global de pages dans le système
@@ -43,29 +43,35 @@ static int nombrePages = 0;
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue)
 {
-   int i;                      // Pour compter les pages initialisées 
-   uint32_t taillePropietaire; // Taille nécessaire pour les gérer
-   
+   int i;                       // Pour compter les pages initialisées 
+   uint32_t tailleProprietaire; // Taille nécessaire pour les gérer
+
+   printk_debug(DBG_KERNEL_MEMOIRE, "base = %d, et = %d\n",
+		tailleMemoireDeBase, tailleMemoireEtendue);
+
    /* Les tailles sont données en Ko */
    nombrePages = (tailleMemoireDeBase + tailleMemoireEtendue) / 4;
 
+   printk_debug(DBG_KERNEL_MEMOIRE, "%d pages de %d octets\n",
+		nombrePages, MANUX_TAILLE_PAGE);
+
+
    /* De combien de pages a-t-on besoin pour les gérer ? */
-   taillePropietaire = (nombrePages + TAILLE_PAGE - 1) / TAILLE_PAGE; 
+   /* Pour le moment, la gestion d'une page demande 4 octets (bientôt 1 bit !) */
+   tailleProprietaire = 4 * nombrePages  / MANUX_TAILLE_PAGE; 
    
-#ifdef DEBUG_MEMOIRE
-   printk("%d pages de %d octets : %d pages de gestion\n",  nombrePages, TAILLE_PAGE, tailleProprietaire);
-#endif
+   printk_debug(DBG_KERNEL_MEMOIRE, "%d pages de gestion\n", tailleProprietaire);
 
    /* Le tableau d'allocation des pages ne doit pas télescoper le noyau !*/
-   assert((void*)(proprietairePage + taillePropietaire*TAILLE_PAGE) < (void *)KERNEL_START_ADDRESS);
+   assert((void*)(proprietairePage + tailleProprietaire*MANUX_TAILLE_PAGE) < (void *)MANUX_KERNEL_START_ADDRESS);
    
    /* On considère le 1er méga occupé par le noyau */
-   for (i = 0; i < DEBUT_MEMOIRE_ETENDUE/TAILLE_PAGE; i++) {
+   for (i = 0; i < MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i++) {
       proprietairePage[i] = (TacheID) 1;
    }
 
    /* Tout le reste est libre */
-   for (i = DEBUT_MEMOIRE_ETENDUE/TAILLE_PAGE; i < nombrePages; i++) {
+   for (i = MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i < nombrePages; i++) {
       proprietairePage[i] = (TacheID) 0;
    }
 }
@@ -76,7 +82,7 @@ void * allouerPageSysteme()
    int    numeroPage;
 
    while (pageAllouee == NULL) {
-      numeroPage = DEBUT_MEMOIRE_ETENDUE/TAILLE_PAGE;
+      numeroPage = MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE;
       while (  (numeroPage < nombrePagesSysteme)
              &&(proprietairePage[numeroPage] != (TacheID) 0)) {
          numeroPage++;
@@ -86,7 +92,7 @@ void * allouerPageSysteme()
          /* On essaie de la réserver */
          if (atomiqueTestInit((Atomique *)&(proprietairePage[numeroPage]),
                               1, 0)) {
-            pageAllouee = (void *) (numeroPage * TAILLE_PAGE);
+            pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
 	 }
       /* Sinon inutile de continuer */
       } else {
@@ -113,7 +119,7 @@ void * allouerPage()
          /* On essaie de la réserver */
          if (atomiqueTestInit((Atomique *)&(proprietairePage[numeroPage]),
                               1, 0)) {
-            pageAllouee = (void *) (numeroPage * TAILLE_PAGE);
+            pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
 	 }
       /* Sinon inutile de continuer */
       } else {
@@ -132,6 +138,7 @@ void libererPage(void * pageLiberee)
 {
 }
 
+#ifdef MANUX_APPELS_SYSTEME
 int AS_obtenirPages(ParametreAS p, int nbPages)
 {
    Page unePage;
@@ -151,7 +158,8 @@ int AS_obtenirPages(ParametreAS p, int nbPages)
                tache->tailleMemoire);
 
    /* On note qu'on a davantage de mémoire */
-   tache->tailleMemoire += TAILLE_PAGE;
+   tache->tailleMemoire += MANUX_TAILLE_PAGE;
 
    return 1;
 }
+#endif

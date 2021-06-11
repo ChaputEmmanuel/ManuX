@@ -10,10 +10,17 @@ bits 32
 
 extern handlerTimer
 extern handlerPanique
+
+%ifdef MANUX_CLAVIER
 extern handlerClavier
+%endif
+
+%ifdef MANUX_APPELS_SYSTEME
 extern vecteurAppelsSysteme         ; WARNING, inutile si on vire les AS de là
 extern entrerAppelSysteme
 extern sortirAppelSysteme
+%endif
+
 extern autoriserIRQ
 
 global stubHandlerTimer
@@ -69,6 +76,7 @@ stubHandlerTimer :
         popa                        ; On restaure les registres
         iret                        ; On revient ...
 
+%ifdef MANUX_CLAVIER
 ; Handler de l'interruption du clavier
 ;-------------------------------------
 stubHandlerClavier :
@@ -82,7 +90,9 @@ stubHandlerClavier :
 
         popa                        ; On restaure les registres
         iret                        ; On revient ...
+%endif
 
+%ifdef MANUX_APPELS_SYSTEME
 ; Le handler des appels systèmes
 ;-------------------------------
 handlerAppelSysteme :
@@ -114,6 +124,7 @@ handlerAppelSysteme :
         pop esi
         pop edi
         iret
+%endif
 
 ; Un handler qui ne fait rien ...
 ;--------------------------------

@@ -44,7 +44,7 @@ void journaliser(char * message)
 
 void afficherJournal()
 {
-#ifdef CONSOLES_VIRTUELLES
+#ifdef MANUX_CONSOLES_VIRTUELLES
    basculerVersConsole(journal);
 #endif
 }

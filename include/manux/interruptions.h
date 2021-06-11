@@ -85,4 +85,9 @@ extern Temps nbTopHorloge;
  * Nombre de tops d'horloge depuis le boot
  */
 
+void setFrequenceTimer(uint16_t freqHz);
+/*
+ * Positionne la fréquence du timer 0
+ */
+
 #endif
