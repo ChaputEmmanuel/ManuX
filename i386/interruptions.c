@@ -15,18 +15,13 @@
 #include <manux/atomique.h>
 #include <manux/console.h>        /* Caractéristiques de l'écran */
 #include <manux/tache.h>          /* IntelTSS */
+#include <manux/string.h>         /* memcpy */
 
 #define MANUX_SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
 
 #ifdef MANUX_APPELS_SYSTEME
 extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
 #endif
-
-/*
- * Pour basculer vers le scheduler //WARNING beurk !
- */
-extern Tache * tacheScheduler ;
-extern Atomique schedulerEnCours;
 
 /*
  * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
@@ -102,7 +97,7 @@ void chargerIDT(IDT idt)
 void initialiserIDT()
 {
    int i;
-   IDT idt = (IDT) 0x30000; /* WARNING 0x30000 pas terrible ! */
+   IDT idt = (IDT) MANUX_ADRESSE_IDT;
 
    /* Comportement par défaut : on ne fait rien ! */
    for (i = 0; i < 256; i++) {
@@ -182,7 +177,12 @@ void initialiserIDT()
    }                                                                    \
 }
 
-void handlerPanique(uint32_t itNum, TousRegistres registres,
+/*
+ * Pour sauver l'ecran caché par l'écran bleu de la mort
+ */
+static char bufferEcran[4000];
+
+void ecranDeLaMort(uint32_t itNum, TousRegistres registres,
 		    uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    /* A définir ailleurs lorsque ce sera au point */
@@ -203,7 +203,10 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
    char * ecran = MANUX_CON_SCREEN;
    int i;
    uint32_t indice;
-   
+
+   /* Sauvegardons l'écran dans un buffer avant de le pourrir */
+   memcpy(bufferEcran, ecran, 4000);
+
    // On fait un peu de place en haut de l'écran
    for (i=0; i<11*2*MANUX_CON_COLONNES; i+=2) {
       ecran[i]   = ecranPanique[i/2];
@@ -243,7 +246,41 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
    afficherHexa(tssDuFautif->ESP, 8, 5, 25);
    afficherHexa(tssDuFautif->ESI, 8, 7, 25);
    afficherHexa(tssDuFautif->EDI, 8, 9, 25);
-   
+
+}
+
+void handlerPanique(uint32_t itNum, TousRegistres registres,
+		    uint32_t eip, uint32_t cs, uint32_t eFlags)
+{
+   char * ecran = MANUX_CON_SCREEN;
+   int d = 1;
+   char c;
+
+   ecranDeLaMort(itNum, registres, eip, cs, eFlags);
+
+   while (1) {
+      inb(0x60, c);
+      switch (c) {
+         case 0x81: // ESC
+	      basculerVersConsoleSuivante();
+            while (c == 0x81){
+	      inb(0x60, c);
+            };
+         break;
+         case 0x39: // SPACE On alterne entre l'écran bleu et l'écran au moment du drame 
+            d = 1-d;
+	    if (d) {
+  	      ecranDeLaMort(itNum, registres, eip, cs, eFlags);
+ 	    }else{
+	      // On restaure l'écran
+              memcpy(ecran, bufferEcran, 4000);
+	    };
+            while (c == 0x39){
+	      inb(0x60, c);
+            };
+         break;
+      }
+   }
    halt();
 }
  

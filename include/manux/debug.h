@@ -19,6 +19,7 @@
 #define DBG_KERNEL_ORDON    0x00000010
 #define DBG_KERNEL_TACHE    0x00000020
 #define DBG_KERNEL_MEMOIRE  0x00000040
+#define DBG_KERNEL_AS       0x00000080
 #define DBG_KERNEL_ALL      0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
@@ -35,17 +36,23 @@
 //  ;
 
 #define masqueDebugage (0x00000000  \
- | DBG_KERNEL_START \
- | DBG_KERNEL_TACHE \
- | DBG_KERNEL_MEMOIRE \
-| DBG_KERNEL_ALL \
+ | DBG_KERNEL_ERREUR     \
+ | DBG_KERNEL_START      \
+ | DBG_KERNEL_PAGIN      \
+ | DBG_KERNEL_MEMOIRE    \
+ | DBG_KERNEL_TACHE      \
 			)
 
-//  | DBG_KERNEL_START
-//  | DBG_KERNEL_TACHE
-//  | DBG_KERNEL_ORDON
-//  | DBG_KERNEL_ALL
-//  | DBG_KERNEL_FILES
+/*
+ | DBG_KERNEL_ERREUR     \
+ | DBG_KERNEL_START      \
+ | DBG_KERNEL_PAGIN      \
+ | DBG_KERNEL_MEMOIRE    \
+ | DBG_KERNEL_TACHE      \
+ | DBG_KERNEL_ORDON      \
+ | DBG_KERNEL_ALL        \
+ | DBG_KERNEL_FILES      \
+*/
 
 /*
  * Une fonction permettant d'afficher des messages de debug thématiques
@@ -60,16 +67,20 @@
  */
 #ifdef MANUX_TACHES
 #define paniqueNoyau(fmt, args...)	                                  \
-   printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero);  \
+{\
+   printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero); \
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \
-   asm( "hlt" );
+   asm( "hlt" );                                                          \
+}
 #else
 #define paniqueNoyau(fmt, args...)	                                  \
-  printk("\n*** PANIQUE NOYAU  ***\n");                                   \
+{\
+   printk("\n*** PANIQUE NOYAU  ***\n");					\
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \
-   asm( "hlt" );
+   asm( "hlt" ); \
+}
 #endif
 
 /*

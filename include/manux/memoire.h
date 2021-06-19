@@ -2,7 +2,7 @@
 /*      Définition des sous-programmes de manipulation de la mémoire sous     */
 /*   ManuX.                                                                   */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #ifndef MEMOIRE_DEF
 #define MEMOIRE_DEF
@@ -21,7 +21,9 @@
 extern int nombrePagesSysteme;
 
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
-			uint32_t tailleMemoireEtendue);
+			uint32_t tailleMemoireEtendue,
+			uint32_t adresseDebutManuX,
+			uint32_t adresseFinManuX);
 /*
  * Initialisation de la mémoire. Nécessaire avant toute
  * demande d'allocation.

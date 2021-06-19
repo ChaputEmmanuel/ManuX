@@ -1,19 +1,26 @@
-ENTRY(start)                /* the name of the entry label */
+ENTRY(start)                    /* Nom du point d'entrée */
 
 SECTIONS {
-    /*. = 1M; */         /* faisons commencer le code ici */
-    . = 0x000020000;         /* faisons commencer le code ici */
-    .boot :
+    . = 0x000020000;            /* C'est ici que tout commence */
+    .boot :                     /* On commence par le multiboot */
     {
-        /* ensure that the multiboot header is at the beginning */
-        *(.multiboot)
         *(.multiboot_header)
+        *(.multiboot)
     }
 
-    .text : { *(.text) }            /* all text sections from all files */
+    adresseDebutManuX = .;      /* C'est ici que le noyau commence */
+    .text : {
+       *(.text)
+    }        
+    .rodata : {
+       *(.rodata)
+    }
     .data : {
        *(.data)
     }
-    .bss : { *(.bss) }
+    .bss : {
+       *(.bss)
+    }
+    adresseFinManuX = .;        /* Repérage de la fin */
 }
 

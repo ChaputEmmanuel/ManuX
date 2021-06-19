@@ -21,4 +21,19 @@ void halt();
 #define ltr(tr) \
    __asm__ __volatile__ ("ltr %%ax"::"a"(tr));
 
+/*
+ * Description du processeur (d'après https://wiki.osdev.org/CPUID)
+ */
+static inline int descriptionProcesseur(int code, uint32_t description[3]) {
+   uint32_t result;
+   asm volatile("cpuid":"=a"(result),"=b"(*(description)),
+               "=c"(*(description+2)),"=d"(*(description+1)):"a"(code));
+   return (int)result;
+}
+
+/*
+ * Calcul du numéro de la page contenant une adresse linéaire
+ */
+#define ADDR_VERS_PAGE(a) ((a)>>12)
+
 #endif

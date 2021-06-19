@@ -56,7 +56,15 @@ void init()
 {
    int n=2; // nombre de messages affichés
 
+   //   while(1){};
+   printk("Pouet\n");
+   appelSystemeInutile();
+   printk("Repouet\n");
+   appelSystemeInutile();
+   printk("Et dix de pouet\n");
+   
    printf("Greetings from userland !\n");
+   printk("Et dix de pouet\n");
 
    n = creerNouvelleTache(deuxiemeTache, FALSE);
 

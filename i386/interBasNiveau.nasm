@@ -103,18 +103,22 @@ handlerAppelSysteme :
         push ebx
         push edx
         push ecx
+	
         shl eax, 02h
         push eax
 	
         ; On verouille le noyau WARNING : non réentrance
-;        call entrerAppelSysteme
-        ; On autorise le timer WARNING, est-ce bien raisonable ?
+        call entrerAppelSysteme
+	
+        ; On autorise les IT WARNING, est-ce bien raisonable ?
         sti
+	
         ; On invoque l'AS
 	pop eax
         call [vecteurAppelsSysteme+eax] ; Le numéro est dans EAX (cf appelsysteme.h)
+
         ; On déverouille le noyau WARNING : non réentrance
-;        call sortirAppelSysteme
+        call sortirAppelSysteme
 
         pop ecx
         pop edx
@@ -178,12 +182,6 @@ stubHandlerPanique_28 : stubHandlerPanique 28
 stubHandlerPanique_29 : stubHandlerPanique 29
 stubHandlerPanique_30 : stubHandlerPanique 30
 stubHandlerPanique_31 : stubHandlerPanique 31
-
-; Lancer une tache (WARNING, ça n'a rien à faire là mais je ne sais pas faire)
-;-----------------
-;lanceTacheInitiale :
-;        call MANUX_KERNEL_TASK_TSS_IND:0h
-;        jmp lanceTacheInitiale ; WARNING ???
 
 ; Arret du système
 ;-----------------

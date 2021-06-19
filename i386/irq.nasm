@@ -4,7 +4,7 @@
 ;      Sauf indication contraire, les paramètres (s'il y en a) sont passés "à la
 ;   C", c'est à dire empilés en ordre inverse et dépilés par l'appelant.
 ;
-;                                                           (C) Manu Chaput 2000
+;                                                      (C) Manu Chaput 2000-2021
 ;-------------------------------------------------------------------------------
 bits 32
 

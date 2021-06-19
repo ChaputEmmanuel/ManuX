@@ -56,20 +56,21 @@ void chargerGDT(DescriptorTable * gdt)
 /*
  * Chargement effectif de la GDT ; lgdt prend en paramètre l'adresse
  * d'une zone contenant la taille puis l'adresse de la GDT.
+ * On va mettre en place ici un modèle "flat" (deux segments qui
+ * couvrent 4G)
  */
 {
    uint16_t limite = 8*gdt->taille - 1;
-   volatile uint8_t argument[6];
-
+   /*   volatile uint8_t argument[6];
+   
    argument[0] = (limite) & 0xFF;
    argument[1] = (limite>>8) & 0xFF;
    argument[2] = ((uint32_t)(&gdt->descripteur[0]) & 0xFF);
    argument[3] = (((uint32_t)(&gdt->descripteur[0])>>8) & 0xFF);
    argument[4] = (((uint32_t)(&gdt->descripteur[0])>>16) & 0xFF);
    argument[5] = (((uint32_t)(&gdt->descripteur[0])>>24) & 0xFF);
-
-   __asm__ __volatile__ ("lgdt (%0)": :"a" ((char *)argument));// + sti ?
-//   return argument[0] +  argument[1]+argument[2]+argument[3]+ argument[4]+argument[5];
+   */
+  _chargerGDT((uint32_t)(&gdt->descripteur[0]), limite);
 }
 
 void chargerLDT(DescriptorTable * ldt)
@@ -95,9 +96,9 @@ void initialiserGDT()
 {
    int resultat;
 
-   gdtSysteme = (DescriptorTable *) 0x40600; /* WARNING pas terrible ! */
+   gdtSysteme = (DescriptorTable *) MANUX_ADRESSE_GDT;
 
-   gdtSysteme->capacite = 512;  /* WARNING danger ! */
+   gdtSysteme->capacite = MANUX_GDT_NB_PAGES * MANUX_TAILLE_PAGE / sizeof(Descripteur);
    gdtSysteme->taille = 0;
 
    /* Le segment nul (obligatoire) */
@@ -106,13 +107,16 @@ void initialiserGDT()
       printk("Probleme sur le segment nul en %d\n", resultat);
    }
 
+   // WARNING pour quoi si je change l'ordre de création (et donc bien
+   // sur le numéro de façon cohérente) cela ne fonctionne pas !?
+   //
    // Le segment de code qui commmence à l'adresse 0, avec une limite
    // à 1 méga(pages puisque Gr=1), donc 4G de mémoire.
    // g00a = 1100  (Gr=1 : blocs de 4K, Sz=1 32 bits protected)
    // type = 10011010
    //    present, priv=0, code/data, exec, dir up, read, access = 0
-   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFF, 0x9A, 0xC0);
-   if (resultat != 0x08) {
+   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x9A, 0xC0);
+   if (resultat != MANUX_CODE_SEG_SEL) {
       printk("Probleme sur le segment de code en %d\n", resultat);
    }
 
@@ -121,8 +125,8 @@ void initialiserGDT()
    // g00a = 1100  (Gr=1 : blocs de 4K, Sz=1 32 bits protected)
    // type = 10010010
    //    present, priv=0, code/data, noexec, dir up, rw, access = 0
-   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFF, 0x92, 0xC0);
-   if (resultat != 0x10) {
+   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x92, 0xC0);
+   if (resultat != MANUX_DATA_SEG_SEL) {
       printk("Probleme sur le segment de donnees en %d\n", resultat);
    }
 
@@ -131,7 +135,7 @@ void initialiserGDT()
    // g00a = 1100  (Gr=1 : blocs de 4K, Sz=1 32 bits protected)
    // type = 10010010
    //    present, priv=0, code/data, noexec, dir up, rw, access = 0
-   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFF, 0x92, 0xC0);
+   resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x92, 0xC0);
    if (resultat != 0x18) {
       printk("Probleme sur le segment de pile en %d\n", resultat);
    }

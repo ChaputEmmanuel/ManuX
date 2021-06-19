@@ -47,20 +47,31 @@ typedef struct _InfoSysteme {
 
 Console * console; // La console système
 
-void _start(InfoSysteme * infoSysteme)
+void _start(InfoSysteme * infoSysteme,
+	    uint32_t adresseDebutManuX,
+	    uint32_t adresseFinManuX)
 {
 #ifdef MANUX_RAMDISK
    uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
                          + infoSysteme->adresseRamdiskLo;
 #endif
+   union {
+      uint32_t registres[3];
+      char     caracteres[13];
+   } descriptionProc;
+   descriptionProcesseur(0, descriptionProc.registres);
+   descriptionProc.caracteres[12] = 0;
 
    interdireIRQ(IRQTimer);
 
-   initialiserGDT();
-   initialiserIDT();
-   
    /* Initialisation de la console noyau */
    console = consoleInit();
+
+   /* Initilisation des descripteurs de segments */
+   initialiserGDT();
+
+   /* Initialisation de la table des interruptions */
+   initialiserIDT();
 
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
@@ -68,7 +79,8 @@ void _start(InfoSysteme * infoSysteme)
 #endif
 
    //basculerConsole();
-   printk_debug(DBG_KERNEL_START, "32 bit ManuX running ...\n");
+   printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
+		descriptionProc.caracteres);
 
 #ifdef MANUX_GESTION_MEMOIRE
    /* Affichage de la mémoire disponible */
@@ -77,7 +89,10 @@ void _start(InfoSysteme * infoSysteme)
    //   while(1){};
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
-   initialiserMemoire(infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
+   initialiserMemoire(infoSysteme->memoireDeBase,
+		      infoSysteme->memoireEtendue,
+		      adresseDebutManuX,
+		      adresseFinManuX);
    printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
 #endif
 
@@ -88,12 +103,10 @@ void _start(InfoSysteme * infoSysteme)
    printk_debug(DBG_KERNEL_START, "Paginiation initialisee\n");
 #endif
    
-   /* Initilisation des descripteurs de segments */
    printk_debug(DBG_KERNEL_START, "Chargement GDT, ...\n");
    //   initialiserGDT();
    printk_debug(DBG_KERNEL_START, "GDT chargee\n");
 
-   /* Initialisation de la table des interruptions */
    printk_debug(DBG_KERNEL_START, "Chargement IDT ...\n");
    //   initialiserIDT();
    printk_debug(DBG_KERNEL_START, "IDT chargee\n");
@@ -133,18 +146,17 @@ void _start(InfoSysteme * infoSysteme)
    setFrequenceTimer(MANUX_FREQUENCE_TIMER);
    autoriserIRQ(IRQTimer);
 
-   /* Initialisation de la gestion des processus */
-
    printk_debug(DBG_KERNEL_START, "Console noyau = 0x%x\n", consoleNoyau());
-   printk_debug(DBG_KERNEL_START, "A comparer a  = 0x%x\n", 0x000250a0);
+   printk_debug(DBG_KERNEL_START, "Adresse de _start : 0x%x\n", _start);
 
+   /* Initialisation de la gestion des processus */
 #ifdef MANUX_TACHES
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
-   
-   printk_debug(DBG_KERNEL_START, "Adresse de __start : 0x%x\n", _start);
+
+   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n", adresseDebutManuX, adresseFinManuX);
 
    init();
 }   /* _start */

@@ -7,25 +7,9 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
 En cours
 --------
-   Finir d'éclaircir les makefile. Voire en particulier la cible "bootage"
+   . Finir d'éclaircir les makefile. Voir en particulier la cible "bootage"
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...
-
-
-   EN COURS : allocation mémoire (dont doc à restructurer).
-   Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
-   de place et peut utiliser bsf comme ffsl
-
-   A FAIRE :
-
-   . utilisation de pandoc, par exemple
-
-pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
-
-   donne une bonne base !
-
-   Il va falloir nettoyer un peu le code, et automatiser ça avec make
-    
    . L'iso "fonctionne" mais je pense qu'il y a encore des soucis de gestion
    de la mémoire :
 
@@ -41,12 +25,34 @@ pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
    grub-mkrescue -o manux.iso ~/tmp/isodir
    qemu-system-i386 -cdrom manux.iso
    
+
+   EN COURS : allocation mémoire (dont doc à restructurer).
+   Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
+   de place et peut utiliser bsf comme ffsl
+
+   WARNING : la première tâche conserve la pile initialement
+   construite par mb-manux, ... Pas forcément un drame (elle fait 16K
+   et n'est pas détruite)
+   
+   A FAIRE :
+
+   . utilisation de pandoc, par exemple
+
+pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
+
+   donne une bonne base !
+
+   Il va falloir nettoyer un peu le code, et automatiser ça avec make
+    
    (Fait, à documenter) Définition du type Temps (ressemblant à time_t) et création de
 fonctions pour afficher la "date" (depuis le boot pour le moment).
 Définition d'une structure TempsVal (proche de timeval) pour compter
 le temps d'exécution d'une tâche.
 
-
+   Pourquoi la version floppy ne fonctionne plus !? Il faudra modifier
+   le code d'init pour qu'il passe au noyau les adresses de début et
+   fin, comme via le linker dans la version multiboot. Peut-être là
+   aussi on peut utiliser le linker ?
    
    Il faudra probablement changer include/manux en include
 
@@ -73,6 +79,9 @@ le temps d'exécution d'une tâche.
    Un petit truc à faire : mettre à droite le message qui dit dans
    quelle console on est et quelle heure il est.
 
+   A faire : clarifier entre elf et bin. changer le nom de _start en
+   ManuX32 !
+   
    Un petit truc à faire : un doc/Makefile
    
    Un truc à faire : des outils pour écrire en (x, y) sur la console
@@ -83,6 +92,10 @@ le temps d'exécution d'une tâche.
 
    A faire un jour : renommer le scheduler en "tacheNoyau" et séparer
    plus clairement encore tache/fileTache/gestionTache/ordonnanceur
+
+   Il y a manifestement un truc qui m'échappe dans la segmentation :
+   si je les créé avec des indices différents, cela ne fonctionne pas!
+   voir le warning dans segment.c
    
    Ca plante, et ça dépend du code que je commente, bref, ça sent
 la fuite mémoire et ça pourrait être chaud à débuguer. C'est de toute
@@ -97,7 +110,7 @@ affichage en fin de creerTache pourra aider, ...
 
 
    ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
-ne démarre pas car l'adresse est hard-codée dans
+ne démarre pas en bootflopy car l'adresse est hard-codée dans
 init-manux.nasm. Trois solutions temporaires :
    . Mettre des gros warning dans main.c pour ne pas placer de code
    avant _start (bof)
@@ -164,7 +177,12 @@ Les Makefile
 
 FAIT
 
-     EN COURS :   A voir : la définition des macros est un soucis. Certaines sont
+   En cours : l'ISO plante sur un AS. Essayer de faire un AS_dumb histoire
+   de tester si c'est ça ou ecrireConsole plus spécifiquement. Rêglé
+   par l'utilisation de _chargerGTD  !?
+   
+
+   EN COURS :   A voir : la définition des macros est un soucis. Certaines sont
    constantes, d'autres calculées par des outils, ... Certaines sont
    utilisées en C, d'autres avec NASM, voire en ligne de commande. Il
    faut clarifier ça, surtout qu'il y a des doublons (comme

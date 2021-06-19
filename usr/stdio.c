@@ -24,7 +24,7 @@ appelSysteme2(NBAS_ECRIRE_CONS, int, ecrireConsole, char *, int);
 void printf(char * format, ...)
 {
    va_list   argList;
-   char      chaine[4096];  // WARNING, c'est nul
+   char      chaine[128];  // WARNING, c'est nul
    int       indice = 0;
    int       n;             // valeur associée à un %d
    char      nombre[10];    // chaîne du nombre
@@ -33,6 +33,7 @@ void printf(char * format, ...)
    int       nbChiffres;    // pour les %[n]d
    int       base;          // de l'affichage entier
 
+   //   printk("AA\n");
    va_start(argList, format);
 
    while (*format) {
@@ -92,8 +93,9 @@ affent :          n = va_arg(argList, int);
    }
 
    chaine[indice] = 0;
+   //   printk("BB\n");
 
-#ifdef MANU_AS
+#ifdef MANU_FS
    ecrire(1, chaine, indice); // WARNING : 1 à remplacer par stdout par exemple
 #else
    // C'est exactement le but de l'AS ecrireConsole

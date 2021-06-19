@@ -22,6 +22,10 @@ int basculerTache();
  * collaboratif.
  */
 
+int appelSystemeInutile();
+/*
+ * Tout est dit !
+ */
 /*
 int numeroTache();
 int obtenirPages(int n);

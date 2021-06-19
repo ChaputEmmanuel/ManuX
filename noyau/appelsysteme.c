@@ -7,6 +7,7 @@
 
 #include <manux/errno.h>
 #include <manux/printk.h>
+#include <manux/debug.h>
 #include <manux/scheduler.h>   // sys_basculerTache
 #include <manux/memoire.h>     // AS_obtenirPages, à virer aprés dispatch  
 #include <manux/console.h>     // Console
@@ -14,12 +15,21 @@
 
 void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
+/*
+ * Implantation de l'appel système inutile
+ */
+int sys_dumbAS(ParametreAS as)
+{
+   printk("I am so useless, ...\n");
+   return 0;
+}
+
 int definirAppelSysteme(int num, void * appel)
 {
    if ((num < 0) || (num >= NB_MAX_APPELS_SYSTEME)) {
       return EINVAL;
    } else {
-      //printk("Appel sys %d loaded\n", num);
+      printk_debug(DBG_KERNEL_AS, "Appel sys %d loaded\n", num);
       vecteurAppelsSysteme[num] = appel;
       return ESUCCES;
    }
@@ -27,6 +37,10 @@ int definirAppelSysteme(int num, void * appel)
 
 void initialiserAppelsSysteme()
 {
+   printk_debug(DBG_KERNEL_AS, "vecteur des AS = 0x%x\n", vecteurAppelsSysteme);
+
+   definirAppelSysteme(NBAS_DUMB, sys_dumbAS);
+   
    /* Envoyer une chaîne de caractères sur la console */
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
 
@@ -48,12 +62,12 @@ void initialiserAppelsSysteme()
 
 void entrerAppelSysteme()
 {
-  printk("Appel sys IN\n");
+  printk_debug(DBG_KERNEL_AS, "Appel sys IN\n");
 }
 
 void sortirAppelSysteme()
 {
-  printk("Appel sys OUT\n");
+  printk_debug(DBG_KERNEL_AS, "Appel sys OUT\n");
 }
 
 /*

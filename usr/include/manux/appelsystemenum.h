@@ -22,9 +22,12 @@
 #define NBAS_ECRIRE_CONS       1
 #define NBAS_BASCULER_TACHE    6
 #define NBAS_CREER_TACHE       7
+#ifdef MANUX_PAGINATION
 #define NBAS_OBTENIR_PAGES     2
+#endif
 #define NBAS_ECRIRE            3
 #define NBAS_CONSOLE           5
 #define NBAS_FORK              4
+#define NBAS_DUMB              8
 
 #endif

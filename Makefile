@@ -29,7 +29,7 @@ INIT_BIN = boot/init-manux.bin
 
 BOOT_SRC =  boot/bootsector.nasm boot/init-manux.nasm
 DEMARAGE  = outils boot
-BOURRAGE    = bourage ./boot/ramdisk.ram
+BOURRAGE    = ./boot/bourrage ./boot/ramdisk.ram
 OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 
 # Les includes de usr/include/manux qui sont des copies de include/manux
@@ -57,6 +57,7 @@ ASM_BIN_OPT = -f bin
 
 #    Les cibles voulues, ce sera probablement des images finales
 all : manux multiboot
+	(cd noyau; make all)
 
 #    Lancement du noyau
 run : manux

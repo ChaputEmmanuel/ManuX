@@ -40,12 +40,34 @@ TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
  */
 static int nombrePages = 0;
 
-void initialiserMemoire(uint32_t tailleMemoireDeBase,
-			uint32_t tailleMemoireEtendue)
+/*
+ * Marquer une page comme réservée
+ */
+static void inline reserverPage(uint32_t i)
 {
-   int i;                       // Pour compter les pages initialisées 
-   uint32_t tailleProprietaire; // Taille nécessaire pour les gérer
+   if (proprietairePage[i] != (TacheID)0) {
+      paniqueNoyau("Page %d déjà prise\n", i);
+   }
+   proprietairePage[i] = (TacheID)1;
+}
 
+/*
+ * Marquer une page comme libre (WARNING trouve un plus joli nom)
+ */
+static void inline demarquerPage(uint32_t i)
+{
+   proprietairePage[i] = (TacheID)0;
+}
+
+void initialiserMemoire(uint32_t tailleMemoireDeBase,
+			uint32_t tailleMemoireEtendue,
+			uint32_t adresseDebutManuX,
+			uint32_t adresseFinManuX)
+{
+   uint32_t i;                  // Pour compter les pages initialisées 
+   uint32_t tailleProprietaire; // Taille nécessaire pour les gérer
+   uint32_t nbrePagesManuX;
+   
    printk_debug(DBG_KERNEL_MEMOIRE, "base = %d, et = %d\n",
 		tailleMemoireDeBase, tailleMemoireEtendue);
 
@@ -55,7 +77,6 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    printk_debug(DBG_KERNEL_MEMOIRE, "%d pages de %d octets\n",
 		nombrePages, MANUX_TAILLE_PAGE);
 
-
    /* De combien de pages a-t-on besoin pour les gérer ? */
    /* Pour le moment, la gestion d'une page demande 4 octets (bientôt 1 bit !) */
    tailleProprietaire = 4 * nombrePages  / MANUX_TAILLE_PAGE; 
@@ -64,16 +85,44 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 
    /* Le tableau d'allocation des pages ne doit pas télescoper le noyau !*/
    assert((void*)(proprietairePage + tailleProprietaire*MANUX_TAILLE_PAGE) < (void *)MANUX_KERNEL_START_ADDRESS);
-   
+
+#ifdef CETAITMIEUXAVANT
    /* On considère le 1er méga occupé par le noyau */
    for (i = 0; i < MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i++) {
       proprietairePage[i] = (TacheID) 1;
    }
-
-   /* Tout le reste est libre */
+   /* Tout le reste (au delà du premier méga) est libre */
    for (i = MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i < nombrePages; i++) {
       proprietairePage[i] = (TacheID) 0;
    }
+#else
+   // Par défaut tout est libre
+   for (i = 0; i < nombrePages; i++) {
+      demarquerPage(i);      
+   }
+       
+   // Le BIOS (indéboulonable !)
+   for (i=0 ; i < MANUX_BIOS_NB_PAGES; i++) {
+      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
+   }
+
+   // Le noyau
+   nbrePagesManuX = (adresseFinManuX-adresseDebutManuX)/MANUX_TAILLE_PAGE
+     + (((adresseFinManuX-adresseDebutManuX)%MANUX_TAILLE_PAGE)?1:0);
+   for (i=0 ; i < nbrePagesManuX; i++) {
+      allouerPage(ADDR_VERS_PAGE(adresseDebutManuX)+i);
+   }
+
+   // La GDT
+   for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
+      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
+   }
+
+   // La IDT
+   for (i=0 ; i < MANUX_IDT_NB_PAGES; i++) {
+      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_IDT)+i);
+   }
+#endif   
 }
 
 void * allouerPageSysteme()
@@ -99,6 +148,7 @@ void * allouerPageSysteme()
          return NULL;
       }
    }
+   //printk("return 0x%x\n", pageAllouee);
    return pageAllouee;
 }
 
@@ -138,7 +188,7 @@ void libererPage(void * pageLiberee)
 {
 }
 
-#ifdef MANUX_APPELS_SYSTEME
+#if defined(MANUX_APPELS_SYSTEME) && defined(MANUX_PAGINATION)
 int AS_obtenirPages(ParametreAS p, int nbPages)
 {
    Page unePage;

@@ -415,7 +415,6 @@ int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 #else
    Console * cons = consoleNoyau();
 #endif
-   
    assert(cons != NULL);
    afficherConsoleN(cons, msg, n);
 

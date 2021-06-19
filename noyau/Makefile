@@ -24,7 +24,7 @@ OBJETS     +=   $(if $(MANUX_OUTILS_SYNCHRO), semaphore.o)
 OBJETS     +=   $(if $(MANUX_APPELS_SYSTEME), appelsysteme.o)
 
 # Une cible pour compiler les binaires, mais sans édition de liens
-binarie :  $(OBJETS)
+binaries :  $(OBJETS)
 
 all : binaries noyau.bin noyau.elf symbols_elf symbols_bin
 

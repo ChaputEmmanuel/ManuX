@@ -15,8 +15,52 @@
 /*----------------------------------------------------------------------------*/
 /* Organisation de la mémoire lors du boot.                                   */
 /*----------------------------------------------------------------------------*/
+/*
+ * Positionnement du code d'init, utilisé en cas de boot sur disquette. On peut
+ * réutiliser cette mémoire dans le noyau, puisque le code d'init est terminé
+ * lorsque le noyau est initialisé.
+ */
 #ifndef MANUX_INIT_START_ADDRESS
 #   define MANUX_INIT_START_ADDRESS  0x1000
+#endif
+
+/*----------------------------------------------------------------------------*/
+/* Organisation de la mémoire au démarrage.                                   */
+/*----------------------------------------------------------------------------*/
+/*
+ * La position et la taille du BIOS. Par prudence, j'y intègre tout l'EBDA, même
+ * s'il est peu probable que ce soit utile ! Voir 
+ *    https://wiki.osdev.org/Memory_Map_(x86)
+ *    https://stackoverflow.com/questions/64817723/relocating-bootloader-into-ebda
+ */
+#ifndef MANUX_ADRESSE_BIOS
+#   define MANUX_ADRESSE_BIOS 0x80000
+#endif
+
+#ifndef MANUX_BIOS_NB_PAGES
+#   define MANUX_BIOS_NB_PAGES 0x80
+#endif
+
+/*
+ * Position de l'IDT (Interrupt Descriptor Table) du noyau.
+ */
+#ifndef MANUX_ADRESSE_IDT
+#   define MANUX_ADRESSE_IDT  0x31000
+#endif
+
+#ifndef MANUX_IDT_NB_PAGES
+#   define MANUX_IDT_NB_PAGES 1
+#endif
+
+/*
+ * Position de la GDT (Global Descriptor Table) du noyau.
+ */
+#ifndef MANUX_ADRESSE_GDT
+#   define MANUX_ADRESSE_GDT  0x32000
+#endif
+
+#ifndef MANUX_GDT_NB_PAGES
+#   define MANUX_GDT_NB_PAGES 1
 #endif
 
 /*
@@ -55,10 +99,6 @@
 
 #ifndef MANUX_DATA_SEG_SEL
 #   define MANUX_DATA_SEG_SEL 0x10
-#endif
-
-#ifndef MANUX_KERNEL_TASK_TSS_IND
-#   define MANUX_KERNEL_TASK_TSS_IND  0x20
 #endif
 
 /*----------------------------------------------------------------------------*/
@@ -126,12 +166,12 @@
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
  * les assert ne produisent aucun code.
  */
-//#define MANUX_ASSERT_ACTIVES
+#define MANUX_ASSERT_ACTIVES
 
 /*
  * Utilisation des outils de synchronisation (mutex, semaphore, ...)
  */
-//#define MANUX_OUTILS_SYNCHRO
+#define MANUX_OUTILS_SYNCHRO
 
 /*
  * Définition des appels système

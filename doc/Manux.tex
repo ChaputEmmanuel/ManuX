@@ -1231,11 +1231,38 @@ crÃ©e quatre descripteurs de segments
 
    Les trois segments se recouvrent donc.
 
-   La {\sc ldt} est une table similaire Ã  la {\sc gdt} mais spÃ©cifique
-Ã  une tÃ¢che. Dans ManuX, pour le moment, elle est initialisÃ©e, lors de
+   La {\sc ldt} est une table similaire à la {\sc gdt} mais spécifique
+à une tÃ¢che. Dans ManuX, pour le moment, elle est initialisÃ©e, lors de
 la crÃ©ation de chaque tÃ¢che, comme une copie de la {\sc gdt}.
 
+%...............................................................................
+%      La segmentation dans ManuX
+%...............................................................................
+\subsubsection{La segmentation dans Manux}
 
+   Nous allons utiliser dans ManuX un mode ``à plat'' (ou {\em flat
+mode}). Dans ce mode minimaliste, deux segments seront définis, l'un
+pour le code, l'autre pour les données, chacun couvrant l'intégralité
+de la mémoire de 0 à 4 G.
+
+   L'avantage de ce modèle est sa grande simplicité. Un de ses
+inconvénients est le fait que la mémoire est à la fois visible au
+travers d'un segment de code (donc exécutable) et d'un segment de
+données (donc modifiable). De ce fait, aucun contrôle n'est fait ici
+permettant d'éviter que du code soit modifié, \ldots
+
+   La mise en place de ce mode segmentation est réalisée dans le
+fichier {\tt i386/segment.c} par la fonction \stinline!initialiserGDT()!
+qui construit les descripteurs de segments en question et les insère
+dans la {\sc gdt}. Cette dernière est ensuite activée sur le système
+par un appel à la fonction \lstinline!chagerGDT()!.
+
+   L'adresse de la {\sc gdt} est définie de façon statique au travers
+de la macro \lstinline!MANUX_ADRESSE_GDT! dans {\tt manux/config.h}.
+Une page complète lui est réservée, ce qui est plus que suffisant,
+surtout tant que l'on utilise le format à plat, qui ne nécéssite que 4
+entrées (de 8 octets chacune) !
+   
 %-------------------------------------------------------------------------------
 %      
 %-------------------------------------------------------------------------------

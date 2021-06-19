@@ -46,20 +46,22 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    void  * unePage;
    Tache * tache;
    void  * pile;      // Elle a sa propre pile
-   
+
+   // printk("aaaaa\n");
    /* On stoque les infos en zone système */
    unePage = allouerPageSysteme();
    if (unePage == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
       return NULL;
    }
-
+   // printk("bbbbb\n");
    tache = (Tache *) unePage;
 
    pile = (void*) allouerPageSysteme();
+   //   printk("cccccc\n");
    if (pile == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
-      // WARNING : libérer unePage
+      // WARNING : libérer la page de la tache
       return NULL;
    }
    
@@ -85,14 +87,17 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->tss.ESP = (uint32_t)pile + 4092;  /* WARNING !! */
    tache->tss.EIP = (uint32_t)corpsTache;
    tache->tss.EFLAGS = (uint32_t)0x200;
+   // printk("ddddd\n");
 
    /* Ajout de la tâche dans la GDT */
    tache->indiceTSSDescriptor = ajouterDescTSS(gdtSysteme,
 					       &tache->tss,
 					       0x67, FALSE);
+   //   printk("eeeee\n");
 
-   /* On recharge la GDT */
+   /* On recharge la GDT (nécessaire suite changement de taille ?) */
    chargerGDT(gdtSysteme);
+   //  printk("fffff\n");
 
    /* On lui affecte son numero */
    tache->numero = numeroProchaineTache++;
@@ -109,10 +114,12 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    /* Elle n'a pas encore été activée */
    tache->nbActivations = 0;
    tache->tempsExecution = (Temps)0;
+   //  printk("ggggg\n");
    
    /* Zone mémoire utilisable */
    tache->tailleMemoire = (void *)(nombrePagesSysteme * MANUX_TAILLE_PAGE);
 
+#ifdef MANUX_PAGINATION
    /* On lui affecte son PDBR */
    creerTablePagination((PageDirectory *)&(tache->tss.CR3));
 
@@ -121,22 +128,33 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 	       tache,
 	       tache->tailleMemoire);
    tache->tailleMemoire += MANUX_TAILLE_PAGE;
+#endif
+   // printk("hhhhh\n");
 
    /* On lui affecte sa LDT */
-   tache->ldt = (DescriptorTable *)(unePage + sizeof(Tache));
+   //   tache->ldt = (DescriptorTable *)(unePage + sizeof(Tache));
+   /*   tache->ldt = (DescriptorTable *)allouerPageSysteme();
    tache->tss.LDT = (uint16_t)setDescripteurSegment(gdtSysteme,
 					  (uint32_t)&(tache->ldt->taille),
 					  LDT_NB_BYTES,
-                                          0x82, 0xC0);
-
+                                        0x82, 0xC0);
+   */
+   tache->ldt = NULL;
+   tache->tss.LDT = NULL;
+   //   printk("iiiii\n");
+   
    /* On recharge la GDT */
-   chargerGDT(gdtSysteme);
+   //   chargerGDT(gdtSysteme);
+   //  printk("jjjjj\n");
 
    /* Copie de la LDT, maintenant qu'elle est complète */
-   memcpy(tache->ldt, gdtSysteme, tailleGDTSysteme);
+   //memcpy(tache->ldt, gdtSysteme, tailleGDTSysteme);
+
+   //  printk("kkkkk\n");
 
    /* Elle est prète à être exécutée */
    tache->etat = Tache_Prete;
+   //  printk("lllll\n");
 
    /* On affiche quelques infos */
    printk_debug(DBG_KERNEL_TACHE, "Tache[%d] = 0x%x\n", tache->numero, tache);
