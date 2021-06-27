@@ -59,6 +59,7 @@ void _start(InfoSysteme * infoSysteme,
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
+
    descriptionProcesseur(0, descriptionProc.registres);
    descriptionProc.caracteres[12] = 0;
 

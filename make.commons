@@ -27,3 +27,7 @@ TAILLE_CONF = taille.conf
 
 COMPRESS = gzip
 
+# Les commandes pour lancer ManuX dans un émulateur
+RUN_MANUX_FLOPPY= qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
+RUN_MANUX_ELF= qemu-system-i386 -m 64M -kernel $(ROOTDIR)/noyau/noyau.elf
+

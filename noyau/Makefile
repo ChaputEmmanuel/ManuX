@@ -44,6 +44,7 @@ noyau.elf  : $(LD_SCRIPT) $(MB_MANUX_ELF) $(OBJETS) $(LIBRAIRIES_MANUX)
 symbols_bin : $(OBJETS) $(LIBRAIRIES_MANUX)
 	ld -m elf_i386 -N --section-start=.text=$(MANUX_KERNEL_START_ADDRESS) $(OBJETS) $(LIBRAIRIES_MANUX) -o noyau.sym
 	nm noyau.sym | sort > symbols_bin
+	rm noyau.sym
 
 symbols_elf : noyau.elf
 	nm noyau.elf | sort > symbols_elf
@@ -58,5 +59,4 @@ symbols_elf : noyau.elf
 
 
 clean :
-	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin
-
+	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin symbols_elf

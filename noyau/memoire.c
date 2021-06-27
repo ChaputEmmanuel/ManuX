@@ -96,6 +96,7 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
       proprietairePage[i] = (TacheID) 0;
    }
 #else
+
    // Par défaut tout est libre
    for (i = 0; i < nombrePages; i++) {
       demarquerPage(i);      
@@ -113,6 +114,11 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
       allouerPage(ADDR_VERS_PAGE(adresseDebutManuX)+i);
    }
 
+   // La table d'allocation de la mémoire
+   for (i=0 ; i < tailleProprietaire; i++){
+     allouerPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
+   }
+   
    // La GDT
    for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
       allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);

@@ -1,9 +1,9 @@
-\documentclass{article}
+\documentclass{book}
 \usepackage{epsf, a4, makeidx, Manu}
 \usepackage{palatino}
 \usepackage{multicol}
 \usepackage{graphicx} 
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
 
 \usepackage{listings}
@@ -11,7 +11,7 @@
 \input{lstasm}
 
 %-------------------------------------------------------------------------------
-\title{Réalisation des prémices d'un noyau}
+\title{RÃ©alisation des prÃ©mices d'un noyau}
 \author{Chaput Emmanuel}
 
 \date{Version 0.00000001}
@@ -29,19 +29,6 @@
 
 \maketitle
 
-%------------------------------------------------------------------------------
-%                                           RESUME
-%-------------------------------------------------------------------------------
-\begin{abstract}
-   Ce document n'est constitué pour le moment que de quelques notes
-que j'ai pu prendre en essayant de réaliser le début d'un truc qui pourrait
-vaguement laisser penser que j'essaye de réaliser un noyau de système
-d'exploitation. 
-
-   Ces notes me sont purement personelles et je vous invite donc, qui que
-vous soyez, à arréter de lire ça ! Vous êtes encore là ? C'est pas sympa \ldots
-\end{abstract}
-
 
 \tableofcontents
 
@@ -49,6 +36,17 @@ vous soyez, à arréter de lire ça ! Vous êtes encore là ? C'est pas sympa \l
 %      Introduction
 %===============================================================================
 \section{Introduction}
+
+\subsection{Préambule}
+   Ce document n'est constitué pour le moment que de quelques notes
+que j'ai pu prendre en essayant de réaliser le début d'un truc qui pourrait
+vaguement laisser penser que j'essaye de réaliser un noyau de système
+d'exploitation. 
+
+   Ces notes me sont purement personelles et je vous invite donc, qui que
+vous soyez, arrêtez de lire ça ! Vous êtes encore là ? C'est pas sympa \ldots
+
+\subsection{Présentation}
 
    Ce document rassemble quelques notes prises durant ma tentative de
 dévelop\-pement de {\em ManuX} ("Misérable Approximation de Noyau
@@ -91,7 +89,7 @@ programmation peut se faire sans nuire aux performances.
 %===============================================================================
 \section{Organisation générale}
 
-   Comme tout système digne de ce nom, Manux-32 définit un mode
+   Comme tout système digne de ce nom, ManuX-32 définit un mode
 utilisateur et un mode noyau. Il n'utilise pour l'instant pas les
 différents modes fournis par le processeur, mais j'ai bon espoir pour
 que cela arrive bientôt.
@@ -124,7 +122,7 @@ usr}.
    \item[{\tt stdio.c}] implante les principales fonctions (décrites
      dans {\tt include/stdio.h}) permettant de réaliser des
      entrées/sorties.
-   \item[{\tt init.c}] implante le code de la première tâche lancée
+   \item[{\tt init.c}] implante le code de la première tÃ¢che lancée
      automatiquement par le noyau lorsqu'il est initialisé.
 \end{description}
 
@@ -430,7 +428,7 @@ base=localtime -m 64M -gdb tcp::1234  -S
   file noyau/noyau.elf
 \end{lstlisting}
 
-   La commande \lstinline!dir! permet de dire à {\tt gdb} où trouver
+   La commande \lstinline!dir! permet de dire à {\tt gdb} oÃ¹ trouver
 les fichiers sources et la command \lstinline:file: lui permet de
 consulter le binaire du noyau pour y trouver l'adresse des fonctions
 et variables (ici en fait, c'est une autre compilation du noyau au
@@ -492,6 +490,7 @@ compilateur :
      fonction {\tt fonc}.
 \end{description}
 
+\chapter{Le boot}
 \input{boot.tex}
 
 %===============================================================================
@@ -544,7 +543,7 @@ texte et du fond.
 implantent un outil de gestion de base de la console.
 
    On construit ici en particulier la fonction suivante, chargée
-d'afficher sur l'écran une chaîne de caractères passée en paramètre :
+d'afficher sur l'écran une chaÃ®ne de caractères passée en paramètre :
 
 \begin{lstlisting}{}
    void afficherEcran(char * msg);
@@ -563,10 +562,10 @@ possible.
 %-------------------------------------------------------------------------------
 \subsection{Plus de souplesse avec les consoles virtuelles}
 
-   Lorsque nous allons mettre en place la notion de tâches, il sera
+   Lorsque nous allons mettre en place la notion de tÃ¢ches, il sera
 intéressant d'attribuer à chacune d'entre elles une console virtuelle
 potentiellement différente des autres. Nous pourrons ainsi basculer de
-l'une à l'autre pour mieux distinguer ce qu'affiche chaque tâche.
+l'une à l'autre pour mieux distinguer ce qu'affiche chaque tÃ¢che.
 
 %-------------------------------------------------------------------------------
 %
@@ -597,7 +596,7 @@ l'écran.
 %-------------------------------------------------------------------------------
 \subsection{Un premier {\tt printk()}}
 
-   Grâce à notre console , l'écriture de {\tt printk()} est assez
+   GrÃ¢ce à notre console , l'écriture de {\tt printk()} est assez
 simple, puisque cette fonction n'a plus qu'à se préoccuper de créer
 une chaîne de caractères et de la transmettre au journal (ou
 directement à la console si on n'utilise pas le journal).
@@ -605,13 +604,13 @@ directement à la console si on n'utilise pas le journal).
    Elle est mise en \oe{}uvre dans les fichiers
 \lstinline!manux/printk.h! et \lstinline!noyau/printk.c!
 
-   La fonction essentielle est bien sûr :
+   La fonction essentielle est bien sÃ»r :
 
 \begin{lstlisting}{}
    void printk(char * format, ...);
 \end{lstlisting} 
 
-   Dont le rôle est de mettre en forme une chaîne de caractèreqs
+   Dont le rôle est de mettre en forme une chaîne de caractères
 qu'elle envoie ensuite à la console ou au journal.
    
 %===============================================================================
@@ -621,7 +620,7 @@ qu'elle envoie ensuite à la console ou au journal.
 
    Sur le 386, une table (l'{\sc idt} pour {\em Interrupt Descriptor Table})
 définit le comportement à adopter pour chacune des 256 interruptions
-et exceptionns. Cette table est enregistrée grâce à l'instruction
+et exceptionns. Cette table est enregistrée grÃ¢ce à l'instruction
 \lstinline!lidt!.
 
    Observons ici comment tout cela est mis en place dans ManuX.
@@ -739,7 +738,7 @@ idt}. C'est le rôle de la fonction C \lstinline!initialiserIDT()!.
 qui ne fait rien :
 
 \begin{lstlisting}{}
-   /* Comportement par défaut : on ne fait rien ! */
+   /* Comportement par defaut : on ne fait rien ! */
    for (i = 0; i < 256; i++) {
       positionnerHandlerInterruption(idt, i, stubHandlerNop);
    }
@@ -893,7 +892,7 @@ int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 }
 \end{lstlisting}
 
-   Bien sûr, cette fonction utilise le code de manipulation de la
+   Bien sÃ»r, cette fonction utilise le code de manipulation de la
 console déjà écrit.   
 
 %-------------------------------------------------------------------------------
@@ -909,7 +908,7 @@ appelsysteme.h} et codée dans {\tt noyau/appelsysteme.c} :
 int definirAppelSysteme(int num, void * appel);
 \end{lstlisting}
 
-   où 
+   oÃ¹ 
 
 \begin{description}
    \item[\lstinline!num!] est le numéro de l'appel système enregistré ;
@@ -934,7 +933,7 @@ void initialiserAppelsSysteme()
 {
    ...
   
-   /* Envoyer une chaîne de caractères sur la console */
+   /* Envoyer une chaine de caracteres sur la console */
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
 
    ...
@@ -956,30 +955,30 @@ noyau au travers des appels système.
 s'exécutent pour le moment dans le même mode que le noyau.
 
 %===============================================================================
-%      Gestion des tâches
+%      Gestion des tÃ¢ches
 %===============================================================================
-\section{Gestion des tâches}
+\section{Gestion des tÃ¢ches}
 
    Nous disposons désormais du minimum permettant d'exécuter quelques
 instructions et d'en voir les conséquences à l'écran. Je vous propose
-donc de mettre en place la notion de {\em tâche} qui nous permettra de
+donc de mettre en place la notion de {\em tÃ¢che} qui nous permettra de
 faire avancer ``en même temps'' plusieurs activités. ManuX devient
-donc à partir de maintenant un système multitâche.
+donc à partir de maintenant un système multitÃ¢che.
 
-   Attention, pour le moment, ce ne sera que du multitâche
+   Attention, pour le moment, ce ne sera que du multitÃ¢che
 collaboratif. En effet, nous n'allons pas encore mettre en place du
-multitâche {\em préemptif}, ce qui signifie que une tâche ne rendra la
+multitÃ¢che {\em préemptif}, ce qui signifie que une tÃ¢che ne rendra la
 main (enfin, le processeur) que lorsqu'elle en aura envie !
 
    De plus, nous ne nous intéressons pas non plus à l'ordonnancement,
 et mettrons en place un simple {\em round robin}.
 
 %-------------------------------------------------------------------------------
-%      Définition d'une tâche
+%      Définition d'une tÃ¢che
 %-------------------------------------------------------------------------------
-\subsection{Définition d'une tâche}
+\subsection{Définition d'une tÃ¢che}
 
-   La structure d'une tâche est définie dans le fichier {\tt
+   La structure d'une tÃ¢che est définie dans le fichier {\tt
 manux/tache.h} au travers d'une struture \lstinline!Tache!. Afin de
 nous simplifier la vie, nous allons utiliser dans ManuX l'aide
 proposée par les processeurs Intel\footnote{Les systèmes récents, pour
@@ -1000,22 +999,22 @@ au processeur et des champs purement liés au noyau.
 
 \begin{itemize}
    \item \lstinline!IntelTSS tss! qui permet, comme son nom laisse à
-penser, de stoquer les informations relatives à l'état de la tâche au
+penser, de stoquer les informations relatives à l'état de la tÃ¢che au
 niveau du processeur ({\sc tss} pour {\em Task State Segment}). On
 trouvera des informations sur ce champs dans les documentations Intel.
 Dans ManuX, une initialisation minimale est faite de cette structure
-lors de la création d'une tâche dans \lstinline!creerTache!.
+lors de la création d'une tÃ¢che dans \lstinline!creerTache!.
 
    \item \lstinline!uint16 indiceTSSDescriptor! représente l'indice,
-dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tâche. C'est
-par un \lstinline!ljmp! vers ce champs que l'on va activer la tâche.
+dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tÃ¢che. C'est
+par un \lstinline!ljmp! vers ce champs que l'on va activer la tÃ¢che.
 
    \item \lstinline!DescriptorTable * ldt! est la table locale de
-decripteurs associée à cette tâche.
+decripteurs associée à cette tÃ¢che.
 \end{itemize}
 
-   Étant donnée la gestion limitée de la mémoire à ce niveau du
-système, les structures définissant une tâche sont placées dans une
+   Ètant donnée la gestion limitée de la mémoire à ce niveau du
+système, les structures définissant une tÃ¢che sont placées dans une
 même page mémoire et organisées comme représenté sur la figure
 \ref{Figure:PageTache}.
 
@@ -1024,40 +1023,40 @@ même page mémoire et organisées comme représenté sur la figure
 $$
 \epsfbox{PageTache.eps}
 $$
-\caption{\label{Figure:PageTache}Structure d'une page de tâche}
+\caption{\label{Figure:PageTache}Structure d'une page de tÃ¢che}
 \end{figure} 
 
 %...............................................................................
 %
 %...............................................................................
-\subsubsection{Les descripteurs de tâche Intel}
+\subsubsection{Les descripteurs de tÃ¢che Intel}
 
    Le {\em Task State Segment} ({\sc tss}) des processeurs Intel
 permet de stoquer et de manipuler les informations relatives à une
-tâche. Dans ManuX, une structure est définie permettant de décrire
-dans le noyau le {\sc tss} de chaque tâche : la structure
+tÃ¢che. Dans ManuX, une structure est définie permettant de décrire
+dans le noyau le {\sc tss} de chaque tÃ¢che : la structure
 \lstinline!IntelTSS! est définie dans
 \lstinline!manux/tache.h!
 
 %-------------------------------------------------------------------------------
-%      Création d'une tâche
+%      Création d'une tÃ¢che
 %-------------------------------------------------------------------------------
-\subsection{Création d'une tâche}
+\subsection{Création d'une tÃ¢che}
 
 %-------------------------------------------------------------------------------
-%      Basculement vers une tâche
+%      Basculement vers une tÃ¢che
 %-------------------------------------------------------------------------------
-\subsection{Basculement vers une tâche}
+\subsection{Basculement vers une tÃ¢che}
 
-   En ce qui concerne le basculement d'une tâche à l'autre, nous
+   En ce qui concerne le basculement d'une tÃ¢che à l'autre, nous
 allons profiter des mécanismes fournis par les processeurs Intel au
 travers de l'instruction {\tt ljmp}. L'{\em Indirect far JMP} permet
-en effet de faire un basculement de tâche lorsque l'argument qui lui
+en effet de faire un basculement de tÃ¢che lorsque l'argument qui lui
 est passé, sur 48 bits (oui madame, 6 octets !) est constitué d'un
 sélecteur de segment (sur 16 bits) qui référence un {\sc tss} puis
 d'un {\em offset} (qui ne sera pas utilisé pour le coup !).
 
-   Bref, le basculement d'une tâche vers une autre se résume à une
+   Bref, le basculement d'une tÃ¢che vers une autre se résume à une
 instruction de saut !
 
 %===============================================================================
@@ -1085,7 +1084,7 @@ mémoire en {\em pages} de taille fixe. Chaque page pourra être dotée
 de propriétées qui lui sont propre. La pagination va nécessiter la
 mise en place d'un certain nombre de tables d'indirection, ce qui peut
 sembler un peu lourd, mais qui va en particulier permettre de la
-mémoire virtuelle, de l'isolation entre les tâches, \ldots
+mémoire virtuelle, de l'isolation entre les tÃ¢ches, \ldots
 
 %-------------------------------------------------------------------------------
 %
@@ -1231,37 +1230,37 @@ crée quatre descripteurs de segments
 
    Les trois segments se recouvrent donc.
 
-   La {\sc ldt} est une table similaire � la {\sc gdt} mais sp�cifique
-� une tâche. Dans ManuX, pour le moment, elle est initialisée, lors de
-la création de chaque tâche, comme une copie de la {\sc gdt}.
+   La {\sc ldt} est une table similaire à la {\sc gdt} mais spécifique
+à une tÃ¢che. Dans ManuX, pour le moment, elle est initialisée, lors de
+la création de chaque tÃ¢che, comme une copie de la {\sc gdt}.
 
 %...............................................................................
 %      La segmentation dans ManuX
 %...............................................................................
 \subsubsection{La segmentation dans Manux}
 
-   Nous allons utiliser dans ManuX un mode ``� plat'' (ou {\em flat
-mode}). Dans ce mode minimaliste, deux segments seront d�finis, l'un
-pour le code, l'autre pour les donn�es, chacun couvrant l'int�gralit�
-de la m�moire de 0 � 4 G.
+   Nous allons utiliser dans ManuX un mode ``à plat'' (ou {\em flat
+mode}). Dans ce mode minimaliste, deux segments seront définis, l'un
+pour le code, l'autre pour les données, chacun couvrant l'intégralité
+de la mémoire de 0 à 4 G.
 
-   L'avantage de ce mod�le est sa grande simplicit�. Un de ses
-inconv�nients est le fait que la m�moire est � la fois visible au
-travers d'un segment de code (donc ex�cutable) et d'un segment de
-donn�es (donc modifiable). De ce fait, aucun contr�le n'est fait ici
-permettant d'�viter que du code soit modifi�, \ldots
+   L'avantage de ce modèle est sa grande simplicité. Un de ses
+inconvénients est le fait que la mémoire est à la fois visible au
+travers d'un segment de code (donc exécutable) et d'un segment de
+données (donc modifiable). De ce fait, aucun contrôle n'est fait ici
+permettant d'éviter que du code soit modifié, \ldots
 
-   La mise en place de ce mode segmentation est r�alis�e dans le
-fichier {\tt i386/segment.c} par la fonction \stinline!initialiserGDT()!
-qui construit les descripteurs de segments en question et les ins�re
-dans la {\sc gdt}. Cette derni�re est ensuite activ�e sur le syst�me
-par un appel � la fonction \lstinline!chagerGDT()!.
+   La mise en place de ce mode segmentation est réalisée dans le
+fichier {\tt i386/segment.c} par la fonction \lstinline!initialiserGDT()!
+qui construit les descripteurs de segments en question et les insère
+dans la {\sc gdt}. Cette dernière est ensuite activée sur le système
+par un appel à la fonction \lstinline!chagerGDT()!.
 
-   L'adresse de la {\sc gdt} est d�finie de fa�on statique au travers
+   L'adresse de la {\sc gdt} est définie de façon statique au travers
 de la macro \lstinline!MANUX_ADRESSE_GDT! dans {\tt manux/config.h}.
-Une page compl�te lui est r�serv�e, ce qui est plus que suffisant,
-surtout tant que l'on utilise le format � plat, qui ne n�c�ssite que 4
-entr�es (de 8 octets chacune) !
+Une page complète lui est réservée, ce qui est plus que suffisant,
+surtout tant que l'on utilise le format à plat, qui ne nécéssite que 4
+entrées (de 8 octets chacune) !
    
 %-------------------------------------------------------------------------------
 %      
@@ -1305,12 +1304,12 @@ centrale, ce qui permet de construire une mémoire virtuelle plus
 grande que la mémoire réellement disponible.
 
    De plus, la gestion de la pagination peut être spécifique à chaque
-tâche, ce qui permet de construire un système multitâche dans lequel
-chaque tâche a une vision de l'espace mémoire qui lui est propre.
+tÃ¢che, ce qui permet de construire un système multitÃ¢che dans lequel
+chaque tÃ¢che a une vision de l'espace mémoire qui lui est propre.
 
    Il y a donc deux problèmes à résoudre, que sont l'organisation de
-la mémoire physique (et sa répartition entre les différentes tâches)
-et l'organisation de la mémoire virtuelle vue par une tâche. Nous
+la mémoire physique (et sa répartition entre les différentes tÃ¢ches)
+et l'organisation de la mémoire virtuelle vue par une tÃ¢che. Nous
 allons voir comment ils sont résolus dans Manux, mais regardons
 d'abord un peu comment la pagination est mise en \oe{}uvre.
 
@@ -1322,7 +1321,7 @@ d'abord un peu comment la pagination est mise en \oe{}uvre.
    Le mécanisme de pagination des processeurs Intel permet, comme
 l'illustre la figure \ref{Figure:Pagination}, de construire une
 mémoire virtuelle, découpée en pages (de 4 Ko) à partir de pages
-physiques situées ``n'importe où'' en mémoire physique (ou même sur un
+physiques situées ``n'importe oÃ¹'' en mémoire physique (ou même sur un
 autre support tel qu'un disque dur ou autre).
 
 \begin{figure}[htbp]
@@ -1398,11 +1397,11 @@ qui ne doivent pas être utilisées.
 %
 \paragraph{Allocation de la mémoire}
 
-   Chaque page mémoire peut être allouée à une tâche (ou au noyau) ou
+   Chaque page mémoire peut être allouée à une tÃ¢che (ou au noyau) ou
 libre (non allouée). C'est le tableau \lstinline!proprietairePage!
 défini dans le fichier {\tt noyau/memoire.c} qui définit cela comme illustré par la figure
 \ref{Figure:ProprietairePage}. Une page libre sera associée à un
-propriétaire nul et une page allouée au système à la tâche 1.
+propriétaire nul et une page allouée au système à la tÃ¢che 1.
 
 \begin{figure}[htbp]
 $$
@@ -1447,7 +1446,7 @@ c'est-à-dire tout ce qui est codé dans le répertoire {\tt lib}.
 \subsection{Le journal}
 
    Le journal permet d'archiver les messages émis par les différents
-éléments du noyau grâce à la fonction \lstinline!printk()!
+éléments du noyau grÃ¢ce à la fonction \lstinline!printk()!
 \index{printk()}.
 
    Le journal est défini dans le fichier {\tt include/journal.h} et implanté
@@ -1473,7 +1472,7 @@ système d'exploitation de développement puisqu'une image disque peut
 %===============================================================================
 \section{Les outils de synchronisation}
 
-   Les moyens de synchronisation entre tâches actuellement disponibles
+   Les moyens de synchronisation entre tÃ¢ches actuellement disponibles
 sont 
 
 \begin{itemize}
@@ -1510,7 +1509,7 @@ réalisées de façon {\em atomique}.
 
    Les variables d'exclusion mutuelle permettent d'assurer que l'accés
 à une ressource (typiquement une section de code critique) se fait de
-façon exclusive entre les tâches.
+façon exclusive entre les tÃ¢ches.
 
    Le fichier {\tt atomique.h} définit le type et les fonctions
 suivants 
@@ -1540,24 +1539,24 @@ une exclusion mutuelle.
 %le biais des appels système.
 
 %===============================================================================
-%      L'ordonnancement des tâches
+%      L'ordonnancement des tÃ¢ches
 %===============================================================================
-\section{L'ordonnancement des tâches}
+\section{L'ordonnancement des tÃ¢ches}
 
    Le scheduler est l'entité chargée de la mise en \oe{}uvre de
 l'ordonnancement. Aussi étrange que cela puisse paraitre, il est
 implanté sous la forme d'un processus. En fait, chaque fois qu'il est
-nécessaire de changer de tâche active (lorsque le quantum de temps
+nécessaire de changer de tÃ¢che active (lorsque le quantum de temps
 alloué à celle en cours est révolu, ou qu'elle se bloque sur une
-entrée/sortie), le système bascule vers la tâche scheduler, qui se
-charge alors d'élire la prochaine tâche et de l'activer.
+entrée/sortie), le système bascule vers la tÃ¢che scheduler, qui se
+charge alors d'élire la prochaine tÃ¢che et de l'activer.
 
    Le corps du scheduler se résume alors à une boucle folle qui ne
 fait qu'appeler le sous-programme {\tt basculerTache()} chargé de
-l'élection de la prochaine tâche.
+l'élection de la prochaine tÃ¢che.
 
-   Naturellement, la tâche de l'ordonnanceur n'est pas stockée dans la
-liste des tâches actives du système.
+   Naturellement, la tÃ¢che de l'ordonnanceur n'est pas stockée dans la
+liste des tÃ¢ches actives du système.
 
 %===============================================================================
 %      Le système de fichiers

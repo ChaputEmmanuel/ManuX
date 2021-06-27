@@ -55,11 +55,9 @@ $(TAILLE_CONF) : $(NOYAU_BIN) $(OUTILS)
 multinit :  $(INIT_ELF) $(MB_MANUX_ELF)
 
 .$(ASM_EXT).bin :
-	echo Tic
 	$(ASM) $(ASM_DEF) $(ASM_BIN_OPT) $< -o $@
 
 .$(ASM_EXT).elf :
-	echo Toc
 	$(ASM) $(ASM_DEF) $(ASM_ELF_OPT) $< -o $@
 
 mb-manux.elf : mb-manux.$(ASM_EXT)

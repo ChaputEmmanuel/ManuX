@@ -19,8 +19,6 @@ CFLAGS   = -g -gdwarf -fno-pie -m32 -march=i686 -Wall  \
            -O0 \
          # -fomit-frame-pointer
 
-RUN_MANUX= qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
-
 BSEC_SRC = bootsector.$(ASM_EXT)
 #KERN_SRC = noyau.$(ASM_EXT)
 
@@ -39,7 +37,8 @@ USR_INC_D   = usr/include/manux
 USR_INC_F   = appelsystemenum.h config.h types.h string.h i386.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
-# Le ficher de configuration est généré par make en fonction de include/manux/config.h
+# Le ficher de configuration est généré par make en fonction du
+# contenu de include/manux/config.h
 include make.conf
 
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
@@ -60,8 +59,11 @@ all : manux multiboot
 	(cd noyau; make all)
 
 #    Lancement du noyau
-run : manux
-	$(RUN_MANUX)
+run : multiboot
+	$(RUN_MANUX_ELF)
+
+oldrun : manux
+	$(RUN_MANUX_FLOPPY)
 
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_BIN_OPT) $< -o $@
@@ -139,7 +141,7 @@ dump :
 
 clean :
 	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__
-	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)
+	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
 
 distclean :
 	rm -f bochs.out *.bin *.obj *.o dump $(TAILLE_CONF) *~

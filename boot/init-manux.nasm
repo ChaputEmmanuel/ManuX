@@ -120,7 +120,7 @@ SuiteRamdisk:
         add     eax, SegCodeNul     ; en adresse "flat"
         mov     [AdresseGDT],eax    ; et enregistrer dans la GDT
 
-        lgdt [LaGDT]     ; Chargement de la GDT
+        lgdt [LaGDT]                ; Chargement de la GDT
 
         cli
 

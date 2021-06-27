@@ -240,6 +240,11 @@
 #   define MANUX_portDonneesClavier  0x60
 #endif
 
+/*
+ * Le clavier est transmis vers la console active
+ */
+#define MANUX_CLAVIER_CONSOLE
+
 /*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */
 /* Sans exhaustivité malheureusement.                                         */

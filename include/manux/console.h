@@ -47,6 +47,9 @@ typedef struct _Console {
    uint8_t             nbLignes;
    uint8_t             nbColonnes;
   //   ExclusionMutuelle   scAcces;
+#ifdef MANU_CLAVIER_CONSOLE
+#endif
+  
 } Console;
 
 /*

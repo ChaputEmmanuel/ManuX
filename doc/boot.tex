@@ -1,7 +1,7 @@
 %===============================================================================
-%      Le boot
+%      Introduction
 %===============================================================================
-\section{Le boot}
+\section{Introduction}
 
    Nous allons ici voir comment en arriver à un noyau présent dans la
 mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
@@ -20,10 +20,10 @@ mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
 \end{itemize}
 
 
-%-------------------------------------------------------------------------------
+%===============================================================================
 %
-%-------------------------------------------------------------------------------
-\subsection{Démarage à partir d'une disquette}
+%===============================================================================
+\section{Démarage à partir d'une disquette}
 
    Nous allons donc devoir mettre en \oe{}uvre le boot du noyau dans
 cette configuration. Pour cela, nous allons construire un fichier qui
@@ -258,7 +258,7 @@ de base dont il aura besoin.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Utilisation de {\em Multiboot}}
+\section{Utilisation de {\em Multiboot}}
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
 par la {\em Free Software Foundation} qui va nous permettre d'utiliser
@@ -270,6 +270,10 @@ modernes qu'un lecteur de disquettes et, par voie de conséquence, de
 faire fonctionner ManuX sur autre chose que des machines virtuelles ou
 hors d'age !
 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Création d'un entête}
 
 %-------------------------------------------------------------------------------
 %
