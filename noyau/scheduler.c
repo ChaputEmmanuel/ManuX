@@ -178,7 +178,7 @@ void initialiserScheduler()
    if (ordonnancerTache(aDummyKernelTask, FALSE)  < 0) {
       paniqueNoyau("impossible de creer la seconde tache !\n");
    }
-   //printk("DDDDD\n");
+   // printk("DDDDD\n");
 }
 
 /*
@@ -194,11 +194,11 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 #ifdef MANUX_CONSOLES_VIRTUELLES
    void    * page;
 
-   //   printk("11111\n");
+   //printk("11111\n");
    // Nouvelle console ? 
    if (nouvelleConsole) {
-     // printk("22222\n");
-      page = allouerPageSysteme();  // WARNING, gérer erreur
+     //printk("22222\n");
+      page = allouerPage();  // WARNING, gérer erreur
       cons = (Console *)page;
       // printk("33333\n");
       if (page != NULL) {
@@ -208,10 +208,10 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
          assert(tacheEnCours != NULL);
          cons = tacheEnCours->console;
       }
-      // printk("44444\n");
+      //printk("44444\n");
 
    } else {
-     // printk("55555\n");
+     //      printk("55555\n");
      
       if (tacheEnCours != NULL) {
          cons = tacheEnCours->console;
@@ -221,18 +221,18 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    }
    
 #endif
-   //  printk("66666\n");
+   //printk("66666\n");
    
    /* Création de la tache */
    tache = creerTache(corpsTache, cons);
    if (tache == NULL) {
       return -ENOMEM;
    }
-   //      printk("77777\n");
+   //printk("77777\n");
 
    /* On insère la nouvelle tache à la fin de la liste */
    if (corpsTache) {
-     // printk("88888\n");
+     //printk("88888\n");
       insererCelluleTache(&listeTaches,
                           tache,
                           (CelluleTache*)tache+sizeof(Tache));
@@ -246,7 +246,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       /*   . et on la déclare comme en cours.   */
       tacheEnCours = tache;
    }
-   // printk("00000\n");
+   //printk("00000\n");
    
    return tache->numero;
 }

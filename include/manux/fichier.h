@@ -21,11 +21,17 @@ typedef struct _Fichier {
  */
 typedef struct _MethodesFichier {
    int (*ecrire) (Fichier * f, void * buffer, int nbOctets);
+   int (*lire) (Fichier * f, void * buffer, int nbOctets);
 } MethodesFichier;
 
 int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets);
 /*
  * L'appel système write
+ */
+
+int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets);
+/*
+ * L'appel système read
  */
 
 void sfInitialiser();

@@ -19,11 +19,14 @@ void calculerPremiers(int q)
    int d; /* Indice de la boucle de recherche de diviseur */
    booleen compose;
    int cpt = 1;
+   int nbLu;
+   
+   char txt[32];
    
    while (TRUE) {
       printf("[%d] C'est la boucle numero %d : \n", q, cpt++);
       printf("%d", 2);
-      for (n = 3; n < 1024; n += 2) {
+      for (n = 3; n < 512; n += 2) {
          compose = FALSE;
          d = 3;
          while ((!compose) && (d*d <= n)) {
@@ -35,6 +38,12 @@ void calculerPremiers(int q)
 	 }
       }
       printf("\n--------------------------------------------------------------------------------\n");
+
+      // Test du clavier et stdin
+      nbLu = lire(0, txt, 31);
+      txt[nbLu] = 0;
+      printf("   Lu %d => '%s'\n", nbLu, txt);
+
 #ifndef MANUX_PREEMPTIF
       basculerTache();
 #endif
@@ -44,9 +53,9 @@ void calculerPremiers(int q)
 void deuxiemeTache()
 {
    int n;
-
+   
    printf("Deuxieme tache\n");
- 
+   
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(2);
    }
@@ -56,15 +65,15 @@ void init()
 {
    int n=2; // nombre de messages affichés
 
-   //   while(1){};
-   printk("Pouet\n");
-   appelSystemeInutile();
-   printk("Repouet\n");
-   appelSystemeInutile();
-   printk("Et dix de pouet\n");
-   
    printf("Greetings from userland !\n");
-   printk("Et dix de pouet\n");
+
+   //   printk("Pouet\n");
+   appelSystemeInutile();
+   //printk("Repouet\n");
+   appelSystemeInutile();
+   //printk("Et dix de pouet\n");
+   
+   //printk("Et dix de pouet\n");
 
    n = creerNouvelleTache(deuxiemeTache, FALSE);
 

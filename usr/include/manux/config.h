@@ -104,7 +104,7 @@
 /*----------------------------------------------------------------------------*/
 /* Utilisation d'un système de fichiers                                       */
 /*----------------------------------------------------------------------------*/
-//#define MANUX_FS
+#define MANUX_FS
 
 /*
  * Le nombre maximal de fichiers manipulés par un processus
@@ -256,6 +256,10 @@
 #   ifndef MANUX_GESTION_MEMOIRE
 #      error "MANUX_TACHES nécessite MANUX_GESTION_MEMOIRE !"
 #   endif
+#endif
+
+#if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
+#   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
 #endif
 
 #endif

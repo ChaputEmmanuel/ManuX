@@ -38,9 +38,6 @@
 #define masqueDebugage (0x00000000  \
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_PAGIN      \
- | DBG_KERNEL_MEMOIRE    \
- | DBG_KERNEL_TACHE      \
 			)
 
 /*
@@ -51,6 +48,8 @@
  | DBG_KERNEL_TACHE      \
  | DBG_KERNEL_ORDON      \
  | DBG_KERNEL_ALL        \
+ | DBG_KERNEL_AS         \
+ | DBG_KERNEL_SYSFI      \
  | DBG_KERNEL_FILES      \
 */
 

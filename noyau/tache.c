@@ -49,7 +49,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    // printk("aaaaa\n");
    /* On stoque les infos en zone système */
-   unePage = allouerPageSysteme();
+   unePage = allouerPage();
    if (unePage == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
       return NULL;
@@ -57,7 +57,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    // printk("bbbbb\n");
    tache = (Tache *) unePage;
 
-   pile = (void*) allouerPageSysteme();
+   pile = (void*) allouerPage();
    //   printk("cccccc\n");
    if (pile == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
@@ -106,7 +106,11 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    assert(cons != NULL);
    tache->console = cons;
 
-#ifdef MANUX_FS   
+#ifdef MANUX_FS
+   // WARNING pourquoi distinguer 0 et 1 ?
+   tache->fichiers[0].prive = (void*)cons;
+   tache->fichiers[0].methodes = &consoleMethodesFichier;
+
    tache->fichiers[1].prive = (void*)cons;
    tache->fichiers[1].methodes = &consoleMethodesFichier;
 #endif
@@ -133,7 +137,7 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On lui affecte sa LDT */
    //   tache->ldt = (DescriptorTable *)(unePage + sizeof(Tache));
-   /*   tache->ldt = (DescriptorTable *)allouerPageSysteme();
+   /*   tache->ldt = (DescriptorTable *)allouerPage();
    tache->tss.LDT = (uint16_t)setDescripteurSegment(gdtSysteme,
 					  (uint32_t)&(tache->ldt->taille),
 					  LDT_NB_BYTES,

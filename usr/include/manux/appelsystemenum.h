@@ -26,6 +26,7 @@
 #define NBAS_OBTENIR_PAGES     2
 #endif
 #define NBAS_ECRIRE            3
+#define NBAS_LIRE              9
 #define NBAS_CONSOLE           5
 #define NBAS_FORK              4
 #define NBAS_DUMB              8

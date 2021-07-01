@@ -89,7 +89,7 @@ void creerTablePagination(PageDirectory * repertoirePagination)
    int         i;
 
    /* Le répertoire occupe une page */
-   *repertoirePagination = allouerPageSysteme();
+   *repertoirePagination = allouerPage();
 
    /* On initialise le répertoire à zéro */
    for (i = 0; i < 1024; i++) {
@@ -110,7 +110,7 @@ void creerTablePagination(PageDirectory * repertoirePagination)
       /* Construction d'une nouvelle PageTable */
       if (!indiceTable) {
          /* On alloue une nouvelle page */
-         tableCourante = allouerPageSysteme();
+         tableCourante = allouerPage();
          for (i = 0; i < 1024; i++) {
             tableCourante[i] = (PTE)0;
 	 }
@@ -149,7 +149,7 @@ int ajouterPage(PageDirectory * repertoirePagination,
    /* Création d'une nouvelle table si nécessaire */
    if ((*repertoirePagination)[indiceDirectory] == 0) {
       (*repertoirePagination)[indiceDirectory] =
-                            (((uint32_t)allouerPageSysteme()) & 0xFFFFF000)
+                            (((uint32_t)allouerPage()) & 0xFFFFF000)
                             | 0x003;
    }
 

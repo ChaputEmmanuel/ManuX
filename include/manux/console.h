@@ -34,10 +34,6 @@
  * pour cette structure.
  */
 typedef struct _Console {
-#ifdef MANUX_CONSOLES_VIRTUELLES
-   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
-   struct _Console   * precedente;  // doublement chaînées
-#endif
    char              * adresseEcran;      // Adresse à laquelle se trouve
                                           // le contenu affiché
    char              * adresseEcranCopie; // Une copie pour lorsque la
@@ -46,8 +42,17 @@ typedef struct _Console {
    unsigned char       attribut;
    uint8_t             nbLignes;
    uint8_t             nbColonnes;
-  //   ExclusionMutuelle   scAcces;
-#ifdef MANU_CLAVIER_CONSOLE
+
+#ifdef MANUX_CONSOLES_VIRTUELLES
+   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
+   struct _Console   * precedente;  // doublement chaînées
+#endif
+
+#ifdef MANUX_CLAVIER_CONSOLE
+   unsigned char     * bufferClavier;     // Pour les données du clavier
+   uint16_t            nbCarAttente;
+   uint16_t            indiceProchainCar; // Le prochain caractère à lire
+   ExclusionMutuelle   accesBufferClavier;
 #endif
   
 } Console;
@@ -145,6 +150,11 @@ void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
  * indice dans ce tableau.
  */
 #ifdef MANUX_CONSOLES_VIRTUELLES
+
+/*
+ * Pointeur vers la console active
+ */
+extern Console * consoleActive;
 
 /*
  * Initialisation d'une console virtuelle. Nécessaire avant toute

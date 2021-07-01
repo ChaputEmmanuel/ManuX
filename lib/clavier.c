@@ -12,6 +12,12 @@
 
 #include <manux/scheduler.h> /* basculeConsoleDemandee */
 
+#ifdef MANUX_CLAVIER_CONSOLE
+#   include <manux/console.h>
+#endif
+
+#include <keymaps/french.h>
+
 int toucheTouche = 0;
 
 void initialiserClavier()
@@ -27,8 +33,8 @@ void initialiserClavier()
    autoriserIRQ(IRQClavier);
 }
 
-#define KEYCODE_ESC  0x81
-#define KEYCODE_TAB  0x8F
+#define KEYCODE_ESC  0x01
+#define KEYCODE_TAB  0x0F
 #define KEYCODE_F1   0x3b
 #define KEYCODE_F2   0x3c
 #define KEYCODE_F3   0x3d
@@ -54,17 +60,36 @@ void handlerClavier()
 #ifdef MANUX_CONSOLES_VIRTUELLES
       if (toucheTouche == KEYCODE_ESC) {
          basculeConsoleDemandee = TRUE;
-	 printk("BASCON\n");
+	 return;
       }
 #endif
       if (toucheTouche == KEYCODE_TAB) {
  	 afficheEtatSystemeDemande = TRUE;
-	 // printk("PRINTSYS\n");
+	 return;
       }
 #ifdef MANUX_TACHES
       if (toucheTouche == KEYCODE_F1) {
  	 basculerTacheDemande = TRUE;
-	 //printk("SWITCHTASK\n");
+	 return;
+      }
+#endif
+#ifdef MANUX_CLAVIER_CONSOLE
+      Console * cons;
+#   ifdef MANUX_CONSOLES_VIRTUELLES
+      cons = consoleActive;
+#   else
+      cons = _consoleNoyau;
+#   endif
+      if (toucheTouche & 0x80) {
+      } else {
+	//         printk(" !!! 0x%x !!!\n", toucheTouche);
+         if (cons->bufferClavier){ 
+            if (cons->nbCarAttente < 4096) {
+               cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] = keymap[toucheTouche];
+	       //	       printk("b[%d] = 0x%x\n", (cons->indiceProchainCar + cons->nbCarAttente)%4096, keymap[toucheTouche]);
+	       cons->nbCarAttente++;
+             }
+ 	 }
       }
 #endif
    }

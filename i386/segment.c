@@ -3,6 +3,7 @@
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
+#include <manux/i386.h>
 #include <manux/segment.h>
 #include <manux/printk.h>
 

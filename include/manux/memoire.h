@@ -31,16 +31,7 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 
 void * allouerPage();
 /*
- * Réservation d'une page (de 4 Ko) au delà de la zone système.
- *
- * Retour
- *    première adresse dispo si la pages a pu être allouée,
- *    NULL sinon
- */
-
-void * allouerPageSysteme();
-/*
- * Réservation d'une page (de 4 Ko) dans la zone système.
+ * Réservation d'une page (de 4 Ko)
  *
  * Retour
  *    première adresse dispo si la pages a pu être allouée,

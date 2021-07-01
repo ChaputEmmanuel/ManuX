@@ -6,6 +6,8 @@
 #ifndef I386_DEF
 #define I386_DEF
 
+#include <manux/types.h>
+
 void halt();
 /*
  * Arret complet du système
@@ -35,5 +37,10 @@ static inline int descriptionProcesseur(int code, uint32_t description[3]) {
  * Calcul du numéro de la page contenant une adresse linéaire
  */
 #define ADDR_VERS_PAGE(a) ((a)>>12)
+
+/*
+ * Chargement effectif de la GDT, implanté dans gestionGDT.nasm
+ */
+void _chargerGDT(uint32_t ad, uint16_t limite);
 
 #endif

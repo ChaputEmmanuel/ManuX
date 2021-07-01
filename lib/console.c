@@ -19,8 +19,6 @@
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
-unsigned int auc;
-
 #ifdef MANUX_CONSOLES_VIRTUELLES
 
 /* A tout moment, il n'y a qu'une console "active" (ie visible) */
@@ -40,9 +38,6 @@ static Console _consoleNoyau;
  */
 Console * consoleInit()
 {
-
-  auc = 0;
-  
    // L'écran est une zone CON_LIGNESxCON_COLONNES d'adresse fixe
    _consoleNoyau.adresseEcran = MANUX_CON_SCREEN;
    _consoleNoyau.ligne = 0; //14;
@@ -51,12 +46,15 @@ Console * consoleInit()
    _consoleNoyau.nbColonnes = MANUX_CON_COLONNES;
    _consoleNoyau.attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
 
-   //   effacerConsole(&_consoleNoyau);
-   
 #ifdef MANUX_CONSOLES_VIRTUELLES
    consoleActive = &_consoleNoyau;
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
+#endif
+
+#ifdef MANUX_CLAVIER_CONSOLE
+   // La console noyau n'a pas de buffer clavier
+   _consoleNoyau.bufferClavier = NULL;
 #endif
 
    return &_consoleNoyau;
@@ -298,6 +296,15 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    consoleActive->suivante = cons;
    cons->precedente = consoleActive;
    cons->suivante->precedente = cons;
+
+#ifdef MANUX_CLAVIER_CONSOLE
+   // Le buffer accueillant le clavier
+   cons->bufferClavier = allouerPage();
+   cons->nbCarAttente = 0;
+   cons->indiceProchainCar = 0;
+   initialiserExclusionMutuelle(&(cons->accesBufferClavier));
+#endif
+
 }
 
 /*
@@ -386,6 +393,44 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
 }
 
 /*
+ * Implantation de l'appel système de lecture pour la console
+ */
+#ifdef MANUX_CLAVIER_CONSOLE
+#define min(a, b) (((a)<(b)) ? (a) : (b))
+
+int lireConsoleN(Console * cons, void * buffer, int nbOctets)
+{
+   // On ne peut pas en lire plus qu'il y en a !
+   uint16_t nb = min(nbOctets, cons->nbCarAttente);
+   uint16_t lu = 0;   // Le cumul des lectures
+   uint16_t aLire;    // Combien on en lit à chaque passage
+   
+   while (lu < nb) {
+     // On lit sur la "fin" du tableau circulaire
+     aLire = min(nb-lu, 4096 - cons->indiceProchainCar);
+     memcpy(buffer+lu,
+	    cons->bufferClavier+cons->indiceProchainCar,
+	    aLire);
+     // On décompte cette lecture du buffer
+     cons->indiceProchainCar = (cons->indiceProchainCar + aLire); // WARNING FAUX !
+     cons->nbCarAttente = cons->nbCarAttente - aLire;
+
+     //     printk("(0x%x) LIRE copie %d, ipc = %d, nb = %d\n", cons, aLire, cons->indiceProchainCar, cons->nbCarAttente);
+     lu = lu + aLire;
+   }
+
+   return lu;
+}
+
+int consoleLire(Fichier * f, void * buffer, int nbOctets)
+{
+   Console * con = f->prive;
+
+   return lireConsoleN(con, buffer, nbOctets);
+}
+#endif
+
+/*
  * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
  * console afficher.
  */
@@ -400,6 +445,7 @@ Console * consoleNoyau()
  */
 MethodesFichier consoleMethodesFichier = {
    ecrire : consoleEcrire,
+   lire : consoleLire
 };
 #endif // MANUX_FS
 

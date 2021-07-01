@@ -41,7 +41,7 @@ TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
 static int nombrePages = 0;
 
 /*
- * Marquer une page comme réservée
+ * Marquer une page comme réservée. WARNING : il faut se protéger par un mutex
  */
 static void inline reserverPage(uint32_t i)
 {
@@ -101,37 +101,41 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    for (i = 0; i < nombrePages; i++) {
       demarquerPage(i);      
    }
-       
+
+   // Les handlers : WARNING est-ce utile ?
+   reserverPage(0);
+
    // Le BIOS (indéboulonable !)
    for (i=0 ; i < MANUX_BIOS_NB_PAGES; i++) {
-      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
    }
 
    // Le noyau
    nbrePagesManuX = (adresseFinManuX-adresseDebutManuX)/MANUX_TAILLE_PAGE
      + (((adresseFinManuX-adresseDebutManuX)%MANUX_TAILLE_PAGE)?1:0);
    for (i=0 ; i < nbrePagesManuX; i++) {
-      allouerPage(ADDR_VERS_PAGE(adresseDebutManuX)+i);
+      reserverPage(ADDR_VERS_PAGE(adresseDebutManuX)+i);
    }
 
    // La table d'allocation de la mémoire
    for (i=0 ; i < tailleProprietaire; i++){
-     allouerPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
+     reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
    }
    
    // La GDT
    for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
-      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
    }
 
    // La IDT
    for (i=0 ; i < MANUX_IDT_NB_PAGES; i++) {
-      allouerPage(ADDR_VERS_PAGE(MANUX_ADRESSE_IDT)+i);
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_IDT)+i);
    }
 #endif   
 }
 
-void * allouerPageSysteme()
+/*
+void * reserverPageSysteme()
 {
    void * pageAllouee = NULL;
    int    numeroPage;
@@ -142,14 +146,14 @@ void * allouerPageSysteme()
              &&(proprietairePage[numeroPage] != (TacheID) 0)) {
          numeroPage++;
       }
-      /* Si on trouve une page dispo */
+      // Si on trouve une page dispo 
       if (numeroPage < nombrePages) {
-         /* On essaie de la réserver */
+         // On essaie de la réserver 
          if (atomiqueTestInit((Atomique *)&(proprietairePage[numeroPage]),
                               1, 0)) {
             pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
 	 }
-      /* Sinon inutile de continuer */
+      // Sinon inutile de continuer 
       } else {
          return NULL;
       }
@@ -157,31 +161,25 @@ void * allouerPageSysteme()
    //printk("return 0x%x\n", pageAllouee);
    return pageAllouee;
 }
+*/
 
 void * allouerPage()
 {
    void * pageAllouee = NULL;
-   int    numeroPage;
+   int    numeroPage = 0;
 
-   while (pageAllouee == NULL) {
-      numeroPage = nombrePagesSysteme;
-      while (  (numeroPage < nombrePages)
-             &&(proprietairePage[numeroPage] != (TacheID) 0)) {
-         numeroPage++;
-      }
-
-      /* Si on trouve une page dispo */
-      if (numeroPage < nombrePages) {
-         /* On essaie de la réserver */
-         if (atomiqueTestInit((Atomique *)&(proprietairePage[numeroPage]),
-                              1, 0)) {
-            pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
-	 }
-      /* Sinon inutile de continuer */
-      } else {
-         return NULL;
-      }
+   // On cherche la première page libre
+   while (  (numeroPage < nombrePages)
+         &&(proprietairePage[numeroPage] != (TacheID) 0)) {
+      numeroPage++;
    }
+
+   /* Si on trouve une page dispo */
+   if (numeroPage < nombrePages) {
+      reserverPage(numeroPage);
+      pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
+   }
+
    return pageAllouee;
 }
 
