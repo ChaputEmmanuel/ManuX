@@ -8,7 +8,6 @@
 ;-------------------------------------------------------------------------------
 bits 32
 
-extern handlerTimer
 extern handlerPanique
 
 %ifdef MANUX_CLAVIER
@@ -23,75 +22,62 @@ extern sortirAppelSysteme
 
 extern autoriserIRQ
 
-global stubHandlerTimer
-global stubHandlerClavier
+; Gestion centralisee des IRQ
+extern MANUX_HANDLER_IRQ            ; La fonction de gestion, liée au PIC
+
+%assign i 0
+%rep 16
+global stubHandlerIRQ%[i]
+%assign i i+1
+%endrep
+
 global stubHandlerNop
-global stubHandlerPanique_0
-global stubHandlerPanique_1
-global stubHandlerPanique_2
-global stubHandlerPanique_3
-global stubHandlerPanique_4
-global stubHandlerPanique_5
-global stubHandlerPanique_6
-global stubHandlerPanique_7
-global stubHandlerPanique_8
-global stubHandlerPanique_9
-global stubHandlerPanique_10
-global stubHandlerPanique_11
-global stubHandlerPanique_12
-global stubHandlerPanique_13
-global stubHandlerPanique_14
-global stubHandlerPanique_15
-global stubHandlerPanique_16
-global stubHandlerPanique_17
-global stubHandlerPanique_18
-global stubHandlerPanique_19
-global stubHandlerPanique_20
-global stubHandlerPanique_21
-global stubHandlerPanique_22
-global stubHandlerPanique_23
-global stubHandlerPanique_24
-global stubHandlerPanique_25
-global stubHandlerPanique_26
-global stubHandlerPanique_27
-global stubHandlerPanique_28
-global stubHandlerPanique_29
-global stubHandlerPanique_30
-global stubHandlerPanique_31
+
+%assign i 0
+%rep 32
+global stubHandlerPanique_%[i]
+%assign i i+1
+%endrep
 
 global handlerAppelSysteme          ; WARNING, à mettre ailleurs
 
 global halt                         ; WARNING, à mettre ailleurs
 
-; Handler de l'interruption du Timer
-;-----------------------------------
-stubHandlerTimer :
-        pusha                       ; On sauvegarde les registres
+;===============================================================================
+;   Gestion des IRQ.
+;
+;   On définit (à l'aide de la macro stubHandlerIRQn) un handler pour chacune
+; des IRS (16 max). Ce handler empile le numéro de l'IRQ (pas de l'interruption,
+; qui dépend du remapping configuré sur le PIC) puis invoque le gestionnaire
+; global (une fonction C répondant au doux nom de handlerIRQ).
+;===============================================================================
+; Un handler pour l'IRQ n
+;------------------------
+%macro stubHandlerIRQn 1
+        push dword %1               ; On empile le numéro de l'IRQ
+	jmp  handlerIRQ
+%endmacro
 
-        mov al, 20h                 ; On envoie un EOI
-        out Port8259_1, al          ; au 8259 ([3] p 1120)
+handlerIRQ :
+	pusha
+	
+        call MANUX_HANDLER_IRQ
 
-        call handlerTimer             ; On apelle le handler C
+	popa
+        add esp, 4                  ; Dépile le numéro d'IRQ
 
-        popa                        ; On restaure les registres
-        iret                        ; On revient ...
+        iret
 
-%ifdef MANUX_CLAVIER
-; Handler de l'interruption du clavier
-;-------------------------------------
-stubHandlerClavier :
-        pusha                       ; On sauvegarde les registres
+; Génération des 16 handlers
+%assign i 0
+%rep 16
+stubHandlerIRQ%[i] : stubHandlerIRQn i
+%assign i i+1
+%endrep
 
-        call handlerClavier         ; On apelle le handler C
-
-        mov al, 20h                 ; On envoie un EOI
-        out Port8259_2, al          ; au 8259 ([3] p 1120)
-        out Port8259_1, al          ; WARNING : a virer !
-
-        popa                        ; On restaure les registres
-        iret                        ; On revient ...
-%endif
-
+;===============================================================================
+;   Gestion des appels système
+;===============================================================================
 %ifdef MANUX_APPELS_SYSTEME
 ; Le handler des appels systèmes
 ;-------------------------------
@@ -140,48 +126,22 @@ stubHandlerNop :
 %macro   stubHandlerPanique 1
 
          pusha                ; Je pense qu'on peut s'en passer, ...
-	 push dword %1
+	 push dword %1        ; On push le numéro en 32 bits
 
          call handlerPanique
 	 
-         add esp, 4
+         add esp, 4           ; On pop le numéro
 	 popa
 
          iret
 %endmacro
 
-stubHandlerPanique_0: stubHandlerPanique 0
-stubHandlerPanique_1 : stubHandlerPanique 1
-stubHandlerPanique_2 : stubHandlerPanique 2
-stubHandlerPanique_3 : stubHandlerPanique 3
-stubHandlerPanique_4 : stubHandlerPanique 4
-stubHandlerPanique_5 : stubHandlerPanique 5
-stubHandlerPanique_6 : stubHandlerPanique 6
-stubHandlerPanique_7 : stubHandlerPanique 7
-stubHandlerPanique_8 : stubHandlerPanique 8
-stubHandlerPanique_9 : stubHandlerPanique 9
-stubHandlerPanique_10 : stubHandlerPanique 10
-stubHandlerPanique_11 : stubHandlerPanique 11
-stubHandlerPanique_12 : stubHandlerPanique 12
-stubHandlerPanique_13 : stubHandlerPanique 13
-stubHandlerPanique_14 : stubHandlerPanique 14
-stubHandlerPanique_15 : stubHandlerPanique 15
-stubHandlerPanique_16 : stubHandlerPanique 16
-stubHandlerPanique_17 : stubHandlerPanique 17
-stubHandlerPanique_18 : stubHandlerPanique 18
-stubHandlerPanique_19 : stubHandlerPanique 19
-stubHandlerPanique_20 : stubHandlerPanique 20
-stubHandlerPanique_21 : stubHandlerPanique 21
-stubHandlerPanique_22 : stubHandlerPanique 22
-stubHandlerPanique_23 : stubHandlerPanique 23
-stubHandlerPanique_24 : stubHandlerPanique 24
-stubHandlerPanique_25 : stubHandlerPanique 25
-stubHandlerPanique_26 : stubHandlerPanique 26
-stubHandlerPanique_27 : stubHandlerPanique 27
-stubHandlerPanique_28 : stubHandlerPanique 28
-stubHandlerPanique_29 : stubHandlerPanique 29
-stubHandlerPanique_30 : stubHandlerPanique 30
-stubHandlerPanique_31 : stubHandlerPanique 31
+; Génération de tous les handlers de panique
+%assign i 0
+%rep 32
+stubHandlerPanique_%[i]: stubHandlerPanique i
+%assign i i+1
+%endrep
 
 ; Arret du système
 ;-----------------

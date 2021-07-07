@@ -13,7 +13,6 @@
 #include <manux/errno.h>
 #include <manux/console.h>
 #include <manux/io.h>
-#include <manux/irq.h>           /* autoriserIRQ(IRQTimer) */
 #include <manux/memoire.h>       /* NULL, allouerPage */
 #include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
 #include <manux/printk.h>        /* printk() */
@@ -197,12 +196,15 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    //printk("11111\n");
    // Nouvelle console ? 
    if (nouvelleConsole) {
-     //printk("22222\n");
+      //printk("22222\n");
       page = allouerPage();  // WARNING, gérer erreur
       cons = (Console *)page;
       // printk("33333\n");
       if (page != NULL) {
          initialiserConsole(cons, page + sizeof(Console)); // WARNING ! il faut que ça tienne !
+#ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
+	 basculerVersConsole(cons);
+#endif
       } else {
   	 printk_debug(DBG_KERNEL_ERREUR, "Impossible de creer une nouvelle console\n");
          assert(tacheEnCours != NULL);
@@ -218,8 +220,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       } else { // Pour la première a priori
          cons = consoleNoyau();
       }
-   }
-   
+   }   
 #endif
    //printk("66666\n");
    

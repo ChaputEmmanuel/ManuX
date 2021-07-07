@@ -618,10 +618,106 @@ qu'elle envoie ensuite à la console ou au journal.
 %===============================================================================
 \section{Gestion des interruptions ({\tt interruptions.c interBasNiveau.nasm})}
 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Introduction}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Interruption et exception}
+
+   Une interruption peut être vue commme la manifestation d'un
+événement qui va perturber le fil d'exécution en cours sur un
+processeur. Nous pouvons les classifier en deux catégories
+
+\begin{description}
+   \item[Les interruptions asynchrones] (que nous appellerons
+     simplement {\rm interruptions}) sont le fait d'un élément
+     extérieur au fil d'exécution en cours (une touche du clavier a
+     été manipulée, une carte réseau a reçue une trame, \ldots)
+   \item[Les interruptions synchrones] (que nous appellerons {\em
+     exceptions}) sont déclanchées par le processeur lui-même comme
+     conséquence de l'exécution (ou de la tentative d'exécution) d'une
+     instruction. 
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Traitement d'une interruption}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Masquage}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le {\em Programmable Interrupt Controller}}
+
+   Le {\sc pic} est un circuit électronique permettant de gérer les
+{\sc irq} provenant de l'environnement afin de les délivrer au
+processeur (c'est en fait une fonction du {\em southbridge}).
+
+   Je ne m'étalerai pas ici sur les différents types de {\sc pic} ni
+sur leur fonctionnement. Ce qu'il est nécessaire de comprendre ici,
+c'es qu'il existe donc un circuit avec lequel le processeur va devoir
+dialoguer pour une partie de la gestion des interruptions.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Sur un processeur Intel}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le {\sc pic} Intel 8259}
+
+   Sur un (vieux) {\sc pc}, le {\sc pic} est un circuit Intel 8259. Ce
+circuit permet de gérer 8 types d'interruptions et on en utilise
+plusieurs en cascade pour les additionner. Nous supposerons ici qu'il
+y en a deux, le {\sc pic} 2 étant derrière le {\sc pic} 1 (en
+``cascade'') pour un total de 15 interruptions.
+
+   Ce circuit, donc on peut trouver la spécification
+\cite{intel-8259a-spec} se programme au travers de deux registres
+
+\begin{description}
+    \item[Le registre de commande] accessible par le port 0x20 pour le
+      circuit maître et 0xa0 pour le circuit esclave ;
+    \item[Le registre de données] accessible par le port 0x21 pour le
+      circuit maître et 0xa1 pour le circuit esclave ;
+\end{itemize}
+
+   Une phase d'initialisation est nécessaire afin de configurer
+correctement ces circuits.
+   
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Définition des handlers}
+
    Sur le 386, une table (l'{\sc idt} pour {\em Interrupt Descriptor Table})
 définit le comportement à adopter pour chacune des 256 interruptions
-et exceptionns. Cette table est enregistrée grÃ¢ce à l'instruction
+et exceptionns. Cette table est enregistrée grâce à l'instruction
 \lstinline!lidt!.
+
+   Cette table contient des entrées de trois types différents
+
+\begin{description}
+   \item[Interrupt Gate]       
+   \item[Trap Gate Descriptor]       
+   \item[Task Gate Descriptor]       
+\end{description}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Gestion dans ManuX}
 
    Observons ici comment tout cela est mis en place dans ManuX.
 
@@ -687,8 +783,8 @@ C.
 permettant de déterminer la cause de l'interruption :
 
 \begin{lstlisting}
-void handlerPanique(uint32 itNum, TousRegistres registres,
-		    uint32 eip, uint32 cs, uint32 eFlags)
+void handlerPanique(uint32_t itNum, TousRegistres registres,
+		    uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    ...
 }
@@ -715,8 +811,8 @@ void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
  * Affectation du handler de l'interruption i
  */
 {
-   idt[i].itg.offsetFaible = ((uint32)handler & 0xFFFF);
-   idt[i].itg.offsetFort = ((uint32)handler >> 16);
+   idt[i].itg.offsetFaible = ((uint32_t)handler & 0xFFFF);
+   idt[i].itg.offsetFort = ((uint32_t)handler >> 16);
    idt[i].itg.parametres = 0x8E00;
    idt[i].itg.selSegment = SELECTEUR_SEGMENT_CODE;
 }

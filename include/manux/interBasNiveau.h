@@ -6,20 +6,27 @@
 #ifndef INTER_BAS_NIVEAU_DEF
 #define INTER_BAS_NIVEAU_DEF
 
-void stubHandlerTimer();
-/*
- * Un handler de bas niveau pour le timer (irq 8)
- */
-
-void stubHandlerClavier();
-/*
- * Un handler de bas niveau pour le clavier
- */
-
 void stubHandlerNop();
 /*
  * Un handler de bas niveau qui ne fait rien
  */
+
+void stubHandlerIRQ0();
+void stubHandlerIRQ1();
+void stubHandlerIRQ2();
+void stubHandlerIRQ3();
+void stubHandlerIRQ4();
+void stubHandlerIRQ5();
+void stubHandlerIRQ6();
+void stubHandlerIRQ7();
+void stubHandlerIRQ8();
+void stubHandlerIRQ9();
+void stubHandlerIRQ10();
+void stubHandlerIRQ11();
+void stubHandlerIRQ12();
+void stubHandlerIRQ13();
+void stubHandlerIRQ14();
+void stubHandlerIRQ15();
 
 void stubHandlerPanique_0();
 /*

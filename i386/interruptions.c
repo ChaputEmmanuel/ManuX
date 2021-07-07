@@ -3,19 +3,20 @@
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
-#include <manux/interruptions.h>
-
 #include <manux/config.h>
+#include <manux/interruptions.h>
+#include <manux/intel-8259a.h>
+#include <manux/memoire.h>        // NULL
 #include <manux/interBasNiveau.h>
-#include <manux/io.h>
-#include <manux/i386.h>           /* str */
-#include <manux/segment.h>        /* gdtSysteme */
-#include <manux/scheduler.h>      /* basculerTache */
-#include <manux/appelsysteme.h>   /* MANUX_AS_INT */
+#include <manux/io.h>             // inb
+#include <manux/i386.h>           // str
+#include <manux/segment.h>        // gdtSysteme
+#include <manux/scheduler.h>      // basculerTache
+#include <manux/appelsysteme.h>   // MANUX_AS_INT 
 #include <manux/atomique.h>
-#include <manux/console.h>        /* Caractéristiques de l'écran */
-#include <manux/tache.h>          /* IntelTSS */
-#include <manux/string.h>         /* memcpy */
+#include <manux/console.h>        // Caractéristiques de l'écran
+#include <manux/tache.h>          // IntelTSS 
+#include <manux/string.h>         // memcpy 
 
 #define MANUX_SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
 
@@ -23,41 +24,9 @@
 extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
 #endif
 
-/*
- * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
- */
-Temps nbTopHorloge = 0;
-
 void exDivisionParZero(TousRegistres registres,
                        uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-}
-
-/*
- * Le handler du timer (irq 8)
- */
-void handlerTimer(TousRegistres registres,
-                  uint32_t eip, uint32_t cs, uint32_t eFlags)
-{
-   nbTopHorloge++;
-
-   outb(0x20, 0x20);
-
-#ifdef MANUX_PREEMPTIF
-   ordonnanceur();
-#endif
-}
-
-void setFrequenceTimer(uint16_t freqHz)
-{
-   uint16_t decompte;
-
-   decompte = 1193200 / freqHz;
-
-   /* On initialise la fréquence du timer 0 WARNING a rendre plus propre */
-   outb(0x43, 0x34); // wAS 36
-   outb(0x40, decompte & 0xFF);
-   outb(0x40, (decompte >> 8) & 0xFF);
 }
 
 void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
@@ -137,24 +106,31 @@ void initialiserIDT()
    positionnerHandlerInterruption(idt, 30, stubHandlerPanique_30);
    positionnerHandlerInterruption(idt, 31, stubHandlerPanique_31);
 
-   /* Le handler du Timer */
-   positionnerHandlerInterruption(idt, intTimer, stubHandlerTimer);
-
+   // Les handler d'IRQ
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  0, stubHandlerIRQ0);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  1, stubHandlerIRQ1);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  2, stubHandlerIRQ2);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  3, stubHandlerIRQ3);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  4, stubHandlerIRQ4);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  5, stubHandlerIRQ5);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  6, stubHandlerIRQ6);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  7, stubHandlerIRQ7);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  8, stubHandlerIRQ8);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  9, stubHandlerIRQ9);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 10, stubHandlerIRQ10);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 11, stubHandlerIRQ11);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 12, stubHandlerIRQ12);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 13, stubHandlerIRQ13);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 14, stubHandlerIRQ14);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 15, stubHandlerIRQ15);
+   
 #ifdef MANUX_APPELS_SYSTEME
    /* Le handler de l'interruption utilisée pour les appels système */
    positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
 #endif
    
-#ifdef MANUX_CLAVIER
-   /* Le handler du clavier */
-   positionnerHandlerInterruption(idt, intClavier, stubHandlerClavier);
-#endif
-   
    /* On charge l'IDT */
    chargerIDT(idt);
-
-   /* On autorise les IRQ WARNING pourquoi ? */
-   //sti();
 }
 
 /*
@@ -261,7 +237,7 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
    while (1) {
       inb(0x60, c);
       switch (c) {
-         case 0x81: // ESC
+         case 0x01: // ESC
 	      basculerVersConsoleSuivante();
             while (c == 0x81){
 	      inb(0x60, c);

@@ -3,7 +3,8 @@
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
-#include <manux/types.h>
+#include <manux/config.h>   // MANUX_FREQUENCE_HORLOGE
+#include <manux/types.h>    // Temps
 
 /*
  * Conversion d'une date/durée exprimée en nombre de top horloges vers
@@ -11,7 +12,7 @@
  */
 int nbTopVersValTemps(Temps nbTop, ValTemps * vt);
 
-#define totalSecondesDansTemps(t) (t / MANUX_FREQUENCE_TIMER)
+#define totalSecondesDansTemps(t) (t / MANUX_FREQUENCE_HORLOGE)
 
 #define totalMinutesDansTemps(t) (totalSecondesDansTemps(t)/60)
 

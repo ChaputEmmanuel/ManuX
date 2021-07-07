@@ -15,9 +15,10 @@
 #define MANUX_CONSOLE_DEF
 
 #include <manux/config.h>
+#include <manux/horloge.h>   // nbTopHorloge
 #include <manux/types.h>
-#include <manux/atomique.h>     /* Accés unique à la console  */
-#include <manux/fichier.h>      /* Une console est un fichier */
+#include <manux/atomique.h>  // Accés unique à la console 
+#include <manux/fichier.h>   // Une console est un fichier
 
 /*
  * Caractéristiques de l'écran physique

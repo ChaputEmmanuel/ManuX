@@ -5,13 +5,19 @@ ASM_EXT  = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f elf
 
-OBJETS      = interruptions.o segment.o interBasNiveau.bin irq.bin gestionGDT.bin
+OBJETS      = interruptions.o \
+              horloge.o \
+              intel-8259a.o \
+	      segment.o \
+              interBasNiveau.bin \
+              gestionGDT.bin
 
 include ../make.conf
 
 ASM_DEF	     = -D MANUX_KERNEL_TASK_TSS_IND=$(MANUX_KERNEL_TASK_TSS_IND)
 ASM_DEF     += -D MANUX_DATA_SEG_SEL=$(MANUX_DATA_SEG_SEL)
 ASM_DEF     += -D MANUX_CODE_SEG_SEL=$(MANUX_CODE_SEG_SEL)
+ASM_DEF     += -D MANUX_HANDLER_IRQ=$(MANUX_HANDLER_IRQ)
 ASM_DEF     += $(if $(MANUX_APPELS_SYSTEME), -D MANUX_APPELS_SYSTEME)
 ASM_DEF     += $(if $(MANUX_CLAVIER), -D MANUX_CLAVIER)
 

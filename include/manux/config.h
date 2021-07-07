@@ -138,6 +138,37 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
+/*   Configuration des interruptions                                          */ 
+/*----------------------------------------------------------------------------*/
+
+/*
+ * On utilise ici des intel 8259a
+ */
+#ifndef MANUX_HANDLER_IRQ
+#   define MANUX_HANDLER_IRQ i8259aGestionIRQ
+#endif
+
+/*
+ * Premier numéro d'interruption utilisé pour repositionner les IRQs
+ */
+#ifndef MANUX_INT_BASE_IRQ
+#   define MANUX_INT_BASE_IRQ 0x20
+#endif
+
+/*
+ * On a deux circuits et donc 16 IRQ potentielles
+ */
+#ifndef I8259A_NB_IRQ
+#   define I8259A_NB_IRQ 16
+#endif
+
+/*
+ * Les IRQ des matériels pris en charge
+ */
+#define IRQ_HORLOGE   0
+#define IRQ_CLAVIER   1
+
+/*----------------------------------------------------------------------------*/
 /*   Configuration générale du noyau                                          */ 
 /*----------------------------------------------------------------------------*/
 /*
@@ -149,13 +180,19 @@
 /*
  * La fréquence du timer
  */
-#define MANUX_FREQUENCE_TIMER 100
+#define MANUX_FREQUENCE_HORLOGE 100
 
 /*
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
 #define MANUX_CONSOLES_VIRTUELLES 
+
+/*
+ * Lorsqu'on crée une nouvelle console, est-ce que l'on bascule
+ * automatiquement vers elle ? 
+ */
+#define MANUX_BASCULER_NOUVELLE_CONSOLE
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?

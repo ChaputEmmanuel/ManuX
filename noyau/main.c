@@ -7,9 +7,10 @@
 #include <manux/console.h>
 #include <manux/clavier.h>
 #include <manux/tache.h>
+#include <manux/horloge.h>        // initialiserHorloge
 #include <manux/scheduler.h>
 #include <manux/interruptions.h>
-#include <manux/irq.h>
+#include <manux/intel-8259a.h>
 #include <manux/io.h>
 #include <manux/segment.h>
 #include <manux/memoire.h>
@@ -60,10 +61,7 @@ void _start(InfoSysteme * infoSysteme,
       char     caracteres[13];
    } descriptionProc;
 
-   descriptionProcesseur(0, descriptionProc.registres);
-   descriptionProc.caracteres[12] = 0;
-
-   interdireIRQ(IRQTimer);
+   i8259aInit(MANUX_INT_BASE_IRQ);
 
    /* Initialisation de la console noyau */
    console = consoleInit();
@@ -80,6 +78,9 @@ void _start(InfoSysteme * infoSysteme,
 #endif
 
    //basculerConsole();
+   descriptionProcesseur(0, descriptionProc.registres);
+   descriptionProc.caracteres[12] = 0;
+
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
 		descriptionProc.caracteres);
 
@@ -104,14 +105,6 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Paginiation initialisee\n");
 #endif
    
-   printk_debug(DBG_KERNEL_START, "Chargement GDT, ...\n");
-   //   initialiserGDT();
-   printk_debug(DBG_KERNEL_START, "GDT chargee\n");
-
-   printk_debug(DBG_KERNEL_START, "Chargement IDT ...\n");
-   //   initialiserIDT();
-   printk_debug(DBG_KERNEL_START, "IDT chargee\n");
-
    /* Initialisation de la table des appels système*/
 #ifdef MANUX_APPELS_SYSTEME
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
@@ -121,9 +114,9 @@ void _start(InfoSysteme * infoSysteme,
 
    /* Initialisation de la gestion des systèmes de fichiers */
 #ifdef MANUX_FS
-   printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers : ");
+   printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers ...\n");
    sfInitialiser();
-   printk_debug(DBG_KERNEL_START, "OK\n");
+   printk_debug(DBG_KERNEL_START, "Systeme de fichiers initialise\n");
 #endif
    
    /* Initialisation du ramdisk */
@@ -142,14 +135,12 @@ void _start(InfoSysteme * infoSysteme,
    initialiserClavier();
    printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
 #endif
-   
-   /* Initialisation de la fréquence du timer */
-   setFrequenceTimer(MANUX_FREQUENCE_TIMER);
-   autoriserIRQ(IRQTimer);
 
+   /*
    printk_debug(DBG_KERNEL_START, "Console noyau = 0x%x\n", consoleNoyau());
    printk_debug(DBG_KERNEL_START, "Adresse de _start : 0x%x\n", _start);
-
+   */
+   
    /* Initialisation de la gestion des processus */
 #ifdef MANUX_TACHES
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
@@ -157,8 +148,24 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
 
-   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n", adresseDebutManuX, adresseFinManuX);
+   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
+   initialiserHorloge();
+   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
+   
+   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
+		adresseDebutManuX, adresseFinManuX);
 
+   /*
+   //afficher le masque des PIC ?
+   uint8_t c, m;
+   inb(0x20, c);
+   inb(0x21, m);
+   printk_debug(DBG_KERNEL_START, "Les masques tombent : 0x%x - 0x%x\n", c, m);
+   inb(0xa0, c);
+   inb(0xa1, m);
+   printk_debug(DBG_KERNEL_START, "Les masques tombent : 0x%x - 0x%x\n", c, m);
+   // __asm__ ("int %0\n" : :"N"(28));
+   */
    init();
 }   /* _start */
 

@@ -8,12 +8,6 @@
 #include <manux/types.h>
 
 /*
- * Définition des interruptions classiques ([3] p 1113)
- */
-#define intTimer   0x08
-#define intClavier 0x09
-
-/*
  * Définition d'un Task Gate Descriptor ([1] p 6-9, 5-14)
  */
 typedef struct {
@@ -80,7 +74,6 @@ void initialiserIDT();
  * WARNING : ce n'est peut être pas le meilleur endroit où le définir
  */
 
-extern Temps nbTopHorloge;
 /*
  * Nombre de tops d'horloge depuis le boot
  */

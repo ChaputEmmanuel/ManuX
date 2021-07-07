@@ -6,11 +6,11 @@
 #include <manux/clavier.h>
 
 #include <manux/io.h>
-#include <manux/irq.h>
+#include <manux/intel-8259a.h>
 #include <manux/printk.h>
 #include <manux/interBasNiveau.h>
-
-#include <manux/scheduler.h> /* basculeConsoleDemandee */
+#include <manux/memoire.h>           // NULL
+#include <manux/scheduler.h>         // basculeConsoleDemandee
 
 #ifdef MANUX_CLAVIER_CONSOLE
 #   include <manux/console.h>
@@ -18,19 +18,27 @@
 
 #include <keymaps/french.h>
 
-int toucheTouche = 0;
+/*
+ * Code de la dernère touche manipulée
+ */
+int codeClavier = 0;
+
+void handlerClavier(void * toto);
 
 void initialiserClavier()
 {
-   interdireIRQ(IRQClavier);
+   codeClavier = 0;
 
-   toucheTouche = 0;
+   i8259aInterdireIRQ(IRQ_CLAVIER);
 
+   // On s'enregistre auprès du PIC
+   i8259aAjouterHandler(IRQ_CLAVIER, handlerClavier, NULL);
+   
    /* Activation du clavier */
    outb(portDonneesClavier, 0xf4);
    outb(portCmdClavier, 0xae);
 
-   autoriserIRQ(IRQClavier);
+   i8259aAutoriserIRQ(IRQ_CLAVIER);
 }
 
 #define KEYCODE_ESC  0x01
@@ -47,28 +55,28 @@ void initialiserClavier()
 #define KEYCODE_F10  0x44
 
 
-void handlerClavier()
+void handlerClavier(void * toto)
 {
    uint8_t etat;
 
    inb(0x64, etat);
    if (etat && 0x01) {
-      inb(0x60, toucheTouche);
-      toucheTouche &= 0xFF;
-      //      printk("[KBD-0x%x]\n", toucheTouche);
+      inb(0x60, codeClavier);
+      codeClavier &= 0xFF;
+      printk("[KBD-0x%x]", codeClavier);
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
-      if (toucheTouche == KEYCODE_ESC) {
+      if (codeClavier == KEYCODE_ESC) {
          basculeConsoleDemandee = TRUE;
 	 return;
       }
 #endif
-      if (toucheTouche == KEYCODE_TAB) {
+      if (codeClavier == KEYCODE_TAB) {
  	 afficheEtatSystemeDemande = TRUE;
 	 return;
       }
 #ifdef MANUX_TACHES
-      if (toucheTouche == KEYCODE_F1) {
+      if (codeClavier == KEYCODE_F1) {
  	 basculerTacheDemande = TRUE;
 	 return;
       }
@@ -80,13 +88,13 @@ void handlerClavier()
 #   else
       cons = _consoleNoyau;
 #   endif
-      if (toucheTouche & 0x80) {
+      if (codeClavier & 0x80) {
       } else {
-	//         printk(" !!! 0x%x !!!\n", toucheTouche);
+	//         printk(" !!! 0x%x !!!\n", codeClavier);
          if (cons->bufferClavier){ 
             if (cons->nbCarAttente < 4096) {
-               cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] = keymap[toucheTouche];
-	       //	       printk("b[%d] = 0x%x\n", (cons->indiceProchainCar + cons->nbCarAttente)%4096, keymap[toucheTouche]);
+               cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] = keymap[codeClavier];
+	       //	       printk("b[%d] = 0x%x\n", (cons->indiceProchainCar + cons->nbCarAttente)%4096, keymap[codeClavier]);
 	       cons->nbCarAttente++;
              }
  	 }

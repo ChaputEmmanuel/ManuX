@@ -11,6 +11,7 @@
 #include <manux/stdarg.h>
 #include <manux/i386.h>       // halt()
 #include <manux/scheduler.h>  // tacheEnCours
+#include <manux/horloge.h>    // nbTopHorloge
 
 #define DBG_KERNEL_ERREUR   0x00000001
 #define DBG_KERNEL_START    0x00000002

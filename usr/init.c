@@ -44,9 +44,9 @@ void calculerPremiers(int q)
       txt[nbLu] = 0;
       printf("   Lu %d => '%s'\n", nbLu, txt);
 
-#ifndef MANUX_PREEMPTIF
+      //#ifndef MANUX_PREEMPTIF
       basculerTache();
-#endif
+      //#endif
    }
 }
 
@@ -64,18 +64,18 @@ void deuxiemeTache()
 void init()
 {
    int n=2; // nombre de messages affichés
-
+   //printk("Pouet\n");
    printf("Greetings from userland !\n");
+   
+   //while(1){};
 
-   //   printk("Pouet\n");
+   //printk("Pouet\n");
    appelSystemeInutile();
    //printk("Repouet\n");
    appelSystemeInutile();
    //printk("Et dix de pouet\n");
    
-   //printk("Et dix de pouet\n");
-
-   n = creerNouvelleTache(deuxiemeTache, FALSE);
+      n = creerNouvelleTache(deuxiemeTache, FALSE);
 
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(1);
