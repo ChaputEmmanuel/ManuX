@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+#   Usage : creationISO <repertoire> <isofile> <noyau> ...
+
+ISO_REP_BASE=$1
+ISO_FICHIER=$2
+
+shift
+shift
+
+/usr/bin/mkdir "$ISO_REP_BASE" > /dev/null 2>&1
+/usr/bin/mkdir "$ISO_REP_BASE/boot" > /dev/null 2>&1
+/usr/bin/mkdir "$ISO_REP_BASE/boot/grub" > /dev/null 2>&1
+
+rm "$ISO_REP_BASE"/boot/grub/grub.cfg
+
+for NOYAU in $*
+do
+NOM=`basename $NOYAU`
+cat << EOF >> "$ISO_REP_BASE"/boot/grub/grub.cfg
+  menuentry "$NOM" {
+  multiboot /boot/$NOM
+}
+EOF
+cp $NOYAU "$ISO_REP_BASE"/boot/$NOM
+done
+
+grub-mkrescue -o "$ISO_FICHIER" "$ISO_REP_BASE"

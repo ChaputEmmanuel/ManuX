@@ -27,7 +27,13 @@ TAILLE_CONF = taille.conf
 
 COMPRESS = gzip
 
-# Les commandes pour lancer ManuX dans un émulateur
-RUN_MANUX_FLOPPY= qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
-RUN_MANUX_ELF= qemu-system-i386 -m 64M -kernel $(ROOTDIR)/noyau/noyau.elf
+# Création de l'ISO
+CREER_ISO=$(ROOTDIR)/outils/creationISO
+ISO_REP_BASE=$(HOME)/tmp/isodir
+ISO_FICHIER=manux.iso
 
+# Les commandes pour lancer ManuX dans un émulateur
+RUN_MANUX_FLOPPY = qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
+RUN_MANUX_ELF    = qemu-system-i386 -m 64M -kernel $(ROOTDIR)/noyau/noyau.elf
+RUN_MANUX_ISO    = qemu-system-i386 -m 64M -cdrom manux.iso   
+RUN_MANUX_VBOX   = vboxmanage startvm ManuX

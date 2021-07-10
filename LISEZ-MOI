@@ -5,28 +5,25 @@
 Je ne stockerai ici que les informations concernant les points instables.
 Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 
+Feuille de route
+----------------
+
+   . Bottom halves
+   . Clavier (utilisateur) à peu près utilisable
+   . Mémoire virtuelle
+   . Modes usager/noyau
+   . Bus PCI
+   . Ethernet
+   . Block device
+   . SGF
+   
 En cours
 --------
    . Finir d'éclaircir les makefile. Voir en particulier la cible "bootage"
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...
-   . L'iso "fonctionne" mais je pense qu'il y a encore des soucis de gestion
-   de la mémoire :
 
-   mkdir ~/tmp/isodir
-   mkdir ~/tmp/isodir/boot
-   mkdir ~/tmp/isodir/boot/grub
-   cat << EOF > ~/tmp/isodir/boot/grub/grub.cfg
-   menuentry "ManuX-31" {
-    multiboot /boot/manux
-   }
-   EOF
-   cp ./noyau/noyau.elf ~/tmp/isodir/boot/manux
-   grub-mkrescue -o manux.iso ~/tmp/isodir
-   qemu-system-i386 -cdrom manux.iso
-   
-
-   EN COURS : allocation mémoire (dont doc à restructurer).
+EN COURS : allocation mémoire (dont doc à restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
    de place et peut utiliser bsf comme ffsl
 
@@ -36,7 +33,7 @@ dans make.conf make.commons make.rules, ...
    
    A FAIRE :
 
-   . utilisation de pandoc, par exemple
+   . utilisation de pandoc, par exemple :
 
 pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
 
@@ -59,25 +56,11 @@ le temps d'exécution d'une tâche.
    Idée : utiliser les outils d'allocation mémoire pour ajouter
    (enfin) une mémoire au journal : liste datée/taguée de messages.
    
-   A faire : mon out() utilise l'ordre inverse des paramètres usuel !
-
    A faire : changer un peu la getion de tacheEnCours de sorte à
    pouvoir faire la compta du temps de chaque tache dans
    basculerTache. C'est par exemple à basculerVersTache(t) de faire
-   tacheEncours = t ce qui lu ipermet de m,ipuler les deux et donc
+   tacheEncours = t ce qui lui permet de manipuler les deux et donc
    pouvoir faire le décompte.
-
-   A voir : Pourquoi lib/clavier est traité à part dans noyau/Makefile !?
-   
-   A faire : profiter de la disponibilité des mcros dans Makefile (via
-   makeconfig) pour ne pas compiler fs si pas utiliser. Idem pour
-   ramdisk, ...
-
-   Un truc étrange : pourquoi avec le journal (ou après le premier
-   changemet de console )je perds les messages système !?
-
-   Un petit truc à faire : mettre à droite le message qui dit dans
-   quelle console on est et quelle heure il est.
 
    A faire : clarifier entre elf et bin. changer le nom de _start en
    ManuX32 !
@@ -107,7 +90,6 @@ n'importe quoi la gestion de la pagination ! Il faut que la structure
 de la mémoire, pour le système et pour chaque tâche, soit claire. Un
 affichage en fin de creerTache pourra aider, ... 
   
-
 
    ATTENTION : si _start ne finit pas à l'adresse 0x20000, le système
 ne démarre pas en bootflopy car l'adresse est hard-codée dans
@@ -173,7 +155,7 @@ Les Makefile
 
    apt-get install qemu-system-i386
 
-
+============================================================================
 
 FAIT
 
@@ -215,3 +197,23 @@ make qui copie de include/manux vers usr/include/manux.
    de qemu ! Et deuxième avec un bon postionnement en mémoire (le soucis
    venait d'uneincohérence de la position avec la gestin de la mémoire)
    
+   . L'iso "fonctionne" mais je pense qu'il y a encore des soucis de gestion
+   de la mémoire :
+
+   mkdir ~/tmp/isodir
+   mkdir ~/tmp/isodir/boot
+   mkdir ~/tmp/isodir/boot/grub
+   cat << EOF > ~/tmp/isodir/boot/grub/grub.cfg
+   menuentry "ManuX-31" {
+    multiboot /boot/manux
+   }
+   EOF
+   cp ./noyau/noyau.elf ~/tmp/isodir/boot/manux
+   grub-mkrescue -o manux.iso ~/tmp/isodir
+   qemu-system-i386 -cdrom manux.iso
+   
+   Idée : Constuire une ISO avec plusieurs noyaux ! Par exemple avoir
+   un répertoire de fichiers config.h et un make qui, pour chacun,
+   fait un make clean, cp ... include/manux/config.h make noyau et qui
+   à la fin construit une iso !
+

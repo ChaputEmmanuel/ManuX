@@ -58,13 +58,6 @@ ASM_BIN_OPT = -f bin
 all : manux multiboot
 	(cd noyau; make all)
 
-#    Lancement du noyau
-run : multiboot
-	$(RUN_MANUX_ELF)
-
-oldrun : manux
-	$(RUN_MANUX_FLOPPY)
-
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_BIN_OPT) $< -o $@
 
@@ -75,6 +68,7 @@ oldrun : manux
 #    Première phase : la configuration générale
 #-------------------------------------------------------------------------------
 configuration : usrinc make.conf
+
 #    Mise à jour des include du monde utilisateur
 usr/include/manux/%.h : include/manux/%.h
 	cp $< $@
@@ -132,6 +126,32 @@ manux : configuration composants $(NOYAU_BIN) bootfloppy
 # L'image multiboot est en fait un noyau linké avec le code pour la compatibilité multiboot
 multiboot : configuration  multinit  composants 
 	(cd noyau ; make noyau.elf)
+
+# Une image ISO
+iso : multiboot
+	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) $(NOYAU_ELF)
+
+#-------------------------------------------------------------------------------
+#    Lancement du noyau
+#-------------------------------------------------------------------------------
+run : multiboot
+	$(RUN_MANUX_ELF)
+
+oldrun : manux
+	$(RUN_MANUX_FLOPPY)
+
+runiso : iso
+	$(RUN_MANUX_ISO)
+
+vbrun : iso
+	$(RUN_MANUX_VBOX)
+
+multiso :
+	cp include/manux/config.h "config.h-`date`"
+	rm noyaux/*
+	(for c in multiconf/* ; do (cp $$c include/manux/config.h ; make clean ; make multiboot ; cp noyau/noyau.elf noyaux/`basename $$c .h`) ; done)
+	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
+	echo "\033[0;31m*** ATTENTION config.h écrasé ! ***\033[0m"
 
 #-------------------------------------------------------------------------------
 #    Quelques cibles complémentaires en vrac

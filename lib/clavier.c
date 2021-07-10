@@ -55,6 +55,9 @@ void initialiserClavier()
 #define KEYCODE_F10  0x44
 
 
+/*
+ * Le handler du clavier. Il n'a pas besoin de paramêtre
+ */
 void handlerClavier(void * toto)
 {
    uint8_t etat;
@@ -90,11 +93,9 @@ void handlerClavier(void * toto)
 #   endif
       if (codeClavier & 0x80) {
       } else {
-	//         printk(" !!! 0x%x !!!\n", codeClavier);
          if (cons->bufferClavier){ 
             if (cons->nbCarAttente < 4096) {
                cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] = keymap[codeClavier];
-	       //	       printk("b[%d] = 0x%x\n", (cons->indiceProchainCar + cons->nbCarAttente)%4096, keymap[codeClavier]);
 	       cons->nbCarAttente++;
              }
  	 }

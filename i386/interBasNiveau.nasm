@@ -1,37 +1,23 @@
-;-------------------------------------------------------------------------------
+;===============================================================================
 ;      Définition des fonctions de bas niveau permettant la gestion des
 ;   interruptions.
 ;      Sauf indication contraire, les paramètres (s'il y en a) sont passés "à la
 ;   C", c'est à dire empilés en ordre inverse et dépilés par l'appelant.
 ;
 ;                                                      (C) Manu Chaput 2000-2021
-;-------------------------------------------------------------------------------
+;===============================================================================
 bits 32
 
 extern handlerPanique
 
-%ifdef MANUX_CLAVIER
-extern handlerClavier
-%endif
-
-%ifdef MANUX_APPELS_SYSTEME
-extern vecteurAppelsSysteme         ; WARNING, inutile si on vire les AS de là
-extern entrerAppelSysteme
-extern sortirAppelSysteme
-%endif
-
-extern autoriserIRQ
-
-; Gestion centralisee des IRQ
-extern MANUX_HANDLER_IRQ            ; La fonction de gestion, liée au PIC
-
+;--------------------------------------------------------------------------------
+;   Exportation des fonctions définies dans ce fichier
+;--------------------------------------------------------------------------------
 %assign i 0
 %rep 16
 global stubHandlerIRQ%[i]
 %assign i i+1
 %endrep
-
-global stubHandlerNop
 
 %assign i 0
 %rep 32
@@ -40,7 +26,6 @@ global stubHandlerPanique_%[i]
 %endrep
 
 global handlerAppelSysteme          ; WARNING, à mettre ailleurs
-
 global halt                         ; WARNING, à mettre ailleurs
 
 ;===============================================================================
@@ -51,6 +36,9 @@ global halt                         ; WARNING, à mettre ailleurs
 ; qui dépend du remapping configuré sur le PIC) puis invoque le gestionnaire
 ; global (une fonction C répondant au doux nom de handlerIRQ).
 ;===============================================================================
+
+extern MANUX_HANDLER_IRQ            ; La fonction de gestion, liée au PIC
+
 ; Un handler pour l'IRQ n
 ;------------------------
 %macro stubHandlerIRQn 1
@@ -79,6 +67,10 @@ stubHandlerIRQ%[i] : stubHandlerIRQn i
 ;   Gestion des appels système
 ;===============================================================================
 %ifdef MANUX_APPELS_SYSTEME
+extern vecteurAppelsSysteme
+extern entrerAppelSysteme
+extern sortirAppelSysteme
+
 ; Le handler des appels systèmes
 ;-------------------------------
 handlerAppelSysteme :
@@ -118,6 +110,7 @@ handlerAppelSysteme :
 
 ; Un handler qui ne fait rien ...
 ;--------------------------------
+global stubHandlerNop 
 stubHandlerNop :
         iret                        ; On revient ...
 
@@ -148,9 +141,4 @@ stubHandlerPanique_%[i]: stubHandlerPanique i
 halt :
         hlt
         jmp halt
-
-; Variables WARNING à mettre ailleurs
-;----------
-Port8259_1  equ 020h
-Port8259_2  equ 0A0h
 
