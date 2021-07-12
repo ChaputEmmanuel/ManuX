@@ -8,11 +8,12 @@ ISO_FICHIER=$2
 shift
 shift
 
-/usr/bin/mkdir "$ISO_REP_BASE" > /dev/null 2>&1
-/usr/bin/mkdir "$ISO_REP_BASE/boot" > /dev/null 2>&1
-/usr/bin/mkdir "$ISO_REP_BASE/boot/grub" > /dev/null 2>&1
+(/usr/bin/mkdir "$ISO_REP_BASE" || true) > /dev/null 2>&1
+(/usr/bin/mkdir "$ISO_REP_BASE/boot" || true) > /dev/null 2>&1
+(/usr/bin/mkdir "$ISO_REP_BASE/boot/grub" || true) > /dev/null 2>&1
 
-rm "$ISO_REP_BASE"/boot/grub/grub.cfg
+(rm "$ISO_REP_BASE"/boot/grub/grub.cfg || true) > /dev/null 2>&1
+
 
 for NOYAU in $*
 do

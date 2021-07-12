@@ -8,7 +8,6 @@ KERN_SRC = noyau.$(ASM_EXT)
 
 BSEC_BIN = bootsector.bin
 INIT_BIN = init-manux.bin
-#MULTINIT_BIN = multinit-manux.bin
 
 ASM         = nasm
 
@@ -39,7 +38,7 @@ MB_MANUX_ELF = mb-manux.elf
 # Le fichier décrivant la taille du noyau
 sinclude $(wildcard taille.conf)
 
-all : floppyboot multinit
+all : floppyboot grubinit
 
 # L'image disquette nécessite un certain nombre de fichiers
 floppyboot : $(BSEC_BIN) $(INIT_BIN) $(CRT0_ELF) $(INIT_ELF) 
@@ -52,7 +51,7 @@ bourrage : $(NOYAU_BIN) $(TAILLE_CONF)
 $(TAILLE_CONF) : $(NOYAU_BIN) $(OUTILS)
 	../outils/taillenoyau $(NOYAU_BIN) > $@
 
-multinit :  $(INIT_ELF) $(MB_MANUX_ELF)
+grubinit :  $(INIT_ELF) $(MB_MANUX_ELF)
 
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_DEF) $(ASM_BIN_OPT) $< -o $@

@@ -1,6 +1,17 @@
 # Quelques éléments globaux qui n'ont pas trop de raison d'être modifiés.
 # Je les place ici pour alléger un peu les Makefile
 #
+#==========================================================================
+
+# Le fichier de configuration générale. Il n'est pas nécessaire de le
+# définir. Toute la configuration par défaut est dans le fichier
+# include/manux/config.h
+#
+# L'idée est de placer des fichiers de configuration dans le répertoire
+# multiconf. Cela permettra de construire une ISO avec les noyaux ainsi
+# configurés
+#
+#MANUX_FICHIER_CONFIG = "$(ROOTDIR)/multiconf/collab.h"
 
 # Position des librairies
 LIBI386   = $(ROOTDIR)/i386/libi386.a
@@ -8,8 +19,8 @@ LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
 LIBSF     = $(ROOTDIR)/sf/libsf.a
 LIBUSR    = $(ROOTDIR)/usr/libusr.a
 
-# Une version du noyau linké en format binaire pour le boot floppy (voir si l'ELF ne fonctionnerait pas !)
-# et une en ELF
+# Une version du noyau linké en format binaire pour le boot floppy
+# (voir si l'ELF ne fonctionnerait pas !) et une en ELF
 NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.bin
 NOYAU_ELF     = $(ROOTDIR)/noyau/noyau.elf
 
@@ -19,21 +30,70 @@ LD_SCRIPT     = manux.lds
 # Le fichier de boot pour multiboot
 MB_MANUX_ELF  = $(ROOTDIR)/boot/mb-manux.elf
 
-# Gestion de l'assembleur
+#--------------------------------------------------------------------------
+#   Gestion de l'assembleur
+#--------------------------------------------------------------------------
 ASM_EXT     = nasm
 ASM         = nasm
+ASM_BIN_OPT = -f bin
 
 TAILLE_CONF = taille.conf
 
 COMPRESS = gzip
 
-# Création de l'ISO
+#--------------------------------------------------------------------------
+#   Création des images
+#--------------------------------------------------------------------------
 CREER_ISO=$(ROOTDIR)/outils/creationISO
 ISO_REP_BASE=$(HOME)/tmp/isodir
 ISO_FICHIER=manux.iso
 
-# Les commandes pour lancer ManuX dans un émulateur
-RUN_MANUX_FLOPPY = qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
-RUN_MANUX_ELF    = qemu-system-i386 -m 64M -kernel $(ROOTDIR)/noyau/noyau.elf
-RUN_MANUX_ISO    = qemu-system-i386 -m 64M -cdrom manux.iso   
+#--------------------------------------------------------------------------
+#   Les commandes pour lancer ManuX dans un émulateur
+#--------------------------------------------------------------------------
+RUN_MANUX_RAMSIZE = 64M
+RUN_MANUX_FLOPPY = qemu-system-i386 \
+                   -drive format=raw,file=manux,index=0,if=floppy \
+		   -m $(RUN_MANUX_RAMSIZE)
+RUN_MANUX_ELF    = qemu-system-i386 \
+                   -kernel $(ROOTDIR)/noyau/noyau.elf \
+		   -m $(RUN_MANUX_RAMSIZE)
+RUN_MANUX_ISO    = qemu-system-i386 \
+		   -m $(RUN_MANUX_RAMSIZE) \
+		   -cdrom
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX
+
+#--------------------------------------------------------------------------
+# Les paramètres du gcc
+#
+#   -fno-stack-protector permet d'éviter les "undefined references to
+# `__stack_chk_fail'" sur les GCC récents
+#
+#   Optimisation
+#     -O2 par défaut
+#     -O0 pour debuguer
+#
+#--------------------------------------------------------------------------
+CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
+           -g -gdwarf  \
+	   -I$(ROOTDIR)/include  \
+           -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
+           -fno-toplevel-reorder \
+           -fno-stack-protector \
+           -O0 \
+         # -fomit-frame-pointer
+
+CFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))
+
+#..........................................................................
+#   Les flags pour le monde utilisateur
+#..........................................................................
+UCFLAGS   = -fno-pie -m32 -march=i686 -Wall \
+           -I../usr/include \
+           -nostdinc -fno-builtin \
+           -fomit-frame-pointer \
+           -fno-toplevel-reorder \
+           -fno-stack-protector \
+           -O2
+
+UCFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))

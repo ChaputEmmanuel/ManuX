@@ -9,6 +9,13 @@
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
+
+/*
+ * On peut définir un autre fichier de configuration générale
+ */
+#ifdef MANUX_FICHIER_CONFIG
+#include MANUX_FICHIER_CONFIG
+#else
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
@@ -171,11 +178,6 @@
 /*----------------------------------------------------------------------------*/
 /*   Configuration générale du noyau                                          */ 
 /*----------------------------------------------------------------------------*/
-/*
- * Un "noyau" minimaliste : il affiche juste un message. Le but est de
- * le réduire à quasiment rien pour mettre en place les mécanismes de
- * boot.
- */
 
 /*
  * La fréquence du timer
@@ -299,4 +301,5 @@
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
 #endif
 
-#endif
+#endif  // MANUX_CONFIG
+#endif  // MANUX_FICHIER_CONFIG
