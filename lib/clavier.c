@@ -19,9 +19,10 @@
 #include <keymaps/french.h>
 
 /*
- * Code de la dernère touche manipulée
+ * Description de l'état courant du clavier
  */
-int codeClavier = 0;
+int codeClavier = 0; // Code de la dernière touche manipulée
+int shiftActif  = 0;
 
 void handlerClavier(void * toto);
 
@@ -54,6 +55,7 @@ void initialiserClavier()
 #define KEYCODE_F9   0x43
 #define KEYCODE_F10  0x44
 
+#define SC_SHIFT_GAUCHE 0x2a
 
 /*
  * Le handler du clavier. Il n'a pas besoin de paramêtre
@@ -66,8 +68,18 @@ void handlerClavier(void * toto)
    if (etat && 0x01) {
       inb(0x60, codeClavier);
       codeClavier &= 0xFF;
-      printk("[KBD-0x%x]", codeClavier);
 
+      // Gestion des shifts
+      if (codeClavier == SC_SHIFT_GAUCHE) {
+         shiftActif++;
+	 return;
+      }
+      if (codeClavier == (SC_SHIFT_GAUCHE | 0x80)) {
+         shiftActif--;
+	 return;
+      }
+      printk("[KBD-0x%x / %d]", codeClavier, shiftActif);
+      
 #ifdef MANUX_CONSOLES_VIRTUELLES
       if (codeClavier == KEYCODE_ESC) {
          basculeConsoleDemandee = TRUE;
@@ -95,7 +107,8 @@ void handlerClavier(void * toto)
       } else {
          if (cons->bufferClavier){ 
             if (cons->nbCarAttente < 4096) {
-               cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] = keymap[codeClavier];
+               cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] =
+		 shiftActif ?keymapShift[codeClavier]:keymap[codeClavier];
 	       cons->nbCarAttente++;
              }
  	 }
