@@ -139,10 +139,10 @@ void afficherEtatTaches()
    printk("\n-------------------------------------------------------------------------------\n");
 }
 
-void aDummyKernelTask()
-/*
- * Le corps d'une tâche à exéctuer lorsqu'on n'a que ça à faire, ...
+/**
+ * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
  */
+void aDummyKernelTask()
 {
    printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 

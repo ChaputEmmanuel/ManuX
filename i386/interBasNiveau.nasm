@@ -9,6 +9,7 @@
 bits 32
 
 extern handlerPanique
+extern gestionGeneraleInterruption
 
 ;--------------------------------------------------------------------------------
 ;   Exportation des fonctions définies dans ce fichier
@@ -114,7 +115,7 @@ global stubHandlerNop
 stubHandlerNop :
         iret                        ; On revient ...
 
-; Un handler qui va afficher un message
+; Un handler qui va afficher un message (WARNING à virer dès que la suite est validée)
 ;--------------------------------------
 %macro   stubHandlerPanique 1
 
@@ -128,6 +129,22 @@ stubHandlerNop :
 
          iret
 %endmacro
+
+; Un handler général pour toutes les interruptions
+;-------------------------------------------------
+%macro   baseGestionGeneraleInterruption 1
+
+         pusha                ; Je pense qu'on peut s'en passer, ...
+	 push dword %1        ; On push le numéro en 32 bits
+
+         call gestionGeneraleInterruption
+	 
+         add esp, 4           ; On pop le numéro
+	 popa
+
+         iret
+%endmacro
+
 
 ; Génération de tous les handlers de panique
 %assign i 0

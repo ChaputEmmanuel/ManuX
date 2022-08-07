@@ -37,7 +37,7 @@ void setFrequenceHorloge(uint16_t freqHz)
    decompte = 1193200 / freqHz;
 
    // On initialise la fréquence du timer 0 WARNING a rendre plus propre
-   outb(0x43, 0x34); // wAS 36
+   outb(0x43, 0x34); // Was 36
    outb(0x40, decompte & 0xFF);
    outb(0x40, (decompte >> 8) & 0xFF);
 }

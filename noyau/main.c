@@ -16,6 +16,9 @@
 #include <manux/memoire.h>
 #include <manux/atomique.h>
 #include <manux/appelsysteme.h>
+#ifdef MANUX_PCI
+#   include <manux/pci.h>
+#endif
 #ifdef MANUX_RAMDISK
 #   include <manux/ramdisk.h>
 #endif
@@ -30,6 +33,11 @@
 #endif
 #ifdef MANUX_FS
 #   include <manux/fichier.h>
+#endif
+#ifdef MANUX_RESEAU
+#   ifdef MANUX_VIRTIO_NET
+#      include <manux/virtio-net.h>
+#   endif
 #endif
 
 extern void init(); // Faire un init.h
@@ -110,6 +118,22 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
    printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
+#endif
+
+   /* Initialisation du bus PCI */
+#ifdef MANUX_PCI
+   printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
+   PCIEnumerationDesEquipements();
+   printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
+#endif
+
+   /* Initialisation du réseau */
+#ifdef MANUX_RESEAU
+   printk_debug(DBG_KERNEL_START, "Initialisation du reseau ...\n");
+#   ifdef MANUX_VIRTIO_NET
+   virtioNetInit();
+#   endif
+   printk_debug(DBG_KERNEL_START, "Reseau initialise\n");
 #endif
 
    /* Initialisation de la gestion des systèmes de fichiers */

@@ -62,6 +62,19 @@ void initialiserIDT();
  * Initialiser l'IDT (Interrupt Description Table)
  */
 
+typedef void (* FonctionGestionInteruption)(uint32_t itNum, TousRegistres registres,
+         uint32_t eip, uint32_t cs, uint32_t eFlags);
+/**
+ * Le type d'une fonction de e gestion d'interruption
+ */
+
+int definirFonctionGestionInteruption(int num,
+   				FonctionGestionInteruption fg);
+/**
+ * Définition de la fonction de gestion d'une interuption
+ * @return : 0 si c'est bon
+ */
+
 #define cli() __asm__("cli"::);
 /*
  * Interdire les interruptions

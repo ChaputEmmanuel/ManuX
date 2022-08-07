@@ -38,20 +38,32 @@ l'interruption.
 %
 %...............................................................................
 \subsection{Le {\em Programmable Interrupt Controller}}
+   Les interruptions peuvent arriver depuis plusieurs sources. Celles
+provenant de périphériques (clavier, cartes réseau, \ldots) sont
+éventuellement acheminées au travers de circuits spécialisés appelés
+{\sc pic}.
 
-   Le {\sc pic} est un circuit électronique permettant de gérer les
+   Le {\sc pic} est donc un circuit électronique permettant de gérer les
 {\sc irq} provenant de l'environnement afin de les délivrer au
 processeur (c'est en fait une fonction du {\em southbridge}).
 
    Je ne m'étalerai pas ici sur les différents types de {\sc pic} ni
-sur leur fonctionnement. Ce qu'il est nécessaire de comprendre ici,
-c'es qu'il existe donc un circuit avec lequel le processeur va devoir
+sur leur fonctionnement. Ce qu'il est nécessaire de comprendre, c'est
+qu'il existe donc un circuit avec lequel le processeur va devoir
 dialoguer pour une partie de la gestion des interruptions.
+
+   Nous verrons plus loin que ManuX gère le 8259A qui est un {\sc pic}
+conçu par Intel.
 
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
 \subsection{Masquage}
+
+   Une interruption peut éventuellement être  {\em masquée}, ce qui
+signifie qu'elle ne sera pas délivrée au processeur, qui ne
+s'appercevra donc pas qu'un événement s'est produit. Mais le masquage
+d'une interruption n'empêche évidemment pas cet événement d'arriver !
 
 %-------------------------------------------------------------------------------
 %
@@ -96,7 +108,7 @@ y en a deux, le {\sc pic} 2 étant derrière le {\sc pic} 1 (en
     \item[Le registre de commande] accessible par le port 0x20 pour le
       circuit maître et 0xa0 pour le circuit esclave ;
     \item[Le registre de données] accessible par le port 0x21 pour le
-      circuit maître et 0xa1 pour le circuit esclave ;
+      circuit maître et 0xa1 pour le circuit esclave.
 \end{description}
 
    Une phase d'initialisation est nécessaire afin de configurer

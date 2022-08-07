@@ -1,7 +1,7 @@
 .SUFFIXES : .tex .pdf
 
 PDFLATEX = pdflatex
-DOCS_PDF = ManuX.pdf boot-part.pdf inter-part.pdf
+DOCS_PDF = ManuX.pdf boot-part.pdf inter-part.pdf memoire-part.pdf
 
 all : $(DOCS_PDF)
 

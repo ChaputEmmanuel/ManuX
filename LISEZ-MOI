@@ -19,6 +19,10 @@ Feuille de route
    
 En cours
 --------
+   VIRTIO : premriers balbutiements ! Apparemment qemu voit la
+   création des files du virtio-net, mais pas la notification du
+   premier envoi naïf, ...
+  
    . Finir d'éclaircir les makefile. Voir en particulier la cible "bootage"
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...
@@ -33,6 +37,9 @@ EN COURS : allocation mémoire (dont doc à restructurer).
    
    A FAIRE :
 
+   Vite fait : dans mémoire, lireNombrePages et lireNombrePagesDispo
+   pour affichage
+   
    . utilisation de pandoc, par exemple :
 
 pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html

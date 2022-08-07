@@ -148,6 +148,13 @@
 /*   Configuration des interruptions                                          */ 
 /*----------------------------------------------------------------------------*/
 
+/**
+ * Combien d'interuptions ?
+ */
+#ifndef MANUX_NB_INTERUPTIONS
+#   define MANUX_NB_INTERUPTIONS 256
+#endif
+
 /*
  * On utilise ici des intel 8259a
  */
@@ -285,6 +292,27 @@
 #define MANUX_CLAVIER_CONSOLE
 
 /*----------------------------------------------------------------------------*/
+/*   Prise en compte du bus PCI.                                              */
+/*----------------------------------------------------------------------------*/
+#define MANUX_PCI
+
+/*
+ * Pour le moment, on ne cherche qu'un bus, donc aucun risque d'avoir plus de 
+ * 32 équipements.
+ */
+#define MANUX_NB_MAX_EQUIPEMENTS_PCI 32
+
+/*----------------------------------------------------------------------------*/
+/* Le réseau.                                                                 */
+/*----------------------------------------------------------------------------*/
+#define MANUX_RESEAU
+
+/*----------------------------------------------------------------------------*/
+/* Les pilotes de périphériques.                                              */
+/*----------------------------------------------------------------------------*/
+#define MANUX_VIRTIO_NET
+
+/*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */
 /* Sans exhaustivité malheureusement.                                         */
 /*----------------------------------------------------------------------------*/
@@ -299,6 +327,14 @@
 
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
+#endif
+
+#if defined(MANUX_VIRTIO_NET) && !defined(MANUX_RESEAU)
+#   error "VIRTIO_NET est un périphérique nécessitant MANUX_RESEAU"
+#endif
+
+#if defined(MANUX_VIRTIO_NET) && !defined(MANUX_PCI)
+#   error "VIRTIO_NET est un périphérique nécessitant MANUX_PCI"
 #endif
 
 #endif  // MANUX_CONFIG

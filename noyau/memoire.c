@@ -183,9 +183,44 @@ void * allouerPage()
    return pageAllouee;
 }
 
+/**
+ * Combien de pages libes à partir de la page numeroPage incluse ?
+ */
+int nombrePagesLibres(unsigned int numeroPage)
+{
+   int result = 0;
+
+   while ((proprietairePage[numeroPage+result] == (TacheID) 0)
+	  && (numeroPage + ++result < nombrePages)) {
+   }
+   return result;
+}
+
+/** 
+ * Allocation de plusieurs pages contigues
+ */
 void * allouerPages(unsigned int nombre)
 {
-   return NULL;
+   void * result = NULL;
+   int    numeroPage = 0;
+
+   // On cherche la première page libre
+   while (  (numeroPage < nombrePages - nombre)
+	    && (nombrePagesLibres(numeroPage) < nombre)) {
+     // Inutile d'aller voir les suivantes, qui sont trop peu
+     // nombreuses, ni celle d'après, qui est allouée.
+     numeroPage += nombrePagesLibres(numeroPage) + 1;
+   }
+
+   /* Si on trouve une page dispo */
+   if ((numeroPage < nombrePages)  && (nombrePagesLibres(numeroPage) >= nombre)){
+     for (int i = numeroPage; i < numeroPage+nombre; i++) {
+         reserverPage(i);
+     }
+     result = (void *) (numeroPage * MANUX_TAILLE_PAGE);
+   }
+
+   return result;
 }
 
 void libererPage(void * pageLiberee)

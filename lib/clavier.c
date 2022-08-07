@@ -78,7 +78,7 @@ void handlerClavier(void * toto)
          shiftActif--;
 	 return;
       }
-      printk("[KBD-0x%x / %d]", codeClavier, shiftActif);
+      //printk("[KBD-0x%x / %d]", codeClavier, shiftActif);
       
 #ifdef MANUX_CONSOLES_VIRTUELLES
       if (codeClavier == KEYCODE_ESC) {

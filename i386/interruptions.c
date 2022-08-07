@@ -24,6 +24,11 @@
 extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
 #endif
 
+/**
+ * La table des fonctions de gestion des interuptions
+ */
+FonctionGestionInteruption fonctionDeGestionInteruption[MANUX_NB_INTERUPTIONS];
+
 void exDivisionParZero(TousRegistres registres,
                        uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
@@ -63,75 +68,28 @@ void chargerIDT(IDT idt)
 
 }
 
-void initialiserIDT()
+int definirFonctionGestionInteruption(int num,
+   				FonctionGestionInteruption fg)
+/**
+ * Définition de la fonction de gestion d'une interuption
+ * @return : 0 si c'est bon
+ */
 {
-   int i;
-   IDT idt = (IDT) MANUX_ADRESSE_IDT;
-
-   /* Comportement par défaut : on ne fait rien ! */
-   for (i = 0; i < 256; i++) {
-      positionnerHandlerInterruption(idt, i, stubHandlerNop);
-   }
-   
-   positionnerHandlerInterruption(idt, 0, stubHandlerPanique_0);
-   positionnerHandlerInterruption(idt, 1, stubHandlerPanique_1);
-   positionnerHandlerInterruption(idt, 2, stubHandlerPanique_2);
-   positionnerHandlerInterruption(idt, 3, stubHandlerPanique_3);
-   positionnerHandlerInterruption(idt, 4, stubHandlerPanique_4);
-   positionnerHandlerInterruption(idt, 5, stubHandlerPanique_5);
-   positionnerHandlerInterruption(idt, 6, stubHandlerPanique_6);
-   positionnerHandlerInterruption(idt, 7, stubHandlerPanique_7);
-   positionnerHandlerInterruption(idt, 8, stubHandlerPanique_8);
-   positionnerHandlerInterruption(idt, 9, stubHandlerPanique_9);
-   positionnerHandlerInterruption(idt, 10, stubHandlerPanique_10);
-   positionnerHandlerInterruption(idt, 11, stubHandlerPanique_11);
-   positionnerHandlerInterruption(idt, 12, stubHandlerPanique_12);
-   positionnerHandlerInterruption(idt, 13, stubHandlerPanique_13);
-   positionnerHandlerInterruption(idt, 14, stubHandlerPanique_14);
-   positionnerHandlerInterruption(idt, 15, stubHandlerPanique_15);
-   positionnerHandlerInterruption(idt, 16, stubHandlerPanique_16);
-   positionnerHandlerInterruption(idt, 17, stubHandlerPanique_17);
-   positionnerHandlerInterruption(idt, 18, stubHandlerPanique_18);
-   positionnerHandlerInterruption(idt, 19, stubHandlerPanique_19);
-   positionnerHandlerInterruption(idt, 20, stubHandlerPanique_20);
-   positionnerHandlerInterruption(idt, 21, stubHandlerPanique_21);
-   positionnerHandlerInterruption(idt, 22, stubHandlerPanique_22);
-   positionnerHandlerInterruption(idt, 23, stubHandlerPanique_23);
-   positionnerHandlerInterruption(idt, 24, stubHandlerPanique_24);
-   positionnerHandlerInterruption(idt, 25, stubHandlerPanique_25);
-   positionnerHandlerInterruption(idt, 26, stubHandlerPanique_26);
-   positionnerHandlerInterruption(idt, 27, stubHandlerPanique_27);
-   positionnerHandlerInterruption(idt, 28, stubHandlerPanique_28);
-   positionnerHandlerInterruption(idt, 29, stubHandlerPanique_29);
-   positionnerHandlerInterruption(idt, 30, stubHandlerPanique_30);
-   positionnerHandlerInterruption(idt, 31, stubHandlerPanique_31);
-
-   // Les handler d'IRQ
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  0, stubHandlerIRQ0);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  1, stubHandlerIRQ1);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  2, stubHandlerIRQ2);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  3, stubHandlerIRQ3);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  4, stubHandlerIRQ4);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  5, stubHandlerIRQ5);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  6, stubHandlerIRQ6);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  7, stubHandlerIRQ7);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  8, stubHandlerIRQ8);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  9, stubHandlerIRQ9);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 10, stubHandlerIRQ10);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 11, stubHandlerIRQ11);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 12, stubHandlerIRQ12);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 13, stubHandlerIRQ13);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 14, stubHandlerIRQ14);
-   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 15, stubHandlerIRQ15);
-   
-#ifdef MANUX_APPELS_SYSTEME
-   /* Le handler de l'interruption utilisée pour les appels système */
-   positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
-#endif
-   
-   /* On charge l'IDT */
-   chargerIDT(idt);
+   fonctionDeGestionInteruption[num] = fg;
+   return 0;
 }
+
+void gestionGeneraleInterruption(uint32_t itNum, TousRegistres registres,
+                                 uint32_t eip, uint32_t cs, uint32_t eFlags)
+/**
+ * Fonction de base de gestion d'un interruption. Elle va se charger
+ * de rediriger sur la bonne fonction de gestion de l'interruption
+ * s'il en existe une, et sur la fonction de panique sinon.
+ */
+{
+   fonctionDeGestionInteruption[itNum](itNum, registres, eip, cs, eFlags);
+}
+
 
 /*
  * Affichage de la valeur v en hexa sur n chiffres à la position l, c
@@ -227,6 +185,10 @@ void ecranDeLaMort(uint32_t itNum, TousRegistres registres,
 
 void handlerPanique(uint32_t itNum, TousRegistres registres,
 		    uint32_t eip, uint32_t cs, uint32_t eFlags)
+/**
+ * Gestion d'une interruption non connue. On affichera ce que l'on peut
+ * à l'écran pour aider l'utilisateur, ...
+ */
 {
    char * ecran = MANUX_CON_SCREEN;
    int d = 1;
@@ -260,3 +222,89 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
    halt();
 }
  
+void initialiserIDT()
+/**
+ * Initialisation de de la table des descripteurs d'interruption
+ */
+{
+   int i;
+   IDT idt = (IDT) MANUX_ADRESSE_IDT;
+
+   // On initialise la table des fonctions de gestion des interuptions
+   for (i = 0; i < 32; i++) {
+      // Pour les exceptions, on panique !
+      fonctionDeGestionInteruption[i] = handlerPanique;
+   }
+   for (i = 32; i < MANUX_NB_INTERUPTIONS; i++) {
+      // Par défaut, on ne fait rien !
+      fonctionDeGestionInteruption[i] = stubHandlerNop; 
+   }
+   
+   // On passe par une fonction de gestion commune qui ensuite
+   // appellera la bonne fonction de gestion
+   for (i = 0; i < MANUX_NB_INTERUPTIONS; i++) {
+      //      positionnerHandlerInterruption(idt, i, stubHandlerNop);
+      positionnerHandlerInterruption(idt, i, gestionGeneraleInterruption);
+   }
+
+   /*
+   positionnerHandlerInterruption(idt, 0, stubHandlerPanique_0);
+   positionnerHandlerInterruption(idt, 1, stubHandlerPanique_1);
+   positionnerHandlerInterruption(idt, 2, stubHandlerPanique_2);
+   positionnerHandlerInterruption(idt, 3, stubHandlerPanique_3);
+   positionnerHandlerInterruption(idt, 4, stubHandlerPanique_4);
+   positionnerHandlerInterruption(idt, 5, stubHandlerPanique_5);
+   positionnerHandlerInterruption(idt, 6, stubHandlerPanique_6);
+   positionnerHandlerInterruption(idt, 7, stubHandlerPanique_7);
+   positionnerHandlerInterruption(idt, 8, stubHandlerPanique_8);
+   positionnerHandlerInterruption(idt, 9, stubHandlerPanique_9);
+   positionnerHandlerInterruption(idt, 10, stubHandlerPanique_10);
+   positionnerHandlerInterruption(idt, 11, stubHandlerPanique_11);
+   positionnerHandlerInterruption(idt, 12, stubHandlerPanique_12);
+   positionnerHandlerInterruption(idt, 13, stubHandlerPanique_13);
+   positionnerHandlerInterruption(idt, 14, stubHandlerPanique_14);
+   positionnerHandlerInterruption(idt, 15, stubHandlerPanique_15);
+   positionnerHandlerInterruption(idt, 16, stubHandlerPanique_16);
+   positionnerHandlerInterruption(idt, 17, stubHandlerPanique_17);
+   positionnerHandlerInterruption(idt, 18, stubHandlerPanique_18);
+   positionnerHandlerInterruption(idt, 19, stubHandlerPanique_19);
+   positionnerHandlerInterruption(idt, 20, stubHandlerPanique_20);
+   positionnerHandlerInterruption(idt, 21, stubHandlerPanique_21);
+   positionnerHandlerInterruption(idt, 22, stubHandlerPanique_22);
+   positionnerHandlerInterruption(idt, 23, stubHandlerPanique_23);
+   positionnerHandlerInterruption(idt, 24, stubHandlerPanique_24);
+   positionnerHandlerInterruption(idt, 25, stubHandlerPanique_25);
+   positionnerHandlerInterruption(idt, 26, stubHandlerPanique_26);
+   positionnerHandlerInterruption(idt, 27, stubHandlerPanique_27);
+   positionnerHandlerInterruption(idt, 28, stubHandlerPanique_28);
+   positionnerHandlerInterruption(idt, 29, stubHandlerPanique_29);
+   positionnerHandlerInterruption(idt, 30, stubHandlerPanique_30);
+   positionnerHandlerInterruption(idt, 31, stubHandlerPanique_31);
+   */
+   
+   // Les IRQs sont gérées au travers du PIC
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  0, stubHandlerIRQ0);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  1, stubHandlerIRQ1);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  2, stubHandlerIRQ2);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  3, stubHandlerIRQ3);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  4, stubHandlerIRQ4);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  5, stubHandlerIRQ5);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  6, stubHandlerIRQ6);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  7, stubHandlerIRQ7);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  8, stubHandlerIRQ8);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  9, stubHandlerIRQ9);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 10, stubHandlerIRQ10);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 11, stubHandlerIRQ11);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 12, stubHandlerIRQ12);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 13, stubHandlerIRQ13);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 14, stubHandlerIRQ14);
+   positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ + 15, stubHandlerIRQ15);
+   
+#ifdef MANUX_APPELS_SYSTEME
+   /* Le handler de l'interruption utilisée pour les appels système */
+   positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
+#endif
+   
+   /* On charge l'IDT */
+   chargerIDT(idt);
+}

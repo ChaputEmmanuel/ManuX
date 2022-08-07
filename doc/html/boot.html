@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Le processus de boot</title>
+  <meta name="author" content="Chaput Emmanuel" />
+  <title>boot-part</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -15,15 +16,16 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Le processus de boot</h1>
+<h1 class="title">Le boot</h1>
+<p class="author">Chaput Emmanuel</p>
 </header>
-<h1 id="le-boot">Le boot</h1>
+<h1 id="introduction">Introduction</h1>
 <p>Nous allons ici voir comment en arriver à un noyau présent dans la mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes</p>
 <ul>
 <li><p>Nous commencerons par nous fonder sur une situation “à l’ancienne” avec un <span class="smallcaps">pc</span> doté d’un lecteur de disquettes. Nous utiliserons alors le <span class="smallcaps">bios</span> du <span class="smallcaps">pc</span> pour charger le noyau en mémoire, lui passer quelques informations et le faire démarrer.</p></li>
 <li><p>Nous observerons ensuite des outils un peu plus modernes permettant de démarrer de façon un peu plus simple et plus indépendante du matériel sous-jacent.</p></li>
 </ul>
-<h2 id="démarage-à-partir-dune-disquette">Démarage à partir d’une disquette</h2>
+<h1 id="démarage-à-partir-dune-disquette">Démarage à partir d’une disquette</h1>
 <p>Nous allons donc devoir mettre en œuvre le boot du noyau dans cette configuration. Pour cela, nous allons construire un fichier qui sera placé sur une disquette à partir de laquelle notre système pourra démarrer. Ntons que nous utiliserons ici un émulateur comme Qemu auquel nous donnerons le chemin vers ce fichier et à qui nous demanderons de démarrer depuis cette disquette.</p>
 <p>Observons la structure de ce fichier puis regardons comment en construire chaque partie.</p>
 <h2 id="construction-du-fichier-de-démarrage">Construction du fichier de démarrage</h2>
@@ -108,9 +110,10 @@ call  eax </code></pre>
 <h3 id="démarrage-du-noyau-noyaumain.c">Démarrage du noyau (<span>noyau/main.c</span>)</h3>
 <p>La dernière action du programme d’initalisation est donc l’exécution de la fonction <code>_start()</code>. Comme je l’ai dit précédemment, il ne s’agit pas d’un appel de foncion C classique, puisque les deux morceaux de code ne sont pas liés entre eux, mais d’un saut à l’adresse de la fonction (le tout après avoir empilé les paramètres).</p>
 <p>Ceci termine donc la description de toute la quincailleire qui nous permet d’arriver au début de l’exécution du code du noyau. Nous allons commencer la description de ce dernier par la mise en place des outils de base dont il aura besoin.</p>
-<h2 id="utilisation-de-multiboot">Utilisation de <span><em>Multiboot</em></span></h2>
+<h1 id="utilisation-de-multiboot">Utilisation de <span><em>Multiboot</em></span></h1>
 <p>Nous allons ici utiliser la spécification <span><em>Multiboot</em></span> définie par la <span><em>Free Software Foundation</em></span> qui va nous permettre d’utiliser les services d’outils tels que <span class="smallcaps">grub</span> afin de grandement simplifier le chargement du noyau de ManuX.</p>
 <p>Cela nous permettra également d’utiliser des outils un peu plus modernes qu’un lecteur de disquettes et, par voie de conséquence, de faire fonctionner ManuX sur autre chose que des machines virtuelles ou hors d’age !</p>
+<h2 id="création-dun-entête">Création d’un entête</h2>
 <h2 id="réalisation-dune-image-iso">Réalisation d’une image <span>iso</span></h2>
 </body>
 </html>

@@ -75,7 +75,7 @@ void init()
    appelSystemeInutile();
    //printk("Et dix de pouet\n");
    
-      n = creerNouvelleTache(deuxiemeTache, FALSE);
+   n = creerNouvelleTache(deuxiemeTache, FALSE);
 
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(1);

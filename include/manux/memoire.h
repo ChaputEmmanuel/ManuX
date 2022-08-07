@@ -15,6 +15,11 @@
 
 #define MANUX_DEBUT_MEMOIRE_ETENDUE 0x100000
 
+/**
+ * Combien de pages pour stocker n octets ?
+ */
+#define NB_PAGES(n) ((n + MANUX_TAILLE_PAGE - 1)/MANUX_TAILLE_PAGE)
+
 /*
  * Nombre de pages communes à toutes les tâches.
  */

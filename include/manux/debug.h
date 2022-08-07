@@ -21,6 +21,9 @@
 #define DBG_KERNEL_TACHE    0x00000020
 #define DBG_KERNEL_MEMOIRE  0x00000040
 #define DBG_KERNEL_AS       0x00000080
+#define DBG_KERNEL_BUS      0x00000100
+#define DBG_KERNEL_NET      0x00000200
+
 #define DBG_KERNEL_ALL      0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
@@ -39,6 +42,8 @@
 #define masqueDebugage (0x00000000  \
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
+ | DBG_KERNEL_BUS        \
+ | DBG_KERNEL_NET        \
 			)
 
 /*

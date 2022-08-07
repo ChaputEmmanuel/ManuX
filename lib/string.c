@@ -5,6 +5,9 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/string.h>
 
+/**
+ * WARNING à refaire en assembleur
+ */
 void * memcpy(void *dest, const void *src, size_t n)
 {
    char * d = dest;
@@ -14,6 +17,19 @@ void * memcpy(void *dest, const void *src, size_t n)
 
    return dest;
 }
+
+/**
+ * WARNING à refaire en assembleur
+ */
+void * memset(void *dest, int val, size_t n)
+{
+   char * d = dest;
+   while (n--)
+      *d++ = val; 
+
+   return dest;
+}
+
 
 void bcopy (const void *src, void *dest, int n)
 /*

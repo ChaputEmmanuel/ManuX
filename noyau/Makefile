@@ -22,6 +22,8 @@ OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), memoire.o)
 OBJETS     +=   $(if $(MANUX_PAGINATION), pagination.o)
 OBJETS     +=   $(if $(MANUX_OUTILS_SYNCHRO), semaphore.o)
 OBJETS     +=   $(if $(MANUX_APPELS_SYSTEME), appelsysteme.o)
+OBJETS     +=   $(if $(MANUX_PCI), pci.o)
+OBJETS     +=   $(if $(MANUX_VIRTIO_NET), virtio-net.o)
 
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)
