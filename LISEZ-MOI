@@ -8,9 +8,10 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 Feuille de route
 ----------------
 
+   . Un malloc, parce qu'il y en a marre de tout déclarer en statique !
+   . Mémoire virtuelle
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
-   . Mémoire virtuelle
    . Modes usager/noyau
    . Bus PCI
    . Ethernet
@@ -19,7 +20,7 @@ Feuille de route
    
 En cours
 --------
-   VIRTIO : premriers balbutiements ! Apparemment qemu voit la
+   VIRTIO : premiers balbutiements ! Apparemment qemu voit la
    création des files du virtio-net, mais pas la notification du
    premier envoi naïf, ...
   

@@ -23,6 +23,9 @@ void halt();
 #define ltr(tr) \
    __asm__ __volatile__ ("ltr %%ax"::"a"(tr));
 
+#define barriereMemoire() \
+  __asm__("mfence");
+
 /*
  * Description du processeur (d'après https://wiki.osdev.org/CPUID)
  */

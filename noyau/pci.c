@@ -141,7 +141,8 @@ void PCIEnumerationDesEquipements()
 	 PCIEquipements[PCINombreEquipements].configAddress.numeroBus = 0 ;
 
 	 // L'interruption
-	 PCIEquipements[PCINombreEquipements].interruption = PCILireOctet(0, numEquipement, 0, PCI_INTERRUPTION);
+	 PCIEquipements[PCINombreEquipements].interruption =
+	   PCILireOctet(0, numEquipement, 0, PCI_INTERRUPTION);
 
 	 // On cherche l'adresse d'E/S
 	 // On parcourt tous les registres mémoire
@@ -157,7 +158,8 @@ void PCIEnumerationDesEquipements()
 	    }
 	 }
 	 
-         printk_debug(DBG_KERNEL_BUS, "[%d] Equipement 0x%x du vendeur 0x%x trouve !\n", PCINombreEquipements, idEquipement, idVendeur);
+         printk_debug(DBG_KERNEL_BUS, "[%d] Equipement 0x%x du vendeur 0x%x trouve !\n",
+		      PCINombreEquipements, idEquipement, idVendeur);
 
 	 PCINombreEquipements++;
 	 if (PCINombreEquipements >= MANUX_NB_MAX_EQUIPEMENTS_PCI) {

@@ -59,7 +59,7 @@ RUN_MANUX_ELF    = qemu-system-i386 \
                    -kernel $(ROOTDIR)/noyau/noyau.elf \
 		   -m $(RUN_MANUX_RAMSIZE)
 RUN_MANUX_ISO    = qemu-system-i386 \
-                   -netdev user,id=v1 \
+                   -netdev user,id=v1,net=192.168.76.0/24,dhcpstart=192.168.76.9 \
                    -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
 		   -object filter-dump,id=f1,netdev=v1,file=dump.dat \
 		   -trace "virtio_*" \

@@ -76,6 +76,7 @@ int definirFonctionGestionInteruption(int num,
  */
 {
    fonctionDeGestionInteruption[num] = fg;
+
    return 0;
 }
 
@@ -247,41 +248,6 @@ void initialiserIDT()
       positionnerHandlerInterruption(idt, i, gestionGeneraleInterruption);
    }
 
-   /*
-   positionnerHandlerInterruption(idt, 0, stubHandlerPanique_0);
-   positionnerHandlerInterruption(idt, 1, stubHandlerPanique_1);
-   positionnerHandlerInterruption(idt, 2, stubHandlerPanique_2);
-   positionnerHandlerInterruption(idt, 3, stubHandlerPanique_3);
-   positionnerHandlerInterruption(idt, 4, stubHandlerPanique_4);
-   positionnerHandlerInterruption(idt, 5, stubHandlerPanique_5);
-   positionnerHandlerInterruption(idt, 6, stubHandlerPanique_6);
-   positionnerHandlerInterruption(idt, 7, stubHandlerPanique_7);
-   positionnerHandlerInterruption(idt, 8, stubHandlerPanique_8);
-   positionnerHandlerInterruption(idt, 9, stubHandlerPanique_9);
-   positionnerHandlerInterruption(idt, 10, stubHandlerPanique_10);
-   positionnerHandlerInterruption(idt, 11, stubHandlerPanique_11);
-   positionnerHandlerInterruption(idt, 12, stubHandlerPanique_12);
-   positionnerHandlerInterruption(idt, 13, stubHandlerPanique_13);
-   positionnerHandlerInterruption(idt, 14, stubHandlerPanique_14);
-   positionnerHandlerInterruption(idt, 15, stubHandlerPanique_15);
-   positionnerHandlerInterruption(idt, 16, stubHandlerPanique_16);
-   positionnerHandlerInterruption(idt, 17, stubHandlerPanique_17);
-   positionnerHandlerInterruption(idt, 18, stubHandlerPanique_18);
-   positionnerHandlerInterruption(idt, 19, stubHandlerPanique_19);
-   positionnerHandlerInterruption(idt, 20, stubHandlerPanique_20);
-   positionnerHandlerInterruption(idt, 21, stubHandlerPanique_21);
-   positionnerHandlerInterruption(idt, 22, stubHandlerPanique_22);
-   positionnerHandlerInterruption(idt, 23, stubHandlerPanique_23);
-   positionnerHandlerInterruption(idt, 24, stubHandlerPanique_24);
-   positionnerHandlerInterruption(idt, 25, stubHandlerPanique_25);
-   positionnerHandlerInterruption(idt, 26, stubHandlerPanique_26);
-   positionnerHandlerInterruption(idt, 27, stubHandlerPanique_27);
-   positionnerHandlerInterruption(idt, 28, stubHandlerPanique_28);
-   positionnerHandlerInterruption(idt, 29, stubHandlerPanique_29);
-   positionnerHandlerInterruption(idt, 30, stubHandlerPanique_30);
-   positionnerHandlerInterruption(idt, 31, stubHandlerPanique_31);
-   */
-   
    // Les IRQs sont gérées au travers du PIC
    positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  0, stubHandlerIRQ0);
    positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  1, stubHandlerIRQ1);

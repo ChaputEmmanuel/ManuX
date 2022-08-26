@@ -310,6 +310,7 @@
 /*----------------------------------------------------------------------------*/
 /* Les pilotes de périphériques.                                              */
 /*----------------------------------------------------------------------------*/
+#define MANUX_VIRTIO
 #define MANUX_VIRTIO_NET
 
 /*----------------------------------------------------------------------------*/
@@ -333,8 +334,12 @@
 #   error "VIRTIO_NET est un périphérique nécessitant MANUX_RESEAU"
 #endif
 
-#if defined(MANUX_VIRTIO_NET) && !defined(MANUX_PCI)
-#   error "VIRTIO_NET est un périphérique nécessitant MANUX_PCI"
+#if defined(MANUX_VIRTIO_NET) && !defined(MANUX_VIRTIO)
+#   error "VIRTIO_NET est un périphérique nécessitant MANUX_VIRTIO"
+#endif
+
+#if defined(MANUX_VIRTIO) && !defined(MANUX_PCI)
+#   error "VIRTIO est un système nécessitant MANUX_PCI"
 #endif
 
 #endif  // MANUX_CONFIG

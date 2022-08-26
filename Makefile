@@ -152,7 +152,7 @@ dump :
 	ndisasm $(NOYAU_BIN) -u > dump
 
 clean :
-	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER)
+	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat
 	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
 
 distclean :
