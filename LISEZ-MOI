@@ -20,9 +20,14 @@ Feuille de route
    
 En cours
 --------
-   VIRTIO : premiers balbutiements ! Apparemment qemu voit la
-   création des files du virtio-net, mais pas la notification du
-   premier envoi naïf, ...
+   VIRTIO : ca avance doucement !
+
+   - Il faut essayer de recevoir enfin quelques trames.
+   - Voir si on peuple également la file d'émission en buffers comme
+   fait avec celle de réception ? Sinon on crée à la volée, ...
+   - (FAIT) Il faut maintenant s'assurer un peu
+   mieux de la gestion  des buffers dans les files. Notemment la
+   fonction virtioFournirBuffer et son utilisation par le réseau.
   
    . Finir d'éclaircir les makefile. Voir en particulier la cible "bootage"
 A faire : remplacer les .bin par des .elf  et ramener un max de choses

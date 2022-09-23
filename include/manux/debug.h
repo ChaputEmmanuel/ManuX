@@ -41,7 +41,6 @@
 
 #define masqueDebugage (0x00000000  \
  | DBG_KERNEL_ERREUR     \
- | DBG_KERNEL_START      \
  | DBG_KERNEL_BUS        \
  | DBG_KERNEL_NET        \
 			)

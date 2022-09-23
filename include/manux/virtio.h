@@ -27,6 +27,42 @@
 #define PCI_PERIPHERIQUE_VIRTIO_NET   0x1000
 
 /**
+ * Les bits d'état du pilote
+ */
+#define VIRTIO_RESET       0x00
+#define VIRTIO_ACKNOWLEDGE 0x01
+#define VIRTIO_DRIVER      0x02
+#define VIRTIO_DRIVER_OK   0x04
+#define VIRTIO_FEATURES_OK 0x08
+
+/**
+ * Les caractéristiques générales
+ */
+#define VIRTIO_F_RING_INDIRECT_DESC         0x10000000   // 28 
+#define VIRTIO_F_RING_EVENT_IDX             0x20000000   // 29
+
+/**
+ * La position des champs principaux de configuration d'une interface
+ * conforme à la spécification 0.9.5 [3] (dite "legacy" dans [1] mais
+ * avec une orgnisation différente!)
+ */
+#define VIRTIO_HIST_CAPA_EQUIP     0x00  // Les capacités de l'équipement
+#define VIRTIO_HIST_CAPA_PILOTE    0x04  // Les capacités du pilote
+#define VIRTIO_HIST_ADDRESS_FILE   0x08  // Numéro de page de la file
+					 // sélectionnée
+#define VIRTIO_HIST_TAILLE_FILE    0x0C  // Taille de la file
+#define VIRTIO_HIST_FILE_SEL       0x0E  // Sélection de la file 
+#define VIRTIO_HIST_FILE_NOTIF     0x10  // Notification de la file
+#define VIRTIO_HIST_ETAT           0x12  // Etat du périph et du pilote
+#define VIRTIO_HIST_ISR            0x13
+
+/**
+ * Les flags de paramètrage des files
+ */
+#define VRING_DESC_F_NEXT 1
+#define VRING_DESC_F_WRITE 2
+
+/**
  * Description d'un buffer (voir par exemple struct vring_desc dans [1]
  * Section 2.4.4 ou dans [3] annexe A)
  * 
@@ -66,12 +102,20 @@ typedef struct _VirtioBufferUtilise {
    //uint16_t            evenementDisponible; // On ne peut pas le déclarer
 } VirtioBufferUtilise;
 
+/**
+ * Description d'une file virtuelle. Le format de cette structure
+ * n'est pas imposé par virtio, car elle est utilisée uniquement dans
+ * ce pilote.
+ */
 typedef struct _VirtioFileVirtuelle {
-  VirtioDescripteurBuffer * tableDescripteurs; // La table des
-					       // descripteurs de
-					       // buffer
-  VirtioBufferDisponible  * buffersDisponibles ;
-  VirtioBufferUtilise     * buffersUtilises;  
+   uint16_t                  taille;
+   uint16_t                  prochainDescripteur; // Le prochain à utiliser
+   VirtioDescripteurBuffer * tableDescripteurs;   // La table des
+ 					          // descripteurs de
+                                                  // buffer
+   VirtioBufferDisponible  * buffersDisponibles ;
+   VirtioBufferUtilise     * buffersUtilises;
+   uint16_t                  dernierIndiceUtilise; // WARNING le nom n'est pas bon je pense
 } VirtioFileVirtuelle;
 
 /**
@@ -99,14 +143,38 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
 /**
  * Fournir un buffer au périphérique.
  * @param fv   la file sur laquelle placer ce buffer
+ * @param id   index de la file
  * @param bu   le buffer (pointeur sur les données/la place)
  * @param lg   la taille du buffer
  * @param fl   lecture/écriture
- * @param id   index de la file
  *
  */
 void virtioFournirBuffer(VirtioPeripherique * vp,
-			 void * bu, int lg, int fl,
-			 uint16_t id);
+			 uint16_t id,
+			 void * bu, int lg, int fl);
+
+
+/**
+ * @brief Fournir plusieurs buffers au périphérique.
+ *
+ * @param fv   la file sur laquelle placer ce buffer
+ * @param id   index de la file
+ * @param bu   les buffers (tableau de pointeurs sur les données/la place)
+ * @param lg   la taille des buffers
+ * @param nb   le nombre de buffers
+ * @param fl   lecture/écriture
+ *
+ * L'idées est de fournir une chaîne de buffers 
+ */
+int virtioFournirBuffers(VirtioPeripherique * vp,
+ 			 uint16_t id,
+			 void * bu[], int lg[], int nb,
+			 int fl);
+
+/** En travaux !! */
+int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv, void * bu[], int lg[], int nb);
+
+void virtioFileInterdireInteruption(VirtioFileVirtuelle * fv);
+void virtioFileAutoriserInteruption(VirtioFileVirtuelle * fv);
 
 #endif

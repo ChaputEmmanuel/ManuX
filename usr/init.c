@@ -70,9 +70,9 @@ void init()
    //while(1){};
 
    //printk("Pouet\n");
-   appelSystemeInutile();
+   //   appelSystemeInutile();
    //printk("Repouet\n");
-   appelSystemeInutile();
+   //appelSystemeInutile();
    //printk("Et dix de pouet\n");
    
    n = creerNouvelleTache(deuxiemeTache, FALSE);

@@ -15,39 +15,15 @@
  *   [3] http://ozlabs.org/~rusty/virtio-spec/virtio-0.9.5.pdf
  */
 
+#define min(a, b)   (((a)<(b))?(a):(b))
+
 #include <manux/virtio.h>
 #include <manux/debug.h>
-#include <manux/memoire.h>      // allouerPages
+#include <manux/memoire.h> // allouerPages
 #include <manux/string.h>  // memcpy
 #include <manux/i386.h>    // barriereMemoire
 #include <manux/errno.h>
 #include <manux/io.h>      // outb
-
-#define VIRTIO_RESET       0x00
-#define VIRTIO_ACKNOWLEDGE 0x01
-#define VIRTIO_DRIVER      0x02
-#define VIRTIO_DRIVER_OK   0x04
-#define VIRTIO_FEATURES_OK 0x08
-
-/**
- * Les caractéristiques générales
- */
-#define VIRTIO_F_RING_INDIRECT_DESC         0x10000000   // 28 
-#define VIRTIO_F_RING_EVENT_IDX             0x20000000   // 29
-
-/**
- * La position des champs principaux de configuration d'une interface
- * conforme à la spécification 0.9.5 [3] (dite "legacy" dans [1] mais
- * avec une orgnisation différente!)
- */
-#define VIRTIO_HIST_CAPA_EQUIP     0x00  // Les capacités de l'équipement
-#define VIRTIO_HIST_CAPA_PILOTE    0x04  // Les capacités du pilote
-#define VIRTIO_HIST_ADDRESS_FILE   0x08  // Numéro de page de la file
-					 // sélectionnée
-#define VIRTIO_HIST_TAILLE_FILE    0x0C  // Taille de la file
-#define VIRTIO_HIST_FILE_SEL       0x0E  // Sélection de la file 
-#define VIRTIO_HIST_FILE_NOTIF     0x10  // Notification de la file
-#define VIRTIO_HIST_ETAT           0x12  // Etat du périph et du pilote
 
 /**
  * Création d'une file de communication.
@@ -69,6 +45,8 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    uint32_t taillePartie2; // Utilisés
    uint32_t nbTotalPages;  // Combien de pages pour stocker ça ?
    char *   pointeur;      // Pour les allocations
+
+   fileVirtuelle->taille = tailleFile;
    
    // La première partie est composée des descripteurs de buffer
    taillePartie1 = tailleFile * sizeof(VirtioDescripteurBuffer);
@@ -103,6 +81,11 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    // Les buffers utilisés sont au début de la page suivante
    fileVirtuelle->buffersUtilises =
      (VirtioBufferUtilise*) (pointeur + NB_PAGES(taillePartie1) * MANUX_TAILLE_PAGE);
+
+   fileVirtuelle->prochainDescripteur = 0;
+
+   // Pour savoir où on en est des récupérations de buffer
+   fileVirtuelle->dernierIndiceUtilise = 0;
    
    printk_debug(DBG_KERNEL_NET, "%d elts, %d+%d octets, %d pages, desc=0x%x, dis=0x%x, uti=0x%x,\n",
 		tailleFile,
@@ -189,16 +172,18 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
       outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
       inw(adresseES + VIRTIO_HIST_TAILLE_FILE, tailleFile);
 
-      // Création des fameuses files
-      virtioCreerFileVirtuelle(&(vp->filesVirtuelles[numFile]),
-				  tailleFile);
+      if (tailleFile) {
+         // Création des fameuses files
+         virtioCreerFileVirtuelle(&(vp->filesVirtuelles[numFile]),   
+	                          tailleFile);
 
-      // On donne l'adresse à l'équipement
-      outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
-      outl(adresseES + VIRTIO_HIST_ADDRESS_FILE,
- 	((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);   
-   }     
-
+         // On donne l'adresse à l'équipement
+         outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
+         outl(adresseES + VIRTIO_HIST_ADDRESS_FILE,
+         ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);   
+      }     
+   }
+   
    // On dit au périphérique qu'on est bon, ...
    outb(adresseES + VIRTIO_HIST_ETAT,
 	VIRTIO_ACKNOWLEDGE
@@ -210,51 +195,144 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
 }
 
 /**
- * Fournir un buffer au périphérique.
- * @param fv   la file sur laquelle placer ce buffer
+ * @brief Fourniture d'un buffer au périphérique.
+ *
+ * @param vp   le périphérique concerné
+ * @param id   numéro de la file sur le périphérique
  * @param bu   le buffer (pointeur sur les données/la place)
  * @param lg   la taille du buffer
- * @param fl   lecture/écriture
- * @param id   index de la file
+ * @param fl   lecture/écriture 
  *
  */
 void virtioFournirBuffer(VirtioPeripherique * vp,
-			 void * bu, int lg, int fl,
-			 uint16_t id)
+			 uint16_t id,
+			 void * bu, int lg, int fl)
 {
-   // WARNING Comment sait-on quels descripteurs de buffer sont utilisés?
+   virtioFournirBuffers(vp, id, &bu, &lg, 1, fl);
+}
 
+/**
+ * @brief Fournir plusieurs buffers au périphérique.
+ *
+ * @param fv   la file sur laquelle placer ce buffer
+ * @param id   index de la file
+ * @param bu   les buffers (tableau de pointeurs sur les données/la place)
+ * @param lg   la taille des buffers
+ * @param nb   le nombre de buffers
+ * @param fl   lecture/écriture
+ * @return     le nombre de buffers réellement fournis
+ * 
+ * L'idée est de fournir une chaîne de buffers . WARNING pas d'erreur gérée !
+ */
+int virtioFournirBuffers(VirtioPeripherique * vp,
+                         uint16_t id,
+			 void * bu[], int lg[], int nb,
+			 int fl)
+{
    VirtioFileVirtuelle * fv = &(vp->filesVirtuelles[id]);
-   int prochainDescripteurAUtiliser = 0;
-   int attentionCestPasZero = 0;
+   VirtioDescripteurBuffer * vb;
+   int prochainDesc = fv->prochainDescripteur;
+   int n;  // Pour boucler sur les buffers
 
-   // On va chercher un descripteur de buffer (2.4.1.1 (a))
-   VirtioDescripteurBuffer * vb = &(fv->tableDescripteurs[prochainDescripteurAUtiliser]);
+   for (n = 0 ; (n < nb) && (prochainDesc + n < fv->taille); n++) {
+      // On va chercher un descripteur de buffer (2.4.1.1 (a))
+      vb = &(fv->tableDescripteurs[prochainDesc + n]);
 
-   printk_debug(DBG_KERNEL_NET, "bu 0x%x, lg %d, fl %d, id %d\n",
-		bu, lg, fl, id);
+      // L'adresse des données (2.4.1.1 (b))
+      vb->adresse = (uint64_t)bu[n];
+      printk_debug(DBG_KERNEL_NET, "On envoie @ 0x%x\n", vb->adresse);
+      // La longueur des données (2.4.1.1 (c))
+      vb->longueur = lg[n]; 
    
-   // L'adresse des données (2.4.1.1 (b))
-   vb->adresse = (uint64_t)bu;
-   
-   // La longueur des données (2.4.1.1 (c))
-   vb->longueur = lg; 
-   
-   // On l'initalise en lecture
-   vb->flags = fl;
+      // On l'initialise en lecture
+      vb->flags = fl;
 
-   // On le met dans les disponibles (2.4.1.2)
-   fv->buffersDisponibles->indicesDesBuffer[attentionCestPasZero] =
-     prochainDescripteurAUtiliser;
+      // On chaîne
+      if (n < nb -1) {
+         vb->flags |= VRING_DESC_F_NEXT;
+         vb->suivant = fv->prochainDescripteur + n + 1;
+  	 if (vb->suivant  >= fv->taille) {
+	    vb->suivant = 0;
+	 }
+      } else {
+         vb->suivant = 0;
+      }
+      
+      // On le met dans les disponibles (2.4.1.2)
+      fv->buffersDisponibles->indicesDesBuffer
+	[(fv->buffersDisponibles->indice+n)%fv->taille] =
+         prochainDesc;
+   }
 
-   barriereMemoire();
+   barriereMemoire();  // WARNING, c'est là ?
 
    // On incremente le nombre de dispo (2.4.1.3)
-   fv->buffersDisponibles->indice++;
+   fv->buffersDisponibles->indice = (fv->buffersDisponibles->indice + n)%fv->taille;
+
+   // On a utiliser n buffers
+   fv->prochainDescripteur = (fv->prochainDescripteur + n) % fv->taille;
    
    barriereMemoire();
    
    // On prévient l'équipement
-   outw(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF, id);   
+   outw(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF, id);
+
+   return n;
 }
 
+/**
+ * @brief on va récupérer des buffers
+ * 
+ * @return Le nombre de pointeurs initialisés
+ *
+ * Voir [3] section 2.4.2 "Receiving Used Buffers From The Device"
+ *
+ * On fait au plus simple : on renvoie un(e chaîne de) buffer(s) tel
+ * que fourni par le périphérique.
+ */
+int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv, void * bu[], int lg[], int nb)
+{
+   uint16_t indiceBuffer;
+   uint32_t lgTotale;       // Nombre d'octets significatifs
+   int      result = 0;
+
+   printk_debug(DBG_KERNEL_NET, "IN\n");
+   printk_debug(DBG_KERNEL_NET, "Pouet %d/%d\n", fv->dernierIndiceUtilise, fv->buffersUtilises->indice);
+   for (int n = 0 ; n < fv->buffersUtilises->indice; n++ ){
+     printk_debug(DBG_KERNEL_NET, "I %d, a 0x%x, l %d\n", n , fv->buffersUtilises->elementsUtilises[n].indiceBuffer, fv->buffersUtilises->elementsUtilises[n].longueur);
+   }
+   // WARNING, c'est une première ébauche pour comprendre comment ça
+   // marche. Il faut gérer les mb et la possibilité de plusieurs
+   // chaînes. Voir [3] 2.4.2
+   if (fv->dernierIndiceUtilise < fv->buffersUtilises->indice) {
+      indiceBuffer = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].indiceBuffer;
+      lgTotale = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].longueur;
+      printk_debug(DBG_KERNEL_NET, "Indice %d, long : %d\n", indiceBuffer, fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise+1].longueur);
+      fv->dernierIndiceUtilise++;
+      // On traite cette chaîne
+      do {
+         bu[result] = (void *) fv->tableDescripteurs[indiceBuffer].adresse;
+	 lg[result] = min(fv->tableDescripteurs[indiceBuffer].longueur, lgTotale);
+	 printk_debug(DBG_KERNEL_NET, "Sur %d : %d(%d)/%d (@ 0x%x)\n", result, lg[result], fv->tableDescripteurs[indiceBuffer].longueur, lgTotale, bu[result]);
+	 lgTotale -= lg[result];
+	 indiceBuffer = fv->tableDescripteurs[indiceBuffer].suivant;
+	 result++;  // Ca en fait un de plus !
+
+	 // On continue tant qu'il y en a et qu'on a de la place pour
+	 // les fournir
+      } while ((result < nb)
+	       && (fv->tableDescripteurs[indiceBuffer].flags & VRING_DESC_F_NEXT));
+   }
+   printk_debug(DBG_KERNEL_NET, "OUT\n");
+   return result;
+}
+
+void virtioFileInterdireInteruption(VirtioFileVirtuelle * fv)
+{
+  fv->buffersUtilises->flags = 1;
+}
+
+void virtioFileAutoriserInteruption(VirtioFileVirtuelle * fv)
+{
+  fv->buffersUtilises->flags = 0;
+}
