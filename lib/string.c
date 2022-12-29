@@ -41,3 +41,14 @@ void bcopy (const void *src, void *dest, int n)
    while (n--)
       *d++ = *s++; 
 }
+
+int strlen(const char * s)
+{
+   int result = 0;
+   
+   while (s[result]) {
+      result++;
+   }
+   
+   return result;
+}

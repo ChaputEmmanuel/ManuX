@@ -9,6 +9,7 @@ OBJETS      = interruptions.o \
               horloge.o \
               intel-8259a.o \
 	      segment.o \
+              arith64.o \
               interBasNiveau.bin \
               gestionGDT.bin
 
@@ -29,7 +30,6 @@ libi386.a : $(OBJETS)
 
 .c.o :
 	gcc $(CFLAGS) -c $<
-
 
 clean :
 	rm -f bochs.out *.bin *.obj *.o *.a

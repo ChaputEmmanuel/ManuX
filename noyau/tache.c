@@ -7,7 +7,9 @@
 #include <manux/scheduler.h>  /* tacheEnCours */
 #include <manux/memoire.h>
 #include <manux/segment.h>
-#include <manux/console.h>
+#ifdef MANUX_TACHE_CONSOLE
+#   include <manux/console.h>
+#endif
 #include <manux/atomique.h>
 #include <manux/segment.h>    /* setDescripteurSegment */
 #include <manux/pagination.h> /* repertoirePaginationSysteme */
@@ -102,19 +104,21 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    /* On lui affecte son numero */
    tache->numero = numeroProchaineTache++;
 
+#ifdef MANUX_TACHE_CONSOLE   
    /* On lui affecte sa console */
    assert(cons != NULL);
    tache->console = cons;
 
-#ifdef MANUX_FS
+#   ifdef MANUX_FS
    // WARNING pourquoi distinguer 0 et 1 ?
    tache->fichiers[0].prive = (void*)cons;
    tache->fichiers[0].methodes = &consoleMethodesFichier;
 
    tache->fichiers[1].prive = (void*)cons;
    tache->fichiers[1].methodes = &consoleMethodesFichier;
+#   endif
 #endif
-
+   
    /* Elle n'a pas encore été activée */
    tache->nbActivations = 0;
    tache->tempsExecution = (Temps)0;
@@ -162,8 +166,11 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
 
    /* On affiche quelques infos */
    printk_debug(DBG_KERNEL_TACHE, "Tache[%d] = 0x%x\n", tache->numero, tache);
+#ifdef MANUX_TACHE_CONSOLE
    printk_debug(DBG_KERNEL_TACHE, "cons = 0x%x, tss=0x%x, ldt=0x%x\n", tache->console, tache->tss, tache->ldt);
-
+#else
+   printk_debug(DBG_KERNEL_TACHE, "tss=0x%x, ldt=0x%x\n", tache->tss, tache->ldt);
+#endif
    return tache;
 }
 

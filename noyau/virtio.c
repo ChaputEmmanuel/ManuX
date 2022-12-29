@@ -26,6 +26,50 @@
 #include <manux/io.h>      // outb
 
 /**
+ * Affichage de l état d'une file, à des fins de debug
+ */
+void virtioAfficherFile(VirtioFileVirtuelle * fv)
+{
+   printk("File 0x%x (lg %d, %d desc)\n",
+		fv,
+		fv->taille,
+		fv->prochainDescripteur);
+   printk("Desc [@/l f n] : [%llx %ld %d %d][%llx %ld %d %d][%llx %ld %d %d]\n",
+		fv->tableDescripteurs[0].adresse,
+		fv->tableDescripteurs[0].longueur,
+		fv->tableDescripteurs[0].flags,
+		fv->tableDescripteurs[0].suivant,
+	  
+		fv->tableDescripteurs[1].adresse,
+		fv->tableDescripteurs[1].longueur,
+		fv->tableDescripteurs[1].flags,
+		fv->tableDescripteurs[1].suivant,
+	  
+		fv->tableDescripteurs[2].adresse,
+		fv->tableDescripteurs[2].longueur,
+		fv->tableDescripteurs[2].flags,
+		fv->tableDescripteurs[2].suivant
+		);
+   printk("Used fl 0x%x, idx %d (i/l) : [%d/%ld][%d/%ld][%d/%ld]\n",
+		fv->buffersUtilises->flags,
+		fv->buffersUtilises->indice,
+		fv->buffersUtilises->elementsUtilises[0].indiceBuffer,
+                fv->buffersUtilises->elementsUtilises[0].longueur, 
+		fv->buffersUtilises->elementsUtilises[1].indiceBuffer,
+                fv->buffersUtilises->elementsUtilises[1].longueur,
+		fv->buffersUtilises->elementsUtilises[2].indiceBuffer,
+		fv->buffersUtilises->elementsUtilises[2].longueur
+		);
+   printk("Dispo fl 0x%x, idx %d (i) : [%d][%d][%d]\n",
+		fv->buffersDisponibles->flags,
+		fv->buffersDisponibles->indice,
+		fv->buffersDisponibles->indicesDesBuffer[0],
+		fv->buffersDisponibles->indicesDesBuffer[1],
+		fv->buffersDisponibles->indicesDesBuffer[2]
+		);
+}
+
+/**
  * Création d'une file de communication.
  *
  * D'après [3] (section 2.3), une file est constituée d'une zone
@@ -74,7 +118,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    // On peut enfin initialiser les pointeurs
    fileVirtuelle->tableDescripteurs = (VirtioDescripteurBuffer *)pointeur;
 
-   // Les buffers disponibles sont collés derrière le dernire buffer
+   // Les buffers disponibles sont collés derrière le dernier buffer
    fileVirtuelle->buffersDisponibles =
      (VirtioBufferDisponible *)&(fileVirtuelle->tableDescripteurs[tailleFile]);
 
@@ -87,7 +131,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    // Pour savoir où on en est des récupérations de buffer
    fileVirtuelle->dernierIndiceUtilise = 0;
    
-   printk_debug(DBG_KERNEL_NET, "%d elts, %d+%d octets, %d pages, desc=0x%x, dis=0x%x, uti=0x%x,\n",
+   printk_debug(DBG_KERNEL_VIRTIO, "%d elts, %d+%d octets, %d pages, desc=0x%x, dis=0x%x, uti=0x%x,\n",
 		tailleFile,
 		taillePartie1,
 		taillePartie2,
@@ -102,7 +146,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
 /**
  * Initialisation d'un périphérique de type virtio accédé en PCI.
  * L'essentiel de ce qui suit est conforme à la v0.9.5 a priori,
- * pas à la v1.0
+ * (voir [3] section 2.2.1), mais pas à la v1.0
  *
  * @param vp      pointeur sur une structure déjà allouée (ou statique)
  * @param PCINum  l'identifiant PCI
@@ -117,70 +161,74 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    uint8_t  etat;       // Etat du périphérique   
    int      numFile;    // Pour boucler sur les files
    
-   // On va chercher un pinteur vers la description PCI
+   // On va chercher un pointeur vers la description PCI
    vp->pciEquipement = PCIEquipementNumero(PCINum);
 
    // Un raccourci sur l'adresse pour alléger le code
    adresseES = vp->pciEquipement->adresseES;
 
-   // On reset le périphérique
+   // On reset le périphérique  (1)
    outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_RESET);
    
-   // On lui dit qu'on l'a vu
+   // On lui dit qu'on l'a vu (2)
    outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_ACKNOWLEDGE);
    
-   // On lui dit qu'on va le gérer
+   // On lui dit qu'on va le gérer (3)
    outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_ACKNOWLEDGE|VIRTIO_DRIVER);
 
-   // Lecture de ses caractéristiques
+   // Lecture de ses caractéristiques (4)
    inl(adresseES + VIRTIO_HIST_CAPA_EQUIP, vp->caracteristiques);
 
    // Un petit message de debug
-   printk_debug(DBG_KERNEL_NET, "Caract : 0x%x\n",
+   printk_debug(DBG_KERNEL_VIRTIO, "Caract : 0x%x\n",
 		vp->caracteristiques);
 
    // C'est donc la phase de "négociation", on va supprimer ce qu'on
    // ne sait pas gérer
-   masque |= VIRTIO_F_RING_EVENT_IDX;  //| VIRTIO_F_RING_INDIRECT_DESC
-     
-   printk_debug(DBG_KERNEL_NET, "Masque : 0x%x\n",
+   masque |= VIRTIO_F_RING_EVENT_IDX
+          | VIRTIO_F_RING_INDIRECT_DESC
+     ;
+   printk_debug(DBG_KERNEL_VIRTIO, "Masque : 0x%x\n",
 		masque);
    
    // On désélectionne les caractéristiques qui ne nous intéressent pas
    vp->caracteristiques &= ~masque ;
 
-   printk_debug(DBG_KERNEL_NET, "Caract : 0x%x\n",
+   printk_debug(DBG_KERNEL_VIRTIO, "Caract : 0x%x\n",
 		vp->caracteristiques);
 
-   // Négociation de ces caractéristiques
+   // Négociation de ces caractéristiques (5)
    outl(adresseES + VIRTIO_HIST_CAPA_PILOTE, vp->caracteristiques);
 
    // On acte définitivement ces caractéristiques
    outb(adresseES + VIRTIO_HIST_ETAT,
 	VIRTIO_ACKNOWLEDGE | VIRTIO_DRIVER | VIRTIO_FEATURES_OK);
 
-   // On vérifie qu'il est OK
+   // On vérifie qu'il est OK (6)
    inb(adresseES + VIRTIO_HIST_ETAT, etat);
 
    if ((etat & VIRTIO_FEATURES_OK) == 0) {
-      printk_debug(DBG_KERNEL_NET, "Le device virtio net refuse les caract. !\n");
+      printk_debug(DBG_KERNEL_VIRTIO, "Le device virtio net refuse les caract. !\n");
       return EINVAL;
    }
 
-   // Construction des files
+   // Construction des files (7) comme décrit dans [3] section 2.3
    for (numFile = 0 ; numFile < MANUX_VIRTIO_NB_MAX_FILES; numFile++) {
+      // Lecture de la taille (1)(2)
       outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
       inw(adresseES + VIRTIO_HIST_TAILLE_FILE, tailleFile);
 
       if (tailleFile) {
-         // Création des fameuses files
+         // Création des fameuses files (3)
          virtioCreerFileVirtuelle(&(vp->filesVirtuelles[numFile]),   
 	                          tailleFile);
 
-         // On donne l'adresse à l'équipement
+         // On donne l'adresse à l'équipement (3)
          outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
          outl(adresseES + VIRTIO_HIST_ADDRESS_FILE,
-         ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);   
+         ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
+         printk_debug(DBG_KERNEL_VIRTIO, "File %d @ %d\n", numFile,
+		      ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
       }     
    }
    
@@ -201,12 +249,13 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
  * @param id   numéro de la file sur le périphérique
  * @param bu   le buffer (pointeur sur les données/la place)
  * @param lg   la taille du buffer
- * @param fl   lecture/écriture 
+ * @param fl   lecture/écriture (VRING_DESC_F_WRITE ou 0)
  *
  */
 void virtioFournirBuffer(VirtioPeripherique * vp,
 			 uint16_t id,
-			 void * bu, int lg, int fl)
+			 void * bu, int lg,
+			 uint16_t fl)
 {
    virtioFournirBuffers(vp, id, &bu, &lg, 1, fl);
 }
@@ -214,12 +263,12 @@ void virtioFournirBuffer(VirtioPeripherique * vp,
 /**
  * @brief Fournir plusieurs buffers au périphérique.
  *
- * @param fv   la file sur laquelle placer ce buffer
+ * @param vp   le périphérique virtio concerné
  * @param id   index de la file
  * @param bu   les buffers (tableau de pointeurs sur les données/la place)
  * @param lg   la taille des buffers
  * @param nb   le nombre de buffers
- * @param fl   lecture/écriture
+ * @param fl   lecture/écriture (VRING_DESC_F_WRITE ou 0)
  * @return     le nombre de buffers réellement fournis
  * 
  * L'idée est de fournir une chaîne de buffers . WARNING pas d'erreur gérée !
@@ -227,24 +276,26 @@ void virtioFournirBuffer(VirtioPeripherique * vp,
 int virtioFournirBuffers(VirtioPeripherique * vp,
                          uint16_t id,
 			 void * bu[], int lg[], int nb,
-			 int fl)
+			 uint16_t fl)
 {
+   int n;
    VirtioFileVirtuelle * fv = &(vp->filesVirtuelles[id]);
    VirtioDescripteurBuffer * vb;
    int prochainDesc = fv->prochainDescripteur;
-   int n;  // Pour boucler sur les buffers
-
+   uint32_t ad;
+   
    for (n = 0 ; (n < nb) && (prochainDesc + n < fv->taille); n++) {
       // On va chercher un descripteur de buffer (2.4.1.1 (a))
       vb = &(fv->tableDescripteurs[prochainDesc + n]);
 
       // L'adresse des données (2.4.1.1 (b))
-      vb->adresse = (uint64_t)bu[n];
-      printk_debug(DBG_KERNEL_NET, "On envoie @ 0x%x\n", vb->adresse);
+      ad = (uint32_t)bu[n];
+      vb->adresse = (uint64_t)ad;
+      
       // La longueur des données (2.4.1.1 (c))
       vb->longueur = lg[n]; 
    
-      // On l'initialise en lecture
+      // On l'initialise en lecture/écriture
       vb->flags = fl;
 
       // On chaîne
@@ -252,7 +303,7 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
          vb->flags |= VRING_DESC_F_NEXT;
          vb->suivant = fv->prochainDescripteur + n + 1;
   	 if (vb->suivant  >= fv->taille) {
-	    vb->suivant = 0;
+            vb->suivant = 0;   // Mouais, bof, ... plutôt remonter une erreur
 	 }
       } else {
          vb->suivant = 0;
@@ -267,9 +318,9 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    barriereMemoire();  // WARNING, c'est là ?
 
    // On incremente le nombre de dispo (2.4.1.3)
-   fv->buffersDisponibles->indice = (fv->buffersDisponibles->indice + n)%fv->taille;
+   fv->buffersDisponibles->indice = fv->buffersDisponibles->indice + 1;
 
-   // On a utiliser n buffers
+   // On a utilisé n buffers
    fv->prochainDescripteur = (fv->prochainDescripteur + n) % fv->taille;
    
    barriereMemoire();
@@ -290,49 +341,76 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
  * On fait au plus simple : on renvoie un(e chaîne de) buffer(s) tel
  * que fourni par le périphérique.
  */
-int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv, void * bu[], int lg[], int nb)
+int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
+			       void * bu[], int lg[], int nb)
 {
    uint16_t indiceBuffer;
-   uint32_t lgTotale;       // Nombre d'octets significatifs
+   uint32_t longueur;     // du buffer en cours de traitement
+   //   uint32_t lgTotale;     // Nombre d'octets significatifs
    int      result = 0;
+   int      finDeChaine;
+   uint32_t ad;
+   
+   //printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
 
-   printk_debug(DBG_KERNEL_NET, "IN\n");
-   printk_debug(DBG_KERNEL_NET, "Pouet %d/%d\n", fv->dernierIndiceUtilise, fv->buffersUtilises->indice);
-   for (int n = 0 ; n < fv->buffersUtilises->indice; n++ ){
-     printk_debug(DBG_KERNEL_NET, "I %d, a 0x%x, l %d\n", n , fv->buffersUtilises->elementsUtilises[n].indiceBuffer, fv->buffersUtilises->elementsUtilises[n].longueur);
+   /*
+   printk_debug(DBG_KERNEL_VIRTIO, "On en est a %d, il y en a %d :\n",
+		fv->dernierIndiceUtilise,
+		fv->buffersUtilises->indice);
+   */
+   if (fv->dernierIndiceUtilise == fv->buffersUtilises->indice) {
+     //printk_debug(DBG_KERNEL_VIRTIO, "On laisse donc tomber ...\n");
+      return result;
    }
+   /*
+   printk_debug(DBG_KERNEL_VIRTIO, "Premier : %d (%d)\n",
+		fv->buffersUtilises->elementsUtilises[0].indiceBuffer,
+		fv->buffersUtilises->elementsUtilises[0].longueur);
+   printk_debug(DBG_KERNEL_VIRTIO, "Second  : %d (%d)\n",
+		fv->buffersUtilises->elementsUtilises[1].indiceBuffer,
+		fv->buffersUtilises->elementsUtilises[1].longueur);
+   */
    // WARNING, c'est une première ébauche pour comprendre comment ça
    // marche. Il faut gérer les mb et la possibilité de plusieurs
    // chaînes. Voir [3] 2.4.2
-   if (fv->dernierIndiceUtilise < fv->buffersUtilises->indice) {
-      indiceBuffer = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].indiceBuffer;
-      lgTotale = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].longueur;
-      printk_debug(DBG_KERNEL_NET, "Indice %d, long : %d\n", indiceBuffer, fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise+1].longueur);
-      fv->dernierIndiceUtilise++;
-      // On traite cette chaîne
-      do {
-         bu[result] = (void *) fv->tableDescripteurs[indiceBuffer].adresse;
-	 lg[result] = min(fv->tableDescripteurs[indiceBuffer].longueur, lgTotale);
-	 printk_debug(DBG_KERNEL_NET, "Sur %d : %d(%d)/%d (@ 0x%x)\n", result, lg[result], fv->tableDescripteurs[indiceBuffer].longueur, lgTotale, bu[result]);
-	 lgTotale -= lg[result];
-	 indiceBuffer = fv->tableDescripteurs[indiceBuffer].suivant;
-	 result++;  // Ca en fait un de plus !
+   while (fv->dernierIndiceUtilise < fv->buffersUtilises->indice) {
+     //lgTotale = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].longueur;
+      //printk_debug(DBG_KERNEL_VIRTIO, "Debut de chaine (lt %d)\n", lgTotale);
 
+      indiceBuffer = fv->buffersUtilises->elementsUtilises
+	                      [fv->dernierIndiceUtilise].indiceBuffer;
+      do {
+         longueur = fv->tableDescripteurs[indiceBuffer].longueur;
+         ad = (uint32_t)fv->tableDescripteurs[indiceBuffer].adresse;
+         bu[result] = (void *) ad;
+	 lg[result] = longueur; 
+	 //         printk_debug(DBG_KERNEL_VIRTIO, "  idx %d (lg %d)\n", indiceBuffer, longueur);
+	 finDeChaine = !(fv->tableDescripteurs[indiceBuffer].flags & VRING_DESC_F_NEXT);
+	 indiceBuffer = fv->tableDescripteurs[indiceBuffer].suivant;
+
+	 result++;  // Ca en fait un de plus !
 	 // On continue tant qu'il y en a et qu'on a de la place pour
 	 // les fournir
       } while ((result < nb)
-	       && (fv->tableDescripteurs[indiceBuffer].flags & VRING_DESC_F_NEXT));
+	       && (!finDeChaine));
+      //printk_debug(DBG_KERNEL_VIRTIO, "Fin de chaine %d/%d\n", result, nb);
+      
+      fv->dernierIndiceUtilise++;  // Faut-il le mettre dans la boucle
+				   // interne ? pas clair si ça compte
+				   // les chaines ou les buffers
    }
-   printk_debug(DBG_KERNEL_NET, "OUT\n");
+   //printk_debug(DBG_KERNEL_VIRTIO, "OUT\n");
    return result;
 }
 
 void virtioFileInterdireInteruption(VirtioFileVirtuelle * fv)
 {
-  fv->buffersUtilises->flags = 1;
+  //  fv->buffersUtilises->flags = 1;
+  fv->buffersDisponibles->flags = 1;
 }
 
 void virtioFileAutoriserInteruption(VirtioFileVirtuelle * fv)
 {
-  fv->buffersUtilises->flags = 0;
+  //  fv->buffersUtilises->flags = 0;
+  fv->buffersDisponibles->flags = 0;
 }

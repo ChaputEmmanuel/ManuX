@@ -15,10 +15,12 @@
 #define MANUX_CONSOLE_DEF
 
 #include <manux/config.h>
-#include <manux/horloge.h>   // nbTopHorloge
+#include <manux/horloge.h>    // nbTopHorloge
 #include <manux/types.h>
-#include <manux/atomique.h>  // Accés unique à la console 
-#include <manux/fichier.h>   // Une console est un fichier
+#include <manux/atomique.h>   // Accés unique à la console 
+#ifdef MANUX_FS
+#   include <manux/fichier.h> // Une console est un fichier
+#endif
 
 /*
  * Caractéristiques de l'écran physique
@@ -29,10 +31,10 @@
 
 /*
  * Structure d'une console. Attention, en cas de consoles virtuelles,
- * l'ordonnanceur stoque ça au début d'une page qui contient également
- * une copie de l'écran. Il faut donc que la somme des deux tailles
- * soit inférieure à la taille d'une page. Ca nous laisse 96 octets
- * pour cette structure.
+ * on stoque ça au début d'une page qui contient également une copie
+ * de l'écran. Il faut donc que la somme des deux tailles soit
+ * inférieure à la taille d'une page. Ca nous laisse 96 octets pour
+ * cette structure.
  */
 typedef struct _Console {
    char              * adresseEcran;      // Adresse à laquelle se trouve
@@ -99,11 +101,19 @@ typedef enum {
  */
 #define ASCII_ESC 27
 
+#ifdef MANUX_JOURNAL_USES_FILES
+/**
+ * Initialisation du système de console. 
+ * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
+ */
+int consoleInitialisation(INoeud * iNoeudConsole);
+#else
 /*
  * Initialisation de la console. Le pointeur retourné permet de
  * manipuler ensuite la console.
  */
 Console * consoleInit();
+#endif
 
 /*
  * Choix des couleurs de texte et de fond (voir l'enum ci dessus)
@@ -152,17 +162,15 @@ void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
  */
 #ifdef MANUX_CONSOLES_VIRTUELLES
 
+/**
+ * @brief : Création (avec allocation mémoire) d'une console
+ */
+Console * creerConsoleVirtuelle();
+
 /*
  * Pointeur vers la console active
  */
 extern Console * consoleActive;
-
-/*
- * Initialisation d'une console virtuelle. Nécessaire avant toute
- * autre opération. 
- * L'adresse de l'écran doit être fournie.
- */
-void initialiserConsole(Console * cons, char * adresseEcran);
 
 /*
  * Forcer l'apparition d'une console à l'écran
@@ -187,9 +195,12 @@ Console * consoleNoyau();
  */
 int consoleEcrire(Fichier * f, void * buffer, int nbOctets);
 
+#ifdef MANUX_APPELS_SYSTEME
 /*
  * La fonction réalisant l'appel système  NBAS_ECRIRE_CONS 
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n);
+
+#endif  // MANUX_APPELS_SYSTEME
 
 #endif 

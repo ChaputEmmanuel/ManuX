@@ -58,11 +58,20 @@ RUN_MANUX_FLOPPY = qemu-system-i386 \
 RUN_MANUX_ELF    = qemu-system-i386 \
                    -kernel $(ROOTDIR)/noyau/noyau.elf \
 		   -m $(RUN_MANUX_RAMSIZE)
-RUN_MANUX_ISO    = qemu-system-i386 \
-                   -netdev user,id=v1 \
-                   -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
-		   -object filter-dump,id=f1,netdev=v1,file=dump.dat \
+
+# A ajouter en dessous mais apparemment ca interfere avec le virtionet !!
+#                   -chardev stdio,id=stdio \
+#                   -device virtconsole,chardev=stdio,id=serial0 \
+#                   -device virtio-serial-pci,id=virtio-console0 \
 		   -trace "virtio_*" \
+
+RUN_MANUX_ISO    = qemu-system-i386 \
+                   -device virtio-serial-pci \
+                   -chardev stdio,id=stdio \
+                   -device virtconsole,chardev=stdio,id=serial0 \
+                   -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
+                   -device virtio-net-pci,disable-legacy=off,tx_queue_size=256,rx_queue_size=256,indirect_desc=off,ctrl_vq=off,page-per-vq=on,mac=c0:ff:ee:de:ad:be,netdev=v1 \
+                   -object filter-dump,id=f1,netdev=v1,file=dump.dat \
 		   -m $(RUN_MANUX_RAMSIZE) \
 		   -cdrom
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX

@@ -23,6 +23,7 @@
 #define DBG_KERNEL_AS       0x00000080
 #define DBG_KERNEL_BUS      0x00000100
 #define DBG_KERNEL_NET      0x00000200
+#define DBG_KERNEL_VIRTIO   0x00000400
 
 #define DBG_KERNEL_ALL      0xFFFFFFFF
 
@@ -43,6 +44,7 @@
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_BUS        \
  | DBG_KERNEL_NET        \
+ | DBG_KERNEL_VIRTIO     \
 			)
 
 /*

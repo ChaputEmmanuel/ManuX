@@ -2,19 +2,34 @@
 /*      Définition des outils de journalisation des messages du noyau.        */
 /*   Pour le moment, ces messages seront envoyés sur une console virtuelle.   */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2002-2021 */
+/*                                                  (C) Manu Chaput 2002-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef JOURNAL_DEF
 #define JOURNAL_DEF
 
-#include <manux/console.h>
+#ifdef MANUX_JOURNAL_USES_FILES
+#   include <manux/fichier.h>
+#else
+#   include <manux/console.h>
+#endif
 
-void initialiserJournal(Console * console);
+#ifdef MANUX_JOURNAL_USES_FILES
+extern Fichier * journal;
+
+void initialiserJournal(Fichier * f);
 /*
  * Initialisation du système de journalisation.
  */
 
-void journaliser(char * message);
+#else
+extern Console * journal;
+void initialiserJournal(Console * console);
+/*
+ * Initialisation du système de journalisation.
+ */
+#endif
+
+void journaliser(char * message, int len);
 /*
  * Journalisation d'un message.
  */

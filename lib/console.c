@@ -7,14 +7,15 @@
 /*   simplement son adresse avec celle de l'écran physique. Du coup, les      */
 /*   affichages se font réellement à l'écran.                                 */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/console.h>
 
+#include <manux/errno.h>
 #include <manux/appelsysteme.h>
-#include <manux/memoire.h>      /* NULL   */
-#include <manux/string.h>       /* memcpy */
-#include <manux/debug.h>        /* assert */
+#include <manux/memoire.h>      // NULL 
+#include <manux/string.h>       // memcpy
+#include <manux/debug.h>        // assert
 #include <manux/temps.h>
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
@@ -32,34 +33,7 @@ Console * consoleActive;
  * printk).
  */
 static Console _consoleNoyau;
-
-/*
- * Initialisation du système.
- */
-Console * consoleInit()
-{
-   // L'écran est une zone CON_LIGNESxCON_COLONNES d'adresse fixe
-   _consoleNoyau.adresseEcran = MANUX_CON_SCREEN;
-   _consoleNoyau.ligne = 0; //14;
-   _consoleNoyau.colonne = 0;
-   _consoleNoyau.nbLignes = MANUX_CON_LIGNES;
-   _consoleNoyau.nbColonnes = MANUX_CON_COLONNES;
-   _consoleNoyau.attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
-
-#ifdef MANUX_CONSOLES_VIRTUELLES
-   consoleActive = &_consoleNoyau;
-   consoleActive->suivante = consoleActive;
-   consoleActive->precedente = consoleActive;
-#endif
-
-#ifdef MANUX_CLAVIER_CONSOLE
-   // La console noyau n'a pas de buffer clavier
-   _consoleNoyau.bufferClavier = NULL;
-#endif
-
-   return &_consoleNoyau;
-}
-
+static char copieEcranConsoleNoyau[2*MANUX_CON_COLONNES*MANUX_CON_LIGNES];
 
 void affecterCouleurFond(Console * cons, Couleur coul)
 {
@@ -215,7 +189,6 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 #endif
 }
 
-
 void afficherConsole(Console * cons, char * msg)
 {
    int n = 0;
@@ -257,8 +230,7 @@ void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
    }
 }
 
-#ifdef MANUX_CONSOLES_VIRTUELLES
-/*
+/**
  * Initialisation d'une nouvelle console virtuelle. Les espaces
  * mémoire doivent avoir été alloués par ailleurs.
  */
@@ -291,11 +263,13 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    afficherConsoleEntier(cons, (int)adresseEcran);
    afficherConsole(cons, "\n");   
 
+#ifdef MANUX_CONSOLES_VIRTUELLES
    /* On l'insère après la console active dans la liste des consoles gérées */
    cons->suivante = consoleActive->suivante;
    consoleActive->suivante = cons;
    cons->precedente = consoleActive;
    cons->suivante->precedente = cons;
+#endif
 
 #ifdef MANUX_CLAVIER_CONSOLE
    // Le buffer accueillant le clavier
@@ -305,6 +279,29 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    initialiserExclusionMutuelle(&(cons->accesBufferClavier));
 #endif
 
+}
+
+#ifdef MANUX_CONSOLES_VIRTUELLES
+/**
+ * @brief : Création (avec allocation mémoire) d'une console
+ */
+Console * creerConsoleVirtuelle()
+{
+   Console * result;
+   void    * page;
+
+   // On va tout mettre dans une page unique
+   assert(2*MANUX_CON_COLONNES*MANUX_CON_LIGNES + sizeof(Console)
+	  <= MANUX_TAILLE_PAGE);
+   
+   page = allouerPage();
+   if (page == NULL) {
+      paniqueNoyau("Plus de memoire !");
+   }
+   result = (Console *)page;
+   initialiserConsole(result, page + sizeof(Console));
+
+   return result;
 }
 
 /*
@@ -322,7 +319,7 @@ void basculerVersConsole(Console * suivante)
    assert(suivante != NULL);
    
    // On sauvegarde l'écran physique dans la console active
-   for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bopy
+   for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bcopy
       consoleActive->adresseEcranCopie[i] = consoleActive->adresseEcran[i];
    }
 
@@ -383,6 +380,14 @@ void basculerVersConsoleSuivante()
 
 #endif  // CONSOLES_VIRTUELLES
 
+int consoleOuvrir(INoeud * iNoeud, Fichier * f)
+{
+   f->methodes = &consoleMethodesFichier;
+   f->prive = &_consoleNoyau;
+
+   return ESUCCES;
+}
+
 int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    Console * con = f->prive;
@@ -392,8 +397,11 @@ int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
    return nbOctets; // WARNING
 }
 
-/*
- * Implantation de l'appel système de lecture pour la console
+/**
+ * @brief : Implantation de l'appel système de lecture pour la console
+ *
+ * On va chercher des données éventuellement mises à dispo par le
+ * clavier. 
  */
 #ifdef MANUX_CLAVIER_CONSOLE
 #define min(a, b) (((a)<(b)) ? (a) : (b))
@@ -428,6 +436,14 @@ int consoleLire(Fichier * f, void * buffer, int nbOctets)
 
    return lireConsoleN(con, buffer, nbOctets);
 }
+#else
+/**
+ * En l'absence de clavier, rien à lire !
+ */
+int consoleLire(Fichier * f, void * buffer, int nbOctets)
+{
+   return 0;
+}
 #endif
 
 /*
@@ -441,17 +457,63 @@ Console * consoleNoyau()
 
 #ifdef MANUX_FS
 /*
- * Les méthodes permettant de traiter une console comme un fichier
+ * Les méthodes permettant de traiter une console comme un
+ * fichier
  */
 MethodesFichier consoleMethodesFichier = {
-   ecrire : consoleEcrire,
-   lire : consoleLire
+   .ouvrir = consoleOuvrir,
+   .ecrire = consoleEcrire,
+   .lire = consoleLire
 };
 #endif // MANUX_FS
 
+/**
+ * Initialisation du système. Idéalement, consoleInit() ne doit plus
+ * être visible hors d'ici, on ne passe plus que par les fichiers.
+ */
+Console * consoleInit()
+{
+   initialiserConsole(&_consoleNoyau, MANUX_CON_SCREEN);
+   _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
+   
+#ifdef MANUX_CONSOLES_VIRTUELLES
+   consoleActive = &_consoleNoyau;
+   consoleActive->suivante = consoleActive;
+   consoleActive->precedente = consoleActive;
+#endif
+
+#   ifdef MANUX_CLAVIER_CONSOLE
+   // La console noyau n'a pas de buffer clavier
+   _consoleNoyau.bufferClavier = NULL;
+#   endif
+
+   return &_consoleNoyau;
+}
+
+#ifdef MANUX_JOURNAL_USES_FILES
+/**
+ * Initialisation du système de console. 
+ * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
+ */
+int consoleInitialisation(INoeud * iNoeudConsole)
+{
+   Console * foo;
+
+   foo = consoleInit();
+
+   iNoeudConsole->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
+   iNoeudConsole->typePeripherique.mineur = 0;
+   iNoeudConsole->prive = NULL;
+   iNoeudConsole->methodesFichier = &consoleMethodesFichier;
+
+   return ESUCCES;
+}
+
+#endif
+
 #ifdef MANUX_APPELS_SYSTEME
 /*
- * L'implatantion de l'AS ecrireConsole
+ * L'implantation de l'AS ecrireConsole
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 {

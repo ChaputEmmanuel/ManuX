@@ -39,6 +39,9 @@
 #      include <manux/virtio-net.h>
 #   endif
 #endif
+#ifdef MANUX_VIRTIO_CONSOLE
+#   include <manux/virtio-console.h>
+#endif
 
 extern void init(); // Faire un init.h
 
@@ -54,7 +57,17 @@ typedef struct _InfoSysteme {
    uint32_t adresseRamdisk;
 } InfoSysteme;
 
+#ifdef MANUX_VIRTIO_CONSOLE
+INoeud iNoeudVirtioConsole;
+Fichier fichierVirtioConsole;
+#endif
+
+#ifdef MANUX_JOURNAL_USES_FILES
+INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
+Fichier fichierConsole; // Le fichier qui permet de manipuler la console
+#else
 Console * console; // La console système
+#endif
 
 void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
@@ -69,20 +82,31 @@ void _start(InfoSysteme * infoSysteme,
       char     caracteres[13];
    } descriptionProc;
 
-   i8259aInit(MANUX_INT_BASE_IRQ);
-
    /* Initialisation de la console noyau */
+#ifdef MANUX_JOURNAL_USES_FILES
+   consoleInitialisation(&iNoeudConsole);
+   ouvrirFichier(&iNoeudConsole, &fichierConsole);
+#else
    console = consoleInit();
+#endif
+
+   printk("Pouet !\n");
+
+   i8259aInit(MANUX_INT_BASE_IRQ);
 
    /* Initilisation des descripteurs de segments */
    initialiserGDT();
 
    /* Initialisation de la table des interruptions */
    initialiserIDT();
-
+   
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
-   initialiserJournal(console);
+#   ifdef MANUX_JOURNAL_USES_FILES
+    initialiserJournal(&fichierConsole);
+#   else
+    initialiserJournal(console);
+#   endif
 #endif
 
    //basculerConsole();
@@ -125,6 +149,15 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
    PCIEnumerationDesEquipements();
    printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
+#endif
+
+#ifdef MANUX_VIRTIO_CONSOLE
+   printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
+   virtioConsoleInitialisation(&iNoeudVirtioConsole);
+   ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
+   initialiserJournal(&fichierVirtioConsole);
+   fichierEcrire(&fichierVirtioConsole, "Pouet\n", 6);
+   printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
 #endif
 
    /* Initialisation du réseau */
@@ -190,6 +223,10 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Les masques tombent : 0x%x - 0x%x\n", c, m);
    // __asm__ ("int %0\n" : :"N"(28));
    */
+
+   //printk_debug(DBG_KERNEL_START, "Deuxieme trame ...\n");
+   //virtioNetTestDeuxiemeEmission();
+
    init();
 }   /* _start */
 

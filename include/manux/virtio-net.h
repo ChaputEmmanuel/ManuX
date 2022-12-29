@@ -10,4 +10,7 @@
  */
 int virtioNetInit();
 
+void virtioNetTestDeuxiemeEmission();
+void virtioReseauPoll();
+
 #endif

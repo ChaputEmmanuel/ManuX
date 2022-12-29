@@ -20,9 +20,42 @@ Feuille de route
    
 En cours
 --------
-   VIRTIO : ca avance doucement !
 
-   - Il faut essayer de recevoir enfin quelques trames.
+   A finaliser
+
+     . virtio : voir ci dessous. En gros je pense que c'est OK, mais
+   il y a encore un soucis sur les ring : c'est quoi la différence
+   entre plein et vide si l'index est à 0 dans les 2 cas !?
+     . une fois un virtio qui fonctionne, j'ai un journal et un printk
+   qui peuvent utiliser le virtio-console !!! Ce sera bien plus
+   confortable pour débuger d'avoir les messages du noyau dans la
+   console d'où je lance Qemu !!!
+     . Il faut alors s'attaquer à un premier système de fichiers ! Là
+   je construis les inodes plutôt que le peupler ... il faut au moins
+   un mknod et un lookup
+     
+   Prochaine étape (boulot de demain):
+      . toujours avoir une console active (si on a une console !)
+      . plus de consoleNoyau(), on doit pouvoir faire avec
+      consoleActive() ? Pas si sûr, si on peut garder les printk du
+      noyau sans journal. Mais onpeut aussi dire que le journal n'est
+      pas une option, ...
+
+   A Ajouter : un AS qui permet de changer la console, plutôt que faire ça
+   à la création.
+   
+   VIRTIO : ca avance doucement ! En gros c'est bon, mais reste à
+   rendre plus propre
+
+   - Pourquoi ça merde ? A voir
+      - Je pense que je gère mal les chaines, à essayer sans ça ?
+      - est-ce que la file en réception est bien prête ? C'est étrange
+      apparemment si je ne la remplie pas, je n'ai pas d'IT, alors que
+      si elle est pleine (de buffers vides) j'ai une IT (mais rien en
+      réception cela dit) !
+      - est-ce que je peux recevoir deux IT d'affilée ?
+      - pourquoi le fichier dump montre 2 trames émises !?
+      
    - Voir si on peuple également la file d'émission en buffers comme
    fait avec celle de réception ? Sinon on crée à la volée, ...
    - (FAIT) Il faut maintenant s'assurer un peu

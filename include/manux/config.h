@@ -122,6 +122,12 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
+/* Définition de périphérique caractère. En pause, je n'en vois pas la        */
+/* nécessité pour le moment                                                   */
+/*----------------------------------------------------------------------------*/
+//#define MANUX_PERIPHERIQUE_CARACTERE
+
+/*----------------------------------------------------------------------------*/
 /* Gestion du RAMdisk.                                                        */ 
 /*----------------------------------------------------------------------------*/
 /*
@@ -192,6 +198,11 @@
 #define MANUX_FREQUENCE_HORLOGE 100
 
 /*
+ * Le numéro majeur des consoles
+ */
+#define MANUX_CONSOLE_MAJEUR  0
+
+/*
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
@@ -204,9 +215,22 @@
 #define MANUX_BASCULER_NOUVELLE_CONSOLE
 
 /*
+ * Affectation d'une console à chaque tâche. Si ce n'est pas le cas
+ * (et si le reste de la configurtion le permet), ce sont les fichiers
+ * associés à la tâche qui sont utilisés pour les entrées-sorties.
+ */
+#define MANUX_TACHE_CONSOLE
+
+/*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
  */
 #define MANUX_JOURNAL
+
+/*
+ * A virer dès que ça fonctionne (et que les consoles sont devenues
+ * des fichiers).
+ */
+#define MANUX_JOURNAL_USES_FILES
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
@@ -311,7 +335,21 @@
 /* Les pilotes de périphériques.                                              */
 /*----------------------------------------------------------------------------*/
 #define MANUX_VIRTIO
-#define MANUX_VIRTIO_NET
+
+/*
+ * Du réseau
+ */
+//#define MANUX_VIRTIO_NET
+
+/*
+ * Une console
+ */
+#define MANUX_VIRTIO_CONSOLE
+
+/*
+ * Le numéro majeur des consoles virtio
+ */
+#define MANUX_VIRTIO_CONSOLE_MAJEUR 1
 
 /*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */
@@ -340,6 +378,10 @@
 
 #if defined(MANUX_VIRTIO) && !defined(MANUX_PCI)
 #   error "VIRTIO est un système nécessitant MANUX_PCI"
+#endif
+
+#if defined(MANUX_PERIPHERIQUE_CARACTERE) && !defined(MANUX_FS)
+#   error "Les périphériques caractères nécessitent le type fichier"
 #endif
 
 #endif  // MANUX_CONFIG

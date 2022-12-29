@@ -25,6 +25,7 @@ OBJETS     +=   $(if $(MANUX_APPELS_SYSTEME), appelsysteme.o)
 OBJETS     +=   $(if $(MANUX_PCI), pci.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO), virtio.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_NET), virtio-net.o)
+OBJETS     +=   $(if $(MANUX_VIRTIO_CONSOLE), virtio-console.o)
 
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)

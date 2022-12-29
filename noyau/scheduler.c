@@ -22,6 +22,13 @@
 #include <manux/appelsysteme.h>  /* console() */
 #include <manux/temps.h>         /* secondesDansTemps */
 
+#ifdef MANUX_VIRTIO_CONSOLE
+#   include <manux/virtio-console.h> // A virer
+#endif
+#ifdef MANUX_VIRTIO_NET
+#   include <manux/virtio-net.h> // A virer
+#endif
+
 extern TacheID numeroProchaineTache ;
 
 /*
@@ -148,6 +155,12 @@ void aDummyKernelTask()
 
    while(1) {
       if (afficheEtatSystemeDemande) {
+#ifdef MANUX_VIRTIO_CONSOLE
+	 virtioConsoleTraiterBuffers(); // WARNING à virer !!!
+#endif
+#ifdef MANUX_VIRTIO_NET
+         virtioReseauPoll(); // WARNING à virer !!!
+#endif
          afficherEtatTaches();
       }
  for (int i = 0; i<10000000; i+=1){asm("");};
@@ -187,53 +200,33 @@ void initialiserScheduler()
 TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 {
    Tache   * tache;
+   Console * cons;
 
-   Console * cons = consoleNoyau(); // En l'absence de consoles virtuelles
-
-#ifdef MANUX_CONSOLES_VIRTUELLES
-   void    * page;
-
-   //printk("11111\n");
-   // Nouvelle console ? 
+#ifdef MANUX_TACHE_CONSOLE   
+#   ifdef MANUX_CONSOLES_VIRTUELLES
    if (nouvelleConsole) {
-      //printk("22222\n");
-      page = allouerPage();  // WARNING, gérer erreur
-      cons = (Console *)page;
-      // printk("33333\n");
-      if (page != NULL) {
-         initialiserConsole(cons, page + sizeof(Console)); // WARNING ! il faut que ça tienne !
-#ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
+      cons = creerConsoleVirtuelle();
+#      ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
 	 basculerVersConsole(cons);
-#endif
-      } else {
-  	 printk_debug(DBG_KERNEL_ERREUR, "Impossible de creer une nouvelle console\n");
-         assert(tacheEnCours != NULL);
-         cons = tacheEnCours->console;
-      }
-      //printk("44444\n");
-
+#      endif
    } else {
-     //      printk("55555\n");
-     
       if (tacheEnCours != NULL) {
          cons = tacheEnCours->console;
       } else { // Pour la première a priori
          cons = consoleNoyau();
       }
    }   
-#endif
-   //printk("66666\n");
+#   endif // MANUX_CONSOLES_VIRTUELLES
+#endif // MANUX_TACHE_CONSOLE
    
    /* Création de la tache */
    tache = creerTache(corpsTache, cons);
    if (tache == NULL) {
       return -ENOMEM;
    }
-   //printk("77777\n");
 
    /* On insère la nouvelle tache à la fin de la liste */
    if (corpsTache) {
-     //printk("88888\n");
       insererCelluleTache(&listeTaches,
                           tache,
                           (CelluleTache*)tache+sizeof(Tache));

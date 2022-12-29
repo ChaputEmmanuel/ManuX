@@ -1,0 +1,242 @@
+/**
+ * @file virtio-console.c
+ *
+ */
+
+#include <manux/virtio-console.h>
+
+#include <manux/intel-8259a.h>  // pour les interruptions 
+#include <manux/pci.h>          // Pour aller récupérer l'irq, on doit
+				// pouvoir s'en passer avec une
+				// fonction dans virtio
+#include <manux/memoire.h>      // allouerPages
+
+#include <manux/io.h>           // outb
+#include <manux/debug.h>
+#include <manux/errno.h>
+
+/**
+ * Description d'un périphérique virtio console
+ */
+typedef struct VirtioConsole_t {
+   VirtioPeripherique    virtioPeripherique; 
+   uint16_t              nbItRecues;
+} VirtioConsole;
+
+/**
+ * WARNING : pour le moment on crée un unique périphérique
+ */
+VirtioConsole virtioConsole; 
+
+/**
+ * Gestion des buffers utilisés par le périphérique
+ */
+void virtioConsoleTraiterBuffers()
+{
+   void *bf [1];
+   int lg[1];
+   int nbLu;
+
+   printk_debug(DBG_KERNEL_VIRTIO, "File 0 :\n");
+   virtioAfficherFile(&(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]));
+   
+   // Récupération d'une éventuelle entrée
+   nbLu = virtioFileRecupererBuffers(
+	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]),
+			      bf, lg, 1);
+   
+   printk_debug(DBG_KERNEL_VIRTIO, "Recu %d buffer\n", nbLu);
+
+   // Récupération des buffers émis et consommés
+   nbLu = virtioFileRecupererBuffers(
+	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
+			      bf, lg, 1);
+   
+   printk_debug(DBG_KERNEL_VIRTIO, "Conso %d buffer\n", nbLu);
+}
+
+/**
+ *  Cf [3] section 2.4.2
+ */
+void virtioConsoleGestionInt(void * pr)
+{
+   VirtioConsole * vc = (VirtioConsole *) pr;
+   uint8_t isr;
+   
+   printk_debug(DBG_KERNEL_VIRTIO, "Interuption %d !!!\n", ++(vc->nbItRecues));
+
+   // Est-ce moi qui suis visé ?
+   inb(vc->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR, isr);
+   if (isr & 0x1) {
+      printk_debug(DBG_KERNEL_VIRTIO, "C'est pour moi, ...\n");
+      i8259aAckIRQ(vc->virtioPeripherique.pciEquipement->interruption);
+
+      // La suite est à déférer dans une partie basse
+      virtioConsoleTraiterBuffers(vc);
+   } else {
+      printk_debug(DBG_KERNEL_NET, "Balek, ...\n");
+   }
+}
+
+
+/**
+ * @brief Initialisation d'un périphérique console virtio
+ *
+ */
+int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
+{
+   PCIEquipement       * pciEquip = PCIEquipementNumero(PCINumeroPeripherique);
+   void                * pointeur; // Pour allouer de la mémoire en
+				   // réception
+
+   VirtioFileVirtuelle * fr;      // réception
+   // On va construire un tableau de buffers (et un de leurs
+   // longueurs) pour passer à virtioFournirBuffers
+   void                * buffers[1];
+   int                   longueurs[1];
+
+   printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
+
+   // On renseigne la structure
+   virtioInitPeripheriquePCI(&(virtioConsole.virtioPeripherique),
+			     PCINumeroPeripherique,
+			     VIRTIO_CONSOLE_F_SIZE
+			     | VIRTIO_CONSOLE_F_MULTIPORT);
+
+   // La suite est à mettre dans virtio (ou à virer ?)
+   i8259aAjouterHandler(pciEquip->interruption,
+			virtioConsoleGestionInt,
+			&virtioConsole);
+   i8259aAutoriserIRQ(pciEquip->interruption);
+   virtioConsole.nbItRecues = 0;
+
+   // On ajoute des buffers sur la file d'entrée
+   fr = &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]);
+
+   // Pas de malloc, ...
+   pointeur = allouerPages(NB_PAGES(fr->taille*(1024)));
+
+   for (int i = 0 ; i < fr->taille - 1; i++) {
+      buffers[0] = pointeur;
+      longueurs[0] = 1024;
+      pointeur += longueurs[0];
+
+      virtioFournirBuffers(&(virtioConsole.virtioPeripherique),
+			   VIRTIO_CONSOLE_PORT0_IN,
+            	           buffers, longueurs,
+                           1,
+		           VRING_DESC_F_WRITE);
+   }
+
+   printk_debug(DBG_KERNEL_VIRTIO, "File 0 :\n");
+   virtioAfficherFile(fr);
+
+   return ESUCCES;
+}
+
+/**
+ * @brief Juste un test d'affichage idiot pour commencer
+ */
+uint8_t message [] = "Hello monde\n";
+void virtioConsoleEcrireHello()
+{
+   void *bf [1];
+   int lg[1];
+
+   printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
+
+   bf[0] = message;
+   lg[0] = 12;
+   virtioFournirBuffers(&(virtioConsole.virtioPeripherique),
+			1,
+			bf, lg, 1, 0);
+   
+   printk_debug(DBG_KERNEL_VIRTIO, "OUT\n");
+}
+
+#ifdef MANUX_FS
+MethodesFichier virtioConsoleMethodesFichier;
+
+/**
+ * @brief : fonction d'écriture dans un périphérique virtio-console
+ */
+size_t virtioConsoleEcrire(Fichier * f, char * b, size_t l)
+{
+   VirtioConsole * vc = (VirtioConsole *)f->prive;
+
+   void *bf [1];
+   int lg[1];
+
+   bf[0] = b;
+   lg[0] = l;
+   virtioFournirBuffers(&(vc->virtioPeripherique),
+			1,
+			bf, lg, 1, 0);
+
+   return 0;
+}
+
+/**
+ * @brief : fonction de lecture dans un périphérique virtio-console
+ */
+size_t virtioConsoleLire(Fichier * f, char * b, size_t l)
+{
+   printk_debug(DBG_KERNEL_VIRTIO, "in\n");
+
+   return 0;
+}
+
+int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f)
+{
+   f->methodes = &virtioConsoleMethodesFichier;
+   f->prive = &virtioConsole; // WARNING, il peut y en avoir plusieurs 
+
+   return ESUCCES;
+}
+
+/**
+ * Les méthodes permettant de traiter une console virtio comme un
+ * fichier
+ */
+MethodesFichier virtioConsoleMethodesFichier = {
+   .ouvrir = virtioConsoleOuvrir,
+   .lire = virtioConsoleLire,
+   .ecrire = virtioConsoleEcrire
+};
+#endif // MANUX_FS
+
+/**
+ * @brief Initialisation des périphériques
+ */
+int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
+{
+   int PCINumeroPeripherique;
+  
+   printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
+
+   // On va chercher un peripherique virtio net
+   PCINumeroPeripherique = PCIObtenirProchainEquipement(PCI_VENDEUR_VIRTIO,
+							PCI_PERIPHERIQUE_VIRTIO_CONSOLE,
+							-1);
+   printk_debug(DBG_KERNEL_VIRTIO, "Peripherique PCI %d\n", PCINumeroPeripherique);
+
+   // Initialisation de l'unique périphérique pour le moment
+   if (virtioConsoleInitPeripherique(PCINumeroPeripherique)== 0) {
+      printk_debug(DBG_KERNEL_VIRTIO, "Console virtio initialisee !\n");
+   }
+
+#ifdef MANUX_FS
+   iNoeudVirtioConsole->typePeripherique.majeur = MANUX_VIRTIO_CONSOLE_MAJEUR;
+   iNoeudVirtioConsole->typePeripherique.mineur = 0;
+   iNoeudVirtioConsole->prive = NULL;
+   iNoeudVirtioConsole->methodesFichier = &virtioConsoleMethodesFichier;
+#endif
+   
+   // Test d'écriture
+   virtioConsoleEcrireHello();
+
+   printk_debug(DBG_KERNEL_VIRTIO, "out\n");
+   return ESUCCES;
+}
+
+
