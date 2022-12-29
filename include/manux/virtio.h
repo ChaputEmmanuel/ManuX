@@ -1,6 +1,15 @@
 /**
  * @file virtio.h
  *
+ * WARNING : les fonctions fournirBuffers et recupererBuffers sont à
+ * revoir. A priori en l'état, elles devraient fonctionner vu l'usage
+ * que j'en fais. Mais je ne cherche pas à savoir quels descripteurs
+ * de buffers sont libres, juste combien sont libres, et je les
+ * utilise en round robin. On peut espérer qu'ils soient consommés et
+ * rendu dans l'ordre dans lequel ils sont fournis, donc ça
+ * passe. Mais il serait plus prudent de mettre en place une liste des
+ * descripteurs libres (en plus c'est super simple).
+ *
  * WARNING : je voudrais mettre toutes les définitions de types dans
  * le .c, mais le soucis c'est qu'elles doivent ensuite être utilisées
  * via des pointeurs (cf le premier champs de virtioReseauPeriph) et
@@ -23,9 +32,12 @@
 #   define MANUX_VIRTIO_NB_MAX_FILES 3
 #endif
 
+/**
+ * Les identifiants de vendeur et équipements
+ */
 #define PCI_VENDEUR_VIRTIO               0x1AF4
 #define PCI_PERIPHERIQUE_VIRTIO_NET      0x1000
-#define PCI_PERIPHERIQUE_VIRTIO_CONSOLE  0x1043
+#define PCI_PERIPHERIQUE_VIRTIO_CONSOLE  0x1003
 
 /**
  * Les bits d'état du pilote
@@ -111,6 +123,7 @@ typedef struct __attribute__((__packed__)) _VirtioBufferUtilise {
 typedef struct __attribute__((__packed__)) _VirtioFileVirtuelle {
    uint16_t                  taille;
    uint16_t                  prochainDescripteur; // Le prochain à utiliser
+   uint16_t                  nbDescripteursLibres;// A-t-on encore des desc ?
    VirtioDescripteurBuffer * tableDescripteurs;   // La table des
  					          // descripteurs de
                                                   // buffer
@@ -142,31 +155,38 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
                               uint32_t masque);
 
 /**
- * Fournir un buffer au périphérique.
+ * @brief : Fournir un buffer au périphérique.
  * @param vp   le périphérique virtio concerné
  * @param id   index de la file
  * @param bu   le buffer (pointeur sur les données/la place)
  * @param lg   la taille du buffer
  * @param fl   lecture/écriture (VRING_DESC_F_WRITE ou 0)
+ * @return     le nombre de buffer effectivement fournis
  *
+ * C'est effectivement le pointeur bu qui est fourni, donc l'appelant
+ * ne doit pas le libérer !
  */
-void virtioFournirBuffer(VirtioPeripherique * vp,
+int  virtioFournirBuffer(VirtioPeripherique * vp,
 			 uint16_t id,
 			 void * bu, int lg,
 			 uint16_t fl);
 
 
 /**
- * @brief Fournir plusieurs buffers au périphérique.
+ * @brief : Fournir un(e chaine de) buffer(s) au périphérique.
  *
- * @param fv   la file sur laquelle placer ce buffer
+ * @param fv   la file sur laquelle placer ce(s) buffer(s)
  * @param id   index de la file
  * @param bu   les buffers (tableau de pointeurs sur les données/la place)
  * @param lg   la taille des buffers
  * @param nb   le nombre de buffers
  * @param fl   lecture/écriture (VRING_DESC_F_WRITE ou 0)
+ * @return     le nombre de buffers effectivement fournis
  *
- * L'idées est de fournir une chaîne de buffers 
+ * C'est effectivement les pointeurs passés dans bu  qui sont fournis,
+ * donc l'appelant ne doit pas les libérer !
+ * S'il y a plusieurs buffers (nb > 1) c'est sous forme d'une chaîne
+ * qu'ils sont fournis
  */
 int virtioFournirBuffers(VirtioPeripherique * vp,
  			 uint16_t id,

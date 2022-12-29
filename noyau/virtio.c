@@ -90,7 +90,11 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    uint32_t nbTotalPages;  // Combien de pages pour stocker ça ?
    char *   pointeur;      // Pour les allocations
 
+   // La taille est fournie
    fileVirtuelle->taille = tailleFile;
+
+   // Pour le moment, ils sont tous libres
+   fileVirtuelle->nbDescripteursLibres = tailleFile;
    
    // La première partie est composée des descripteurs de buffer
    taillePartie1 = tailleFile * sizeof(VirtioDescripteurBuffer);
@@ -130,7 +134,8 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
 
    // Pour savoir où on en est des récupérations de buffer
    fileVirtuelle->dernierIndiceUtilise = 0;
-   
+
+   /*   
    printk_debug(DBG_KERNEL_VIRTIO, "%d elts, %d+%d octets, %d pages, desc=0x%x, dis=0x%x, uti=0x%x,\n",
 		tailleFile,
 		taillePartie1,
@@ -139,7 +144,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
 		fileVirtuelle->tableDescripteurs,
 		fileVirtuelle->buffersDisponibles,
 		fileVirtuelle->buffersUtilises);
-
+   */
    return ESUCCES;
 }
 
@@ -153,8 +158,8 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
  * @param masque  les caractéristiques à *ne pas* utiliser
  */
 int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
-			       int PCINum,
-			       uint32_t masque)
+	                      int PCINum,
+		              uint32_t masque)
 {
    uint16_t adresseES;  // L'adresse d'E/S pour dialoguer avec lui
    uint16_t tailleFile; // Pour lire les tailles de files virtio
@@ -252,12 +257,12 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
  * @param fl   lecture/écriture (VRING_DESC_F_WRITE ou 0)
  *
  */
-void virtioFournirBuffer(VirtioPeripherique * vp,
+int virtioFournirBuffer(VirtioPeripherique * vp,
 			 uint16_t id,
 			 void * bu, int lg,
 			 uint16_t fl)
 {
-   virtioFournirBuffers(vp, id, &bu, &lg, 1, fl);
+   return virtioFournirBuffers(vp, id, &bu, &lg, 1, fl);
 }
 
 /**
@@ -283,10 +288,11 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    VirtioDescripteurBuffer * vb;
    int prochainDesc = fv->prochainDescripteur;
    uint32_t ad;
-   
-   for (n = 0 ; (n < nb) && (prochainDesc + n < fv->taille); n++) {
+
+   for (n = 0 ; (n < nb) && (fv->nbDescripteursLibres); n++) {
       // On va chercher un descripteur de buffer (2.4.1.1 (a))
-      vb = &(fv->tableDescripteurs[prochainDesc + n]);
+      // on sait qu'il en reste puisqu'on les compte
+      vb = &(fv->tableDescripteurs[(prochainDesc + n)%fv->taille]);
 
       // L'adresse des données (2.4.1.1 (b))
       ad = (uint32_t)bu[n];
@@ -299,20 +305,22 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
       vb->flags = fl;
 
       // On chaîne
-      if (n < nb -1) {
+      if ((n < nb -1) && (fv->nbDescripteursLibres > 1)) {
          vb->flags |= VRING_DESC_F_NEXT;
-         vb->suivant = fv->prochainDescripteur + n + 1;
-  	 if (vb->suivant  >= fv->taille) {
-            vb->suivant = 0;   // Mouais, bof, ... plutôt remonter une erreur
-	 }
+         vb->suivant = (fv->prochainDescripteur + n + 1)%fv->taille;
       } else {
          vb->suivant = 0;
       }
       
       // On le met dans les disponibles (2.4.1.2)
-      fv->buffersDisponibles->indicesDesBuffer
-	[(fv->buffersDisponibles->indice+n)%fv->taille] =
-         prochainDesc;
+      if (n == 0) {
+         fv->buffersDisponibles->indicesDesBuffer
+           [(fv->buffersDisponibles->indice+n)%fv->taille] =
+            prochainDesc;
+      }
+
+      // Un de moins qui soit disponible
+      fv->nbDescripteursLibres--;
    }
 
    barriereMemoire();  // WARNING, c'est là ?
@@ -346,60 +354,43 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
 {
    uint16_t indiceBuffer;
    uint32_t longueur;     // du buffer en cours de traitement
-   //   uint32_t lgTotale;     // Nombre d'octets significatifs
    int      result = 0;
    int      finDeChaine;
    uint32_t ad;
-   
-   //printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
 
-   /*
-   printk_debug(DBG_KERNEL_VIRTIO, "On en est a %d, il y en a %d :\n",
-		fv->dernierIndiceUtilise,
-		fv->buffersUtilises->indice);
-   */
+   // Ai-je vraiment des choses à récupérer ?
    if (fv->dernierIndiceUtilise == fv->buffersUtilises->indice) {
-     //printk_debug(DBG_KERNEL_VIRTIO, "On laisse donc tomber ...\n");
       return result;
    }
-   /*
-   printk_debug(DBG_KERNEL_VIRTIO, "Premier : %d (%d)\n",
-		fv->buffersUtilises->elementsUtilises[0].indiceBuffer,
-		fv->buffersUtilises->elementsUtilises[0].longueur);
-   printk_debug(DBG_KERNEL_VIRTIO, "Second  : %d (%d)\n",
-		fv->buffersUtilises->elementsUtilises[1].indiceBuffer,
-		fv->buffersUtilises->elementsUtilises[1].longueur);
-   */
-   // WARNING, c'est une première ébauche pour comprendre comment ça
-   // marche. Il faut gérer les mb et la possibilité de plusieurs
-   // chaînes. Voir [3] 2.4.2
-   while (fv->dernierIndiceUtilise < fv->buffersUtilises->indice) {
-     //lgTotale = fv->buffersUtilises->elementsUtilises[fv->dernierIndiceUtilise].longueur;
-      //printk_debug(DBG_KERNEL_VIRTIO, "Debut de chaine (lt %d)\n", lgTotale);
 
+   while ((fv->dernierIndiceUtilise != fv->buffersUtilises->indice) && (result < nb)) {
+      // Récupération de l'indice du descripteur libéré
       indiceBuffer = fv->buffersUtilises->elementsUtilises
 	                      [fv->dernierIndiceUtilise].indiceBuffer;
       do {
+         // On récupère les données et leur longueur
          longueur = fv->tableDescripteurs[indiceBuffer].longueur;
          ad = (uint32_t)fv->tableDescripteurs[indiceBuffer].adresse;
          bu[result] = (void *) ad;
 	 lg[result] = longueur; 
-	 //         printk_debug(DBG_KERNEL_VIRTIO, "  idx %d (lg %d)\n", indiceBuffer, longueur);
+
+	 result++;  // Ca en fait un de plus !
+
+	 // Cela peut être le premier d'une chaîne
 	 finDeChaine = !(fv->tableDescripteurs[indiceBuffer].flags & VRING_DESC_F_NEXT);
 	 indiceBuffer = fv->tableDescripteurs[indiceBuffer].suivant;
 
-	 result++;  // Ca en fait un de plus !
 	 // On continue tant qu'il y en a et qu'on a de la place pour
 	 // les fournir
       } while ((result < nb)
 	       && (!finDeChaine));
-      //printk_debug(DBG_KERNEL_VIRTIO, "Fin de chaine %d/%d\n", result, nb);
       
-      fv->dernierIndiceUtilise++;  // Faut-il le mettre dans la boucle
-				   // interne ? pas clair si ça compte
-				   // les chaines ou les buffers
+      // On vient de traiter un buffer (peut-être une chaîne)
+      fv->dernierIndiceUtilise++;  
    }
-   //printk_debug(DBG_KERNEL_VIRTIO, "OUT\n");
+   // On a donc récupérer result descripteurs
+   fv->nbDescripteursLibres += result;
+   
    return result;
 }
 

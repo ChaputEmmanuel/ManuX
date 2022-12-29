@@ -4,6 +4,7 @@
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
+#include <manux/errno.h>
 #include <manux/console.h>
 #include <manux/clavier.h>
 #include <manux/tache.h>
@@ -90,8 +91,6 @@ void _start(InfoSysteme * infoSysteme,
    console = consoleInit();
 #endif
 
-   printk("Pouet !\n");
-
    i8259aInit(MANUX_INT_BASE_IRQ);
 
    /* Initilisation des descripteurs de segments */
@@ -153,10 +152,10 @@ void _start(InfoSysteme * infoSysteme,
 
 #ifdef MANUX_VIRTIO_CONSOLE
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
-   virtioConsoleInitialisation(&iNoeudVirtioConsole);
-   ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
-   initialiserJournal(&fichierVirtioConsole);
-   fichierEcrire(&fichierVirtioConsole, "Pouet\n", 6);
+   if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
+      ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
+      initialiserJournal(&fichierVirtioConsole);
+   }
    printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
 #endif
 

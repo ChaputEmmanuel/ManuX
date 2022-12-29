@@ -115,7 +115,7 @@ void virtioNetTraiterEmissions(VirtioReseau * vr)
    int                   longueurs[2];
    VirtioFileVirtuelle * fv = &(vr->virtioPeripherique.filesVirtuelles[VR_FILE_EMISSION]);
 
-   printk_debug(DBG_KERNEL_NET, "emission (file %x)!!!\n", fv);
+   //printk_debug(DBG_KERNEL_NET, "emission (file %x)!!!\n", fv);
 
    // On ne veut plus être embêté
    virtioFileInterdireInteruption(fv);
@@ -145,6 +145,8 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    int                   nbLu;
    VirtioFileVirtuelle * fv = &(vr->virtioPeripherique.filesVirtuelles[VR_FILE_RECEPTION]);
 
+   printk("Prout\n");
+   /*
    printk_debug(DBG_KERNEL_NET, "reception (file %x)!!!\n", fv);
 
    printk_debug(DBG_KERNEL_NET, "File emission :\n");
@@ -152,6 +154,7 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    
    printk_debug(DBG_KERNEL_NET, "File reception :\n");
    virtioAfficherFile(&(vr->virtioPeripherique.filesVirtuelles[VR_FILE_RECEPTION]));
+   */
    
    // On ne veut plus être embêté
    virtioFileInterdireInteruption(fv);
@@ -159,15 +162,16 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    // On va chercher une trame, a priori dans une chaîne de buffers
    nbLu = virtioFileRecupererBuffers(fv, buffers, longueurs, 2);
 
+   printk(" G %d recu %d/%d+%d\n", vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
+   
    if (nbLu) {
       // WARNING Horreur de debogage 
       printk("\n (R)Recu %d + %d :\n", longueurs[0], longueurs[1]);
-      for (int i = 0; i < 42 /*longueurs[1]*/; i++) {
+      for (int i = 0; i < 42 ; i++) {
         printk(" 0x%x ", buffers[1][i]);
       }
       printk("\n");
    }
-   
    // On peut reprendre une activité normale
    virtioFileAutoriserInteruption(fv);
 }
@@ -184,8 +188,10 @@ void virtioNetGestionInt(void * pr)
 {
    VirtioReseau * vr = (VirtioReseau *) pr;
    uint8_t isr;
+
+   vr->nbItRecues++;
    
-   printk_debug(DBG_KERNEL_NET, "Interuption %d !!!\n", ++(vr->nbItRecues));
+   //   printk_debug(DBG_KERNEL_NET, "Interuption %d !!!\n", ++(vr->nbItRecues));
 
    // Est-ce moi qui suis visé ?
    inb(vr->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR, isr);
@@ -195,9 +201,9 @@ void virtioNetGestionInt(void * pr)
 
       // La suite est à déférer dans une partie basse
       virtioNetRecevoirTrame(vr);
-      virtioNetTraiterEmissions(vr); // WARNING : à vérifier si ça doit être là
+      //      virtioNetTraiterEmissions(vr); // WARNING : à vérifier si ça doit être là
    } else {
-      printk_debug(DBG_KERNEL_NET, "Balek, ...\n");
+     //      printk_debug(DBG_KERNEL_NET, "Balek, ...\n");
    }
 }
 
@@ -247,7 +253,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // entête à lui, on va lui fourni systématiquement une chaîne avec
    // un premier buffer pour l'entête, comme ça la trame sera toute
    // seule dans son buffer, donc directement manipulable ! Malin JP, ...
-   for (int i = 0 ; i < fr->taille/2 -1; i++) {
+   for (int i = 0 ; i < fr->taille/2; i++) {
       buffers[0] = pointeur;
       longueurs[0] = sizeof(VirtioReseauEntete);
       pointeur += sizeof(VirtioReseauEntete);
@@ -273,13 +279,14 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
 			&virtioReseau);
    i8259aAutoriserIRQ(pciEquip->interruption);
    virtioReseau.nbItRecues = 0;
-
+   
+   /*
    printk_debug(DBG_KERNEL_NET, "File emission :\n");
    virtioAfficherFile(&(virtioReseau.virtioPeripherique.filesVirtuelles[VR_FILE_EMISSION]));
    
    printk_debug(DBG_KERNEL_NET, "File reception :\n");
    virtioAfficherFile(&(virtioReseau.virtioPeripherique.filesVirtuelles[VR_FILE_RECEPTION]));
-   
+   */
    return 0;
 }
 
@@ -312,6 +319,7 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
                         buffers, longueurs,
                         2,
 		        0); // pour émettre
+
    //   printk_debug(DBG_KERNEL_NET, "OUT\n");
 } 
 

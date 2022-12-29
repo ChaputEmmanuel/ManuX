@@ -154,12 +154,12 @@ void PCIEnumerationDesEquipements()
 	       // non signifiants
                PCIEquipements[PCINombreEquipements].adresseES = adresse & (~0x3);
 	    } else {
-               printk_debug(DBG_KERNEL_ERREUR, "Memory BARs a prendre en compte !\n");
+	      //            printk_debug(DBG_KERNEL_ERREUR, "Memory BARs a prendre en compte !\n");
 	    }
 	 }
 	 
-         printk_debug(DBG_KERNEL_BUS, "[%d] Equipement 0x%x du vendeur 0x%x trouve !\n",
-		      PCINombreEquipements, idEquipement, idVendeur);
+         printk_debug(DBG_KERNEL_BUS, "[%d] Vendeur/Id 0x%x/0x%x\n",
+		      PCINombreEquipements, idVendeur, idEquipement);
 
 	 PCINombreEquipements++;
 	 if (PCINombreEquipements >= MANUX_NB_MAX_EQUIPEMENTS_PCI) {
@@ -179,7 +179,7 @@ void PCIEnumerationDesEquipements()
 
 /**
  * @brief : récuperer l'identifiant du prochain équipement PCI
- * @param : precedent : indice du précendent (-1 pour chercher le premier)
+ * @param : precedent : indice du précédent (-1 pour chercher le premier)
  * @return : indice >= 0 si un équipement trouvé, -1 sinon
  */
 int PCIObtenirProchainEquipement(uint16_t vendeur, uint16_t equipement, int precedent)
@@ -187,8 +187,8 @@ int PCIObtenirProchainEquipement(uint16_t vendeur, uint16_t equipement, int prec
    int result = precedent;
 
    while ((++result < PCINombreEquipements)
-	  && (PCIEquipements[result].vendeur != vendeur)
-	  && (PCIEquipements[result].equipement != equipement)
+	  && ((PCIEquipements[result].vendeur != vendeur)
+	      || (PCIEquipements[result].equipement != equipement))
    ) {}
 
    if (result >= PCINombreEquipements)

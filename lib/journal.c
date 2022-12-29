@@ -18,19 +18,10 @@ Console * journal = NULL;
 #endif
 //static ExclusionMutuelle emj;
 
-/*
- * Le buffer de stockage de l'écran.
- */
-//char bufferJournal[4096];
-
 #ifdef MANUX_JOURNAL_USES_FILES
 void initialiserJournal(Fichier * pc)
 {
-   char * msg = "OK\n";
-  
    journal = pc;
-
-   fichierEcrire(journal, msg, 3);
 }
 
 #else
