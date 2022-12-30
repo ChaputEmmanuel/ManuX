@@ -23,19 +23,15 @@ En cours
 
    A finaliser
 
-     . La console virtio semble fonctionner à peu près correctement !
-     Il faut tout de même comprendre et corriger les bugs qui restent
-     (affichage parfois foireux en particulier, voir les mb ?)
-
      . Apparemment la console virtio seule marche donc à peu près, le
      reseau virtio seul semble également fonctionner (il reçoit les
      trames émises par un telnet par exemple !) mais dès qu'on
      configure les deux, c'est la panique, ... J'ai l'impression que
      le soucis est à chercher autour des handlers, mais même si on
-     désactve celui du réseau, ça foir.
-     Particulièrement troublant, quand ça déconne, plus moyen de voir
-     les tâches de userland, alors que cela ne plante pas au sens pas
-     de panique noyau !!! 
+     désactve celui du réseau, ça foire.
+        Ca vient peut-être de virtio-console (ou virtio tout court)
+     parce que si je décommente une ligne de printk_debug dans le
+     main, même avec virtio-console seul ça plante méchamment !!!
 
      . Réfléchir à utiliser tout de même la consoleNoyau pour certains
      messages spécifiques. En tous cas, sur la console, il reste
@@ -46,15 +42,17 @@ En cours
       noyau sans journal. Mais onpeut aussi dire que le journal n'est
       pas une option, ...
 
-     . Il faut alors s'attaquer à un premier système de fichiers ! Là
+   Il faut alors s'attaquer à un premier système de fichiers ! Là
    je construis les inodes plutôt que le peupler ... il faut au moins
    un mknod et un lookup
      
-
-   A Ajouter : un AS qui permet de changer la console, plutôt que faire ça
+   A ajouter : un AS qui permet de changer la console, plutôt que faire ça
    à la création.
    
-  
+   A ajouter dans l'affichage (fonction afficherEtatTaches de
+   scheduler) un affichage du nombre de pages allouées, du nombre
+   d'interruptions reçues, ...
+   
    . Finir d'éclaircir les makefile. Voir en particulier la cible "bootage"
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...

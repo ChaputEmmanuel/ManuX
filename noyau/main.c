@@ -204,12 +204,12 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
 
-   //printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
+//   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();
-   //printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
+//   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
    
-   //printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
-   //adresseDebutManuX, adresseFinManuX);
+//   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
+//   adresseDebutManuX, adresseFinManuX);
 
    /*
    //afficher le masque des PIC ?

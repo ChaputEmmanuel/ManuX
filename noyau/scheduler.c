@@ -175,16 +175,16 @@ void initialiserScheduler()
    tacheEnCours = NULL;
    dateDernierOrdonnancement = nbTopHorloge;
 
-   //printk("AAAAA\n");
+   //   printk_debug(DBG_KERNEL_START, "AAAAA\n");
    /* Initialisation de la liste des taches en cours */
    initialiserListeTache(&listeTaches);
-   //printk("BBBBB\n");
+   //   printk_debug(DBG_KERNEL_START, "BBBBBB\n");
 
    /* Création d'une tâche pour le fil actuel */
    if (ordonnancerTache(NULL, TRUE) < 0) {
       paniqueNoyau("impossible de creer la premiere tache !\n");
    }
-   //printk("CCCCC\n");
+   //   printk_debug(DBG_KERNEL_START, "CCCCCC\n");
 
    /* Initialisation de la tache "aDummyKernelTask" */
    if (ordonnancerTache(aDummyKernelTask, FALSE)  < 0) {

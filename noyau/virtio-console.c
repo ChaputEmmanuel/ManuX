@@ -1,6 +1,15 @@
 /**
  * @file virtio-console.c
  *
+ * A faire : la gestion de la mémoire n'est pas terrible ! J'alloue
+ * une page pour chaque nouveau message et je la supprime lorsque je
+ * récupère les buffers (voir les "WARNING Pas top" dans le
+ * code). Idéalement, il vaudrait mieux que ce soit virtio qui gère
+ * ça. Par exemple à l'initialisation, je lui dit que je veux qu'il
+ * copie les données. Du coup il alloue une première fois les buffers
+ * assiociés aux descripteurs, puis il les récupère avec les buffers,
+ * sans les libérer/réallouer. Au pire il peut les faire croitre si
+ * nécessaire !
  */
 
 #include <manux/virtio-console.h>
@@ -47,6 +56,11 @@ void virtioConsoleTraiterBuffers()
    nbLu = virtioFileRecupererBuffers(
 	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
 			      bf, lg, NB_BUFF_TRAITES);
+
+   // WARNING Pas top
+   for (int n = 0; n < nbLu; n++) {
+      libererPage(bf[n]);
+   }
 }
 
 /**
@@ -139,9 +153,13 @@ size_t virtioConsoleEcrire(Fichier * f, char * b, size_t l)
    void *bf [1];
    int lg[1];
    int nb;
-   
-   bf[0] = b;
+
+   // WARNING Pas top
+   bf[0] = allouerPage();
+   memcpy(bf[0], b, l);
+
    lg[0] = l;
+
    nb = virtioFournirBuffers(&(vc->virtioPeripherique),
 			1,
 			bf, lg, 1, 0);

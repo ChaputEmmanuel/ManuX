@@ -258,9 +258,9 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
  *
  */
 int virtioFournirBuffer(VirtioPeripherique * vp,
-			 uint16_t id,
-			 void * bu, int lg,
-			 uint16_t fl)
+                        uint16_t id,
+                        void * bu, int lg,
+                        uint16_t fl)
 {
    return virtioFournirBuffers(vp, id, &bu, &lg, 1, fl);
 }
