@@ -59,11 +59,17 @@ void libererPage(void * pageLiberee);
  * vérification n'est effectuée.
  */
 
+int nombrePagesAllouees();
+
+int nombrePagesTotal();
+
+#ifdef MANUX_AS
 int AS_obtenirPages(ParametreAS p, int nbPages);
 /*
  * Demande d'accroissement de la zone mémoire disponible à
  * la tâche.
  * Retour : nombre de pages obtenues.
  */
+#endif
 
 #endif

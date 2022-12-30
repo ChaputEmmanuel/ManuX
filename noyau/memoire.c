@@ -39,6 +39,7 @@ TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
  * Le nombre global de pages dans le système
  */
 static int nombrePages = 0;
+static int nombreDePagesAllouees = 0;
 
 /*
  * Marquer une page comme réservée. WARNING : il faut se protéger par un mutex
@@ -48,7 +49,23 @@ static void inline reserverPage(uint32_t i)
    if (proprietairePage[i] != (TacheID)0) {
       paniqueNoyau("Page %d déjà prise\n", i);
    }
-   proprietairePage[i] = (TacheID)1;
+   nombreDePagesAllouees++;
+   proprietairePage[i] = (TacheID)1;  // WARNING
+}
+
+/**
+ * La libération qui va avec
+ */
+void libererPage(void * pageLiberee)
+{
+   int i = ((uint32_t) pageLiberee) / MANUX_TAILLE_PAGE;
+   
+   if (proprietairePage[i] == (TacheID)0) {
+      paniqueNoyau("Liberation de la page %d non allouee !\n", i);
+   }
+   nombreDePagesAllouees--;
+   proprietairePage[i] = (TacheID)0;
+  
 }
 
 /*
@@ -183,6 +200,16 @@ void * allouerPage()
    return pageAllouee;
 }
 
+int nombrePagesAllouees()
+{
+  return nombreDePagesAllouees;
+}
+
+int nombrePagesTotal()
+{
+  return nombrePages;
+}
+
 /**
  * Combien de pages libes à partir de la page numeroPage incluse ?
  */
@@ -221,10 +248,6 @@ void * allouerPages(unsigned int nombre)
    }
 
    return result;
-}
-
-void libererPage(void * pageLiberee)
-{
 }
 
 #if defined(MANUX_APPELS_SYSTEME) && defined(MANUX_PAGINATION)

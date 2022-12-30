@@ -134,6 +134,8 @@ void afficherEtatTaches()
 	  totalMinutesDansTemps(nbTopHorloge),
 	  secondesDansTemps(nbTopHorloge),
 	  nbTopHorloge);
+   printk("Memoire : %d / %d pages allouees\n",
+	  nombrePagesAllouees(), nombrePagesTotal());
    printk("Num prochaine tache : %d\n", numeroProchaineTache);
    afficheEtatSystemeDemande = FALSE;
    printk("[num] et   nbAc  tpsEx     tache    console       ldt\n");

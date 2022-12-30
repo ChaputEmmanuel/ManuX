@@ -34,8 +34,10 @@ En cours
      main, même avec virtio-console seul ça plante méchamment !!!
 
      . Réfléchir à utiliser tout de même la consoleNoyau pour certains
-     messages spécifiques. En tous cas, sur la console, il reste
-     quelques points à voir :
+     messages spécifiques. Ce sera sûrement utile pour débuger la
+     virtio-console. En tous cas, sur la console, il reste quelques
+     points à voir :
+     
       . toujours avoir une console active (si on a une console !)
       . plus de consoleNoyau(), on doit pouvoir faire avec
       consoleActive() ? Pas si sûr, si on peut garder les printk du
@@ -59,7 +61,8 @@ dans make.conf make.commons make.rules, ...
 
 EN COURS : allocation mémoire (dont doc à restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
-   de place et peut utiliser bsf comme ffsl
+   de place et peut utiliser bsf comme ffsl ...
+   Mettre le vrai propriétaire de la page (pour le moment c'est 1)
 
    WARNING : la première tâche conserve la pile initialement
    construite par mb-manux, ... Pas forcément un drame (elle fait 16K
