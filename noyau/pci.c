@@ -122,7 +122,7 @@ void PCIEnumerationDesEquipements()
    uint32_t adresse;        // Pour chercher les adresse d'E/S
    uint8_t  bar;            // Parcourir les BAR
    
-   printk_debug(DBG_KERNEL_BUS, "Enumeration des equipements PCI ...\n");
+   printk_debug(DBG_KERNEL_PCI, "Enumeration des equipements PCI ...\n");
    
    for (numEquipement = 0; numEquipement < PCI_NB_EQUIP_PAR_BUS; numEquipement++) {
       // Lecture des numéros de vendeur et d'équipement
@@ -154,21 +154,21 @@ void PCIEnumerationDesEquipements()
 	       // non signifiants
                PCIEquipements[PCINombreEquipements].adresseES = adresse & (~0x3);
 	    } else {
-	      //            printk_debug(DBG_KERNEL_ERREUR, "Memory BARs a prendre en compte !\n");
+               printk_debug(DBG_KERNEL_A_FAIRE, "Memory BARs a prendre en compte !\n");
 	    }
 	 }
 	 
-         printk_debug(DBG_KERNEL_BUS, "[%d] Vendeur/Id 0x%x/0x%x\n",
+         printk_debug(DBG_KERNEL_PCI, "[%d] Vendeur/Id 0x%x/0x%x\n",
 		      PCINombreEquipements, idVendeur, idEquipement);
 
 	 PCINombreEquipements++;
 	 if (PCINombreEquipements >= MANUX_NB_MAX_EQUIPEMENTS_PCI) {
-            printk_debug(DBG_KERNEL_ERREUR, "Trop d'equipements PCI pour moi !\n");
+            printk(PRINTK_CRITIQUE"Trop d'equipements PCI pour moi !\n");
             return;
 	 }
       }
    }
-   printk_debug(DBG_KERNEL_BUS, "%d equipements PCI\n", PCINombreEquipements);
+   printk_debug(DBG_KERNEL_PCI, "%d equipements PCI\n", PCINombreEquipements);
 }
 
 /**

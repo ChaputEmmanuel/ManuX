@@ -122,7 +122,8 @@ affent :          switch (prefixe) {
    /* On affiche  */
 #ifdef MANUX_JOURNAL
    // Si le journal n'est pas encore actif, on envoie directement sur la console
-   if (journal) {
+   // Ce n'est pas génial, voir le commentaire au début de journal.c
+   if (journalOperationnel()) {
       journaliser(chaine, indice);
    } else {
       afficherConsoleN(consoleNoyau(), chaine, indice);

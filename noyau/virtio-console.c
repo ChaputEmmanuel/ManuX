@@ -23,6 +23,7 @@
 #include <manux/io.h>           // outb
 #include <manux/debug.h>
 #include <manux/errno.h>
+#include <manux/string.h>
 
 /**
  * Description d'un périphérique virtio console
@@ -72,7 +73,7 @@ void virtioConsoleGestionInt(void * pr)
    uint8_t isr;
 
    vc->nbItRecues++;
-   //   printk_debug(DBG_KERNEL_VIRTIO, "Interuption %d !!!\n", vc->nbItRecues);
+   printk_debug(DBG_KERNEL_VIRTIO, "Interuption %d !!!\n", vc->nbItRecues);
 
    // Est-ce moi qui suis visé ?
    inb(vc->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR, isr);
@@ -82,8 +83,6 @@ void virtioConsoleGestionInt(void * pr)
 
       // La suite est à déférer dans une partie basse
       virtioConsoleTraiterBuffers(vc);
-      //   } else {
-      //      printk_debug(DBG_KERNEL_VIRTIO, "Balek, ...\n");
    }
 }
 
@@ -215,7 +214,7 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
    PCINumeroPeripherique = PCIObtenirProchainEquipement(PCI_VENDEUR_VIRTIO,
 							PCI_PERIPHERIQUE_VIRTIO_CONSOLE,
 							-1);
-   printk_debug(DBG_KERNEL_ALL, "Peripherique PCI %d\n", PCINumeroPeripherique);
+   printk_debug(DBG_KERNEL_VIRTIO, "Peripherique PCI %d\n", PCINumeroPeripherique);
 
    if (PCINumeroPeripherique == -1) {
       return ENOENT;

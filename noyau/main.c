@@ -63,12 +63,10 @@ INoeud iNoeudVirtioConsole;
 Fichier fichierVirtioConsole;
 #endif
 
-#ifdef MANUX_JOURNAL_USES_FILES
+/**
+ * Configuration de la console
+ */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
-Fichier fichierConsole; // Le fichier qui permet de manipuler la console
-#else
-Console * console; // La console système
-#endif
 
 void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
@@ -84,12 +82,7 @@ void _start(InfoSysteme * infoSysteme,
    } descriptionProc;
 
    /* Initialisation de la console noyau */
-#ifdef MANUX_JOURNAL_USES_FILES
    consoleInitialisation(&iNoeudConsole);
-   ouvrirFichier(&iNoeudConsole, &fichierConsole);
-#else
-   console = consoleInit();
-#endif
 
    i8259aInit(MANUX_INT_BASE_IRQ);
 
@@ -101,11 +94,7 @@ void _start(InfoSysteme * infoSysteme,
    
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
-#   ifdef MANUX_JOURNAL_USES_FILES
-    initialiserJournal(&fichierConsole);
-#   else
-    initialiserJournal(console);
-#   endif
+    journalInitialiser(&iNoeudConsole);
 #endif
 
    //basculerConsole();
@@ -142,7 +131,7 @@ void _start(InfoSysteme * infoSysteme,
    initialiserAppelsSysteme();
    printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
 #endif
-
+   
    /* Initialisation du bus PCI */
 #ifdef MANUX_PCI
    printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
@@ -154,7 +143,7 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
       ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
-      initialiserJournal(&fichierVirtioConsole);
+      journalAffecterFichier(&fichierVirtioConsole);
    }
    printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
 #endif
@@ -225,7 +214,7 @@ void _start(InfoSysteme * infoSysteme,
 
    //printk_debug(DBG_KERNEL_START, "Deuxieme trame ...\n");
    //virtioNetTestDeuxiemeEmission();
-
+   
    init();
 }   /* _start */
 

@@ -52,7 +52,7 @@
  * Position de l'IDT (Interrupt Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_IDT
-#   define MANUX_ADRESSE_IDT  0x31000
+#   define MANUX_ADRESSE_IDT  0x41000 //0x31000
 #endif
 
 #ifndef MANUX_IDT_NB_PAGES
@@ -63,7 +63,7 @@
  * Position de la GDT (Global Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_GDT
-#   define MANUX_ADRESSE_GDT  0x32000
+#   define MANUX_ADRESSE_GDT  0x42000 //0x32000
 #endif
 
 #ifndef MANUX_GDT_NB_PAGES
@@ -227,10 +227,32 @@
 #define MANUX_JOURNAL
 
 /*
- * A virer dès que ça fonctionne (et que les consoles sont devenues
- * des fichiers).
+ * Le journal utilise la console via l'interface fichier
+ * traditionnelle (read/write). Mais dans certaines phases de debug,
+ * ça peut s'avérer utile de contourner ça et de l'accéder
+ * directement.
  */
-#define MANUX_JOURNAL_USES_FILES
+#define MANUX_JOURNAL_DIRECT_CONSOLE
+
+/**
+ * On affichera les messages d'un niveau <=
+ * MANUX_JOURNAL_NIVEAU_DEFAUT
+ */
+#define MANUX_JOURNAL_NIVEAU_PANIQUE      0
+#define MANUX_JOURNAL_NIVEAU_URGENCE      1
+#define MANUX_JOURNAL_NIVEAU_CRITIQUE     2
+#define MANUX_JOURNAL_NIVEAU_ERREUR       3
+#define MANUX_JOURNAL_NIVEAU_ATTENTION    4
+#define MANUX_JOURNAL_NIVEAU_NOTIFICATION 5
+#define MANUX_JOURNAL_NIVEAU_INFORMATION  6
+#define MANUX_JOURNAL_NIVEAU_DEBUGAGE     7
+
+#define MANUX_JOURNAL_NIVEAU_DEFAUT       7
+
+#define PRINTK_PANIQUE   "{0}"
+#define PRINTK_URGENCE   "{1}"
+#define PRINTK_CRITIQUE  "{2}"
+#define PRINTK_ERREUR    "{3}"
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
@@ -339,7 +361,7 @@
 /*
  * Du réseau
  */
-//#define MANUX_VIRTIO_NET
+#define MANUX_VIRTIO_NET
 
 /*
  * Une console

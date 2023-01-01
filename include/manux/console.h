@@ -101,19 +101,11 @@ typedef enum {
  */
 #define ASCII_ESC 27
 
-#ifdef MANUX_JOURNAL_USES_FILES
 /**
  * Initialisation du système de console. 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
  */
 int consoleInitialisation(INoeud * iNoeudConsole);
-#else
-/*
- * Initialisation de la console. Le pointeur retourné permet de
- * manipuler ensuite la console.
- */
-Console * consoleInit();
-#endif
 
 /*
  * Choix des couleurs de texte et de fond (voir l'enum ci dessus)

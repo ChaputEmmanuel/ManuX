@@ -468,10 +468,9 @@ MethodesFichier consoleMethodesFichier = {
 #endif // MANUX_FS
 
 /**
- * Initialisation du système. Idéalement, consoleInit() ne doit plus
- * être visible hors d'ici, on ne passe plus que par les fichiers.
+ * Initialisation de la console.
  */
-Console * consoleInit()
+Console * initialiserConsoleNoyau()
 {
    initialiserConsole(&_consoleNoyau, MANUX_CON_SCREEN);
    _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
@@ -490,26 +489,19 @@ Console * consoleInit()
    return &_consoleNoyau;
 }
 
-#ifdef MANUX_JOURNAL_USES_FILES
 /**
  * Initialisation du système de console. 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
  */
 int consoleInitialisation(INoeud * iNoeudConsole)
 {
-   Console * foo;
-
-   foo = consoleInit();
-
    iNoeudConsole->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
    iNoeudConsole->typePeripherique.mineur = 0;
-   iNoeudConsole->prive = NULL;
+   iNoeudConsole->prive = initialiserConsoleNoyau();
    iNoeudConsole->methodesFichier = &consoleMethodesFichier;
 
    return ESUCCES;
 }
-
-#endif
 
 #ifdef MANUX_APPELS_SYSTEME
 /*

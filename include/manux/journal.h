@@ -7,37 +7,23 @@
 #ifndef JOURNAL_DEF
 #define JOURNAL_DEF
 
-#ifdef MANUX_JOURNAL_USES_FILES
-#   include <manux/fichier.h>
-#else
-#   include <manux/console.h>
-#endif
+#include <manux/types.h>
+#include <manux/fichier.h>
+#include <manux/console.h>
 
-#ifdef MANUX_JOURNAL_USES_FILES
-extern Fichier * journal;
-
-void initialiserJournal(Fichier * f);
-/*
+/**
  * Initialisation du système de journalisation.
  */
+void journalInitialiser(INoeud * iNoeudConsole);
 
-#else
-extern Console * journal;
-void initialiserJournal(Console * console);
-/*
- * Initialisation du système de journalisation.
- */
-#endif
+void journalAffecterFichier(Fichier * pc);
 
 void journaliser(char * message, int len);
 /*
  * Journalisation d'un message.
  */
 
-void afficherJournal();
-/*
- * Forcer l'affichage du journal à l'écran
- */
+booleen journalOperationnel();
 
 
 #endif

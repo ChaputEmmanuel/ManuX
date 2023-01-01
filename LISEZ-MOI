@@ -21,9 +21,43 @@ Feuille de route
 En cours
 --------
 
+   BON, ben au delà de tous les points ci dessous, j'en suis à essayer
+   de débuguer virtio, ... 
+   ATTENTION, je suspecte que mon noyau devient trop gros et que la
+   fin empiète sur les GDT/IDT. Du coup j'essaie d'en changer les
+   adresses dans config.h, mais patatras, ça ne marche plus ! Deux
+   choses à voir donc : (1) il me semblait avoir des outils de test
+   pour s'assurer qu'on na pas de soucis de ce type. (2), le plus
+   important, pourquoi changer l'adresse dans config.h ne fonctionne
+   pas !? OUF, pas de soucis pour le second point, mais la première
+   question reste posée !
+   
    A finaliser
 
-     . Apparemment la console virtio seule marche donc à peu près, le
+     (0) (C'est fait ! A documenter)  Prochain truc à faire pour le
+     point (2) : un journal qui fonctionne avec une console ET un
+     fichier ! 
+
+        . Initialisation avec une console possible (par exemple
+     iniitaliserJournal(Console * c) avec c = NULL si pas de Console
+        . Ajout d'un fichier avec journalAjouterFichier(Fichier *)
+	. Par défaut printk() affiche dans les deux (ou pas en
+     fonction d'une macro, voire d'une variable de config)
+        . Ajout d'un logeLevel optionnel en tête de printk :
+	printk("[1]" "Msg ", ...)     qui envoie sur la console
+	printk("(1)" "Msg ", ...)     qui envoie sur le fichier
+	printk("{1}" "Msg ", ...)     qui envoie sur les deux
+
+        avec un niveau de log inspiré de Linux.
+
+        Bon, c'est en cours ... C'est même utilisable ! Il reste des
+     choses à rêgler : ça serait bien que printk() prenne un niveau
+     par défaut qui affiche *uniquement* sur le fichier si dispo et
+     sur la console sinon par exemple.
+	
+	
+
+     (1) Apparemment la console virtio seule marche donc à peu près, le
      reseau virtio seul semble également fonctionner (il reçoit les
      trames émises par un telnet par exemple !) mais dès qu'on
      configure les deux, c'est la panique, ... J'ai l'impression que
@@ -33,7 +67,7 @@ En cours
      parce que si je décommente une ligne de printk_debug dans le
      main, même avec virtio-console seul ça plante méchamment !!!
 
-     . Réfléchir à utiliser tout de même la consoleNoyau pour certains
+     (2) Réfléchir à utiliser tout de même la consoleNoyau pour certains
      messages spécifiques. Ce sera sûrement utile pour débuger la
      virtio-console. En tous cas, sur la console, il reste quelques
      points à voir :

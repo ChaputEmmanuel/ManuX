@@ -135,7 +135,6 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
    // Pour savoir où on en est des récupérations de buffer
    fileVirtuelle->dernierIndiceUtilise = 0;
 
-   /*   
    printk_debug(DBG_KERNEL_VIRTIO, "%d elts, %d+%d octets, %d pages, desc=0x%x, dis=0x%x, uti=0x%x,\n",
 		tailleFile,
 		taillePartie1,
@@ -144,7 +143,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
 		fileVirtuelle->tableDescripteurs,
 		fileVirtuelle->buffersDisponibles,
 		fileVirtuelle->buffersUtilises);
-   */
+
    return ESUCCES;
 }
 
@@ -213,7 +212,7 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    inb(adresseES + VIRTIO_HIST_ETAT, etat);
 
    if ((etat & VIRTIO_FEATURES_OK) == 0) {
-      printk_debug(DBG_KERNEL_VIRTIO, "Le device virtio net refuse les caract. !\n");
+      printk(PRINTK_ERREUR, "Le device virtio net refuse les caract. !\n");
       return EINVAL;
    }
 

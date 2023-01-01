@@ -115,7 +115,7 @@ void ordonnanceur()
 
 void afficherEtatUneTache(Tache * tache)
 {
-   printk("[  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x \n",
+  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x \n",
        tache->numero,
          (tache->etat == Tache_En_Cours)?"c":((tache->etat == Tache_Prete)?"p":"b"),
           tache->nbActivations,
@@ -130,22 +130,22 @@ void afficherEtatTaches()
 {
    CelluleTache * celluleTache;
 
-   printk("\n-------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
+   printk("\n ------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
 	  totalMinutesDansTemps(nbTopHorloge),
 	  secondesDansTemps(nbTopHorloge),
 	  nbTopHorloge);
-   printk("Memoire : %d / %d pages allouees\n",
+   printk(" Memoire : %d / %d pages allouees\n",
 	  nombrePagesAllouees(), nombrePagesTotal());
-   printk("Num prochaine tache : %d\n", numeroProchaineTache);
+   printk(" Num prochaine tache : %d\n", numeroProchaineTache);
    afficheEtatSystemeDemande = FALSE;
-   printk("[num] et   nbAc  tpsEx     tache    console       ldt\n");
+   printk(" [num] et   nbAc  tpsEx     tache    console       ldt\n");
    afficherEtatUneTache(tacheEnCours);
    for (celluleTache = listeTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
         afficherEtatUneTache(celluleTache->tache);
    }
-   printk("\n-------------------------------------------------------------------------------\n");
+   printk("\n ------------------------------------------------------------------------------\n");
 }
 
 /**
