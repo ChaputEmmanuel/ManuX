@@ -97,7 +97,6 @@ void _start(InfoSysteme * infoSysteme,
     journalInitialiser(&iNoeudConsole);
 #endif
 
-   //basculerConsole();
    descriptionProcesseur(0, descriptionProc.registres);
    descriptionProc.caracteres[12] = 0;
 
@@ -108,7 +107,6 @@ void _start(InfoSysteme * infoSysteme,
    /* Affichage de la mémoire disponible */
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
 
-   //   while(1){};
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme->memoireDeBase,

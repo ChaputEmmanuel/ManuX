@@ -388,7 +388,7 @@ int consoleOuvrir(INoeud * iNoeud, Fichier * f)
    return ESUCCES;
 }
 
-int consoleEcrire(Fichier * f, void * buffer, int nbOctets)
+size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Console * con = f->prive;
 
@@ -430,7 +430,7 @@ int lireConsoleN(Console * cons, void * buffer, int nbOctets)
    return lu;
 }
 
-int consoleLire(Fichier * f, void * buffer, int nbOctets)
+size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Console * con = f->prive;
 

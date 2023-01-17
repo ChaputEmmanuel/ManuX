@@ -18,8 +18,8 @@ typedef struct _INoeud INoeud;
  */
 typedef struct _MethodesFichier {
    int (*ouvrir) (INoeud * iNoeud, Fichier * f);
-   int (*ecrire) (Fichier * f, void * buffer, int nbOctets);
-   int (*lire) (Fichier * f, void * buffer, int nbOctets);
+   size_t (*ecrire) (Fichier * f, void * buffer, size_t nbOctets);
+   size_t (*lire) (Fichier * f, void * buffer, size_t nbOctets);
 } MethodesFichier;
 
 /**

@@ -169,6 +169,13 @@
 #endif
 
 /*
+ * Combien de handlers peut-on greffer sur une interruption ?
+ */
+#ifndef MANUX_NB_HANDLER_PAR_IRQ
+#   define MANUX_NB_HANDLER_PAR_IRQ 4
+#endif
+
+/*
  * Premier numéro d'interruption utilisé pour repositionner les IRQs
  */
 #ifndef MANUX_INT_BASE_IRQ

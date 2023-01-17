@@ -185,7 +185,7 @@ Console * consoleNoyau();
 /*
  * Écriture sur une console
  */
-int consoleEcrire(Fichier * f, void * buffer, int nbOctets);
+size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets);
 
 #ifdef MANUX_APPELS_SYSTEME
 /*

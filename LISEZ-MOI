@@ -13,24 +13,17 @@ Feuille de route
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
    . Modes usager/noyau
-   . Bus PCI
-   . Ethernet
+   . Bus PCI                     <- Un minimum opérationnel est fait
+   . Ethernet                    <- La base y est !
    . Block device
    . SGF
    
 En cours
 --------
 
-   BON, ben au delà de tous les points ci dessous, j'en suis à essayer
-   de débuguer virtio, ... 
-   ATTENTION, je suspecte que mon noyau devient trop gros et que la
-   fin empiète sur les GDT/IDT. Du coup j'essaie d'en changer les
-   adresses dans config.h, mais patatras, ça ne marche plus ! Deux
-   choses à voir donc : (1) il me semblait avoir des outils de test
-   pour s'assurer qu'on na pas de soucis de ce type. (2), le plus
-   important, pourquoi changer l'adresse dans config.h ne fonctionne
-   pas !? OUF, pas de soucis pour le second point, mais la première
-   question reste posée !
+   EN COURS : virtio semble fonctionner, il faut donc finaliser ça
+   ainsi que le journal (voir ci-dessous) de sorte à être bien pour
+   passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
    
    A finaliser
 
@@ -55,18 +48,6 @@ En cours
      par défaut qui affiche *uniquement* sur le fichier si dispo et
      sur la console sinon par exemple.
 	
-	
-
-     (1) Apparemment la console virtio seule marche donc à peu près, le
-     reseau virtio seul semble également fonctionner (il reçoit les
-     trames émises par un telnet par exemple !) mais dès qu'on
-     configure les deux, c'est la panique, ... J'ai l'impression que
-     le soucis est à chercher autour des handlers, mais même si on
-     désactve celui du réseau, ça foire.
-        Ca vient peut-être de virtio-console (ou virtio tout court)
-     parce que si je décommente une ligne de printk_debug dans le
-     main, même avec virtio-console seul ça plante méchamment !!!
-
      (2) Réfléchir à utiliser tout de même la consoleNoyau pour certains
      messages spécifiques. Ce sera sûrement utile pour débuger la
      virtio-console. En tous cas, sur la console, il reste quelques
@@ -93,6 +74,15 @@ En cours
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...
 
+   ATTENTION, je suspecte que mon noyau devient trop gros et que la
+   fin empiète sur les GDT/IDT. Du coup j'essaie d'en changer les
+   adresses dans config.h, mais patatras, ça ne marche plus ! Deux
+   choses à voir donc : (1) il me semblait avoir des outils de test
+   pour s'assurer qu'on na pas de soucis de ce type. (2), le plus
+   important, pourquoi changer l'adresse dans config.h ne fonctionne
+   pas !? OUF, pas de soucis pour le second point, mais la première
+   question reste posée !
+   
 EN COURS : allocation mémoire (dont doc à restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
    de place et peut utiliser bsf comme ffsl ...

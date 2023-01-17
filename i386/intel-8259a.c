@@ -12,6 +12,7 @@
 #include <manux/memoire.h>      // NULL
 #include <manux/io.h>
 #include <manux/types.h>
+#include <manux/errno.h>
 
 #include <manux/intel-8259a.h>
 
@@ -23,10 +24,15 @@ typedef struct {
    void * private;;
 } i8259aClient;
 
-/*
+/**
  * Tableau des handlers et data
  */
-i8259aClient hanlderClients[I8259A_NB_IRQ];
+i8259aClient handlerClients[I8259A_NB_IRQ][MANUX_NB_HANDLER_PAR_IRQ];
+
+/**
+ * Nombre de handlers enregistrés par IRQ
+ */
+int nbHandlerClients[I8259A_NB_IRQ];
 
 /*
  * Quelques macros utiles 
@@ -100,28 +106,31 @@ void i8259aInit(uint8_t intBase)
 
    // On met à NULL les handlers
    for (i = 0; i < I8259A_NB_IRQ; i++) {
-      hanlderClients[i].handler = (void (*)(void *)) NULL;
-      hanlderClients[i].private = NULL;
+      nbHandlerClients[i] = 0;
+      //      handlerClients[i].handler = (void (*)(void *)) NULL;
+      //      handlerClients[i].private = NULL;
    }
 }
 
-/*
+/**
  * Ajout d'un handler
  */
 int i8259aAjouterHandler(int numIRQ, void (*handler)(void *), void * private)
 {
    // On ne gère que un handler par IRQ
-   if (hanlderClients[numIRQ].handler) {
-      return 0;
+   if (nbHandlerClients[numIRQ] >= MANUX_NB_HANDLER_PAR_IRQ) {
+      return ENOMEM;
    }
 
-   hanlderClients[numIRQ].handler = handler;
-   hanlderClients[numIRQ].private = private;
+   handlerClients[numIRQ][nbHandlerClients[numIRQ]].handler = handler;
+   handlerClients[numIRQ][nbHandlerClients[numIRQ]].private = private;
 
-   return 1;
+   nbHandlerClients[numIRQ] ++;
+   
+   return ESUCCES;
 }
 
-/*
+/**
  * Masquage d'une IRQ
  */
 void i8259aInterdireIRQ(uint8_t numIRQ)
@@ -186,11 +195,15 @@ void i8259aAckIRQ(uint8_t numIRQ)
 void i8259aGestionIRQ(TousRegistres registres, uint32_t numIRQ, 
                       uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
+   int i;
+   
    // On accuse réception auprès du PIC
    i8259aAckIRQ(numIRQ);
 
-   // Si un client a enregistré une fonction, on l'invoque
-   if (hanlderClients[numIRQ].handler) {
-      hanlderClients[numIRQ].handler(hanlderClients[numIRQ].private);
+   // On invoque les handlers de tous les clients
+   for (i = 0 ; i < nbHandlerClients[numIRQ]; i++) {
+      if (handlerClients[numIRQ][i].handler) {
+         handlerClients[numIRQ][i].handler(handlerClients[numIRQ][i].private);
+      }
    }
 }
