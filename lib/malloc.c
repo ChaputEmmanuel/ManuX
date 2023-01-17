@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Implantation des sous-programmes de manipulation de la mÈmoire au     */
+/*      Implantation des sous-programmes de manipulation de la m√©moire au     */
 /*   niveau d'une tache sous ManuX.                                           */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
@@ -12,15 +12,15 @@
 #include <manux/appelsysteme.h> /* numeroTache  */
 
 /*
- * Informations relatives ‡ la gestion de la mÈmoire par malloc/free.
- * Ici, on gËre les blocs via une liste.
+ * Informations relatives √† la gestion de la m√©moire par malloc/free.
+ * Ici, on g√®re les blocs via une liste.
  */
 typedef struct _InfoGestionMemoire {
    void        * prochainBlocLibre;
 } InfoGestionMemoire;
 
 /*
- * Informations permettant de gÈrer un bloc de mÈmoire libre.
+ * Informations permettant de g√©rer un bloc de m√©moire libre.
  */
 typedef struct _BlocLibre {
    unsigned int       taille;   /* Taille utilisable, en octets */ 
@@ -28,8 +28,8 @@ typedef struct _BlocLibre {
 } BlocLibre;
 
 /*
- * DÈfinition de la vision d'un bloc de mÈmoire lorsqu'il a ÈtÈ allouÈ ‡ la
- * t‚che. Naturellement, c'est le pointeur sur la zone utilisateur qui est
+ * D√©finition de la vision d'un bloc de m√©moire lorsqu'il a √©t√© allou√© √† la
+ * t√¢che. Naturellement, c'est le pointeur sur la zone utilisateur qui est
  * fourni.
  */
 typedef struct _BlocAlloue {
@@ -38,8 +38,8 @@ typedef struct _BlocAlloue {
 } BlocAlloue;
 
 /*
- * On conserve l'adresse de dÈpart de gestion des infos. On les place dans
- * le premier segment, juste aprÈs les infos de la t‚che.
+ * On conserve l'adresse de d√©part de gestion des infos. On les place dans
+ * le premier segment, juste apr√©s les infos de la t√¢che.
  */
 InfoGestionMemoire * infoMalloc
    = (InfoGestionMemoire * )(MANUX_NOMBRE_PAGES_SYSTEME * MANUX_TAILLE_PAGE + sizeof(Tache));
@@ -53,7 +53,7 @@ void * malloc(int taille)
       return NULL;
    }
 
-   /* Si la t‚che ne veut rien, elle n'a rien :-) */
+   /* Si la t√¢che ne veut rien, elle n'a rien :-) */
    if (taille <= 0) {
       return NULL;
    }
@@ -69,7 +69,7 @@ void * malloc(int taille)
    }
 
    /* */
-   /* Si on en est l‡, c'est un Èchec */
+   /* Si on en est l√†, c'est un √©chec */
    return NULL;
 }
 
@@ -81,7 +81,7 @@ int initialiserMalloc()
 {
   //   Page debutTas;
 
-   /* Il nous faut au moins une page pour gÈrer les infos */
+   /* Il nous faut au moins une page pour g√©rer les infos */
    infoMalloc->prochainBlocLibre = NULL;
 
    return 0;

@@ -230,8 +230,14 @@ Les Makefile
    . Je génère des fichiers html depuis les fichiers source grâce à
    doxygen
    . Je génère des fichiers html depuis les doc LaTeX grâce à pandoc.
-   . Grâce au package hyperref, les liens semblent possibles !
+   . Grâce au package hyperref, les liens semblent possibles ! Ca m'a
+   l'air pas mal (voir affichage-part). Macro à ajouter genre
 
+\manuxref{rep}{fichier}{ext} qui donne
+   \href{html/fichier_8ext_source.html}{\verb rep/fichier.ext}
+   (\href{html/fichier_8ext_source.html}{\sc dox})
+
+   
    C'est maintenant à travailler en commençant avec la première doc à
    écrire, par exemple celle sur l'affichage. Parmis les questions qui
    se posent
@@ -244,7 +250,9 @@ Les Makefile
   A faire sur la doc (à part la généraliser, l'écrire, répondre à ces
   questions, ...) :
 
-   . un plan avec des liens vers chaque partie
+   . Un plan avec des liens vers chaque partie, et une barre de
+   navigation à gauche
+
 
 ============================================================================
 

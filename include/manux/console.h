@@ -1,15 +1,16 @@
-/*----------------------------------------------------------------------------*/
-/*      Définition des fonctions de base d'accés à la console.                */
-/*                                                                            */
-/*      Une console est protégée par un verrour de type ExclusionMutuelle.    */
-/*   C'est à l'utilisateur de veiller à respecter les appels aux fonctions    */
-/*   d'entrée et de sortie de la section critique avant et aprés chaque       */
-/*   utilisation de la console. Bien sur le printf s'en occupe.               */
-/*      La seule fonction dans laquelle ces appels sont effectués est celle   */
-/*   permettant le basculement de console active.                             */
-/*                                                                            */
-/*                                                (C) Manu Chaput 2000 - 2021 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file console.h
+ * @brief Définition des fonctions de base d'accés à la console.     
+ *                                                                          
+ *      Une console est protégée par un verrour de type ExclusionMutuelle.    
+ *   C'est à l'utilisateur de veiller à respecter les appels aux fonctions    
+ *   d'entrée et de sortie de la section critique avant et aprés chaque       
+ *   utilisation de la console. Bien sur le printf s'en occupe.               
+ *      La seule fonction dans laquelle ces appels sont effectués est celle   
+ *   permettant le basculement de console active.                             
+ *                                                                            
+ *                                                (C) Manu Chaput 2000 - 2023 
+                                                                              */
 
 #ifndef MANUX_CONSOLE_DEF
 #define MANUX_CONSOLE_DEF
@@ -22,14 +23,14 @@
 #   include <manux/fichier.h> // Une console est un fichier
 #endif
 
-/*
+/**
  * Caractéristiques de l'écran physique
  */
 #define MANUX_CON_SCREEN   (char *)MANUX_ADRESSE_ECRAN
 #define MANUX_CON_COLONNES 80
 #define MANUX_CON_LIGNES   25
 
-/*
+/**
  * Structure d'une console. Attention, en cas de consoles virtuelles,
  * on stoque ça au début d'une page qui contient également une copie
  * de l'écran. Il faut donc que la somme des deux tailles soit
@@ -65,7 +66,7 @@ typedef struct _Console {
  */
 extern MethodesFichier consoleMethodesFichier;
 
-/*
+/**
  * Définition des couleurs utilisables pour l'affichage
  */
 typedef enum {

@@ -1,14 +1,15 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantation des fonctions de base d'accÈs ‡ la console.              */
-/*                                                                            */
-/*      Il s'agit ici aussi de quelque chose de trËs primitif. Chaque         */
-/*   console est une zone mÈmoire de la taille d'un Ècran et on tape          */
-/*   directement l‡-dedans. Pour rendre une console active, on permutte       */
-/*   simplement son adresse avec celle de l'Ècran physique. Du coup, les      */
-/*   affichages se font rÈellement ‡ l'Ècran.                                 */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file  console.c
+ * @brief Implantation des fonctions de base d'acc√©s √† la console.        
+ *                                                                      
+ *      Il s'agit ici aussi de quelque chose de tr√®s primitif. Chaque   
+ *   console est une zone m√©moire de la taille d'un √©cran et on tape    
+ *   directement l√†-dedans. Pour rendre une console active, on permutte 
+ *   simplement son adresse avec celle de l'√©cran physique. Du coup, les
+ *   affichages se font r√©ellement √† l'√©cran.                               
+ *                                                                            
+ *                                                  (C) Manu Chaput 2000-2023 
+ *                                                                            */
 #include <manux/console.h>
 
 #include <manux/errno.h>
@@ -28,8 +29,8 @@ Console * consoleActive;
 #endif // MANUX_CONSOLES_VIRTUELLES
 
 /*
- * La console du noyau est celle "par dÈfaut", sur laquelle seront
- * envoyÈs en particulier les messages du noyau (ceux affichÈs par
+ * La console du noyau est celle "par d√©faut", sur laquelle seront
+ * envoy√©s en particulier les messages du noyau (ceux affich√©s par
  * printk).
  */
 static Console _consoleNoyau;
@@ -61,17 +62,17 @@ void effacerConsole(Console * cons)
 
 void scrollUp(Console * cons)
 /*
- * RemontÈ de l'Ècran d'une ligne
+ * Remont√© de l'√©cran d'une ligne
  */
 {
    int c;
 
-   /* RemontÈe du contenu de l'Ècran */
+   /* Remont√©e du contenu de l'√©cran */
    memcpy(cons->adresseEcran,
 	  cons->adresseEcran+2*cons->nbColonnes,
 	  2*((cons->nbLignes-1)*cons->nbColonnes));
    
-   /* On place une ligne d'espaces en bas de l'Ècran */
+   /* On place une ligne d'espaces en bas de l'√©cran */
    for (c = 0; c < cons->nbColonnes; c++) {
       cons->adresseEcran[2*((cons->nbLignes-1)*cons->nbColonnes+c)] = ' ';
       cons->adresseEcran[2*((cons->nbLignes-1)*cons->nbColonnes+c)+1] = cons->attribut;
@@ -90,7 +91,7 @@ void avancerLigne(Console * cons)
 }
 
 /*
- * L'attribut est l‡ pour maintenir la compilation mÍme sans
+ * L'attribut est l√† pour maintenir la compilation m√™me sans
  * optimisation (donc pour le debogage) 
  */
  __attribute__((always_inline))
@@ -100,7 +101,7 @@ inline void afficherConsoleCaractere(Console * cons, char c)
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2+1] = cons->attribut;
    cons->colonne++;
 
-   // On avance d'un caratËre
+   // On avance d'un carat√®re
    assert(cons->nbColonnes != 0);
    if (!(cons->colonne % cons->nbColonnes)) {
       cons->colonne = 0;
@@ -232,11 +233,11 @@ void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
 
 /**
  * Initialisation d'une nouvelle console virtuelle. Les espaces
- * mÈmoire doivent avoir ÈtÈ allouÈs par ailleurs.
+ * m√©moire doivent avoir √©t√© allou√©s par ailleurs.
  */
 void initialiserConsole(Console * cons, char * adresseEcran)
 {
-   // Chaque console a sa propre zone mÈmoire
+   // Chaque console a sa propre zone m√©moire
    cons->adresseEcran = adresseEcran;
    cons->adresseEcranCopie = adresseEcran;
 
@@ -252,7 +253,7 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    initialiserExclusionMutuelle(&cons->scAcces);
 #endif
 
-   // Un peu de mÈnage
+   // Un peu de m√©nage
    effacerConsole(cons);
    
    afficherConsole(cons, "Console ");   
@@ -264,7 +265,7 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    afficherConsole(cons, "\n");   
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   /* On l'insËre aprËs la console active dans la liste des consoles gÈrÈes */
+   /* On l'ins√®re apr√®s la console active dans la liste des consoles g√©r√©es */
    cons->suivante = consoleActive->suivante;
    consoleActive->suivante = cons;
    cons->precedente = consoleActive;
@@ -283,7 +284,7 @@ void initialiserConsole(Console * cons, char * adresseEcran)
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
 /**
- * @brief : CrÈation (avec allocation mÈmoire) d'une console
+ * @brief : Cr√©ation (avec allocation m√©moire) d'une console
  */
 Console * creerConsoleVirtuelle()
 {
@@ -318,27 +319,27 @@ void basculerVersConsole(Console * suivante)
 
    assert(suivante != NULL);
    
-   // On sauvegarde l'Ècran physique dans la console active
+   // On sauvegarde l'√©cran physique dans la console active
    for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bcopy
       consoleActive->adresseEcranCopie[i] = consoleActive->adresseEcran[i];
    }
 
-   // On la dÈsactive (‡ partir de maintenant, ce qui y est Ècrit
-   // n'est plus visible ‡ l'Ècran)
+   // On la d√©sactive (√† partir de maintenant, ce qui y est √©crit
+   // n'est plus visible √† l'√©cran)
    consoleActive->adresseEcran = consoleActive->adresseEcranCopie;
    
-   // On passe ‡ la nouvelle CV 
+   // On passe √† la nouvelle CV 
    consoleActive = suivante;
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
    entrerExclusionMutuelle(&consolesVirtuelles[consoleCourante]->scAcces);
 #endif
 
-   // On l'active (‡ partir de maintenant, ce qui y est Ècrit apparaÓt
-   // directement ‡ l'Ècran).
+   // On l'active (√† partir de maintenant, ce qui y est √©crit appara√Æt
+   // directement √† l'√©cran).
    consoleActive->adresseEcran = MANUX_CON_SCREEN;
 
-   // On copie son Ètat actuel sur l'Ècran
+   // On copie son √©tat actuel sur l'√©cran
    for (i=0; i < MANUX_CON_LIGNES*MANUX_CON_COLONNES*2; i++) { // WARNING utiliser bopy
       consoleActive->adresseEcran[i] = consoleActive->adresseEcranCopie[i];
    }
@@ -398,9 +399,9 @@ size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
 }
 
 /**
- * @brief : Implantation de l'appel systËme de lecture pour la console
+ * @brief : Implantation de l'appel syst√®me de lecture pour la console
  *
- * On va chercher des donnÈes Èventuellement mises ‡ dispo par le
+ * On va chercher des donn√©es √©ventuellement mises √† dispo par le
  * clavier. 
  */
 #ifdef MANUX_CLAVIER_CONSOLE
@@ -411,7 +412,7 @@ int lireConsoleN(Console * cons, void * buffer, int nbOctets)
    // On ne peut pas en lire plus qu'il y en a !
    uint16_t nb = min(nbOctets, cons->nbCarAttente);
    uint16_t lu = 0;   // Le cumul des lectures
-   uint16_t aLire;    // Combien on en lit ‡ chaque passage
+   uint16_t aLire;    // Combien on en lit √† chaque passage
    
    while (lu < nb) {
      // On lit sur la "fin" du tableau circulaire
@@ -419,7 +420,7 @@ int lireConsoleN(Console * cons, void * buffer, int nbOctets)
      memcpy(buffer+lu,
 	    cons->bufferClavier+cons->indiceProchainCar,
 	    aLire);
-     // On dÈcompte cette lecture du buffer
+     // On d√©compte cette lecture du buffer
      cons->indiceProchainCar = (cons->indiceProchainCar + aLire); // WARNING FAUX !
      cons->nbCarAttente = cons->nbCarAttente - aLire;
 
@@ -438,7 +439,7 @@ size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
 }
 #else
 /**
- * En l'absence de clavier, rien ‡ lire !
+ * En l'absence de clavier, rien √† lire !
  */
 int consoleLire(Fichier * f, void * buffer, int nbOctets)
 {
@@ -457,7 +458,7 @@ Console * consoleNoyau()
 
 #ifdef MANUX_FS
 /*
- * Les mÈthodes permettant de traiter une console comme un
+ * Les m√©thodes permettant de traiter une console comme un
  * fichier
  */
 MethodesFichier consoleMethodesFichier = {
@@ -490,8 +491,8 @@ Console * initialiserConsoleNoyau()
 }
 
 /**
- * Initialisation du systËme de console. 
- * @param iNoeudConsole (out) un INoeud dÈcrivant la console par dÈfaut 
+ * Initialisation du syst√®me de console. 
+ * @param iNoeudConsole (out) un INoeud d√©crivant la console par d√©faut 
  */
 int consoleInitialisation(INoeud * iNoeudConsole)
 {
