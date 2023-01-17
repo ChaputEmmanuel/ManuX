@@ -1,0 +1,123 @@
+%===============================================================================
+%      L'affichage
+%===============================================================================
+\section{L'affichage ({\tt lib/console.c lib/printk.c})}
+
+   Testons \href{http://www.overleaf.com}{Something 
+     Linky}
+   
+   Une des premières choses à faire, afin de nous simplifier la vie
+pour la suite du développement, est de se doter d'un service minimal
+d'affichage. Nous allons donc mettre en place un outil très simple
+fondé sur ce que nous founit le matériel.
+
+   Nous allons pour cela procéder en trois étapes.
+
+\begin{itemize}
+   \item   Dans un premier temps, nous allons écrire le code
+permettant un accès simple à l'écran et une gestion minimale de ce
+dernier dans un module ``{\em Console}''. Cet outil est suffisant pour
+que notre noyau soit capable de nous donner un signe de vie à
+l'écran. Mais nous n'allons pas nous arrêter en si bon chemin !
+
+   \item   Nous construirons là-dessus un ``journal'' du noyau, c'est-à-dire
+un outil permettant de rassembler et d'organiser les messages émis par
+les différents sous-systèmes du noyau. Ils pourront être affichés sur
+une console, ou conservés pour être stockés/traités d'une autre façon.
+
+   \item Nous pourrons alors écrire une fonction \lstinline!printk!
+utilisable partout dans le noyau et chargée de mettre en forme des
+messages riches et de les envoyer dans le journal.
+\end{itemize}
+
+   L'avantage d'une telle structure est que nous pourrons la faire
+évoluer. Nous pourrons par exemple créér des consoles virtuelles
+fournissant le même service que notre outil de gestion de l'écran. Il
+sera très simple de les intégrer dans le noyau.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Gestion de l'écran : la console}
+
+   Il se trouve que l'écran d'un PC peut être utilisé en mode textuel
+comme un simple tableau de caractères. Ce tableau est situé à une
+adresse bien connue $a$ et contient $l$ lignes de $c$
+caractères. Chaque caractère est codé sur deux octets : l'un définit
+le code {\sc ascii} du caractère affiché et l'autre la couleur du
+texte et du fond. 
+
+   Les fichiers \lstinline!manux/console.h! et \lstinline!lib/console.c!
+implantent un outil de gestion de base de la console.
+
+   On construit ici en particulier la fonction suivante, chargée
+d'afficher sur l'écran une chaîne de caractères passée en paramètre :
+
+\begin{lstlisting}
+   void afficherEcran(char * msg);
+\end{lstlisting}
+
+   Elle prend en paramètre une chaîne de caractères ``classique''
+(terminée par un caractère nul) et l'affiche à l'écran sans aucune
+mise en forme.
+
+   La gestion de la console est une des toutes premières choses
+initialisées par le noyau, de sorte à pouvoir faire coucou dès que
+possible.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Plus de souplesse avec les consoles virtuelles}
+
+   Lorsque nous allons mettre en place la notion de tâches, il sera
+intéressant d'attribuer à chacune d'entre elles une console virtuelle
+potentiellement différente des autres. Nous pourrons ainsi basculer de
+l'une à l'autre pour mieux distinguer ce qu'affiche chaque tâche.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Mise en place d'un journal}
+
+   Nous allons définir un mécanisme de journal permettant de conserver
+les messages transmis par le noyau. Pour le moment, notre journal se
+contente de transmettre ces messages sur l'écran physique. Lorsque
+nous aurons mis en place des outils de gestion mémoire, nous pourrons
+étoffer ce mécanisme de journal.
+
+   Le journal est implanté dans les fichiers
+\lstinline!manux/journal.h! et \lstinline!lib/journal.c!. Il
+propose essentiellement la fonction suivante
+
+\begin{lstlisting}{}
+   void journaliser(char * message); 
+\end{lstlisting}
+
+   Elle utilise la fonction \lstinline!afficherEcran()! pour envoyer le message à
+l'écran.
+
+   Évidemment, le journal est initialisé juste après la console.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Un premier {\tt printk()}}
+
+   GrÃ¢ce à notre console , l'écriture de {\tt printk()} est assez
+simple, puisque cette fonction n'a plus qu'à se préoccuper de créer
+une chaîne de caractères et de la transmettre au journal (ou
+directement à la console si on n'utilise pas le journal).
+
+   Elle est mise en \oe{}uvre dans les fichiers
+\lstinline!manux/printk.h! et \lstinline!noyau/printk.c!
+
+   La fonction essentielle est bien sûr :
+
+\begin{lstlisting}
+   void printk(char * format, ...);
+\end{lstlisting} 
+
+   Dont le rôle est de mettre en forme une chaîne de caractères
+qu'elle envoie ensuite à la console ou au journal.
+

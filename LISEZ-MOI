@@ -20,7 +20,9 @@ Feuille de route
    
 En cours
 --------
-
+   EN COURS : mise en place de la documentation. Voir ci dessous
+   (cherche Documentation)
+   
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
@@ -97,11 +99,6 @@ EN COURS : allocation mémoire (dont doc à restructurer).
    Vite fait : dans mémoire, lireNombrePages et lireNombrePagesDispo
    pour affichage
    
-   . utilisation de pandoc, par exemple :
-
-pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
-
-   donne une bonne base !
 
    Il va falloir nettoyer un peu le code, et automatiser ça avec make
     
@@ -221,7 +218,33 @@ Les Makefile
 
 ============================================================================
 
-FAIT
+# Documentation
+
+   Le gros est écrit en LaTeX pour le moment. Je suis en train de
+   mettre en place l'architecture suivante
+
+   . Je génère des fichiers html depuis les fichiers source grâce à
+   doxygen
+   . Je génère des fichiers html depuis les doc LaTeX grâce à pandoc.
+   . Grâce au package hyperref, les liens semblent possibles !
+
+   C'est maintenant à travailler en commençant avec la première doc à
+   écrire, par exemple celle sur l'affichage. Parmis les questions qui
+   se posent
+
+   . Soucis d'encodage de certains fichiers
+   . Comment connaître l'URL d'une cible doxygen pour pouvoir
+   l'atteindre depuis la doc LaTeX/Pandoc ?
+   . Comment se comportent les images ?
+
+  A faire sur la doc (à part la généraliser, l'écrire, répondre à ces
+  questions, ...) :
+
+   . un plan avec des liens vers chaque partie
+
+============================================================================
+
+# FAIT
 
    En cours : l'ISO plante sur un AS. Essayer de faire un AS_dumb histoire
    de tester si c'est ça ou ecrireConsole plus spécifiquement. Rêglé
