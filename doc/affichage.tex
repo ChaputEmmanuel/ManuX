@@ -1,7 +1,7 @@
 %===============================================================================
 %      L'affichage
 %===============================================================================
-\section{L'affichage ({\tt lib/console.c lib/printk.c})}
+\section{Introduction}
 
    Testons \href{http://www.overleaf.com}{Something 
      Linky}
@@ -20,14 +20,15 @@ dernier dans un module ``{\em Console}''. Cet outil est suffisant pour
 que notre noyau soit capable de nous donner un signe de vie à
 l'écran. Mais nous n'allons pas nous arrêter en si bon chemin !
 
+   \item Nous pourrons alors écrire une fonction \lstinline!printk!
+utilisable partout dans le noyau et chargée de mettre en forme des
+messages riches et de les envoyer dans le journal.
+
    \item   Nous construirons là-dessus un ``journal'' du noyau, c'est-à-dire
 un outil permettant de rassembler et d'organiser les messages émis par
 les différents sous-systèmes du noyau. Ils pourront être affichés sur
 une console, ou conservés pour être stockés/traités d'une autre façon.
 
-   \item Nous pourrons alors écrire une fonction \lstinline!printk!
-utilisable partout dans le noyau et chargée de mettre en forme des
-messages riches et de les envoyer dans le journal.
 \end{itemize}
 
    L'avantage d'une telle structure est que nous pourrons la faire
@@ -38,7 +39,7 @@ sera très simple de les intégrer dans le noyau.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Gestion de l'écran : la console}
+\section{Gestion de l'écran : la console}
 
    Il se trouve que l'écran d'un PC peut être utilisé en mode textuel
 comme un simple tableau de caractères. Ce tableau est situé à une
@@ -68,43 +69,9 @@ possible.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Plus de souplesse avec les consoles virtuelles}
+\section{Un premier {\tt printk()}}
 
-   Lorsque nous allons mettre en place la notion de tâches, il sera
-intéressant d'attribuer à chacune d'entre elles une console virtuelle
-potentiellement différente des autres. Nous pourrons ainsi basculer de
-l'une à l'autre pour mieux distinguer ce qu'affiche chaque tâche.
-
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{Mise en place d'un journal}
-
-   Nous allons définir un mécanisme de journal permettant de conserver
-les messages transmis par le noyau. Pour le moment, notre journal se
-contente de transmettre ces messages sur l'écran physique. Lorsque
-nous aurons mis en place des outils de gestion mémoire, nous pourrons
-étoffer ce mécanisme de journal.
-
-   Le journal est implanté dans les fichiers
-\lstinline!manux/journal.h! et \lstinline!lib/journal.c!. Il
-propose essentiellement la fonction suivante
-
-\begin{lstlisting}{}
-   void journaliser(char * message); 
-\end{lstlisting}
-
-   Elle utilise la fonction \lstinline!afficherEcran()! pour envoyer le message à
-l'écran.
-
-   Évidemment, le journal est initialisé juste après la console.
-
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{Un premier {\tt printk()}}
-
-   GrÃ¢ce à notre console , l'écriture de {\tt printk()} est assez
+   Grâce à notre console , l'écriture de {\tt printk()} est assez
 simple, puisque cette fonction n'a plus qu'à se préoccuper de créer
 une chaîne de caractères et de la transmettre au journal (ou
 directement à la console si on n'utilise pas le journal).
@@ -120,4 +87,48 @@ directement à la console si on n'utilise pas le journal).
 
    Dont le rôle est de mettre en forme une chaîne de caractères
 qu'elle envoie ensuite à la console ou au journal.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\section{Plus de souplesse avec les consoles virtuelles}
+
+   Lorsque nous allons mettre en place la notion de tâches, il sera
+intéressant d'attribuer à chacune d'entre elles une console virtuelle
+potentiellement différente des autres. Nous pourrons ainsi basculer de
+l'une à l'autre pour mieux distinguer ce qu'affiche chaque tâche.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\section{Mise en place d'un journal}
+
+   Nous allons définir un mécanisme de journal permettant de conserver
+les messages transmis par le noyau. Pour le moment, notre journal se
+contente de transmettre ces messages sur l'écran physique. Lorsque
+nous aurons mis en place des outils de gestion mémoire, nous pourrons
+étoffer ce mécanisme de journal.
+
+   Le journal est implanté dans les fichiers
+\lstinline!manux/journal.h! et \lstinline!lib/journal.c!. Il
+propose essentiellement la fonction suivante
+
+\begin{lstlisting}
+   void journaliser(char * message); 
+\end{lstlisting}
+
+   Elle utilise la fonction \lstinline!afficherEcran()! pour envoyer le message à
+l'écran.
+
+   Évidemment, le journal est initialisé juste après la console.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Introduction de plusieurs niveaux de messages}
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Utilisation des fichiers}
 

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition de l'interface du Système de Fichier de Manux.             */
+/*      DÃ©finition de l'interface du SystÃ¨me de Fichier de Manux.             */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -19,7 +19,7 @@
 #define SFM_TAILLE_BLOC 512
 
 /*
- * Nombre de blocs en accés direct
+ * Nombre de blocs en accÃ©s direct
  */
 #define SFM_NB_BLOCS_DIRECTS 8
 
@@ -39,7 +39,7 @@ typedef struct _SFMSuperBloc {
 } SFMSuperBloc;
 
 /*
- * Les différents types de fichier
+ * Les diffÃ©rents types de fichier
  */
 typedef enum _SFMTypeFichier {
    SFM_FICHIER_ELEMENTAIRE = 0,
@@ -56,7 +56,7 @@ typedef struct _SFMInode {
 } SFMInode;
 
 /*
- * Structure d'une entrée dans un répertoire
+ * Structure d'une entrÃ©e dans un rÃ©pertoire
  */
 typedef struct _SFMEntreeRepertoire {
    uint32_t offsetInode
@@ -64,7 +64,7 @@ typedef struct _SFMEntreeRepertoire {
 } SFMEntreeRepertoire;
 
 /*
- * Structure d'un répertoire
+ * Structure d'un rÃ©pertoire
  */
 typedef struct _SFMRepertoire {
    uint32_t nombreEntrees;

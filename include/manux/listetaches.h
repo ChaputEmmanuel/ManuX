@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition des opÈrations et types permettant de manipuler des listes */
+/*      D√©finition des op√©rations et types permettant de manipuler des listes */
 /*   de taches.                                                               */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
@@ -8,7 +8,7 @@
 #define LISTETACHES_DEF
 
 /*
- * DÈfinition des listes de taches
+ * D√©finition des listes de taches
  */
 typedef struct _CelluleTache {
    struct _Tache        * tache;
@@ -22,21 +22,21 @@ typedef struct _ListeTache {
 
 void initialiserListeTache(ListeTache * listeTache);
 /*
- * Initialisation d'une liste prÈalablement allouÈe
+ * Initialisation d'une liste pr√©alablement allou√©e
  */
 
 void insererCelluleTache(ListeTache    * listeTaches,
                          struct _Tache * tache,
                          CelluleTache  * celluleTache);
 /*
- * Insertion d'une Tache en fin de liste. Le troisiËme paramËtre est
- * un pointeur sur une zone de type CelluleTache dÈj‡ allouÈe.
+ * Insertion d'une Tache en fin de liste. Le troisi√®me param√®tre est
+ * un pointeur sur une zone de type CelluleTache d√©j√† allou√©e.
  */
 
 struct _Tache * extraireTache(ListeTache * listeTaches);
 /*
- * Extraction de la derniËre tache de la liste. Attention, aucune
- * dÈsallocation de la Cellule n'est faite.
+ * Extraction de la derni√®re tache de la liste. Attention, aucune
+ * d√©sallocation de la Cellule n'est faite.
  */
 
 #endif

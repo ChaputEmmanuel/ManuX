@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Implantation des appels système de Manux.                             */
+/*      Implantation des appels systÃ¨me de Manux.                             */
 /*                                                                            */
 /*      Attention, il s'agit donc bien ici de la partie noyau !               */
 /*                                                                            */
@@ -8,11 +8,11 @@
 #ifndef APPEL_SYSTEME_DEF
 #define APPEL_SYSTEME_DEF
 
-#include <manux/appelsystemenum.h>  /* Les numéros des AS définis */
+#include <manux/appelsystemenum.h>  /* Les numÃ©ros des AS dÃ©finis */
 #include <manux/types.h>
 
 /*
- * Définition du nombre maximal d'appels système
+ * DÃ©finition du nombre maximal d'appels systÃ¨me
  */
 #ifndef NB_MAX_APPELS_SYSTEME
 #   define NB_MAX_APPELS_SYSTEME 10
@@ -24,8 +24,8 @@
 extern void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
 /*
- * Type du premier paramètre de chaque appel système (dû au
- * séquencement des appels). WARNING a expliquer.
+ * Type du premier paramÃ¨tre de chaque appel systÃ¨me (dÃ» au
+ * sÃ©quencement des appels). WARNING a expliquer.
  */
 typedef struct _ParametreAS {
    uint32_t ecx;
@@ -44,15 +44,15 @@ typedef struct _ParametreAS {
 
 int definirAppelSysteme(int num, void * appel);
 /*
- * Définition de la fonction appel comme appel système de numéro num.
+ * DÃ©finition de la fonction appel comme appel systÃ¨me de numÃ©ro num.
  * Code de retour:
- *    0         succés
+ *    0         succÃ©s
  *    EINVAL    num n'est pas dans l'intervalle correct
  */
 
 void initialiserAppelsSysteme();
 /*
- * Initialisation des appels systèmes prédéfinis.
+ * Initialisation des appels systÃ¨mes prÃ©dÃ©finis.
  */
 
 #endif

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition des taches de ManuX-32.                                    */
+/*      D√©finition des taches de ManuX-32.                                    */
 /*                                                                            */
 /*                                     (C) Manu Chaput 2000, 2001, 2002, 2003 */
 /*----------------------------------------------------------------------------*/
@@ -13,30 +13,30 @@
 #include <manux/segment.h>        /* Pour la descriptor table */
 #include <manux/fichier.h>
 /*
- * Taille de la Local Descriptor Table de chaque t‚che
+ * Taille de la Local Descriptor Table de chaque t√¢che
  */
 #define LDT_NB_BYTES 1024 /* WARNING, pas top */
 
 /*
- * Les diffÈrents Ètats possibles pour une t‚che
+ * Les diff√©rents √©tats possibles pour une t√¢che
  */
 typedef enum _EtatTache {
-   Tache_En_Cours   = 1,    // la t‚che courante
-   Tache_Prete      = 2,    // les t‚ches en attente du processeur
-   Tache_Bloquee    = 3     // sur un sÈmaphore par ex
+   Tache_En_Cours   = 1,    // la t√¢che courante
+   Tache_Prete      = 2,    // les t√¢ches en attente du processeur
+   Tache_Bloquee    = 3     // sur un s√©maphore par ex
 } EtatTache;
 
 /*
- * DÈfinition du type du "main" d'une nouvelle t‚che
+ * D√©finition du type du "main" d'une nouvelle t√¢che
  */
 typedef void (CorpsTache());
 
 /*
- * DÈfinition de la structure TSS (Task State Segment)
- * WARNING : ‡ mettre dans i386/processeur.h
+ * D√©finition de la structure TSS (Task State Segment)
+ * WARNING : √† mettre dans i386/processeur.h
  */
 typedef struct _IntelTSS {
-   uint16_t TSSPrecedent;  /* Pour le chaÓnage */
+   uint16_t TSSPrecedent;  /* Pour le cha√Ænage */
    uint16_t Reserve1;
    uint32_t ESP0;
    uint16_t SS0;
@@ -53,17 +53,17 @@ typedef struct _IntelTSS {
    uint32_t EAX, ECX, EDX,
           EBX, ESP, EBP,
           ESI, EDI;      /* Les registres ! */
-   uint16_t ES;            /* Le sÈlecteur de segment */
+   uint16_t ES;            /* Le s√©lecteur de segment */
    uint16_t Reserve5;
-   uint16_t CS;            /* Le sÈlecteur de segment */ 
+   uint16_t CS;            /* Le s√©lecteur de segment */ 
    uint16_t Reserve6;
-   uint16_t SS;            /* Le sÈlecteur de segment */ 
+   uint16_t SS;            /* Le s√©lecteur de segment */ 
    uint16_t Reserve7;
-   uint16_t DS;            /* Le sÈlecteur de segment */ 
+   uint16_t DS;            /* Le s√©lecteur de segment */ 
    uint16_t Reserve8;
-   uint16_t FS;            /* Le sÈlecteur de segment */ 
+   uint16_t FS;            /* Le s√©lecteur de segment */ 
    uint16_t Reserve9;
-   uint16_t GS;            /* Le sÈlecteur de segment */ 
+   uint16_t GS;            /* Le s√©lecteur de segment */ 
    uint16_t Reserve10;
    uint16_t LDT;           /* La Local Descriptor Table */
    uint16_t Reserve11;
@@ -72,7 +72,7 @@ typedef struct _IntelTSS {
 } IntelTSS;
 
 /*
- * DÈfinition du type dÈcrivant une tache.
+ * D√©finition du type d√©crivant une tache.
  */
 typedef struct _Tache {
    IntelTSS           tss;
@@ -87,31 +87,31 @@ typedef struct _Tache {
    struct _Console  * console;
 #endif
 #ifdef MANUX_FS
-  Fichier             fichiers[MANUX_NB_MAX_FICHIERS]; // WARNING ‡ gÈnÈraliser
+  Fichier             fichiers[MANUX_NB_MAX_FICHIERS]; // WARNING √† g√©n√©raliser
 #endif
-   uint32_t           nbActivations;   // DÈcompte du nombre d'activations
-   Temps              tempsExecution;  // Cumul du temps d'exÈcution
+   uint32_t           nbActivations;   // D√©compte du nombre d'activations
+   Temps              tempsExecution;  // Cumul du temps d'ex√©cution
 } Tache;
 
 /*
- * Chaque t‚che pourra voir les infos la concernant ‡ cette adresse
+ * Chaque t√¢che pourra voir les infos la concernant √† cette adresse
  */
 extern Tache * tacheCourante;
 
 Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
 /*
- * CrÈation d'une nouvelle t‚che. Attention, elle doit ensuite Ítre
- * insÈrÈe dans la liste des t‚ches en cours.
+ * Cr√©ation d'une nouvelle t√¢che. Attention, elle doit ensuite √™tre
+ * ins√©r√©e dans la liste des t√¢ches en cours.
  */
 
 void basculerVersTache(Tache * tache);
 /*
- * ExÈcuter une t‚che. A l'utilisation exclusive du scheduler
+ * Ex√©cuter une t√¢che. A l'utilisation exclusive du scheduler
  */
 
 TacheID sysFork();
 /*
- * Implantation de l'appel systËme fork
+ * Implantation de l'appel syst√®me fork
  */
 
 #endif

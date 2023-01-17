@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition du scheduler de Manux. Version trÈs minimale ‡ revoir.     */
+/*      D√©finition du scheduler de Manux. Version tr√©s minimale √† revoir.     */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -14,62 +14,62 @@
 #include <manux/appelsysteme.h>
 
 /*
- * Pour paramÈtrer le scheduler
+ * Pour param√©trer le scheduler
  */
 //#define KHZ * 1000
 
 /*
  * Pour permettre la gestion des consoles virtuelles. WARNING n'a rien
- * ‡ faire l‡
+ * √† faire l√†
  */
 extern booleen basculeConsoleDemandee;
 extern booleen afficheEtatSystemeDemande;
 extern booleen basculerTacheDemande;
 
 /*
- * L'identification de la t‚che en cours
+ * L'identification de la t√¢che en cours
  */
 extern Tache * tacheEnCours;
 
 /*
  * Le verrou suivant nous permet de garantir qu'un seul processus
- * est en mode noyau ‡ un instant donnÈ.
+ * est en mode noyau √† un instant donn√©.
  */
 //ExclusionMutuelle verrouNoyau;
 
 void initialiserScheduler();
 /*
- * DÈclencher le scheduler avant toute crÈation de tache
+ * D√©clencher le scheduler avant toute cr√©ation de tache
  */
 
 TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
 /*
- * CrÈation d'une nouvelle t‚che et mise de celle-ci dans
- * la liste du scheduler. Si nouvelleConsole est vrai, on crÈe une
- * nouvelle console pour cette t‚che. Sinon elle hÈrite de celle de
- * son crÈateur.
+ * Cr√©ation d'une nouvelle t√¢che et mise de celle-ci dans
+ * la liste du scheduler. Si nouvelleConsole est vrai, on cr√©e une
+ * nouvelle console pour cette t√¢che. Sinon elle h√©rite de celle de
+ * son cr√©ateur.
  */
 
 void ordonnanceur();
 /*
- * Basculer vers la prochaine tache ‡ exÈcuter
+ * Basculer vers la prochaine tache √† ex√©cuter
  */
 
 int AS_numeroTache();
 /*
- * Obtention du numero de la tache en cours. WARNING Áa n'a rien
- * ‡ faire l‡ ...
+ * Obtention du numero de la tache en cours. WARNING √ßa n'a rien
+ * √† faire l√† ...
  */
 
 uint32_t AS_console();
 /*
- * Obtention de la console de la tache en cours. WARNING Áa n'a rien
- * ‡ faire l‡ ...
+ * Obtention de la console de la tache en cours. WARNING √ßa n'a rien
+ * √† faire l√† ...
  */
 
 int sys_basculerTache(ParametreAS as);
 /*
- * Implantation de l'appel systËme d'invocation de l'ordonnanceur
+ * Implantation de l'appel syst√®me d'invocation de l'ordonnanceur
  */
 
 TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConsole);

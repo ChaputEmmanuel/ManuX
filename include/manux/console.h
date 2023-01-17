@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des fonctions de base d'accés à la console.                */
+/*      DÃ©finition des fonctions de base d'accÃ©s Ã  la console.                */
 /*                                                                            */
-/*      Une console est protégée par un verrour de type ExclusionMutuelle.    */
-/*   C'est à l'utilisateur de veiller à respecter les appels aux fonctions    */
-/*   d'entrée et de sortie de la section critique avant et aprés chaque       */
+/*      Une console est protÃ©gÃ©e par un verrour de type ExclusionMutuelle.    */
+/*   C'est Ã  l'utilisateur de veiller Ã  respecter les appels aux fonctions    */
+/*   d'entrÃ©e et de sortie de la section critique avant et aprÃ©s chaque       */
 /*   utilisation de la console. Bien sur le printf s'en occupe.               */
-/*      La seule fonction dans laquelle ces appels sont effectués est celle   */
+/*      La seule fonction dans laquelle ces appels sont effectuÃ©s est celle   */
 /*   permettant le basculement de console active.                             */
 /*                                                                            */
 /*                                                (C) Manu Chaput 2000 - 2021 */
@@ -17,13 +17,13 @@
 #include <manux/config.h>
 #include <manux/horloge.h>    // nbTopHorloge
 #include <manux/types.h>
-#include <manux/atomique.h>   // Accés unique à la console 
+#include <manux/atomique.h>   // AccÃ©s unique Ã  la console 
 #ifdef MANUX_FS
 #   include <manux/fichier.h> // Une console est un fichier
 #endif
 
 /*
- * Caractéristiques de l'écran physique
+ * CaractÃ©ristiques de l'Ã©cran physique
  */
 #define MANUX_CON_SCREEN   (char *)MANUX_ADRESSE_ECRAN
 #define MANUX_CON_COLONNES 80
@@ -31,14 +31,14 @@
 
 /*
  * Structure d'une console. Attention, en cas de consoles virtuelles,
- * on stoque ça au début d'une page qui contient également une copie
- * de l'écran. Il faut donc que la somme des deux tailles soit
- * inférieure à la taille d'une page. Ca nous laisse 96 octets pour
+ * on stoque Ã§a au dÃ©but d'une page qui contient Ã©galement une copie
+ * de l'Ã©cran. Il faut donc que la somme des deux tailles soit
+ * infÃ©rieure Ã  la taille d'une page. Ca nous laisse 96 octets pour
  * cette structure.
  */
 typedef struct _Console {
-   char              * adresseEcran;      // Adresse à laquelle se trouve
-                                          // le contenu affiché
+   char              * adresseEcran;      // Adresse Ã  laquelle se trouve
+                                          // le contenu affichÃ©
    char              * adresseEcranCopie; // Une copie pour lorsque la
                                           // console est active
    int                 ligne, colonne ;
@@ -47,26 +47,26 @@ typedef struct _Console {
    uint8_t             nbColonnes;
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
-   struct _Console   * precedente;  // doublement chaînées
+   struct _Console   * suivante;    // Les consoles virtuelles sont chaÃ®nÃ©es
+   struct _Console   * precedente;  // doublement chaÃ®nÃ©es
 #endif
 
 #ifdef MANUX_CLAVIER_CONSOLE
-   unsigned char     * bufferClavier;     // Pour les données du clavier
+   unsigned char     * bufferClavier;     // Pour les donnÃ©es du clavier
    uint16_t            nbCarAttente;
-   uint16_t            indiceProchainCar; // Le prochain caractère à lire
+   uint16_t            indiceProchainCar; // Le prochain caractÃ¨re Ã  lire
    ExclusionMutuelle   accesBufferClavier;
 #endif
   
 } Console;
 
 /*
- * Les méthodes permettant de traiter une console comme un fichier
+ * Les mÃ©thodes permettant de traiter une console comme un fichier
  */
 extern MethodesFichier consoleMethodesFichier;
 
 /*
- * Définition des couleurs utilisables pour l'affichage
+ * DÃ©finition des couleurs utilisables pour l'affichage
  */
 typedef enum {
    COUL_TXT_NOIR             = 0x00,
@@ -97,13 +97,13 @@ typedef enum {
 } Couleur;
 
 /*
- * Définition de certains caractères ASCII
+ * DÃ©finition de certains caractÃ¨res ASCII
  */
 #define ASCII_ESC 27
 
 /**
- * Initialisation du système de console. 
- * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
+ * Initialisation du systÃ¨me de console. 
+ * @param iNoeudConsole (out) un INoeud dÃ©crivant la console par dÃ©faut 
  */
 int consoleInitialisation(INoeud * iNoeudConsole);
 
@@ -115,22 +115,22 @@ void affecterCouleurFond(Console * cons, Couleur coul);
 void affecterCouleurTexte(Console * cons, Couleur coul);
 
 /*
- * Affichage d'un message à l'écran. Attention, aucun formatage
- * n'est fait. En revanche, la chaine de caractères doit être terminée
- * par un zéro.
+ * Affichage d'un message Ã  l'Ã©cran. Attention, aucun formatage
+ * n'est fait. En revanche, la chaine de caractÃ¨res doit Ãªtre terminÃ©e
+ * par un zÃ©ro.
  */
 void afficherConsole(Console * cons, char * msg);
 
 /*
- * Affichage d'un message à l'écran. Attention, aucun formatage
- * n'est fait. Seuls les nbOctets premiers octets sont affichés,
- * indépemment de la présence d'un caractère nul.
+ * Affichage d'un message Ã  l'Ã©cran. Attention, aucun formatage
+ * n'est fait. Seuls les nbOctets premiers octets sont affichÃ©s,
+ * indÃ©pemment de la prÃ©sence d'un caractÃ¨re nul.
  */
 void afficherConsoleN(Console * cons, char * msg, int nbOctets);
 
 /*
  * Effacement (avec la couleur courante) et positionnement du curseur en
- * haut à gauche.
+ * haut Ã  gauche.
  */
 void effacerConsole(Console * cons);
 
@@ -146,16 +146,16 @@ void afficherConsoleEntier(Console * cons, int n);
 void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
 
 /*
- * La notion de console virtuelle permet de gérer plusieurs affichages
- * disjoints. Chaque console est donc gérée indépendemment des autres.
- * Une seule est affichée à l'écran à un instant t.
- * Les consoles sont stoquées dans un tableau et repérées par leur
+ * La notion de console virtuelle permet de gÃ©rer plusieurs affichages
+ * disjoints. Chaque console est donc gÃ©rÃ©e indÃ©pendemment des autres.
+ * Une seule est affichÃ©e Ã  l'Ã©cran Ã  un instant t.
+ * Les consoles sont stoquÃ©es dans un tableau et repÃ©rÃ©es par leur
  * indice dans ce tableau.
  */
 #ifdef MANUX_CONSOLES_VIRTUELLES
 
 /**
- * @brief : Création (avec allocation mémoire) d'une console
+ * @brief : CrÃ©ation (avec allocation mÃ©moire) d'une console
  */
 Console * creerConsoleVirtuelle();
 
@@ -165,7 +165,7 @@ Console * creerConsoleVirtuelle();
 extern Console * consoleActive;
 
 /*
- * Forcer l'apparition d'une console à l'écran
+ * Forcer l'apparition d'une console Ã  l'Ã©cran
  */
 void basculerVersConsole(Console * cons);
 
@@ -183,13 +183,13 @@ void basculerVersConsoleSuivante();
 Console * consoleNoyau();
 
 /*
- * Écriture sur une console
+ * Ã‰criture sur une console
  */
 size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets);
 
 #ifdef MANUX_APPELS_SYSTEME
 /*
- * La fonction réalisant l'appel système  NBAS_ECRIRE_CONS 
+ * La fonction rÃ©alisant l'appel systÃ¨me  NBAS_ECRIRE_CONS 
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n);
 

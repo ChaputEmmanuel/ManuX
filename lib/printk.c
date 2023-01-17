@@ -1,8 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantion des fonctions de base d'entrée-sortie.                     */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file printk.c
+ * @bried Implantion des fonctions de base d'entrée-sortie.                     
+ *                                                                            
+ *                                                  (C) Manu Chaput 2000-2023 
+ *                                                                            */
 #include <manux/printk.h>
 
 #ifdef MANUX_JOURNAL
@@ -18,6 +19,10 @@
 #include <manux/arith64.h>
 #include "../i386/arith64.c"   // WARNING, pourquoi dois-je faire ça ?
 
+/**
+ * Longueur maximale d'une chaîne affichable (à supprimer dès qu'on
+ * aura de la mémoire dynamique)
+ */
 #define MAX_PRINTK_LENGTH 128
 
 #define chiffre "0123456789abcdef"
@@ -42,14 +47,14 @@ void printk(char * format, ...)
       switch (*format) {
          case '%' :
             format++;
-            /* Lecture de la taille */
+            // Lecture de la taille
             nbChiffres = 0;
             while ((*format <= '9') && (*format >= '0')) {
                nbChiffres = nbChiffres * 10 + *format - '0';
                format++;
 	    }
 
-	    /* Pas forcément bien là, mais j'ai pas mieux dans l'immédiat */
+	    // Pas forcément bien là, mais j'ai pas mieux dans l'immédiat
 	    prefixe = 0;
 	    if (*format == 'l') {
                format++;

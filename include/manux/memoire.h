@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des sous-programmes de manipulation de la mémoire sous     */
+/*      DÃ©finition des sous-programmes de manipulation de la mÃ©moire sous     */
 /*   ManuX.                                                                   */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
@@ -21,7 +21,7 @@
 #define NB_PAGES(n) ((n + MANUX_TAILLE_PAGE - 1)/MANUX_TAILLE_PAGE)
 
 /*
- * Nombre de pages communes à toutes les tâches.
+ * Nombre de pages communes Ã  toutes les tÃ¢ches.
  */
 extern int nombrePagesSysteme;
 
@@ -30,33 +30,33 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t adresseDebutManuX,
 			uint32_t adresseFinManuX);
 /*
- * Initialisation de la mémoire. Nécessaire avant toute
+ * Initialisation de la mÃ©moire. NÃ©cessaire avant toute
  * demande d'allocation.
  */
 
 void * allouerPage();
 /*
- * Réservation d'une page (de 4 Ko)
+ * RÃ©servation d'une page (de 4 Ko)
  *
  * Retour
- *    première adresse dispo si la pages a pu être allouée,
+ *    premiÃ¨re adresse dispo si la pages a pu Ãªtre allouÃ©e,
  *    NULL sinon
  */
 
 void * allouerPages(unsigned int nombre);
 /*
- * Réservation d'un nombre choisi de pages (de 4 Ko) contigues.
+ * RÃ©servation d'un nombre choisi de pages (de 4 Ko) contigues.
  *
  * Retour
- *    première adresse dispo si les pages ont pu être allouées,
+ *    premiÃ¨re adresse dispo si les pages ont pu Ãªtre allouÃ©es,
  *    NULL sinon
- * WARNING à mettre en appel système ?
+ * WARNING Ã  mettre en appel systÃ¨me ?
  */
 
 void libererPage(void * pageLiberee);
 /*
- * Libération d'une page préalablement allouée. Attention, aucune
- * vérification n'est effectuée.
+ * LibÃ©ration d'une page prÃ©alablement allouÃ©e. Attention, aucune
+ * vÃ©rification n'est effectuÃ©e.
  */
 
 int nombrePagesAllouees();
@@ -66,8 +66,8 @@ int nombrePagesTotal();
 #ifdef MANUX_AS
 int AS_obtenirPages(ParametreAS p, int nbPages);
 /*
- * Demande d'accroissement de la zone mémoire disponible à
- * la tâche.
+ * Demande d'accroissement de la zone mÃ©moire disponible Ã 
+ * la tÃ¢che.
  * Retour : nombre de pages obtenues.
  */
 #endif

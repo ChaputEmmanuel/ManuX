@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition des types et opÈrations spÈcifiques au mÈcanisme de        */
+/*      D√©finition des types et op√©rations sp√©cifiques au m√©canisme de        */
 /*   pagination.                                                              */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
@@ -10,19 +10,19 @@
 #include <manux/types.h>
 
 /*
- * Type d'une entrÈe dans un rÈpertoire de pages (PDE pour
+ * Type d'une entr√©e dans un r√©pertoire de pages (PDE pour
  * "Page Directory Entry").
  */
 typedef uint32_t PDE;
 
 /*
- * Type d'une entrÈe dans un rÈpertoire de tables (PTE pour
+ * Type d'une entr√©e dans un r√©pertoire de tables (PTE pour
  * "Page Table Entry").
  */
 typedef uint32_t PTE;
 
 /*
- * Un rÈpertoire de pages est simplement un tableau de PDE
+ * Un r√©pertoire de pages est simplement un tableau de PDE
  * (1024 max).
  */
 typedef PDE * PageDirectory;
@@ -34,24 +34,24 @@ typedef PDE * PageDirectory;
 typedef PTE * PageTable;
 
 /*
- * RÈpertoire de pagination global au systËme. Le but est d'avoir une
- * premiËre configuration de la pagination, qui donne une vision "flat"
- * de la mÈmoire.
+ * R√©pertoire de pagination global au syst√®me. Le but est d'avoir une
+ * premi√®re configuration de la pagination, qui donne une vision "flat"
+ * de la m√©moire.
  */
 extern PageDirectory repertoirePaginationSysteme;
 
 void creerTablePaginationDirecte(PageDirectory * repertoirePagination,
                                  int tailleMemoireEtendue);
 /*
- * Initialisation d'une table de pagination "directe", c'est ‡ dire
+ * Initialisation d'une table de pagination "directe", c'est √† dire
  * qui conserve les adresses physiques dans l'espace virtuel.
  */
 
 void creerTablePagination(PageDirectory * repertoirePagination);
 /*
- * Initialisation d'une table de pagination pour une nouvelle t‚che.
- * elle est crÈÈe dans la zone pointÈe par repertoirePagination et
- * englobe les pages rÈservÈes au systËme.
+ * Initialisation d'une table de pagination pour une nouvelle t√¢che.
+ * elle est cr√©√©e dans la zone point√©e par repertoirePagination et
+ * englobe les pages r√©serv√©es au syst√®me.
  */
 
 int ajouterPage(PageDirectory * repertoirePagination,
@@ -59,12 +59,12 @@ int ajouterPage(PageDirectory * repertoirePagination,
                 void          * adresseVirtuelle);
 /*
  * Ajout d'une page dans l'espace d'adressage virtuel d'une
- * t‚che ‡ l'adresse voulue.
+ * t√¢che √† l'adresse voulue.
  */
 
 int initialiserPagination(int tailleMemoireEtendue);
 /*
- * Initialisation de la mÈmoire virtuelle
+ * Initialisation de la m√©moire virtuelle
  */
 
 #endif

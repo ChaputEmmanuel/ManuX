@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des fonctions de bas-niveau permettant de manipuler les    */
+/*      DÃ©finition des fonctions de bas-niveau permettant de manipuler les    */
 /*   interruptions.                                                           */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/

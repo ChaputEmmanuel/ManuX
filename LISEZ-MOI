@@ -22,6 +22,10 @@ En cours
 --------
    EN COURS : mise en place de la documentation. Voir ci dessous
    (cherche Documentation)
+
+   EN COURS : A exumer la génaration d'un ISO multiboot. Ce serait
+   bien d'avoir des images différentes, par exemple pour des copies
+   d'écran pour la doc.
    
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour

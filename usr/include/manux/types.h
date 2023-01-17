@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des types de base.                                         */
+/*      DÃ©finition des types de base.                                         */
 /*                                                                            */ 
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ typedef int booleen;
 #endif
 
 /*
- * Définition de la structure contenant tous les registres et sauvée lors d'un
+ * DÃ©finition de la structure contenant tous les registres et sauvÃ©e lors d'un
  * pusha ([3] p 121). WARNING, ce n'est pas le meilleur endroit ...
  */
 typedef struct _TousRegistres {
@@ -58,22 +58,22 @@ typedef struct _TousRegistres {
 } TousRegistres;
 
 /*
- * Type des identificateurs de tâche
+ * Type des identificateurs de tÃ¢che
  */
 typedef uint16_t TacheID;
 
 /*
- * Une page mémoire est simplement vue comme une adresse.
+ * Une page mÃ©moire est simplement vue comme une adresse.
  */
 typedef void * Page;
 
 /*
- * Un nombre de secondes écoulées
+ * Un nombre de secondes Ã©coulÃ©es
  */
 typedef int32_t Temps;
 
 /* 
- * Une structure permettant de décrire des dates/durées plus précisément
+ * Une structure permettant de dÃ©crire des dates/durÃ©es plus prÃ©cisÃ©ment
  */
 typedef struct _ValTemps {
   Temps  secondes;

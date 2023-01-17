@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition de RamDisk pour Manux.                                     */
+/*      DÃ©finition de RamDisk pour Manux.                                     */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -10,8 +10,8 @@
 
 void initialiserRamDisk(uint32_t adresse, uint16_t tailleKo);
 /*
- * Prise en compte d'un ramdisk chargé par l'init et dont la taille
- * est fournie. L'adresse de départ (fournie) est telle que le ramdisk
+ * Prise en compte d'un ramdisk chargÃ© par l'init et dont la taille
+ * est fournie. L'adresse de dÃ©part (fournie) est telle que le ramdisk
  * occupe les tailleKo derniers Ko de la RAM.
  */
 

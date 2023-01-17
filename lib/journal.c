@@ -1,4 +1,5 @@
 /**
+ * @file journal.c
  * @brief Implantation des outils de journalisation des messages du noyau.     
  *
  * Il y a des trucs pas très jolis, par exemple l'accès direct à la
@@ -70,7 +71,7 @@ void journalAffecterFichier(Fichier * pc)
 }
 
 /**
- * Journalisation d'un message
+ * @brief Journalisation d'un message avec un niveau d'urgence
  */
 void journaliserNiveau(booleen console, booleen fichier,
 		       uint8_t niveau,
@@ -99,6 +100,9 @@ void journaliserNiveau(booleen console, booleen fichier,
   //   sortirExclusionMutuelle(&emj);
 }
 
+/**
+ * @brief Gestion des niveaux d'affichage
+ */
 void aiguillerMessage(char ** message, int * lg,
 		      booleen * cons, booleen * fic, uint8_t * niv)
 {
@@ -137,7 +141,7 @@ void aiguillerMessage(char ** message, int * lg,
 }
 
 /**
- * Journalisation d'un message
+ * @brief Journalisation d'un message
  */
 void journaliser(char * message, int len)
 {

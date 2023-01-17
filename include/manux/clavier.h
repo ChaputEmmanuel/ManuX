@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Définition des sous-programmes permettant de manipuler le clavier.         */
+/* DÃ©finition des sous-programmes permettant de manipuler le clavier.         */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
@@ -13,7 +13,7 @@ extern int toucheTouche;
 
 void initialiserClavier();
 /*
- * Initialisation du clavier, à appeler avant toute utilisation de ce dernier.
+ * Initialisation du clavier, Ã  appeler avant toute utilisation de ce dernier.
  */
 
 void handlerClavier();

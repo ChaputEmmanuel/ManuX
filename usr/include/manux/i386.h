@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des opérations spécifiques au processeur Intel.            */
+/*      DÃ©finition des opÃ©rations spÃ©cifiques au processeur Intel.            */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
@@ -10,10 +10,10 @@
 
 void halt();
 /*
- * Arret complet du système
+ * Arret complet du systÃ¨me
  *
- * WARNING : codé dans interBasNiveau ... Est-ce là qu'il faut le coder et le
- * définir ?
+ * WARNING : codÃ© dans interBasNiveau ... Est-ce lÃ  qu'il faut le coder et le
+ * dÃ©finir ?
  */
 
 #define str(tr) \
@@ -27,7 +27,7 @@ void halt();
   __asm__("mfence");
 
 /*
- * Description du processeur (d'après https://wiki.osdev.org/CPUID)
+ * Description du processeur (d'aprÃ¨s https://wiki.osdev.org/CPUID)
  */
 static inline int descriptionProcesseur(int code, uint32_t description[3]) {
    uint32_t result;
@@ -37,12 +37,12 @@ static inline int descriptionProcesseur(int code, uint32_t description[3]) {
 }
 
 /*
- * Calcul du numéro de la page contenant une adresse linéaire
+ * Calcul du numÃ©ro de la page contenant une adresse linÃ©aire
  */
 #define ADDR_VERS_PAGE(a) ((a)>>12)
 
 /*
- * Chargement effectif de la GDT, implanté dans gestionGDT.nasm
+ * Chargement effectif de la GDT, implantÃ© dans gestionGDT.nasm
  */
 void _chargerGDT(uint32_t ad, uint16_t limite);
 
