@@ -1,5 +1,5 @@
 \documentclass{book}
-\usepackage{epsf, a4, makeidx, Manu}
+\usepackage{epsf, a4, makeidx, Manu, hyperref}
 \usepackage{palatino}
 \usepackage{multicol}
 \usepackage{graphicx} 
@@ -11,7 +11,7 @@
 \input{lstasm}
 
 %-------------------------------------------------------------------------------
-\title{RÃ©alisation des prÃ©mices d'un noyau}
+\title{Réalisation des prémices d'un noyau}
 \author{Chaput Emmanuel}
 
 \date{Version 0.00000001}
@@ -120,7 +120,7 @@ usr}.
    \item[{\tt stdio.c}] implante les principales fonctions (décrites
      dans {\tt include/stdio.h}) permettant de réaliser des
      entrées/sorties.
-   \item[{\tt init.c}] implante le code de la première tÃ¢che lancée
+   \item[{\tt init.c}] implante le code de la première tâche lancée
      automatiquement par le noyau lorsqu'il est initialisé.
 \end{description}
 
@@ -426,7 +426,7 @@ base=localtime -m 64M -gdb tcp::1234  -S
   file noyau/noyau.elf
 \end{lstlisting}
 
-   La commande \lstinline!dir! permet de dire à {\tt gdb} oÃ¹ trouver
+   La commande \lstinline!dir! permet de dire à {\tt gdb} où trouver
 les fichiers sources et la command \lstinline:file: lui permet de
 consulter le binaire du noyau pour y trouver l'adresse des fonctions
 et variables (ici en fait, c'est une autre compilation du noyau au
@@ -635,7 +635,7 @@ appelsysteme.h} et codée dans {\tt noyau/appelsysteme.c} :
 int definirAppelSysteme(int num, void * appel);
 \end{lstlisting}
 
-   oÃ¹ 
+   où 
 
 \begin{description}
    \item[\lstinline!num!] est le numéro de l'appel système enregistré ;
@@ -682,30 +682,30 @@ noyau au travers des appels système.
 s'exécutent pour le moment dans le même mode que le noyau.
 
 %===============================================================================
-%      Gestion des tÃ¢ches
+%      Gestion des tâches
 %===============================================================================
-\section{Gestion des tÃ¢ches}
+\section{Gestion des tâches}
 
    Nous disposons désormais du minimum permettant d'exécuter quelques
 instructions et d'en voir les conséquences à l'écran. Je vous propose
-donc de mettre en place la notion de {\em tÃ¢che} qui nous permettra de
+donc de mettre en place la notion de {\em tâche} qui nous permettra de
 faire avancer ``en même temps'' plusieurs activités. ManuX devient
-donc à partir de maintenant un système multitÃ¢che.
+donc à partir de maintenant un système multitâche.
 
-   Attention, pour le moment, ce ne sera que du multitÃ¢che
+   Attention, pour le moment, ce ne sera que du multitâche
 collaboratif. En effet, nous n'allons pas encore mettre en place du
-multitÃ¢che {\em préemptif}, ce qui signifie que une tÃ¢che ne rendra la
+multitâche {\em préemptif}, ce qui signifie que une tâche ne rendra la
 main (enfin, le processeur) que lorsqu'elle en aura envie !
 
    De plus, nous ne nous intéressons pas non plus à l'ordonnancement,
 et mettrons en place un simple {\em round robin}.
 
 %-------------------------------------------------------------------------------
-%      Définition d'une tÃ¢che
+%      Définition d'une tâche
 %-------------------------------------------------------------------------------
-\subsection{Définition d'une tÃ¢che}
+\subsection{Définition d'une tâche}
 
-   La structure d'une tÃ¢che est définie dans le fichier {\tt
+   La structure d'une tâche est définie dans le fichier {\tt
 manux/tache.h} au travers d'une struture \lstinline!Tache!. Afin de
 nous simplifier la vie, nous allons utiliser dans ManuX l'aide
 proposée par les processeurs Intel\footnote{Les systèmes récents, pour
@@ -726,22 +726,22 @@ au processeur et des champs purement liés au noyau.
 
 \begin{itemize}
    \item \lstinline!IntelTSS tss! qui permet, comme son nom laisse à
-penser, de stoquer les informations relatives à l'état de la tÃ¢che au
+penser, de stoquer les informations relatives à l'état de la tâche au
 niveau du processeur ({\sc tss} pour {\em Task State Segment}). On
 trouvera des informations sur ce champs dans les documentations Intel.
 Dans ManuX, une initialisation minimale est faite de cette structure
-lors de la création d'une tÃ¢che dans \lstinline!creerTache!.
+lors de la création d'une tâche dans \lstinline!creerTache!.
 
    \item \lstinline!uint16 indiceTSSDescriptor! représente l'indice,
-dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tÃ¢che. C'est
-par un \lstinline!ljmp! vers ce champs que l'on va activer la tÃ¢che.
+dans la {\sc gdt}, du {\em {\sc tss} Descriptor} de la tâche. C'est
+par un \lstinline!ljmp! vers ce champs que l'on va activer la tâche.
 
    \item \lstinline!DescriptorTable * ldt! est la table locale de
-decripteurs associée à cette tÃ¢che.
+decripteurs associée à cette tâche.
 \end{itemize}
 
    Ètant donnée la gestion limitée de la mémoire à ce niveau du
-système, les structures définissant une tÃ¢che sont placées dans une
+système, les structures définissant une tâche sont placées dans une
 même page mémoire et organisées comme représenté sur la figure
 \ref{Figure:PageTache}.
 
@@ -750,40 +750,40 @@ même page mémoire et organisées comme représenté sur la figure
 $$
 \epsfbox{PageTache.eps}
 $$
-\caption{\label{Figure:PageTache}Structure d'une page de tÃ¢che}
+\caption{\label{Figure:PageTache}Structure d'une page de tâche}
 \end{figure} 
 
 %...............................................................................
 %
 %...............................................................................
-\subsubsection{Les descripteurs de tÃ¢che Intel}
+\subsubsection{Les descripteurs de tâche Intel}
 
    Le {\em Task State Segment} ({\sc tss}) des processeurs Intel
 permet de stoquer et de manipuler les informations relatives à une
-tÃ¢che. Dans ManuX, une structure est définie permettant de décrire
-dans le noyau le {\sc tss} de chaque tÃ¢che : la structure
+tâche. Dans ManuX, une structure est définie permettant de décrire
+dans le noyau le {\sc tss} de chaque tâche : la structure
 \lstinline!IntelTSS! est définie dans
 \lstinline!manux/tache.h!
 
 %-------------------------------------------------------------------------------
-%      Création d'une tÃ¢che
+%      Création d'une tâche
 %-------------------------------------------------------------------------------
-\subsection{Création d'une tÃ¢che}
+\subsection{Création d'une tâche}
 
 %-------------------------------------------------------------------------------
-%      Basculement vers une tÃ¢che
+%      Basculement vers une tâche
 %-------------------------------------------------------------------------------
-\subsection{Basculement vers une tÃ¢che}
+\subsection{Basculement vers une tâche}
 
-   En ce qui concerne le basculement d'une tÃ¢che à l'autre, nous
+   En ce qui concerne le basculement d'une tâche à l'autre, nous
 allons profiter des mécanismes fournis par les processeurs Intel au
 travers de l'instruction {\tt ljmp}. L'{\em Indirect far JMP} permet
-en effet de faire un basculement de tÃ¢che lorsque l'argument qui lui
+en effet de faire un basculement de tâche lorsque l'argument qui lui
 est passé, sur 48 bits (oui madame, 6 octets !) est constitué d'un
 sélecteur de segment (sur 16 bits) qui référence un {\sc tss} puis
 d'un {\em offset} (qui ne sera pas utilisé pour le coup !).
 
-   Bref, le basculement d'une tÃ¢che vers une autre se résume à une
+   Bref, le basculement d'une tâche vers une autre se résume à une
 instruction de saut !
 
 %===============================================================================
@@ -806,7 +806,7 @@ c'est-à-dire tout ce qui est codé dans le répertoire {\tt lib}.
 \subsection{Le journal}
 
    Le journal permet d'archiver les messages émis par les différents
-éléments du noyau grÃ¢ce à la fonction \lstinline!printk()!
+éléments du noyau grâce à la fonction \lstinline!printk()!
 \index{printk()}.
 
    Le journal est défini dans le fichier {\tt include/journal.h} et implanté
@@ -832,7 +832,7 @@ système d'exploitation de développement puisqu'une image disque peut
 %===============================================================================
 \section{Les outils de synchronisation}
 
-   Les moyens de synchronisation entre tÃ¢ches actuellement disponibles
+   Les moyens de synchronisation entre tâches actuellement disponibles
 sont 
 
 \begin{itemize}
@@ -869,7 +869,7 @@ réalisées de façon {\em atomique}.
 
    Les variables d'exclusion mutuelle permettent d'assurer que l'accés
 à une ressource (typiquement une section de code critique) se fait de
-façon exclusive entre les tÃ¢ches.
+façon exclusive entre les tâches.
 
    Le fichier {\tt atomique.h} définit le type et les fonctions
 suivants 
@@ -899,24 +899,24 @@ une exclusion mutuelle.
 %le biais des appels système.
 
 %===============================================================================
-%      L'ordonnancement des tÃ¢ches
+%      L'ordonnancement des tâches
 %===============================================================================
-\section{L'ordonnancement des tÃ¢ches}
+\section{L'ordonnancement des tâches}
 
    Le scheduler est l'entité chargée de la mise en \oe{}uvre de
 l'ordonnancement. Aussi étrange que cela puisse paraitre, il est
 implanté sous la forme d'un processus. En fait, chaque fois qu'il est
-nécessaire de changer de tÃ¢che active (lorsque le quantum de temps
+nécessaire de changer de tâche active (lorsque le quantum de temps
 alloué à celle en cours est révolu, ou qu'elle se bloque sur une
-entrée/sortie), le système bascule vers la tÃ¢che scheduler, qui se
-charge alors d'élire la prochaine tÃ¢che et de l'activer.
+entrée/sortie), le système bascule vers la tâche scheduler, qui se
+charge alors d'élire la prochaine tâche et de l'activer.
 
    Le corps du scheduler se résume alors à une boucle folle qui ne
 fait qu'appeler le sous-programme {\tt basculerTache()} chargé de
-l'élection de la prochaine tÃ¢che.
+l'élection de la prochaine tâche.
 
-   Naturellement, la tÃ¢che de l'ordonnanceur n'est pas stockée dans la
-liste des tÃ¢ches actives du système.
+   Naturellement, la tâche de l'ordonnanceur n'est pas stockée dans la
+liste des tâches actives du système.
 
 %===============================================================================
 %      Le système de fichiers

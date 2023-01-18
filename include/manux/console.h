@@ -31,25 +31,27 @@
 #define MANUX_CON_LIGNES   25
 
 /**
- * Structure d'une console. Attention, en cas de consoles virtuelles,
+ * @brief Structure d'une console.
+ *
+ * Attention, en cas de consoles virtuelles,
  * on stoque ça au début d'une page qui contient également une copie
  * de l'écran. Il faut donc que la somme des deux tailles soit
  * inférieure à la taille d'une page. Ca nous laisse 96 octets pour
  * cette structure.
  */
 typedef struct _Console {
-   char              * adresseEcran;      // Adresse à laquelle se trouve
-                                          // le contenu affiché
-   char              * adresseEcranCopie; // Une copie pour lorsque la
-                                          // console est active
+   //! Adresse à laquelle se trouve le contenu affiché 
+   char              * adresseEcran;
+   //! Une copie pour lorsque la console est active
+   char              * adresseEcranCopie;
    int                 ligne, colonne ;
    unsigned char       attribut;
    uint8_t             nbLignes;
    uint8_t             nbColonnes;
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   struct _Console   * suivante;    // Les consoles virtuelles sont chaînées
-   struct _Console   * precedente;  // doublement chaînées
+   struct _Console   * suivante;    //!< Les consoles virtuelles sont chaînées
+   struct _Console   * precedente;  //!< doublement chaînées
 #endif
 
 #ifdef MANUX_CLAVIER_CONSOLE

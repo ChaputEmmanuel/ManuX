@@ -11,7 +11,7 @@ PANDOC = pandoc
 DOCS_PDF = ManuX.pdf boot-part.pdf inter-part.pdf memoire-part.pdf affichage-part.pdf
 DOCS_PAN = $(DOCS_PDF:.pdf=.pan)
 
-all : $(DOCS_PDF)
+all : $(DOCS_PDF) dox pan
 
 dox :
 	$(DOXYGEN) $(DOXY_CFG)

@@ -206,6 +206,10 @@ Les Makefile
 
 # Les outils nécessaires
 
+## Documentation
+
+   latex pandoc doxygen
+   
 ## Compilation
 
   * nasm : l'assembleur
@@ -253,6 +257,16 @@ Les Makefile
    . Un plan avec des liens vers chaque partie, et une barre de
    navigation à gauche
 
+   . Pour mettre des liens internes vers les fonctions dans les
+   fichiers source, on doit pouvoir profiter des éléments suivants
+      . Chaque fonction/... a un tag unique avec doxygen. Par exemple
+   pour afficherConsole c'est a495a8fee69ba5fecbcf14360914c2134
+      . Grâce à ctags, on peut trouver où est défini la fonction :
+find . -type f -iname "*.[chS]" | xargs ctags -x | grep "afficherConsole "
+afficherConsole  193 lib/console.c    void afficherConsole(
+
+   du coup on peut mettre un \href{} qui va bien, reste à trouver
+   comment automatiser ce href !
 
 ============================================================================
 

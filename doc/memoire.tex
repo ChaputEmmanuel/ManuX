@@ -23,7 +23,7 @@ mémoire en {\em pages} de taille fixe. Chaque page pourra être dotée
 de propriétées qui lui sont propre. La pagination va nécessiter la
 mise en place d'un certain nombre de tables d'indirection, ce qui peut
 sembler un peu lourd, mais qui va en particulier permettre de la
-mémoire virtuelle, de l'isolation entre les tÃ¢ches, \ldots
+mémoire virtuelle, de l'isolation entre les tâches, \ldots
 
 %-------------------------------------------------------------------------------
 %
@@ -47,12 +47,15 @@ peut donc voir ça comme une découpe de la mémoire
 en zones (ou segments) logiques et/ou comme une façon d'accéder à des
 adresses plus élevées que ce que permet la taille des registres.
 
-\begin{figure}[htbp]
-$$
-\includegraphics[width=0.4\textwidth]{adresse-logique}
-$$
-\caption{\label{Figure:addlog}Adresse logique}
-\end{figure} 
+%\begin{figure}[htbp]
+%$$
+%\includegraphics[width=0.4\textwidth]{adresse-logique}
+%![](adresse-logique.png){}
+\includegraphics{adresse-logique}
+
+%$$
+%\caption{\label{Figure:addlog}Adresse logique}
+%\end{figure} 
 
    Le segment est contenu dans un registre qui peut être fourni
 explicitement ou implicitement par l'instruction. Il donne donc
@@ -170,8 +173,8 @@ crée quatre descripteurs de segments
    Les trois segments se recouvrent donc.
 
    La {\sc ldt} est une table similaire à la {\sc gdt} mais spécifique
-à une tÃ¢che. Dans ManuX, pour le moment, elle est initialisée, lors de
-la création de chaque tÃ¢che, comme une copie de la {\sc gdt}.
+à une tâche. Dans ManuX, pour le moment, elle est initialisée, lors de
+la création de chaque tâche, comme une copie de la {\sc gdt}.
 
 %...............................................................................
 %      La segmentation dans ManuX
@@ -243,12 +246,12 @@ centrale, ce qui permet de construire une mémoire virtuelle plus
 grande que la mémoire réellement disponible.
 
    De plus, la gestion de la pagination peut être spécifique à chaque
-tÃ¢che, ce qui permet de construire un système multitÃ¢che dans lequel
-chaque tÃ¢che a une vision de l'espace mémoire qui lui est propre.
+tâche, ce qui permet de construire un système multitâche dans lequel
+chaque tâche a une vision de l'espace mémoire qui lui est propre.
 
    Il y a donc deux problèmes à résoudre, que sont l'organisation de
-la mémoire physique (et sa répartition entre les différentes tÃ¢ches)
-et l'organisation de la mémoire virtuelle vue par une tÃ¢che. Nous
+la mémoire physique (et sa répartition entre les différentes tâches)
+et l'organisation de la mémoire virtuelle vue par une tâche. Nous
 allons voir comment ils sont résolus dans Manux, mais regardons
 d'abord un peu comment la pagination est mise en \oe{}uvre.
 
@@ -260,7 +263,7 @@ d'abord un peu comment la pagination est mise en \oe{}uvre.
    Le mécanisme de pagination des processeurs Intel permet, comme
 l'illustre la figure \ref{Figure:Pagination}, de construire une
 mémoire virtuelle, découpée en pages (de 4 Ko) à partir de pages
-physiques situées ``n'importe oÃ¹'' en mémoire physique (ou même sur un
+physiques situées ``n'importe où'' en mémoire physique (ou même sur un
 autre support tel qu'un disque dur ou autre).
 
 \begin{figure}[htbp]
@@ -321,9 +324,7 @@ garderons bien d'aller y lire ou écrire pour autre chose !
 donné  par la figure \ref{etat-memoire-boot-2} que nous redonnons ici.
 
 \begin{figure}[htbp]
-$$
 \includegraphics[width=\textwidth]{etat-memoire-boot}
-$$
 \caption{\label{fig:etat-memoire-boot-2}État de la mémoire après le boot}
 \end{figure} 
 
@@ -336,11 +337,11 @@ qui ne doivent pas être utilisées.
 %
 \paragraph{Allocation de la mémoire}
 
-   Chaque page mémoire peut être allouée à une tÃ¢che (ou au noyau) ou
+   Chaque page mémoire peut être allouée à une tâche (ou au noyau) ou
 libre (non allouée). C'est le tableau \lstinline!proprietairePage!
 défini dans le fichier {\tt noyau/memoire.c} qui définit cela comme illustré par la figure
 \ref{Figure:ProprietairePage}. Une page libre sera associée à un
-propriétaire nul et une page allouée au système à la tÃ¢che 1.
+propriétaire nul et une page allouée au système à la tâche 1.
 
 \begin{figure}[htbp]
 $$
