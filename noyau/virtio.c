@@ -172,16 +172,16 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    adresseES = vp->pciEquipement->adresseES;
 
    // On reset le périphérique  (1)
-   outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_RESET);
+   outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT), (uint8_t)VIRTIO_RESET);
    
    // On lui dit qu'on l'a vu (2)
-   outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_ACKNOWLEDGE);
+   outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT), (uint8_t)VIRTIO_ACKNOWLEDGE);
    
    // On lui dit qu'on va le gérer (3)
-   outb(adresseES + VIRTIO_HIST_ETAT, VIRTIO_ACKNOWLEDGE|VIRTIO_DRIVER);
+   outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT), (uint16_t)VIRTIO_ACKNOWLEDGE|VIRTIO_DRIVER);
 
    // Lecture de ses caractéristiques (4)
-   inl(adresseES + VIRTIO_HIST_CAPA_EQUIP, vp->caracteristiques);
+   inl((uint16_t)(adresseES + VIRTIO_HIST_CAPA_EQUIP), vp->caracteristiques);
 
    // Un petit message de debug
    printk_debug(DBG_KERNEL_VIRTIO, "Caract : 0x%x\n",
@@ -202,14 +202,14 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
 		vp->caracteristiques);
 
    // Négociation de ces caractéristiques (5)
-   outl(adresseES + VIRTIO_HIST_CAPA_PILOTE, vp->caracteristiques);
+   outl((uint16_t)(adresseES + VIRTIO_HIST_CAPA_PILOTE), vp->caracteristiques);
 
    // On acte définitivement ces caractéristiques
-   outb(adresseES + VIRTIO_HIST_ETAT,
-	VIRTIO_ACKNOWLEDGE | VIRTIO_DRIVER | VIRTIO_FEATURES_OK);
+   outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT),
+	(uint8_t)VIRTIO_ACKNOWLEDGE | VIRTIO_DRIVER | VIRTIO_FEATURES_OK);
 
    // On vérifie qu'il est OK (6)
-   inb(adresseES + VIRTIO_HIST_ETAT, etat);
+   inb((uint16_t)(adresseES + VIRTIO_HIST_ETAT), etat);
 
    if ((etat & VIRTIO_FEATURES_OK) == 0) {
       printk(PRINTK_ERREUR, "Le device virtio net refuse les caract. !\n");
@@ -219,8 +219,8 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    // Construction des files (7) comme décrit dans [3] section 2.3
    for (numFile = 0 ; numFile < MANUX_VIRTIO_NB_MAX_FILES; numFile++) {
       // Lecture de la taille (1)(2)
-      outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
-      inw(adresseES + VIRTIO_HIST_TAILLE_FILE, tailleFile);
+      outw((uint16_t)(adresseES + VIRTIO_HIST_FILE_SEL), numFile);
+      inw((uint16_t)(adresseES + VIRTIO_HIST_TAILLE_FILE), tailleFile);
 
       if (tailleFile) {
          // Création des fameuses files (3)
@@ -228,8 +228,8 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
 	                          tailleFile);
 
          // On donne l'adresse à l'équipement (3)
-         outw(adresseES + VIRTIO_HIST_FILE_SEL, numFile);
-         outl(adresseES + VIRTIO_HIST_ADDRESS_FILE,
+         outw((uint16_t)(adresseES + VIRTIO_HIST_FILE_SEL), numFile);
+         outl((uint16_t)(adresseES + VIRTIO_HIST_ADDRESS_FILE),
          ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
          printk_debug(DBG_KERNEL_VIRTIO, "File %d @ %d\n", numFile,
 		      ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
@@ -237,7 +237,7 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    }
    
    // On dit au périphérique qu'on est bon, ...
-   outb(adresseES + VIRTIO_HIST_ETAT,
+   outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT),
 	VIRTIO_ACKNOWLEDGE
 	| VIRTIO_DRIVER
 	| VIRTIO_FEATURES_OK
@@ -333,7 +333,7 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    barriereMemoire();
    
    // On prévient l'équipement
-   outw(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF, id);
+   outw((uint16_t)(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF), id);
 
    return n;
 }

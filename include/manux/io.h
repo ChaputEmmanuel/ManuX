@@ -34,8 +34,8 @@
 /**
  * @brief Emission d'un long sur un port
  */
-#define outl(port, long) \
-   asm ("outl %%eax, %1":: "a"(long), "Nd"(port))
+#define outl(port, lng) \
+   asm ("outl %%eax, %1":: "a"(lng), "Nd"(port))
 
 /**
  * @brief Lecture d'un long depuis un port

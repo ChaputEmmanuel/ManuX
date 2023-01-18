@@ -194,7 +194,7 @@ void virtioNetGestionInt(void * pr)
    //   printk_debug(DBG_KERNEL_NET, "Interuption %d !!!\n", ++(vr->nbItRecues));
 
    // Est-ce moi qui suis visé ?
-   inb(vr->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR, isr);
+   inb((uint16_t)(vr->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR), isr);
    if (isr & 0x1) {
      //      printk_debug(DBG_KERNEL_NET, "C'est pour moi, ...\n");
       i8259aAckIRQ(vr->virtioPeripherique.pciEquipement->interruption);
@@ -269,7 +269,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    
    // Lecture de l'adresse IEEE
    for (int i = 0; i < 6; i++){
-      inb(pciEquip->adresseES + 0x14 + i, addr);
+      inb((uint16_t)(pciEquip->adresseES + 0x14 + i), addr);
       virtioReseau.adresseMAC[i] = addr;
    }
 

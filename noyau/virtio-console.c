@@ -76,7 +76,7 @@ void virtioConsoleGestionInt(void * pr)
    printk_debug(DBG_KERNEL_VIRTIO, "Interuption %d !!!\n", vc->nbItRecues);
 
    // Est-ce moi qui suis visé ?
-   inb(vc->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR, isr);
+   inb((uint16_t)(vc->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR), isr);
    if (isr & 0x1) {
       printk_debug(DBG_KERNEL_VIRTIO, "C'est pour moi, ...\n");
       i8259aAckIRQ(vc->virtioPeripherique.pciEquipement->interruption);

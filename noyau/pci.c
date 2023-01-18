@@ -79,10 +79,10 @@ uint32_t PCILireLong(uint8_t bus, uint8_t slot, uint8_t fonction, uint8_t offset
      | ((uint32_t)0x80000000);
 
    // On envoie l'adresse qui nous intéresse
-   outl(PCI_CONFIG_ADDRESS, adresse);
+   outl((uint16_t)PCI_CONFIG_ADDRESS, adresse);
 
    // On y lit un long conformément à [1]
-   inl(PCI_CONFIG_DATA, result);
+   inl((uint16_t)PCI_CONFIG_DATA, result);
 
    return result;
 }
