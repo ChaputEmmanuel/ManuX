@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des fichiers de Manux.                                     */
+/*      DÃ©finition des fichiers de Manux.                                     */
 /*                                                                            */
-/* Pour le moment très simplifié : on ne se soucis pas d'ouvrir ou de fermer  */
+/* Pour le moment trÃ¨s simplifiÃ© : on ne se soucis pas d'ouvrir ou de fermer  */
 /* par exemple                                                                */
 /*                                                  (C) Manu Chaput 2002-2023 */
 /*----------------------------------------------------------------------------*/
@@ -14,26 +14,26 @@ typedef struct _Fichier Fichier;
 typedef struct _INoeud INoeud;
 
 /**
- * @brief : Définition des opérations réalisables sur un fichier
+ * @brief : DÃ©finition des opÃ©rations rÃ©alisables sur un fichier
  */
 typedef struct _MethodesFichier {
    int (*ouvrir) (INoeud * iNoeud, Fichier * f);
-   int (*ecrire) (Fichier * f, void * buffer, int nbOctets);
-   int (*lire) (Fichier * f, void * buffer, int nbOctets);
+   size_t (*ecrire) (Fichier * f, void * buffer, size_t nbOctets);
+   size_t (*lire) (Fichier * f, void * buffer, size_t nbOctets);
 } MethodesFichier;
 
 /**
  * @brief : Qu'est-ce qu'un fichier ouvert du point de vue du noyau ?
  */
 typedef struct _Fichier {
-   void            * prive;   // Données privées au fichier
+   void            * prive;   // DonnÃ©es privÃ©es au fichier
    MethodesFichier * methodes;
 } Fichier;
 
 /**
- * @brief : Définition du type d'un périphérique
- * Pour le moment il sera représenté de façon assez classique par une
- * numérotation à deux champs : un majeur et un mineur.
+ * @brief : DÃ©finition du type d'un pÃ©riphÃ©rique
+ * Pour le moment il sera reprÃ©sentÃ© de faÃ§on assez classique par une
+ * numÃ©rotation Ã  deux champs : un majeur et un mineur.
  */
 typedef struct _TypePeripherique {
    uint16_t majeur;
@@ -41,13 +41,13 @@ typedef struct _TypePeripherique {
 } TypePeripherique;
 
 /**
- * @brief : Un INoeud représente un fichier, d'un point de vue statique
- * Il s'agit donc de la description d'un fichier, même spécial, sur le disque.
+ * @brief : Un INoeud reprÃ©sente un fichier, d'un point de vue statique
+ * Il s'agit donc de la description d'un fichier, mÃªme spÃ©cial, sur le disque.
  */
 typedef struct _INoeud {
    TypePeripherique   typePeripherique;
-   void             * prive;           // Données spécifiques à la nature
-   MethodesFichier  * methodesFichier; // Les fonctions applicables à ce fichier
+   void             * prive;           // DonnÃ©es spÃ©cifiques Ã  la nature
+   MethodesFichier  * methodesFichier; // Les fonctions applicables Ã  ce fichier
 } INoeud;
 
 int fichierEcrire(Fichier * f, void * buffer, int nbOctets);
@@ -55,26 +55,26 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets);
 #ifdef MANUX_APPELS_SYSTEME
 int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets);
 /**
- * L'appel système write
+ * L'appel systÃ¨me write
  */
 
 int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets);
 /**
- * L'appel système read
+ * L'appel systÃ¨me read
  */
 #endif
 
 void sfInitialiser();
 /* 
- * Initialisation de tout ce qui est lié au SF
+ * Initialisation de tout ce qui est liÃ© au SF
  */
 
 /**
  * @brief : Ouverture d'un fichier. 
- * @param iNoeud : le noeud à ouvrir (in)
+ * @param iNoeud : le noeud Ã  ouvrir (in)
  * @param f : le fichier ouvert (out)
  *
- * On utilise la fonction d'ouverture du type de périphérique correspondant
+ * On utilise la fonction d'ouverture du type de pÃ©riphÃ©rique correspondant
  */
 int ouvrirFichier(INoeud * iNoeud, Fichier * f);
 

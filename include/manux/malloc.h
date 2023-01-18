@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des sous-programme de manipulation de la mémoire au niveau */
+/*      DÃ©finition des sous-programme de manipulation de la mÃ©moire au niveau */
 /*   d'une tache sous ManuX. Ces sous-programmes devront faire partie de la   */
-/*   librairie, et non du système.                                            */
+/*   librairie, et non du systÃ¨me.                                            */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -14,24 +14,24 @@
 
 void * malloc(int taille);
 /*
- * Allocation d'une zone mémoire de taille voulue.
+ * Allocation d'une zone mÃ©moire de taille voulue.
  *
  * Retour
  *    adresse de la zone si possible
  *    0 si impossible
  *
- * Attention la taille doit être <= 4092 octets
+ * Attention la taille doit Ãªtre <= 4092 octets
  */
 
 void free(void * pointeur);
 /*
- * Libération d'une zone mémoire précédemment allouée.
+ * LibÃ©ration d'une zone mÃ©moire prÃ©cÃ©demment allouÃ©e.
  */
 
 int initialiserMalloc();
 /*
- * Initialisation du gestionnaire de mémoire. A appeler une fois et une
- * seule par tâche. Idéalement cet appel sera caché dans la phase
+ * Initialisation du gestionnaire de mÃ©moire. A appeler une fois et une
+ * seule par tÃ¢che. IdÃ©alement cet appel sera cachÃ© dans la phase
  * d'initialisation du processus.
  *
  * Retour

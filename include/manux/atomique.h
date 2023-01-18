@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition des opÈrations atomiques de ManuX.                         */
+/*      D√©finition des op√©rations atomiques de ManuX.                         */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -8,11 +8,11 @@
 
 #include <manux/types.h>
 #include <manux/tache.h>
-#include <manux/listetaches.h>  /* Pour les listes de t‚ches en attente */
+#include <manux/listetaches.h>  /* Pour les listes de t√¢ches en attente */
 #include <manux/scheduler.h>    /* tacheEnCours */
 
 /*
- * Type des donnÈes manipulÈes de faÁon atomique
+ * Type des donn√©es manipul√©es de fa√ßon atomique
  */
 typedef uint32_t Atomique;
 
@@ -24,7 +24,7 @@ typedef uint32_t Atomique;
 
 static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32_t cond)
 /*
- * La valeur de l'Atomique est comparÈe ‡ la valeur cond ; en cas d'ÈgalitÈ,
+ * La valeur de l'Atomique est compar√©e √† la valeur cond ; en cas d'√©galit√©,
  * l'Atomique prend la valeur val et le retour est 1. Sinon rien n'est fait
  * et le retour est 0.
  */

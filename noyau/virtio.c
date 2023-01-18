@@ -393,13 +393,13 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
    return result;
 }
 
-void virtioFileInterdireInteruption(VirtioFileVirtuelle * fv)
+void virtioFileInterdireInterruption(VirtioFileVirtuelle * fv)
 {
   //  fv->buffersUtilises->flags = 1;
   fv->buffersDisponibles->flags = 1;
 }
 
-void virtioFileAutoriserInteruption(VirtioFileVirtuelle * fv)
+void virtioFileAutoriserInterruption(VirtioFileVirtuelle * fv)
 {
   //  fv->buffersUtilises->flags = 0;
   fv->buffersDisponibles->flags = 0;

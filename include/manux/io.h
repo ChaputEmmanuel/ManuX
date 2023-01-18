@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/*       Manipulation des entrées/sorties.                                    */
+/*       Manipulation des entrÃ©es/sorties.                                    */
 /*                                                  (C) Manu Chaput 2000-2022 */
 /*----------------------------------------------------------------------------*/
 #ifndef IO_DEF
 #define IO_DEF
 
-// WARNING les "Nd" étaient des "N", ...
+// WARNING les "Nd" Ã©taient des "N", ...
 
 /**
  * @brief Emission d'un octet sur un port

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des éléments liés aux interruptions.                       */
+/*      DÃ©finition des Ã©lÃ©ments liÃ©s aux interruptions.                       */
 /*                                     (C) Manu Chaput 2000, 2001, 2002, 2003 */
 /*----------------------------------------------------------------------------*/
 #ifndef INTERRUPTION_DEF
@@ -8,7 +8,7 @@
 #include <manux/types.h>
 
 /*
- * Définition d'un Task Gate Descriptor ([1] p 6-9, 5-14)
+ * DÃ©finition d'un Task Gate Descriptor ([1] p 6-9, 5-14)
  */
 typedef struct {
    uint16_t reserve1;
@@ -19,7 +19,7 @@ typedef struct {
 } TaskGateDescriptor;
 
 /*
- * Définition d'une Interrupt Gate ([1] p 5-14)
+ * DÃ©finition d'une Interrupt Gate ([1] p 5-14)
  */
 typedef struct {
    uint16_t offsetFaible;
@@ -29,7 +29,7 @@ typedef struct {
 } InterruptGate;
 
 /*
- * Définition d'une Trap Gate ([1] p 5-14)
+ * DÃ©finition d'une Trap Gate ([1] p 5-14)
  */
 typedef struct {
    uint16_t offsetFaible;
@@ -71,20 +71,20 @@ typedef void (* FonctionGestionInteruption)(uint32_t itNum, TousRegistres regist
 int definirFonctionGestionInteruption(int num,
    				FonctionGestionInteruption fg);
 /**
- * Définition de la fonction de gestion d'une interuption
+ * DÃ©finition de la fonction de gestion d'une interuption
  * @return : 0 si c'est bon
  */
 
 #define cli() __asm__("cli"::);
 /*
  * Interdire les interruptions
- * WARNING : ce n'est peut être pas le meilleur endroit où le définir
+ * WARNING : ce n'est peut Ãªtre pas le meilleur endroit oÃ¹ le dÃ©finir
  */
 
 #define sti() __asm__("sti"::);
 /*
  * Autoriser les interruptions
- * WARNING : ce n'est peut être pas le meilleur endroit où le définir
+ * WARNING : ce n'est peut Ãªtre pas le meilleur endroit oÃ¹ le dÃ©finir
  */
 
 /*
@@ -93,7 +93,7 @@ int definirFonctionGestionInteruption(int num,
 
 void setFrequenceTimer(uint16_t freqHz);
 /*
- * Positionne la fréquence du timer 0
+ * Positionne la frÃ©quence du timer 0
  */
 
 #endif

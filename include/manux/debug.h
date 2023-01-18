@@ -39,6 +39,7 @@
   // | DBG_KERNEL_PAGIN
   // | DBG_KERNEL_FILES
   // | DBG_KERNEL_ALL
+  // | DBG_KERNEL_VIRTIO
 //  ;
 
 #define masqueDebugageConsole (0x00000000 	\
@@ -46,7 +47,6 @@
    | DBG_KERNEL_ERREUR	   \
    | DBG_KERNEL_START      \
    | DBG_KERNEL_PCI        \
-   | DBG_KERNEL_VIRTIO        \
 			)
 
 #define masqueDebugageFichier (0x00000000		\

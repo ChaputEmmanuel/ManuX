@@ -1,8 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantion des fonctions de base d'entrÈe-sortie.                     */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file printk.c
+ * @bried Implantion des fonctions de base d'entr√©e-sortie.                     
+ *                                                                            
+ *                                                  (C) Manu Chaput 2000-2023 
+ *                                                                            */
 #include <manux/printk.h>
 
 #ifdef MANUX_JOURNAL
@@ -16,8 +17,12 @@
 #include <manux/debug.h>
 
 #include <manux/arith64.h>
-#include "../i386/arith64.c"   // WARNING, pourquoi dois-je faire Áa ?
+#include "../i386/arith64.c"   // WARNING, pourquoi dois-je faire √ßa ?
 
+/**
+ * Longueur maximale d'une cha√Æne affichable (√† supprimer d√®s qu'on
+ * aura de la m√©moire dynamique)
+ */
 #define MAX_PRINTK_LENGTH 128
 
 #define chiffre "0123456789abcdef"
@@ -28,9 +33,9 @@ void printk(char * format, ...)
    char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une getion dynamique
                             // attention aux risques de telescopage avec la pile !
    int       indice = 0;
-   long long int       n;             // valeur associÈe ‡ un %[l]d
-   char      nombre[10];    // chaÓne du nombre
-   char    * s;             // valeur associÈe ‡ un %s
+   long long int       n;             // valeur associ√©e √† un %[l]d
+   char      nombre[10];    // cha√Æne du nombre
+   char    * s;             // valeur associ√©e √† un %s
    int       in;            // indice pour les boucles internes
    int       nbChiffres;    // pour les %[n]d
    int       base;          // de l'affichage entier
@@ -42,14 +47,14 @@ void printk(char * format, ...)
       switch (*format) {
          case '%' :
             format++;
-            /* Lecture de la taille */
+            // Lecture de la taille
             nbChiffres = 0;
             while ((*format <= '9') && (*format >= '0')) {
                nbChiffres = nbChiffres * 10 + *format - '0';
                format++;
 	    }
 
-	    /* Pas forcÈment bien l‡, mais j'ai pas mieux dans l'immÈdiat */
+	    // Pas forc√©ment bien l√†, mais j'ai pas mieux dans l'imm√©diat
 	    prefixe = 0;
 	    if (*format == 'l') {
                format++;
@@ -122,7 +127,7 @@ affent :          switch (prefixe) {
    /* On affiche  */
 #ifdef MANUX_JOURNAL
    // Si le journal n'est pas encore actif, on envoie directement sur la console
-   // Ce n'est pas gÈnial, voir le commentaire au dÈbut de journal.c
+   // Ce n'est pas g√©nial, voir le commentaire au d√©but de journal.c
    if (journalOperationnel()) {
       journaliser(chaine, indice);
    } else {

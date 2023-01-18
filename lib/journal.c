@@ -1,14 +1,15 @@
 /**
+ * @file journal.c
  * @brief Implantation des outils de journalisation des messages du noyau.     
  *
- * Il y a des trucs pas très jolis, par exemple l'accès direct à la
- * console. A priori elle devrait être utilisée uniquement via des read/write
+ * Il y a des trucs pas trÃ¨s jolis, par exemple l'accÃ¨s direct Ã  la
+ * console. A priori elle devrait Ãªtre utilisÃ©e uniquement via des read/write
  * mais c'est pas plus mal de pouvoir les contourner pour certains
- * debugages. Le truc, c'est que le journal ne la connaît que comme un
- * iNoeud (même s'il sait aller y trouver l'accès direct). Du coup,
+ * debugages. Le truc, c'est que le journal ne la connaÃ®t que comme un
+ * iNoeud (mÃªme s'il sait aller y trouver l'accÃ¨s direct). Du coup,
  * printk doit passer par le journal, ce qui est bien, mais pour
- * contourner tout ça, j'ai encore un accès direct pas joli dans
- * printk. A supprimer un jour j'espère. Si en particulier la macro
+ * contourner tout Ã§a, j'ai encore un accÃ¨s direct pas joli dans
+ * printk. A supprimer un jour j'espÃ¨re. Si en particulier la macro
  * MANUX_JOURNAL_DIRECT_CONSOLE ne sert pas trop.
  *
  *                                                  (C) Manu Chaput 2002-2023 
@@ -19,7 +20,7 @@
 
 /**
  * Le journal utilise la console. Si MANUX_JOURNAL_DIRECT_CONSOLE est
- * activée, il l'accède directement. Sinon il passe par l'interface
+ * activÃ©e, il l'accÃ¨de directement. Sinon il passe par l'interface
  * fichier.
  */
 #ifdef MANUX_JOURNAL_DIRECT_CONSOLE
@@ -29,14 +30,14 @@ Fichier consoleFichier;
 #endif
 
 /**
- * Il faut pourvoir se prémunir si on souhaite utiliser printk avant
+ * Il faut pourvoir se prÃ©munir si on souhaite utiliser printk avant
  * l'initialisation du journal.
  */
 static booleen journalInitialise = FALSE;
 
 /**
- * Le journal utilise également éventuellement un second fichier, par
- * exemple pour envoyer sur l'écran de l'hôte via un virtio-console,
+ * Le journal utilise Ã©galement Ã©ventuellement un second fichier, par
+ * exemple pour envoyer sur l'Ã©cran de l'hÃ´te via un virtio-console,
  * ou pour stocker dans un fichier pour analyse post-mortem.
  */
 Fichier * fichierJournal = NULL;
@@ -58,7 +59,7 @@ void journalInitialiser(INoeud * iNoeudConsole)
    ouvrirFichier(iNoeudConsole, &consoleFichier);
 #endif
 
-   // A partir de maintenant, le journal est opérationnel
+   // A partir de maintenant, le journal est opÃ©rationnel
    journalInitialise = TRUE;
    
    //   sortirExclusionMutuelle(&emj);
@@ -70,7 +71,7 @@ void journalAffecterFichier(Fichier * pc)
 }
 
 /**
- * Journalisation d'un message
+ * @brief Journalisation d'un message avec un niveau d'urgence
  */
 void journaliserNiveau(booleen console, booleen fichier,
 		       uint8_t niveau,
@@ -84,8 +85,8 @@ void journaliserNiveau(booleen console, booleen fichier,
          afficherConsoleN(consoleJournal, message, len);
       } 
 #else
-      // WARNING, pas de test d'état ! Si j'essaie de journaliser avant
-      // la création de la console, ça plante !
+      // WARNING, pas de test d'Ã©tat ! Si j'essaie de journaliser avant
+      // la crÃ©ation de la console, Ã§a plante !
       fichierEcrire(&consoleFichier, message, len);   
 #endif
    }
@@ -99,6 +100,9 @@ void journaliserNiveau(booleen console, booleen fichier,
   //   sortirExclusionMutuelle(&emj);
 }
 
+/**
+ * @brief Gestion des niveaux d'affichage
+ */
 void aiguillerMessage(char ** message, int * lg,
 		      booleen * cons, booleen * fic, uint8_t * niv)
 {
@@ -137,7 +141,7 @@ void aiguillerMessage(char ** message, int * lg,
 }
 
 /**
- * Journalisation d'un message
+ * @brief Journalisation d'un message
  */
 void journaliser(char * message, int len)
 {

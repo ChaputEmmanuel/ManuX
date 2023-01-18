@@ -1,17 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/*      DÈfinition des ÈlÈments de configuration de ManuX. Les options et     */
-/* valeurs dÈfinies ici sont utilisÈes dans le code C mais Ègalement parfois  */
-/* ailleurs. Le Makefile gÈnËre pour cela un fichier make.conf qui est ensuite*/
+/*      D√©finition des √©l√©ments de configuration de ManuX. Les options et     */
+/* valeurs d√©finies ici sont utilis√©es dans le code C mais √©galement parfois  */
+/* ailleurs. Le Makefile g√©n√®re pour cela un fichier make.conf qui est ensuite*/
 /* inclus.                                                                    */
 /*                                                                            */
-/*    Pour le bon fonctionnement de cette procÈdure, il est impÈratif que les */
-/* macros en question dÈbutent par le prÈfixe MANUX_                          */
+/*    Pour le bon fonctionnement de cette proc√©dure, il est imp√©ratif que les */
+/* macros en question d√©butent par le pr√©fixe MANUX_                          */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 
 /*
- * On peut dÈfinir un autre fichier de configuration gÈnÈrale
+ * On peut d√©finir un autre fichier de configuration g√©n√©rale
  */
 #ifdef MANUX_FICHIER_CONFIG
 #include MANUX_FICHIER_CONFIG
@@ -20,22 +20,22 @@
 #define MANUX_CONFIG
 
 /*----------------------------------------------------------------------------*/
-/* Organisation de la mÈmoire lors du boot.                                   */
+/* Organisation de la m√©moire lors du boot.                                   */
 /*----------------------------------------------------------------------------*/
 /*
- * Positionnement du code d'init, utilisÈ en cas de boot sur disquette. On peut
- * rÈutiliser cette mÈmoire dans le noyau, puisque le code d'init est terminÈ
- * lorsque le noyau est initialisÈ.
+ * Positionnement du code d'init, utilis√© en cas de boot sur disquette. On peut
+ * r√©utiliser cette m√©moire dans le noyau, puisque le code d'init est termin√©
+ * lorsque le noyau est initialis√©.
  */
 #ifndef MANUX_INIT_START_ADDRESS
 #   define MANUX_INIT_START_ADDRESS  0x1000
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* Organisation de la mÈmoire au dÈmarrage.                                   */
+/* Organisation de la m√©moire au d√©marrage.                                   */
 /*----------------------------------------------------------------------------*/
 /*
- * La position et la taille du BIOS. Par prudence, j'y intËgre tout l'EBDA, mÍme
+ * La position et la taille du BIOS. Par prudence, j'y int√®gre tout l'EBDA, m√™me
  * s'il est peu probable que ce soit utile ! Voir 
  *    https://wiki.osdev.org/Memory_Map_(x86)
  *    https://stackoverflow.com/questions/64817723/relocating-bootloader-into-ebda
@@ -72,7 +72,7 @@
 
 /*
  * Adresse de la fonction _start de main.c attention, les 4 bits de
- * poids faible doivent Ítre nuls (voir bootsector.nasm)
+ * poids faible doivent √™tre nuls (voir bootsector.nasm)
  */
 #ifndef MANUX_KERNEL_START_ADDRESS
 #   define MANUX_KERNEL_START_ADDRESS 0x20000
@@ -87,7 +87,7 @@
 #endif
 
 /*
- * Adresse de l'Ècran
+ * Adresse de l'√©cran
  */
 #ifndef MANUX_ADRESSE_ECRAN
 #   define MANUX_ADRESSE_ECRAN 0xb8000
@@ -98,7 +98,7 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* DÈfinition des indices de descripteurs dans la GDT.                        */
+/* D√©finition des indices de descripteurs dans la GDT.                        */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_CODE_SEG_SEL
 #   define MANUX_CODE_SEG_SEL 0x08
@@ -109,21 +109,21 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* Utilisation d'un systËme de fichiers                                       */
+/* Utilisation d'un syst√®me de fichiers                                       */
 /*----------------------------------------------------------------------------*/
 #define MANUX_FS
 
 /*
- * Le nombre maximal de fichiers manipulÈs par un processus
- * WARNING : sans aucun intÈret pour le moment !
+ * Le nombre maximal de fichiers manipul√©s par un processus
+ * WARNING : sans aucun int√©ret pour le moment !
  */
 #ifndef MANUX_NB_MAX_FICHIERS
 #   define MANUX_NB_MAX_FICHIERS  4
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* DÈfinition de pÈriphÈrique caractËre. En pause, je n'en vois pas la        */
-/* nÈcessitÈ pour le moment                                                   */
+/* D√©finition de p√©riph√©rique caract√®re. En pause, je n'en vois pas la        */
+/* n√©cessit√© pour le moment                                                   */
 /*----------------------------------------------------------------------------*/
 //#define MANUX_PERIPHERIQUE_CARACTERE
 
@@ -136,7 +136,7 @@
 //#define MANUX_RAMDISK
 
 /*
- * Sa taille. WARNING : ‡ calculer par un outils comme la taille du noyau
+ * Sa taille. WARNING : √† calculer par un outils comme la taille du noyau
  */
 #ifndef MANUX_NB_SECT_RAMDISK
 #   define MANUX_NB_SECT_RAMDISK 0x2
@@ -169,7 +169,14 @@
 #endif
 
 /*
- * Premier numÈro d'interruption utilisÈ pour repositionner les IRQs
+ * Combien de handlers peut-on greffer sur une interruption ?
+ */
+#ifndef MANUX_NB_HANDLER_PAR_IRQ
+#   define MANUX_NB_HANDLER_PAR_IRQ 4
+#endif
+
+/*
+ * Premier num√©ro d'interruption utilis√© pour repositionner les IRQs
  */
 #ifndef MANUX_INT_BASE_IRQ
 #   define MANUX_INT_BASE_IRQ 0x20
@@ -183,53 +190,53 @@
 #endif
 
 /*
- * Les IRQ des matÈriels pris en charge
+ * Les IRQ des mat√©riels pris en charge
  */
 #define IRQ_HORLOGE   0
 #define IRQ_CLAVIER   1
 
 /*----------------------------------------------------------------------------*/
-/*   Configuration gÈnÈrale du noyau                                          */ 
+/*   Configuration g√©n√©rale du noyau                                          */ 
 /*----------------------------------------------------------------------------*/
 
 /*
- * La frÈquence du timer
+ * La fr√©quence du timer
  */
 #define MANUX_FREQUENCE_HORLOGE 100
 
 /*
- * Le numÈro majeur des consoles
+ * Le num√©ro majeur des consoles
  */
 #define MANUX_CONSOLE_MAJEUR  0
 
 /*
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
- * pas, tout ce qui est affichÈ est mÈlangÈ ‡ l'Ècran.
+ * pas, tout ce qui est affich√© est m√©lang√© √† l'√©cran.
  */
 #define MANUX_CONSOLES_VIRTUELLES 
 
 /*
- * Lorsqu'on crÈe une nouvelle console, est-ce que l'on bascule
+ * Lorsqu'on cr√©e une nouvelle console, est-ce que l'on bascule
  * automatiquement vers elle ? 
  */
 #define MANUX_BASCULER_NOUVELLE_CONSOLE
 
 /*
- * Affectation d'une console ‡ chaque t‚che. Si ce n'est pas le cas
+ * Affectation d'une console √† chaque t√¢che. Si ce n'est pas le cas
  * (et si le reste de la configurtion le permet), ce sont les fichiers
- * associÈs ‡ la t‚che qui sont utilisÈs pour les entrÈes-sorties.
+ * associ√©s √† la t√¢che qui sont utilis√©s pour les entr√©es-sorties.
  */
 #define MANUX_TACHE_CONSOLE
 
 /*
- * Utilise-t-on un mÈcanisme de journal des messages du noyau ?
+ * Utilise-t-on un m√©canisme de journal des messages du noyau ?
  */
 #define MANUX_JOURNAL
 
 /*
  * Le journal utilise la console via l'interface fichier
  * traditionnelle (read/write). Mais dans certaines phases de debug,
- * Áa peut s'avÈrer utile de contourner Áa et de l'accÈder
+ * √ßa peut s'av√©rer utile de contourner √ßa et de l'acc√©der
  * directement.
  */
 #define MANUX_JOURNAL_DIRECT_CONSOLE
@@ -255,7 +262,7 @@
 #define PRINTK_ERREUR    "{3}"
 
 /*
- * Doit-on activer les "assert" ? Si cette macro n'est pas dÈfinie,
+ * Doit-on activer les "assert" ? Si cette macro n'est pas d√©finie,
  * les assert ne produisent aucun code.
  */
 #define MANUX_ASSERT_ACTIVES
@@ -266,49 +273,49 @@
 #define MANUX_OUTILS_SYNCHRO
 
 /*
- * DÈfinition des appels systËme
+ * D√©finition des appels syst√®me
  */
 #define MANUX_APPELS_SYSTEME
 
 /*----------------------------------------------------------------------------*/
-/*   Gestion des t‚ches et ordonnancement.                                    */
+/*   Gestion des t√¢ches et ordonnancement.                                    */
 /*----------------------------------------------------------------------------*/
 /*
- * Implantation des t‚ches ? 
+ * Implantation des t√¢ches ? 
  */
 #define MANUX_TACHES
 
 /*
- * Ordonnancement prÈemptif ?
+ * Ordonnancement pr√©emptif ?
  */
 #define MANUX_PREEMPTIF
 
 /*----------------------------------------------------------------------------*/
-/*   Gestion de la mÈmoire.                                                   */
+/*   Gestion de la m√©moire.                                                   */
 /*----------------------------------------------------------------------------*/
 #define MANUX_GESTION_MEMOIRE
 
 /*
- * Taille d'une page mÈmoire (4 Ko)
+ * Taille d'une page m√©moire (4 Ko)
  */
 #define MANUX_TAILLE_PAGE           0x1000
 
 /*
- * Nombres de pages "systËme" c'est-‡-dire communes ‡ toutes les t‚ches.
+ * Nombres de pages "syst√®me" c'est-√†-dire communes √† toutes les t√¢ches.
  * WARNING, il serait bon de le calculer en fonction de la taille de la
- * mÈmoire physique. 
+ * m√©moire physique. 
  */
 #define MANUX_NOMBRE_PAGES_SYSTEME 0x800   /* 8 Mo */
 
 /*
- * Adresse utilisÈe pour le tableau d'affectation des pages
+ * Adresse utilis√©e pour le tableau d'affectation des pages
  */
 #ifndef MANUX_AFFECTATION_PAGES
 #   define MANUX_AFFECTATION_PAGES 0x1000
 #endif
 
 /*
- * Adresse de dÈbut de la zone gÈrÈe par malloc
+ * Adresse de d√©but de la zone g√©r√©e par malloc
  */
 #ifndef MANUX_ADRESSE_DEBUT_TAS
 #   define MANUX_ADRESSE_DEBUT_TAS 0x1000000
@@ -344,22 +351,22 @@
 
 /*
  * Pour le moment, on ne cherche qu'un bus, donc aucun risque d'avoir plus de 
- * 32 Èquipements.
+ * 32 √©quipements.
  */
 #define MANUX_NB_MAX_EQUIPEMENTS_PCI 32
 
 /*----------------------------------------------------------------------------*/
-/* Le rÈseau.                                                                 */
+/* Le r√©seau.                                                                 */
 /*----------------------------------------------------------------------------*/
 #define MANUX_RESEAU
 
 /*----------------------------------------------------------------------------*/
-/* Les pilotes de pÈriphÈriques.                                              */
+/* Les pilotes de p√©riph√©riques.                                              */
 /*----------------------------------------------------------------------------*/
 #define MANUX_VIRTIO
 
 /*
- * Du rÈseau
+ * Du r√©seau
  */
 #define MANUX_VIRTIO_NET
 
@@ -369,41 +376,41 @@
 #define MANUX_VIRTIO_CONSOLE
 
 /*
- * Le numÈro majeur des consoles virtio
+ * Le num√©ro majeur des consoles virtio
  */
 #define MANUX_VIRTIO_CONSOLE_MAJEUR 1
 
 /*----------------------------------------------------------------------------*/
-/*   Et maintenant quelques vÈrifications de cohÈrence de la configuration.   */
-/* Sans exhaustivitÈ malheureusement.                                         */
+/*   Et maintenant quelques v√©rifications de coh√©rence de la configuration.   */
+/* Sans exhaustivit√© malheureusement.                                         */
 /*----------------------------------------------------------------------------*/
 /*
  * Le ramdisk ne sait pas trouver la taille seul
  */
 #ifdef MANUX_TACHES
 #   ifndef MANUX_GESTION_MEMOIRE
-#      error "MANUX_TACHES nÈcessite MANUX_GESTION_MEMOIRE !"
+#      error "MANUX_TACHES n√©cessite MANUX_GESTION_MEMOIRE !"
 #   endif
 #endif
 
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
-#   error "MANUX_CLAVIER_CONSOLE nÈcessite MANUX_APPELS_SYSTEME"
+#   error "MANUX_CLAVIER_CONSOLE n√©cessite MANUX_APPELS_SYSTEME"
 #endif
 
 #if defined(MANUX_VIRTIO_NET) && !defined(MANUX_RESEAU)
-#   error "VIRTIO_NET est un pÈriphÈrique nÈcessitant MANUX_RESEAU"
+#   error "VIRTIO_NET est un p√©riph√©rique n√©cessitant MANUX_RESEAU"
 #endif
 
 #if defined(MANUX_VIRTIO_NET) && !defined(MANUX_VIRTIO)
-#   error "VIRTIO_NET est un pÈriphÈrique nÈcessitant MANUX_VIRTIO"
+#   error "VIRTIO_NET est un p√©riph√©rique n√©cessitant MANUX_VIRTIO"
 #endif
 
 #if defined(MANUX_VIRTIO) && !defined(MANUX_PCI)
-#   error "VIRTIO est un systËme nÈcessitant MANUX_PCI"
+#   error "VIRTIO est un syst√®me n√©cessitant MANUX_PCI"
 #endif
 
 #if defined(MANUX_PERIPHERIQUE_CARACTERE) && !defined(MANUX_FS)
-#   error "Les pÈriphÈriques caractËres nÈcessitent le type fichier"
+#   error "Les p√©riph√©riques caract√®res n√©cessitent le type fichier"
 #endif
 
 #endif  // MANUX_CONFIG

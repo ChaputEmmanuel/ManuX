@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des segments et leurs descripteurs et sélecteurs.          */
+/*      DÃ©finition des segments et leurs descripteurs et sÃ©lecteurs.          */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -72,10 +72,10 @@ int ajouterDescTSS(DescriptorTable * dt,
 		   void * adresse, uint32_t limite,
 		   booleen busyTask);
 /*
- * Ajout d'un descripteur de TSS à la DescriptorTable
+ * Ajout d'un descripteur de TSS Ã  la DescriptorTable
  *
- * L'adresse et la limite du segment sont fournies en paramètre.
- * L'indice dans la DescriptorTable est fournie en retour (multiplié
+ * L'adresse et la limite du segment sont fournies en paramÃ¨tre.
+ * L'indice dans la DescriptorTable est fournie en retour (multipliÃ©
  * par 8 comme l'index Intel).
  */
 

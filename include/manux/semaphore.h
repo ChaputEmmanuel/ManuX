@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des sémaphores et opértions associées.                     */
+/*      DÃ©finition des sÃ©maphores et opÃ©rtions associÃ©es.                     */
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
@@ -21,17 +21,17 @@ typedef struct _Semaphore {
 
 void semInit(Semaphore * sem, int val);
 /*
- * Définition de la valeur initiale d'un sémaphore
+ * DÃ©finition de la valeur initiale d'un sÃ©maphore
  */
 
 void semObtenir(Semaphore * sem);
 /*
- * Obtention d'une ressource. Cette opération est bloquante.
+ * Obtention d'une ressource. Cette opÃ©ration est bloquante.
  */
 
 void semRelacher(Semaphore * sem);
 /*
- * Remise au système d'une ressource préalablement obtenue.
+ * Remise au systÃ¨me d'une ressource prÃ©alablement obtenue.
  */
 
 #endif

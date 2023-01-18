@@ -73,16 +73,17 @@ void virtioConsoleGestionInt(void * pr)
    uint8_t isr;
 
    vc->nbItRecues++;
-   printk_debug(DBG_KERNEL_VIRTIO, "Interuption %d !!!\n", vc->nbItRecues);
+   printk_debug(DBG_KERNEL_VIRTIO, "Interruption %d !!!\n", vc->nbItRecues);
 
    // Est-ce moi qui suis visé ?
    inb((uint16_t)(vc->virtioPeripherique.pciEquipement->adresseES + VIRTIO_HIST_ISR), isr);
    if (isr & 0x1) {
       printk_debug(DBG_KERNEL_VIRTIO, "C'est pour moi, ...\n");
-      i8259aAckIRQ(vc->virtioPeripherique.pciEquipement->interruption);
 
       // La suite est à déférer dans une partie basse
       virtioConsoleTraiterBuffers(vc);
+   } else {
+     printk_debug(DBG_KERNEL_VIRTIO, "Fuck\n");
    }
 }
 
@@ -112,9 +113,13 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
 	                   | VIRTIO_CONSOLE_F_MULTIPORT);
 
    // La suite est à mettre dans virtio (ou à virer ?)
-   i8259aAjouterHandler(pciEquip->interruption,
+   if (i8259aAjouterHandler(pciEquip->interruption,
 			virtioConsoleGestionInt,
-			&virtioConsole);
+			    &virtioConsole)){
+      printk(PRINTK_CRITIQUE "Trop de handler sur l'interruption %d\n", pciEquip->interruption);
+      paniqueNoyau("Pas possible");
+      return ENOENT;
+   }
    i8259aAutoriserIRQ(pciEquip->interruption);
    virtioConsole.nbItRecues = 0;
    
@@ -145,7 +150,7 @@ MethodesFichier virtioConsoleMethodesFichier;
 /**
  * @brief : fonction d'écriture dans un périphérique virtio-console
  */
-size_t virtioConsoleEcrire(Fichier * f, char * b, size_t l)
+size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
 {
    VirtioConsole * vc = (VirtioConsole *)f->prive;
 
@@ -175,7 +180,7 @@ size_t virtioConsoleEcrire(Fichier * f, char * b, size_t l)
 /**
  * @brief : fonction de lecture dans un périphérique virtio-console
  */
-size_t virtioConsoleLire(Fichier * f, char * b, size_t l)
+size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
 {
    printk_debug(DBG_KERNEL_VIRTIO, "in\n");
 

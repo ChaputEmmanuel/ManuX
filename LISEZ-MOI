@@ -13,24 +13,23 @@ Feuille de route
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
    . Modes usager/noyau
-   . Bus PCI
-   . Ethernet
+   . Bus PCI                     <- Un minimum opérationnel est fait
+   . Ethernet                    <- La base y est !
    . Block device
    . SGF
    
 En cours
 --------
+   EN COURS : mise en place de la documentation. Voir ci dessous
+   (cherche Documentation)
 
-   BON, ben au delà de tous les points ci dessous, j'en suis à essayer
-   de débuguer virtio, ... 
-   ATTENTION, je suspecte que mon noyau devient trop gros et que la
-   fin empiète sur les GDT/IDT. Du coup j'essaie d'en changer les
-   adresses dans config.h, mais patatras, ça ne marche plus ! Deux
-   choses à voir donc : (1) il me semblait avoir des outils de test
-   pour s'assurer qu'on na pas de soucis de ce type. (2), le plus
-   important, pourquoi changer l'adresse dans config.h ne fonctionne
-   pas !? OUF, pas de soucis pour le second point, mais la première
-   question reste posée !
+   EN COURS : A exumer la génaration d'un ISO multiboot. Ce serait
+   bien d'avoir des images différentes, par exemple pour des copies
+   d'écran pour la doc.
+   
+   EN COURS : virtio semble fonctionner, il faut donc finaliser ça
+   ainsi que le journal (voir ci-dessous) de sorte à être bien pour
+   passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
    
    A finaliser
 
@@ -55,18 +54,6 @@ En cours
      par défaut qui affiche *uniquement* sur le fichier si dispo et
      sur la console sinon par exemple.
 	
-	
-
-     (1) Apparemment la console virtio seule marche donc à peu près, le
-     reseau virtio seul semble également fonctionner (il reçoit les
-     trames émises par un telnet par exemple !) mais dès qu'on
-     configure les deux, c'est la panique, ... J'ai l'impression que
-     le soucis est à chercher autour des handlers, mais même si on
-     désactve celui du réseau, ça foire.
-        Ca vient peut-être de virtio-console (ou virtio tout court)
-     parce que si je décommente une ligne de printk_debug dans le
-     main, même avec virtio-console seul ça plante méchamment !!!
-
      (2) Réfléchir à utiliser tout de même la consoleNoyau pour certains
      messages spécifiques. Ce sera sûrement utile pour débuger la
      virtio-console. En tous cas, sur la console, il reste quelques
@@ -93,6 +80,15 @@ En cours
 A faire : remplacer les .bin par des .elf  et ramener un max de choses
 dans make.conf make.commons make.rules, ...
 
+   ATTENTION, je suspecte que mon noyau devient trop gros et que la
+   fin empiète sur les GDT/IDT. Du coup j'essaie d'en changer les
+   adresses dans config.h, mais patatras, ça ne marche plus ! Deux
+   choses à voir donc : (1) il me semblait avoir des outils de test
+   pour s'assurer qu'on na pas de soucis de ce type. (2), le plus
+   important, pourquoi changer l'adresse dans config.h ne fonctionne
+   pas !? OUF, pas de soucis pour le second point, mais la première
+   question reste posée !
+   
 EN COURS : allocation mémoire (dont doc à restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
    de place et peut utiliser bsf comme ffsl ...
@@ -107,11 +103,6 @@ EN COURS : allocation mémoire (dont doc à restructurer).
    Vite fait : dans mémoire, lireNombrePages et lireNombrePagesDispo
    pour affichage
    
-   . utilisation de pandoc, par exemple :
-
-pandoc --css pandoc.css boot-part.tex -f latex -t html  -s -o html/boot.html
-
-   donne une bonne base !
 
    Il va falloir nettoyer un peu le code, et automatiser ça avec make
     
@@ -231,7 +222,41 @@ Les Makefile
 
 ============================================================================
 
-FAIT
+# Documentation
+
+   Le gros est écrit en LaTeX pour le moment. Je suis en train de
+   mettre en place l'architecture suivante
+
+   . Je génère des fichiers html depuis les fichiers source grâce à
+   doxygen
+   . Je génère des fichiers html depuis les doc LaTeX grâce à pandoc.
+   . Grâce au package hyperref, les liens semblent possibles ! Ca m'a
+   l'air pas mal (voir affichage-part). Macro à ajouter genre
+
+\manuxref{rep}{fichier}{ext} qui donne
+   \href{html/fichier_8ext_source.html}{\verb rep/fichier.ext}
+   (\href{html/fichier_8ext_source.html}{\sc dox})
+
+   
+   C'est maintenant à travailler en commençant avec la première doc à
+   écrire, par exemple celle sur l'affichage. Parmis les questions qui
+   se posent
+
+   . Soucis d'encodage de certains fichiers
+   . Comment connaître l'URL d'une cible doxygen pour pouvoir
+   l'atteindre depuis la doc LaTeX/Pandoc ?
+   . Comment se comportent les images ?
+
+  A faire sur la doc (à part la généraliser, l'écrire, répondre à ces
+  questions, ...) :
+
+   . Un plan avec des liens vers chaque partie, et une barre de
+   navigation à gauche
+
+
+============================================================================
+
+# FAIT
 
    En cours : l'ISO plante sur un AS. Essayer de faire un AS_dumb histoire
    de tester si c'est ça ou ecrireConsole plus spécifiquement. Rêglé

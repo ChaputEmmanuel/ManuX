@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*      Définition des fonctions de manipulation des chaines.                 */
+/*      DÃ©finition des fonctions de manipulation des chaines.                 */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/

@@ -201,7 +201,7 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv, void * bu[], int lg[], 
  */
 void virtioAfficherFile(VirtioFileVirtuelle * fv);
 
-void virtioFileInterdireInteruption(VirtioFileVirtuelle * fv);
-void virtioFileAutoriserInteruption(VirtioFileVirtuelle * fv);
+void virtioFileInterdireInterruption(VirtioFileVirtuelle * fv);
+void virtioFileAutoriserInterruption(VirtioFileVirtuelle * fv);
 
 #endif
