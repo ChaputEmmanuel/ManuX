@@ -2,7 +2,7 @@
  * @file console.h
  * @brief Définition des fonctions de base d'accés à la console.     
  *                                                                          
- *      Une console est protégée par un verrour de type ExclusionMutuelle.    
+ *      Une console est protégée par un verrou de type ExclusionMutuelle.    
  *   C'est à l'utilisateur de veiller à respecter les appels aux fonctions    
  *   d'entrée et de sortie de la section critique avant et aprés chaque       
  *   utilisation de la console. Bien sur le printf s'en occupe.               
@@ -18,17 +18,12 @@
 #include <manux/config.h>
 #include <manux/horloge.h>    // nbTopHorloge
 #include <manux/types.h>
-#include <manux/atomique.h>   // Accés unique à la console 
+#include <manux/atomique.h>   // Accés unique à la console
+#include <manux/ecran.h>
+
 #ifdef MANUX_FS
 #   include <manux/fichier.h> // Une console est un fichier
 #endif
-
-/**
- * Caractéristiques de l'écran physique
- */
-#define MANUX_CON_SCREEN   (char *)MANUX_ADRESSE_ECRAN
-#define MANUX_CON_COLONNES 80
-#define MANUX_CON_LIGNES   25
 
 /**
  * @brief Structure d'une console.
@@ -42,14 +37,17 @@
 typedef struct _Console {
    //! Adresse à laquelle se trouve le contenu affiché 
    char              * adresseEcran;
-   //! Une copie pour lorsque la console est active
-   char              * adresseEcranCopie;
-   int                 ligne, colonne ;
-   unsigned char       attribut;
+   //! Caractéristiques de l'écran
    uint8_t             nbLignes;
    uint8_t             nbColonnes;
+   //! Position et attribut (couleur, ...) actuels
+   int                 ligne, colonne ;
+   unsigned char       attribut;
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
+   //! Une copie pour lorsque la console est inactive
+   char              * adresseEcranCopie;
+  
    struct _Console   * suivante;    //!< Les consoles virtuelles sont chaînées
    struct _Console   * precedente;  //!< doublement chaînées
 #endif
@@ -63,90 +61,65 @@ typedef struct _Console {
   
 } Console;
 
-/*
+#ifdef MANUX_FS
+/**
  * Les méthodes permettant de traiter une console comme un fichier
  */
 extern MethodesFichier consoleMethodesFichier;
 
 /**
- * Définition des couleurs utilisables pour l'affichage
- */
-typedef enum {
-   COUL_TXT_NOIR             = 0x00,
-   COUL_TXT_BLEU             = 0x01,
-   COUL_TXT_VERT             = 0x02,
-   COUL_TXT_CYAN             = 0x03,
-   COUL_TXT_ROUGE            = 0x04,
-   COUL_TXT_MAGENTA          = 0x05,
-   COUL_TXT_MARRON           = 0x06,
-   COUL_TXT_GRIS_CLAIR       = 0x07,
-   COUL_TXT_GRIS             = 0x08,
-   COUL_TXT_BLEU_CLAIR       = 0x09,
-   COUL_TXT_VERT_CLAIR       = 0x0A,
-   COUL_TXT_CYAN_CLAIR       = 0x0B,
-   COUL_TXT_ROUGE_CLAIR      = 0x0C,
-   COUL_TXT_MAGENTA_CLAIR    = 0x0D,
-   COUL_TXT_JAUNE            = 0x0E,
-   COUL_TXT_BLANC            = 0x0F,
-   COUL_FOND_NOIR            = 0x00,
-   COUL_FOND_BLEU            = 0x10,
-   COUL_FOND_VERT            = 0x20,
-   COUL_FOND_CYAN            = 0x30,
-   COUL_FOND_ROUGE           = 0x40,
-   COUL_FOND_MAGENTA         = 0x50,
-   COUL_FOND_MARRON          = 0x60,
-   COUL_FOND_GRIS_CLAIR      = 0x70,
-   COUL_CLIGNOTANT           = 0x80
-} Couleur;
-
-/*
- * Définition de certains caractères ASCII
- */
-#define ASCII_ESC 27
-
-/**
- * Initialisation du système de console. 
+ * @brief Initialisation du système de console 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
+ * @return ESUCCES en cas de succès, autre chose sinon
  */
 int consoleInitialisation(INoeud * iNoeudConsole);
+
+#else
+/**
+ * @brief Initialisation du système de console sans notion de fichier
+ * @return ESUCCES en cas de succès, autre chose sinon
+ */
+int consoleInitialisation();
+#endif
 
 /*
  * Choix des couleurs de texte et de fond (voir l'enum ci dessus)
  */
-void affecterCouleurFond(Console * cons, Couleur coul);
+void consoleAffecterCouleurFond(Console * cons, Couleur coul);
 
-void affecterCouleurTexte(Console * cons, Couleur coul);
+void consoleAffecterCouleurTexte(Console * cons, Couleur coul);
 
-/*
- * Affichage d'un message à l'écran. Attention, aucun formatage
- * n'est fait. En revanche, la chaine de caractères doit être terminée
- * par un zéro.
+/**
+ * @brief Affichage d'un message sur la console
+ *
+ * Attention, aucun formatage n'est fait. En revanche, la chaine de
+ * caractères doit être terminée par un zéro.
  */
-void afficherConsole(Console * cons, char * msg);
+void consoleAfficher(Console * cons, char * msg);
 
 /*
  * Affichage d'un message à l'écran. Attention, aucun formatage
  * n'est fait. Seuls les nbOctets premiers octets sont affichés,
  * indépemment de la présence d'un caractère nul.
  */
-void afficherConsoleN(Console * cons, char * msg, int nbOctets);
+void consoleAfficherN(Console * cons, char * msg, int nbOctets);
 
 /*
  * Effacement (avec la couleur courante) et positionnement du curseur en
  * haut à gauche.
  */
-void effacerConsole(Console * cons);
+void consoleEffacer(Console * cons);
 
 /*
  * Affichage d'un entier sur la console
  */
-void afficherConsoleEntier(Console * cons, int n);
+void consoleAfficherEntier(Console * cons, int n);
 
 /*
  * Affichage d'un entier sur la console. En hexa sur le nbre d'octets
  * voulu.
  */
-void afficherConsoleRegistre(Console * cons, int nbOctets, int reg);
+void consoleAfficherRegistre(Console * cons, int nbOctets, int reg);
 
 /*
  * La notion de console virtuelle permet de gérer plusieurs affichages
@@ -179,9 +152,12 @@ void basculerVersConsoleSuivante();
 
 #endif  // MANUX_CONSOLES_VIRTUELLES
 
-/*
+/**
+ * @brief obtention d'un pointeur du la console noyau
+ *
  * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
- * console afficher.
+ * console afficher. C'est essentiellement pour ça que cette fonction
+ * est publique.
  */
 Console * consoleNoyau();
 

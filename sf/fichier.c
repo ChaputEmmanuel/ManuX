@@ -18,6 +18,7 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
    return result;
 }
 
+#ifdef MANUX_APPELS_SYSTEME
 int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
@@ -53,11 +54,14 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
    
    return result;
 }
+#endif //MANUX_APPELS_SYSTEME
 
 void sfInitialiser()
 {
-  definirAppelSysteme(NBAS_ECRIRE, sys_ecrire);
-  definirAppelSysteme(NBAS_LIRE, sys_lire);
+#ifdef MANUX_APPELS_SYSTEME
+   definirAppelSysteme(NBAS_ECRIRE, sys_ecrire);
+   definirAppelSysteme(NBAS_LIRE, sys_lire);
+#endif
 }
 
 /**

@@ -14,6 +14,27 @@
 #include <manux/console.h>
 
 /**
+ * @brief Les différents niveaux d'affichage
+ */
+#define MANUX_JOURNAL_NIVEAU_PANIQUE      0
+#define MANUX_JOURNAL_NIVEAU_URGENCE      1
+#define MANUX_JOURNAL_NIVEAU_CRITIQUE     2
+#define MANUX_JOURNAL_NIVEAU_ERREUR       3
+#define MANUX_JOURNAL_NIVEAU_ATTENTION    4
+#define MANUX_JOURNAL_NIVEAU_NOTIFICATION 5
+#define MANUX_JOURNAL_NIVEAU_INFORMATION  6
+#define MANUX_JOURNAL_NIVEAU_DEBUGAGE     7
+
+#define PRINTK_PANIQUE      "{0}"
+#define PRINTK_URGENCE      "{1}"
+#define PRINTK_CRITIQUE     "{2}"
+#define PRINTK_ERREUR       "{3}"
+#define PRINTK_ATTENTION    "{4}"
+#define PRINTK_NOTIFICATION "{5}"
+#define PRINTK_INFORMATION  "{6}"
+#define PRINTK_DEBUGAGE     "{7}"
+
+/**
  * @brief Initialisation du système de journalisation.
  */
 void journalInitialiser(INoeud * iNoeudConsole);

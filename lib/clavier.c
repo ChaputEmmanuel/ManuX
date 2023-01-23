@@ -101,7 +101,7 @@ void handlerClavier(void * toto)
 #   ifdef MANUX_CONSOLES_VIRTUELLES
       cons = consoleActive;
 #   else
-      cons = _consoleNoyau;
+      cons = consoleNoyau();
 #   endif
       if (codeClavier & 0x80) {
       } else {

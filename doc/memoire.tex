@@ -42,7 +42,7 @@ adresse logique est composée de deux parties : un {\em segment}, et un
 {\em offset}.
 
    Le segment est une partie de la mémoire, et l'offset un déplacement
-dans le segment, comme l'illustre la figure \ref{Figure:addlog}. On
+dans le segment, comme l'illustre la figure \ref{Fig-1}. On
 peut donc voir ça comme une découpe de la mémoire 
 en zones (ou segments) logiques et/ou comme une façon d'accéder à des
 adresses plus élevées que ce que permet la taille des registres.
@@ -51,11 +51,13 @@ adresses plus élevées que ce que permet la taille des registres.
 %$$
 %\includegraphics[width=0.4\textwidth]{adresse-logique}
 %![](adresse-logique.png){}
-\includegraphics{adresse-logique}
 
-%$$
-%\caption{\label{Figure:addlog}Adresse logique}
-%\end{figure} 
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{adresse-logique.png}
+\caption{\label{Fig-1}Adresse logique}
+\end{center}
+\end{figure} 
 
    Le segment est contenu dans un registre qui peut être fourni
 explicitement ou implicitement par l'instruction. Il donne donc
@@ -69,13 +71,14 @@ descripteur de segment}. C'est évidemment ce dernier (que nous
 allons décrire par la suite) qui donne, entre autres, l'adresse du
 segment. La figure \ref{Figure:addlogsel} illustre cette indirection.
 
+\note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=0.4\textwidth]{adresse-logique-sel}
 $$
 \caption{\label{Figure:addlogsel}Adresse logique et sélecteur de segment}
 \end{figure} 
-
+}
 
 %-------------------------------------------------------------------------------
 %      Segmentation
@@ -114,13 +117,14 @@ segment.
    La figure \ref{Figure:DescrSegment} montre la structure d'un
 descripteur de segment.
 
-\begin{figure}[htbp]
+\note{
+  \begin{figure}[htbp]
 $$
 \includegraphics[width=0.3\textwidth]{DescrSegment}
 $$
 \caption{\label{Figure:DescrSegment}Structure d'un descripteur de segment}
 \end{figure} 
-
+}
    Dans ManuX, la fonction suivante crée un descripteur de segment et
 l'ajoute dans la {\sc gdt} ou la {\sc ldt} passée en paramètre :
 
@@ -216,13 +220,14 @@ C'est finalement relativement simple, non ? Alors continuons,
      linéaire}. La structure d'une adresse linéaire est donnée dans la
    figure \ref{Figure:addlin}.
 
+   \note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=0.8\textwidth]{adresse-lineaire}
 $$
 \caption{\label{Figure:addline}Structure d'une adresse linéaire.}
 \end{figure} 
-
+}
    Les bits de poids forts ({\tt Dir}) donnent la position dans le
 répertoire de page de l'adresse d'une table de pages. Les bits
 suivants ({\tt Page}) donnent la position dans dans cette table de
@@ -266,13 +271,14 @@ mémoire virtuelle, découpée en pages (de 4 Ko) à partir de pages
 physiques situées ``n'importe où'' en mémoire physique (ou même sur un
 autre support tel qu'un disque dur ou autre).
 
+\note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=0.5\textwidth]{Pagination}
 $$
 \caption{\label{Figure:Pagination}Principe de la pagination}
 \end{figure} 
-
+}
    Le processeur offre (via sa {\sc mmu}) des mécanismes évolués
 permettant la mise en place de la pagination. La pagination est
 activée en positionnant à un le bit 31 du registre {\sc cr0}.
@@ -291,13 +297,14 @@ partie application. La première partie est dédiée à la gestion du
 système et la seconde et utilisée pour satisfaire les besoins en
 mémoire des différentes applications.
 
+\note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=0.5\textwidth]{MemoirePhysique}
 $$
 \caption{\label{Figure:MemoirePhysique}Structure de la mémoire physique}
 \end{figure} 
-
+}
    Au niveau système, la mémoire est gérée par page (une gestion plus
 fine doit donc être implantée au niveau application, par le biais
 des librairies).
@@ -310,13 +317,14 @@ des librairies).
    Traditionnellement, sur un PC, la mémoire physique est organisée
 comme décrit par la figure \ref{etat-memoire-base}.
 
+\note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=\textwidth]{etat-memoire-base}
 $$
 \caption{\label{fig:etat-memoire-boot}État de la mémoire au démarage}
 \end{figure} 
-
+}
    Une partie est réservée pour le {\sc bios} et la vidéo, nous nous
 garderons bien d'aller y lire ou écrire pour autre chose !
    
@@ -343,6 +351,7 @@ défini dans le fichier {\tt noyau/memoire.c} qui définit cela comme illustré 
 \ref{Figure:ProprietairePage}. Une page libre sera associée à un
 propriétaire nul et une page allouée au système à la tâche 1.
 
+\note{
 \begin{figure}[htbp]
 $$
 \includegraphics[width=0.5\textwidth]{proprietaire-page}
@@ -350,7 +359,7 @@ $$
 \caption{\label{Figure:ProprietairePage}Définition de l'allocation des
   pages mémoire}
 \end{figure} 
-
+}
 \subparagraph{Initialisation}
 
 

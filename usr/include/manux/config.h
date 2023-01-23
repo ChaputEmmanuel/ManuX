@@ -14,7 +14,8 @@
  * On peut définir un autre fichier de configuration générale
  */
 #ifdef MANUX_FICHIER_CONFIG
-#include MANUX_FICHIER_CONFIG
+#   error "Cette chose ne devrait pas se produire !"
+#   include MANUX_FICHIER_CONFIG
 #else
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
@@ -242,24 +243,10 @@
 #define MANUX_JOURNAL_DIRECT_CONSOLE
 
 /**
- * On affichera les messages d'un niveau <=
+ * On affichera les messages d'un niveau plus faible ou égal à
  * MANUX_JOURNAL_NIVEAU_DEFAUT
  */
-#define MANUX_JOURNAL_NIVEAU_PANIQUE      0
-#define MANUX_JOURNAL_NIVEAU_URGENCE      1
-#define MANUX_JOURNAL_NIVEAU_CRITIQUE     2
-#define MANUX_JOURNAL_NIVEAU_ERREUR       3
-#define MANUX_JOURNAL_NIVEAU_ATTENTION    4
-#define MANUX_JOURNAL_NIVEAU_NOTIFICATION 5
-#define MANUX_JOURNAL_NIVEAU_INFORMATION  6
-#define MANUX_JOURNAL_NIVEAU_DEBUGAGE     7
-
 #define MANUX_JOURNAL_NIVEAU_DEFAUT       7
-
-#define PRINTK_PANIQUE   "{0}"
-#define PRINTK_URGENCE   "{1}"
-#define PRINTK_CRITIQUE  "{2}"
-#define PRINTK_ERREUR    "{3}"
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,

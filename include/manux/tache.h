@@ -12,6 +12,7 @@
 #include <manux/interruptions.h>
 #include <manux/segment.h>        /* Pour la descriptor table */
 #include <manux/fichier.h>
+
 /*
  * Taille de la Local Descriptor Table de chaque tâche
  */
@@ -98,7 +99,12 @@ typedef struct _Tache {
  */
 extern Tache * tacheCourante;
 
+#ifdef MANUX_TACHE_CONSOLE
 Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
+#else
+Tache * creerTache(CorpsTache corpsTache);
+#endif
+
 /*
  * Création d'une nouvelle tâche. Attention, elle doit ensuite être
  * insérée dans la liste des tâches en cours.

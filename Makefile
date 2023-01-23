@@ -22,12 +22,12 @@ USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 # Le ficher de configuration est généré par make en fonction du
 # contenu de include/manux/config.h
-include make.conf
+-include make.conf
 
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
 MANUX_PARTS  = i386 lib usr noyau  
 
-MANUX_PARTS += $(if  $(MANUX_FS), sf)
+MANUX_PARTS += $(if $(MANUX_FS), sf)
 
 # Les sous-répertoires (pour le nettoyage par exemple)
 SOUS_REP  = $(MANUX_PARTS) $(DEMARAGE) 
@@ -58,7 +58,7 @@ usrinc : $(USR_INC)
 #...............................................................................
 #    Le fichier de configuration (une des premières choses à faire !)
 #...............................................................................
-make.conf : include/manux/config.h
+make.conf : $(MANUX_FICHIER_CONFIG)
 	cpp -nostdinc -fno-builtin  -dM $<  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
 
 #-------------------------------------------------------------------------------
@@ -118,13 +118,15 @@ bootgrub : configuration  grubinit  composants
 iso : bootgrub
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) $(NOYAU_ELF)
 
+$(ISO_FICHIER) : iso
+
 #...............................................................................
 #    Création d'une image iso intégrant un noyau pour chaque fichier de config
 # du répertoire multiconf
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/* ; do (make clean ; make MANUX_FICHIER_CONFIG="$$c" bootgrub ; cp noyau/noyau.elf noyaux/`basename $$c .h` ) ; done )
+	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" bootgrub ; cp noyau/noyau.elf noyaux/`basename $$c .h` ) ; done )
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------
@@ -136,7 +138,7 @@ run : bootgrub
 oldrun : manux
 	$(RUN_MANUX_FLOPPY)
 
-runiso : iso
+runiso : #$(ISO_FICHIER)
 	$(RUN_MANUX_ISO) $(ISO_FICHIER)
 
 runmultiso : multiso
@@ -152,12 +154,12 @@ dump :
 	ndisasm $(NOYAU_BIN) -u > dump
 
 clean :
-	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat
 	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
+	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf
 
 distclean :
-	rm -f bochs.out *.bin *.obj *.o dump $(TAILLE_CONF) *~
 	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)
+	rm -f bochs.out *.bin *.obj *.o dump $(TAILLE_CONF) *~
 
 tar : clean
 	(cd .. ; tar cvf -  ManuX-32 | $(COMPRESS) > manux-32-`date +"%Y-%m-%d"`.tgz ; echo Archive dans manux-32-`date +"%Y-%m-%d"`.tgz )

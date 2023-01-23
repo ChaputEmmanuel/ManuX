@@ -14,7 +14,10 @@
 #include <manux/scheduler.h>      // basculerTache
 #include <manux/appelsysteme.h>   // MANUX_AS_INT 
 #include <manux/atomique.h>
-#include <manux/console.h>        // Caractéristiques de l'écran
+#include <manux/ecran.h>          // Caractéristiques de l'écran
+#ifdef MANUX_CONSOLES_VIRTUELLES
+#   include <manux/console.h>     // basculerVersConsoleSuivante
+#endif
 #include <manux/tache.h>          // IntelTSS 
 #include <manux/string.h>         // memcpy 
 
@@ -201,9 +204,11 @@ void handlerPanique(uint32_t itNum, TousRegistres registres,
       inb(0x60, c);
       switch (c) {
          case 0x01: // ESC
-	      basculerVersConsoleSuivante();
-            while (c == 0x81){
-	      inb(0x60, c);
+#ifdef MANUX_CONSOLES_VIRTUELLES	   
+	    basculerVersConsoleSuivante();
+#endif
+	    while (c == 0x81){
+	       inb(0x60, c);
             };
          break;
          case 0x39: // SPACE On alterne entre l'écran bleu et l'écran au moment du drame 

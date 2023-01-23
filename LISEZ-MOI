@@ -9,6 +9,8 @@ Feuille de route
 ----------------
 
    . Un malloc, parce qu'il y en a marre de tout déclarer en statique !
+      . Un buddy area dans un premier temps
+      . Pourquoi pas un slab allocator plus tard
    . Mémoire virtuelle
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
@@ -23,10 +25,6 @@ En cours
    EN COURS : mise en place de la documentation. Voir ci dessous
    (cherche Documentation)
 
-   EN COURS : A exumer la génaration d'un ISO multiboot. Ce serait
-   bien d'avoir des images différentes, par exemple pour des copies
-   d'écran pour la doc.
-   
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
@@ -234,22 +232,16 @@ Les Makefile
    . Je génère des fichiers html depuis les fichiers source grâce à
    doxygen
    . Je génère des fichiers html depuis les doc LaTeX grâce à pandoc.
-   . Grâce au package hyperref, les liens semblent possibles ! Ca m'a
-   l'air pas mal (voir affichage-part). Macro à ajouter genre
-
-\manuxref{rep}{fichier}{ext} qui donne
-   \href{html/fichier_8ext_source.html}{\verb rep/fichier.ext}
-   (\href{html/fichier_8ext_source.html}{\sc dox})
-
+   . Grâce au package hyperref, les liens semblent possibles !
    
    C'est maintenant à travailler en commençant avec la première doc à
    écrire, par exemple celle sur l'affichage. Parmis les questions qui
    se posent
 
-   . Soucis d'encodage de certains fichiers
+   . (OK) Soucis d'encodage de certains fichiers 
    . Comment connaître l'URL d'une cible doxygen pour pouvoir
    l'atteindre depuis la doc LaTeX/Pandoc ?
-   . Comment se comportent les images ?
+   . (OK) Comment se comportent les images ?
 
   A faire sur la doc (à part la généraliser, l'écrire, répondre à ces
   questions, ...) :
@@ -330,3 +322,11 @@ make qui copie de include/manux vers usr/include/manux.
    fait un make clean, cp ... include/manux/config.h make noyau et qui
    à la fin construit une iso !
 
+   FAIT : déplacer la description de l'écran depuis console.h vers
+   ecran.h par exemple pour permettre de l'include (eg interruption.c)
+   et donc de commenter MANUX_CONSOLE
+   
+   FAIT : La génaration d'un ISO multiboot permet d'avoir des images
+   différentes, par exemple pour des copies  d'écran pour la doc.
+   Reste à voir quel est le comportement par défaut
+   

@@ -43,24 +43,27 @@ void basculerVersTache(Tache * tache)
 
 }
 
-Tache * creerTache(CorpsTache corpsTache, Console * cons)
+#ifdef MANUX_TACHE_CONSOLE
+Tache * creerTache(CorpsTache corpsTache, struct _Console * cons)
+#else
+Tache * creerTache(CorpsTache corpsTache)
+#endif
 {
    void  * unePage;
    Tache * tache;
    void  * pile;      // Elle a sa propre pile
 
-   // printk("aaaaa\n");
    /* On stoque les infos en zone système */
    unePage = allouerPage();
    if (unePage == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
       return NULL;
    }
-   // printk("bbbbb\n");
+
    tache = (Tache *) unePage;
 
    pile = (void*) allouerPage();
-   //   printk("cccccc\n");
+
    if (pile == NULL) {
       printk_debug(DBG_KERNEL_TACHE, "plus de memoire disponible\n");
       // WARNING : libérer la page de la tache
@@ -89,17 +92,14 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    tache->tss.ESP = (uint32_t)pile + 4092;  /* WARNING !! */
    tache->tss.EIP = (uint32_t)corpsTache;
    tache->tss.EFLAGS = (uint32_t)0x200;
-   // printk("ddddd\n");
 
    /* Ajout de la tâche dans la GDT */
    tache->indiceTSSDescriptor = ajouterDescTSS(gdtSysteme,
 					       &tache->tss,
 					       0x67, FALSE);
-   //   printk("eeeee\n");
 
    /* On recharge la GDT (nécessaire suite changement de taille ?) */
    chargerGDT(gdtSysteme);
-   //  printk("fffff\n");
 
    /* On lui affecte son numero */
    tache->numero = numeroProchaineTache++;
@@ -122,7 +122,6 @@ Tache * creerTache(CorpsTache corpsTache, Console * cons)
    /* Elle n'a pas encore été activée */
    tache->nbActivations = 0;
    tache->tempsExecution = (Temps)0;
-   //  printk("ggggg\n");
    
    /* Zone mémoire utilisable */
    tache->tailleMemoire = (void *)(nombrePagesSysteme * MANUX_TAILLE_PAGE);

@@ -11,7 +11,10 @@
 # multiconf. Cela permettra de construire une ISO avec les noyaux ainsi
 # configurés
 #
-#MANUX_FICHIER_CONFIG = "$(ROOTDIR)/multiconf/collab.h"
+
+ifndef MANUX_FICHIER_CONFIG
+MANUX_FICHIER_CONFIG = $(ROOTDIR)/include/manux/config.h
+endif
 
 # Position des librairies
 LIBI386   = $(ROOTDIR)/i386/libi386.a

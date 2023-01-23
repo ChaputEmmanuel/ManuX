@@ -8,7 +8,14 @@ DOXY_CFG = config.doxy
 PDFLATEX = pdflatex
 DOXYGEN = doxygen
 PANDOC = pandoc
-DOCS_PDF = ManuX.pdf boot-part.pdf inter-part.pdf memoire-part.pdf affichage-part.pdf
+DOCS_PDF = ManuX.pdf \
+           presentation-part.pdf \
+           outils-part.pdf \
+           boot-part.pdf \
+           affichage-part.pdf \
+           inter-part.pdf \
+           memoire-part.pdf 
+
 DOCS_PAN = $(DOCS_PDF:.pdf=.pan)
 
 all : $(DOCS_PDF) dox pan

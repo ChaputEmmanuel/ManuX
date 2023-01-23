@@ -51,10 +51,10 @@ void journalInitialiser(INoeud * iNoeudConsole)
 
 #ifdef MANUX_JOURNAL_DIRECT_CONSOLE
    consoleJournal = iNoeudConsole->prive;
-   affecterCouleurTexte(consoleJournal, COUL_TXT_BLANC);
+   consoleAffecterCouleurTexte(consoleJournal, COUL_TXT_BLANC);
 
    // Affichons un petit message   
-   afficherConsole(consoleJournal, "Journal de ManuX-32\n");
+   consoleAfficher(consoleJournal, "Journal de ManuX-32\n");
 #else
    ouvrirFichier(iNoeudConsole, &consoleFichier);
 #endif
@@ -82,7 +82,7 @@ void journaliserNiveau(booleen console, booleen fichier,
    if ((console) && (niveau <= MANUX_JOURNAL_NIVEAU_DEFAUT)) {
 #ifdef MANUX_JOURNAL_DIRECT_CONSOLE
       if (consoleJournal) {
-         afficherConsoleN(consoleJournal, message, len);
+         consoleAfficherN(consoleJournal, message, len);
       } 
 #else
       // WARNING, pas de test d'état ! Si j'essaie de journaliser avant

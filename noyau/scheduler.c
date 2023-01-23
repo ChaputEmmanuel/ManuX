@@ -4,7 +4,7 @@
 /* A voir : le paramètre "nouvelleConsole" n'a pas de sens s'il n'y a pas de  */
 /* consoles virtuelles, à supprimer dans ce cas ? Ca rendra le code moins     */
 /* lisible.                                                                   */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/scheduler.h>
 
@@ -122,7 +122,11 @@ void afficherEtatUneTache(Tache * tache)
 	  totalMinutesDansTemps(tache->tempsExecution),
 	  secondesDansTemps(tache->tempsExecution),
           tache,
+#ifdef MANUX_TACHE_CONSOLE
           tache->console,
+#else
+          consoleNoyau(),
+#endif
           tache->ldt);
 }
 
@@ -202,9 +206,9 @@ void initialiserScheduler()
 TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 {
    Tache   * tache;
-   Console * cons;
 
 #ifdef MANUX_TACHE_CONSOLE   
+   Console * cons;
 #   ifdef MANUX_CONSOLES_VIRTUELLES
    if (nouvelleConsole) {
       cons = creerConsoleVirtuelle();
@@ -222,7 +226,11 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 #endif // MANUX_TACHE_CONSOLE
    
    /* Création de la tache */
+#ifdef MANUX_TACHE_CONSOLE
    tache = creerTache(corpsTache, cons);
+#else
+   tache = creerTache(corpsTache);
+#endif
    if (tache == NULL) {
       return -ENOMEM;
    }
@@ -247,13 +255,21 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    return tache->numero;
 }
 
+#ifdef MANUX_APPELS_SYSTEME
+
+/**
+ * @brief Implantation de l'AS d'obtention de l'identifiant
+ */
 int AS_numeroTache()
 {
    return (int)tacheEnCours->numero;
 }
 
-/*
- * Le nom de la fonction suivante est probablement à changer, comme celui
+#ifdef MANUX_TACHE_CONSOLE
+/**
+ * @brief l'AS permettant d'obtenir la Console de la tâche
+ *
+ * Le nom de cette fonction est probablement à changer, comme celui
  * de la précédente d'ailleurs.
  */
 uint32_t AS_console()
@@ -266,9 +282,10 @@ uint32_t AS_console()
       return (uint32_t) NULL;
    }
 }
+#endif // MANUX_TACHE_CONSOLE
 
-/*
- * Implantation de l'appel système d'invocation de l'ordonnanceur
+/**
+ * @brief Implantation de l'appel système d'invocation de l'ordonnanceur
  */
 int sys_basculerTache(ParametreAS as)
 {
@@ -286,3 +303,4 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
    return ordonnancerTache(corpsTache, !shareConsole);
 }
 
+#endif // MANUX_APPELS_SYSTEME

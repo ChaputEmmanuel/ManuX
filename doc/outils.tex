@@ -1,0 +1,201 @@
+\section{Les outils de développement}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La compilation}
+
+Observons les principaux éléments du {\tt Makefile}.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{L'assembleur}
+
+   J'utilise NASM pour les quelques fichiers écrits en assembleur.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le compilateur C}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La création du noyau}
+
+   Sans grande surprise, on compile avec
+
+\begin{lstlisting}{}
+  make
+\end{lstlisting}
+
+  Différentes cibles sont créées
+
+\begin{description}
+   \item [{\tt manux}]
+   \item [{\tt run}]
+   \item [{\tt clean}]
+\end{description}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{L'exécution}
+
+   Le but n'est évidemment pas de faire tourner cette merveille sur du
+vrai matériel, mais plutôt dans un émulateur.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{L'émulateur Bochs}
+
+   J'utilisais initialement cet outil, mais les fichiers de
+configuration ne semblent plus convenir aux dernières versions de
+Bochs, il faudrait les mettre à jour ! Des volontaires ?
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{L'émulateur QEMU}
+
+   C'est maintenant {\tt qemu} que j'utilise, par exemple de la façon
+suivante
+   
+\begin{lstlisting}{}
+qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
+\end{lstlisting}
+
+  C'est d'ailleurs la commande que lance
+
+\begin{lstlisting}{}
+   make run
+\end{lstlisting}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Le débugage ``interne''}
+
+   Ce que j'appelle ici le débugage interne, c'est tous les outils que
+l'on peut utiliser dans le code lui-même pour essayer de comprendre ce
+qu'il s'y passe.
+
+   Nous avons pour le moment quelques outils de base, copieusement bugués
+eux-mêmes (!).
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La fonction {\tt printk\_debug}}
+
+   Elle permet de produire des messages d'erreur qui seront envoyés de
+façon sélective en fonction de la valeur de \lstinline!masqueDebugage!
+qui doit être construite dans {\tt manux/debug.h}.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La macro {\tt assert}}
+
+   Voir {\tt manux/debug.h}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le handler {\tt handlerPanique}}
+ 
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Le fichier {\tt noyau/symbols}}
+
+   Il va surtout nous servir pour aider au débugage externe, mais il
+est généré à la compilation du noyau.
+ 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Le débugage ``externe''}
+
+   Une technique pour débuguer est d'utiliser {\tt qemu} couplé avec
+{\tt gdb}. Pour cela, je lance par exemple {\tt qemu} de la façon suivante
+
+\begin{lstlisting}{}
+qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc
+base=localtime -m 64M -gdb tcp::1234  -S 
+\end{lstlisting}
+
+   Je lance ensuite {\tt gdb} dans un autre terminal avec un
+\lstinline!.gdbinit! qui contient :
+
+\begin{lstlisting}{}
+  target remote :1234
+  dir noyau
+  dir lib
+  file noyau/noyau.elf
+\end{lstlisting}
+
+   La commande \lstinline!dir! permet de dire à {\tt gdb} où trouver
+les fichiers sources et la command \lstinline:file: lui permet de
+consulter le binaire du noyau pour y trouver l'adresse des fonctions
+et variables (ici en fait, c'est une autre compilation du noyau au
+format {\sc elf} !).
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Exécution}
+
+   Quelques commandes de base pour l'exécution de code dans {\tt gdb}
+
+\begin{description}
+     \item[{\tt {\bf r} un}] permet de lancer l'exécution d'un
+       programme (inutilisable ici étant donné notre fonctionnement :
+       on débogue à distance) ;
+     \item[{\tt {\bf c} ontinue}] permet de poursuivre l'exécution jusqu'au
+       prochain point d'arrêt/bug/fin/\ldots ;
+     \item[{\tt {\bf s} tep}] avance d'une instruction dans le code ;
+     \item[{\tt {\bf n} ext}]
+     \item[{\tt {\bf b} reakpoint fonction}]
+     \item[{\tt {\bf b} reakpoint fichier:ligne}]
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Affichage des registres}
+
+   Il peut être intéressant de consulter le contenu des registres
+
+\begin{description}
+     \item[{\tt info registers}] donne le contenu des principaux registres.
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Affichage des variables}
+
+   {\tt Gdb} permet également de consulter le contenu des variables :
+
+\begin{description}
+   \item[{\tt p toto}] affiche le contenu de la variable {\tt toto}.
+\end{description}
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Désassemblage du code}
+
+    Une fonctionnalité intéressante est de pouvoir observer le code
+assembleur, ce qui peut permettre de comprendre certains comportements
+étranges, tels que les conséquences de choix d'optimisation du
+compilateur :
+
+\begin{description}
+   \item[{\tt disassemble fonc}] affiche le code assembleur de la
+     fonction {\tt fonc}.
+\end{description}
+

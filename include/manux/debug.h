@@ -42,19 +42,9 @@
   // | DBG_KERNEL_VIRTIO
 //  ;
 
-#define masqueDebugageConsole (0x00000000 	\
-   | DBG_KERNEL_MEMOIRE	   \
-   | DBG_KERNEL_ERREUR	   \
-   | DBG_KERNEL_START      \
-   | DBG_KERNEL_PCI        \
-			)
+#define masqueDebugageConsole (0x00000000)
+#define masqueDebugageFichier (0x00000000)
 
-#define masqueDebugageFichier (0x00000000		\
-   | DBG_KERNEL_MEMOIRE	   \
-   | DBG_KERNEL_ERREUR	   \
-   | DBG_KERNEL_START      \
-   | DBG_KERNEL_NET        \
-			)
 /*
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \

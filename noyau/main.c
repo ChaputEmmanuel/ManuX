@@ -212,7 +212,7 @@ void _start(InfoSysteme * infoSysteme,
 
    //printk_debug(DBG_KERNEL_START, "Deuxieme trame ...\n");
    //virtioNetTestDeuxiemeEmission();
-   
+
    init();
 }   /* _start */
 

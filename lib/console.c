@@ -21,12 +21,6 @@
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
-#ifdef MANUX_CONSOLES_VIRTUELLES
-
-/* A tout moment, il n'y a qu'une console "active" (ie visible) */
-Console * consoleActive;
-
-#endif // MANUX_CONSOLES_VIRTUELLES
 
 /*
  * La console du noyau est celle "par défaut", sur laquelle seront
@@ -34,19 +28,37 @@ Console * consoleActive;
  * printk).
  */
 static Console _consoleNoyau;
+
+#ifdef MANUX_CONSOLES_VIRTUELLES
+
+/**
+ * En cas de gestion de consoles virtuelles, à tout moment, il n'y a
+ * qu'une console "active" (ie visible). On en garde trace par une
+ * variable globale.
+ */
+Console * consoleActive;
+
+/**
+ * Pour basculer d'une console à l'autre, on a besoin de stocker le
+ * contenu des consoles non actives. Pour celle du noyau, la zone
+ * mémoire est déclarée ici.
+ */
 static char copieEcranConsoleNoyau[2*MANUX_CON_COLONNES*MANUX_CON_LIGNES];
 
-void affecterCouleurFond(Console * cons, Couleur coul)
+
+#endif // MANUX_CONSOLES_VIRTUELLES
+
+void consoleAffecterCouleurFond(Console * cons, Couleur coul)
 {
    cons->attribut = (cons->attribut & 0x0F)|(coul<<4);
 }
 
-void affecterCouleurTexte(Console * cons, Couleur coul)
+void consoleAffecterCouleurTexte(Console * cons, Couleur coul)
 {
    cons->attribut = (cons->attribut & 0xF0)|(coul);
 }
 
-void effacerConsole(Console * cons)
+void consoleEffacer(Console * cons)
 {
    int l, c;
 
@@ -95,7 +107,7 @@ void avancerLigne(Console * cons)
  * optimisation (donc pour le debogage) 
  */
  __attribute__((always_inline))
-inline void afficherConsoleCaractere(Console * cons, char c)
+inline void consoleAfficherCaractere(Console * cons, char c)
 {
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2] = c;
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2+1] = cons->attribut;
@@ -109,7 +121,7 @@ inline void afficherConsoleCaractere(Console * cons, char c)
    }
 }
 
-void afficherConsoleN(Console * cons, char * msg, int nbOctets)
+void consoleAfficherN(Console * cons, char * msg, int nbOctets)
 {
   int controle;
 
@@ -140,38 +152,38 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 	          }
                   switch (controle) {
                      case 0 : 
-                        affecterCouleurTexte(cons, COUL_TXT_BLANC);
-                        affecterCouleurFond(cons, COUL_FOND_NOIR);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_BLANC);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_NOIR);
                      break;
                      case 30 : 
-                        affecterCouleurTexte(cons, COUL_TXT_NOIR);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_NOIR);
                      break;
                      case 31 :
-                        affecterCouleurTexte(cons, COUL_TXT_ROUGE);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_ROUGE);
                      break;
                      case 32 : 
-                        affecterCouleurTexte(cons, COUL_TXT_VERT);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_VERT);
                      break;
                      case 34 :
-                        affecterCouleurTexte(cons, COUL_TXT_BLEU);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_BLEU);
                      break;
                      case 37 :
-                        affecterCouleurTexte(cons, COUL_TXT_BLANC);
+                        consoleAffecterCouleurTexte(cons, COUL_TXT_BLANC);
                      break;
                      case 40 : 
-                        affecterCouleurFond(cons, COUL_FOND_NOIR);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_NOIR);
                      break;
                      case 41 :
-                        affecterCouleurFond(cons, COUL_FOND_ROUGE);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_ROUGE);
                      break;
                      case 42 : 
-                        affecterCouleurFond(cons, COUL_FOND_VERT);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_VERT);
                      break;
                      case 44 :
-                        affecterCouleurFond(cons, COUL_FOND_BLEU);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_BLEU);
                      break;
                      case 47 :
-                        affecterCouleurFond(cons, COUL_FOND_GRIS_CLAIR);
+                        consoleAffecterCouleurFond(cons, COUL_FOND_GRIS_CLAIR);
                      break;
                      default:
                      break;
@@ -180,7 +192,7 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
             }
 	    break;
          default :
-            afficherConsoleCaractere(cons, *msg);
+            consoleAfficherCaractere(cons, *msg);
          break;
       }
       msg++;nbOctets--;
@@ -190,14 +202,14 @@ void afficherConsoleN(Console * cons, char * msg, int nbOctets)
 #endif
 }
 
-void afficherConsole(Console * cons, char * msg)
+void consoleAfficher(Console * cons, char * msg)
 {
    int n = 0;
    while (msg[n])n++;
-   afficherConsoleN(cons, msg, n);
+   consoleAfficherN(cons, msg, n);
 }
 
-void afficherConsoleEntier(Console * cons, int n)
+void consoleAfficherEntier(Console * cons, int n)
 {
    char nombre[12];
    int i = 0;
@@ -209,11 +221,11 @@ void afficherConsoleEntier(Console * cons, int n)
    } while (n);
    for (i--; i>=0; i--) {
       assert(cons->nbColonnes != 0);
-      afficherConsoleCaractere(cons, nombre[i]);
+      consoleAfficherCaractere(cons, nombre[i]);
    }
 }
 
-void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
+void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
 {
    char chiffre[17] = "0123456789abcdef";
    char nombre[2*nbOctets+2];
@@ -227,20 +239,26 @@ void afficherConsoleEntierHex(Console * cons, int nbOctets, uint32_t reg)
    nombre[i] = '0';
    for (; i>=0; i--) {
      assert(cons->nbColonnes != 0);
-      afficherConsoleCaractere(cons, nombre[i]);
+      consoleAfficherCaractere(cons, nombre[i]);
    }
 }
 
 /**
- * Initialisation d'une nouvelle console virtuelle. Les espaces
- * mémoire doivent avoir été alloués par ailleurs.
+ * @brief Initialisation d'une nouvelle console virtuelle.
+ *
+ * Les espaces mémoire doivent avoir été alloués par ailleurs.
  */
-void initialiserConsole(Console * cons, char * adresseEcran)
+void consoleInitialiser(Console * cons, char * adresseEcran)
 {
-   // Chaque console a sa propre zone mémoire
+   //! Adresse de la zone d'écran. L'affichage consiste en fait à
+   //! écrire des choses dans la zone mémoire pointée
    cons->adresseEcran = adresseEcran;
-   cons->adresseEcranCopie = adresseEcran;
 
+#ifdef MANUX_CONSOLES_VIRTUELLES
+   //! Chaque console a sa propre zone mémoire
+   cons->adresseEcranCopie = adresseEcran;
+#endif
+   
    // La configuration de base
    cons->ligne = 0; 
    cons->colonne = 0;
@@ -254,8 +272,9 @@ void initialiserConsole(Console * cons, char * adresseEcran)
 #endif
 
    // Un peu de ménage
-   effacerConsole(cons);
-   
+   consoleEffacer(cons);
+
+   /*
    afficherConsole(cons, "Console ");   
    afficherConsoleEntierHex(cons, 4, (int)cons);
    afficherConsole(cons, " creee a ");   
@@ -263,7 +282,8 @@ void initialiserConsole(Console * cons, char * adresseEcran)
    afficherConsole(cons, ", ecran a ");   
    afficherConsoleEntier(cons, (int)adresseEcran);
    afficherConsole(cons, "\n");   
-
+   */
+   
 #ifdef MANUX_CONSOLES_VIRTUELLES
    /* On l'insère après la console active dans la liste des consoles gérées */
    cons->suivante = consoleActive->suivante;
@@ -291,16 +311,18 @@ Console * creerConsoleVirtuelle()
    Console * result;
    void    * page;
 
-   // On va tout mettre dans une page unique
+   //! On va tout mettre dans une page unique
    assert(2*MANUX_CON_COLONNES*MANUX_CON_LIGNES + sizeof(Console)
 	  <= MANUX_TAILLE_PAGE);
-   
    page = allouerPage();
    if (page == NULL) {
       paniqueNoyau("Plus de memoire !");
    }
+   
    result = (Console *)page;
-   initialiserConsole(result, page + sizeof(Console));
+
+   //! On initialise ensuite la console
+   consoleInitialiser(result, page + sizeof(Console));
 
    return result;
 }
@@ -352,13 +374,13 @@ void basculerVersConsole(Console * suivante)
    consoleActive->colonne = 55;
 
    consoleActive->attribut = 0x1B;
-   afficherConsole(consoleActive, "Cons ");
-   afficherConsoleEntierHex(consoleActive, 4,(uint32_t)consoleActive);
-   afficherConsole(consoleActive, "  t= ");
-   afficherConsoleEntier(consoleActive, totalMinutesDansTemps(nbTopHorloge));
-   afficherConsole(consoleActive, ":");
-   afficherConsoleEntier(consoleActive, secondesDansTemps(nbTopHorloge));
-   afficherConsole(consoleActive, " ");
+   consoleAfficher(consoleActive, "Cons ");
+   consoleAfficherEntierHex(consoleActive, 4,(uint32_t)consoleActive);
+   consoleAfficher(consoleActive, "  t= ");
+   consoleAfficherEntier(consoleActive, totalMinutesDansTemps(nbTopHorloge));
+   consoleAfficher(consoleActive, ":");
+   consoleAfficherEntier(consoleActive, secondesDansTemps(nbTopHorloge));
+   consoleAfficher(consoleActive, " ");
 
    consoleActive->ligne = l;
    consoleActive->colonne = c;
@@ -380,23 +402,6 @@ void basculerVersConsoleSuivante()
 }
 
 #endif  // CONSOLES_VIRTUELLES
-
-int consoleOuvrir(INoeud * iNoeud, Fichier * f)
-{
-   f->methodes = &consoleMethodesFichier;
-   f->prive = &_consoleNoyau;
-
-   return ESUCCES;
-}
-
-size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
-{
-   Console * con = f->prive;
-
-   afficherConsoleN(con, buffer, nbOctets);
-
-   return nbOctets; // WARNING
-}
 
 /**
  * @brief : Implantation de l'appel système de lecture pour la console
@@ -457,9 +462,32 @@ Console * consoleNoyau()
 };
 
 #ifdef MANUX_FS
-/*
- * Les méthodes permettant de traiter une console comme un
- * fichier
+/**
+ * @brief Ouverture d'une Console en tant que Fichier 
+ */
+int consoleOuvrir(INoeud * iNoeud, Fichier * f)
+{
+   f->methodes = &consoleMethodesFichier;
+   f->prive = &_consoleNoyau;
+
+   return ESUCCES;
+}
+
+/**
+ * @brief Écriture dans une Console vue comme un fichier
+ */
+size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
+{
+   Console * con = f->prive;
+
+   consoleAfficherN(con, buffer, nbOctets);
+
+   return nbOctets; // WARNING
+}
+
+/**
+ * @brief Déclaratio des méthodes permettant de traiter une console
+ * comme un fichier
  */
 MethodesFichier consoleMethodesFichier = {
    .ouvrir = consoleOuvrir,
@@ -469,14 +497,21 @@ MethodesFichier consoleMethodesFichier = {
 #endif // MANUX_FS
 
 /**
- * Initialisation de la console.
+ * @brief Initialisation de la console du noyau
+ *
  */
-Console * initialiserConsoleNoyau()
+void initialiserConsoleNoyau()
 {
-   initialiserConsole(&_consoleNoyau, MANUX_CON_SCREEN);
-   _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
-   
+   //! Le gros du travail est fait par initialiserConsole
+   consoleInitialiser(&_consoleNoyau, MANUX_CON_SCREEN);
+
 #ifdef MANUX_CONSOLES_VIRTUELLES
+   //! Si on utilise plusieurs consoles, on doit pouvoir sauvegarder
+   //! leur contenu, y compris pour celle du noyau
+   _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
+
+   //! C'est la première, la seule pour le moment, on l'active donc et
+   //! on la chaîne avec elle-même
    consoleActive = &_consoleNoyau;
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
@@ -486,23 +521,38 @@ Console * initialiserConsoleNoyau()
    // La console noyau n'a pas de buffer clavier
    _consoleNoyau.bufferClavier = NULL;
 #   endif
-
-   return &_consoleNoyau;
 }
 
+#ifdef MANUX_FS
 /**
  * Initialisation du système de console. 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
  */
 int consoleInitialisation(INoeud * iNoeudConsole)
 {
+   //! On initialise la console
+   initialiserConsoleNoyau();
+
+   //! On initialise l'INoeud qui la décrit
    iNoeudConsole->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
    iNoeudConsole->typePeripherique.mineur = 0;
-   iNoeudConsole->prive = initialiserConsoleNoyau();
+   iNoeudConsole->prive = consoleNoyau();
    iNoeudConsole->methodesFichier = &consoleMethodesFichier;
 
    return ESUCCES;
 }
+
+#else 
+/**
+ * Initialisation du système de console. 
+ */
+int consoleInitialisation()
+{
+   initialiserConsoleNoyau();
+   
+   return ESUCCES;
+}
+#endif
 
 #ifdef MANUX_APPELS_SYSTEME
 /*
@@ -510,14 +560,18 @@ int consoleInitialisation(INoeud * iNoeudConsole)
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 {
-#ifdef MANUX_TACHES
+   //! Si on a attribué une console à  chaque tâche, on va la chercher
+   //! Si ce n'est pas le cas, on prend la seule console, celle du
+   //! noyau
+#if defined(MANUX_TACHES) && defined(MANUX_TACHE_CONSOLE)
    assert(tacheEnCours != NULL);
    Console * cons = tacheEnCours->console;
 #else
    Console * cons = consoleNoyau();
 #endif
+   
    assert(cons != NULL);
-   afficherConsoleN(cons, msg, n);
+   consoleAfficherN(cons, msg, n);
 
    return n;
 }

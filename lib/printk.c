@@ -33,7 +33,7 @@ void printk(char * format, ...)
    char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une getion dynamique
                             // attention aux risques de telescopage avec la pile !
    int       indice = 0;
-   long long int       n;             // valeur associée à un %[l]d
+   long long int       n;   // valeur associée à un %[l]d
    char      nombre[10];    // chaîne du nombre
    char    * s;             // valeur associée à un %s
    int       in;            // indice pour les boucles internes
@@ -131,10 +131,10 @@ affent :          switch (prefixe) {
    if (journalOperationnel()) {
       journaliser(chaine, indice);
    } else {
-      afficherConsoleN(consoleNoyau(), chaine, indice);
+      consoleAfficherN(consoleNoyau(), chaine, indice);
    }
 #else
-   afficherConsoleN(consoleNoyau(), chaine, indice);
+   consoleAfficherN(consoleNoyau(), chaine, indice);
 #endif
    
    va_end(argList);

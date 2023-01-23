@@ -14,8 +14,7 @@
  * On peut définir un autre fichier de configuration générale
  */
 #ifdef MANUX_FICHIER_CONFIG
-#   error "Cette chose ne devrait pas se produire !"
-#   include MANUX_FICHIER_CONFIG
+#include MANUX_FICHIER_CONFIG
 #else
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
@@ -112,7 +111,7 @@
 /*----------------------------------------------------------------------------*/
 /* Utilisation d'un système de fichiers                                       */
 /*----------------------------------------------------------------------------*/
-#define MANUX_FS
+//#define MANUX_FS
 
 /*
  * Le nombre maximal de fichiers manipulés par un processus
@@ -208,31 +207,31 @@
 /*
  * Le numéro majeur des consoles
  */
-#define MANUX_CONSOLE_MAJEUR  0
+//#define MANUX_CONSOLE_MAJEUR  0
 
 /*
  * Utilisation (ou non) des consoles virtuelles. Si on ne les utilise
  * pas, tout ce qui est affiché est mélangé à l'écran.
  */
-#define MANUX_CONSOLES_VIRTUELLES 
+//#define MANUX_CONSOLES_VIRTUELLES 
 
 /*
  * Lorsqu'on crée une nouvelle console, est-ce que l'on bascule
  * automatiquement vers elle ? 
  */
-#define MANUX_BASCULER_NOUVELLE_CONSOLE
+//#define MANUX_BASCULER_NOUVELLE_CONSOLE
 
 /*
  * Affectation d'une console à chaque tâche. Si ce n'est pas le cas
- * (et si le reste de la configurtion le permet), ce sont les fichiers
+ * (et si le reste de la configuration le permet), ce sont les fichiers
  * associés à la tâche qui sont utilisés pour les entrées-sorties.
  */
-#define MANUX_TACHE_CONSOLE
+//#define MANUX_TACHE_CONSOLE
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
  */
-#define MANUX_JOURNAL
+//#define MANUX_JOURNAL
 
 /*
  * Le journal utilise la console via l'interface fichier
@@ -240,24 +239,38 @@
  * ça peut s'avérer utile de contourner ça et de l'accéder
  * directement.
  */
-#define MANUX_JOURNAL_DIRECT_CONSOLE
+//#define MANUX_JOURNAL_DIRECT_CONSOLE
 
 /**
  * On affichera les messages d'un niveau plus faible ou égal à
  * MANUX_JOURNAL_NIVEAU_DEFAUT
  */
+#define MANUX_JOURNAL_NIVEAU_PANIQUE      0
+#define MANUX_JOURNAL_NIVEAU_URGENCE      1
+#define MANUX_JOURNAL_NIVEAU_CRITIQUE     2
+#define MANUX_JOURNAL_NIVEAU_ERREUR       3
+#define MANUX_JOURNAL_NIVEAU_ATTENTION    4
+#define MANUX_JOURNAL_NIVEAU_NOTIFICATION 5
+#define MANUX_JOURNAL_NIVEAU_INFORMATION  6
+#define MANUX_JOURNAL_NIVEAU_DEBUGAGE     7
+
 #define MANUX_JOURNAL_NIVEAU_DEFAUT       7
+
+#define PRINTK_PANIQUE   "{0}"
+#define PRINTK_URGENCE   "{1}"
+#define PRINTK_CRITIQUE  "{2}"
+#define PRINTK_ERREUR    "{3}"
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
  * les assert ne produisent aucun code.
  */
-#define MANUX_ASSERT_ACTIVES
+//#define MANUX_ASSERT_ACTIVES
 
 /*
  * Utilisation des outils de synchronisation (mutex, semaphore, ...)
  */
-#define MANUX_OUTILS_SYNCHRO
+//#define MANUX_OUTILS_SYNCHRO
 
 /*
  * Définition des appels système
@@ -329,12 +342,12 @@
 /*
  * Le clavier est transmis vers la console active
  */
-#define MANUX_CLAVIER_CONSOLE
+//#define MANUX_CLAVIER_CONSOLE
 
 /*----------------------------------------------------------------------------*/
 /*   Prise en compte du bus PCI.                                              */
 /*----------------------------------------------------------------------------*/
-#define MANUX_PCI
+//#define MANUX_PCI
 
 /*
  * Pour le moment, on ne cherche qu'un bus, donc aucun risque d'avoir plus de 
@@ -345,27 +358,27 @@
 /*----------------------------------------------------------------------------*/
 /* Le réseau.                                                                 */
 /*----------------------------------------------------------------------------*/
-#define MANUX_RESEAU
+//#define MANUX_RESEAU
 
 /*----------------------------------------------------------------------------*/
 /* Les pilotes de périphériques.                                              */
 /*----------------------------------------------------------------------------*/
-#define MANUX_VIRTIO
+//#define MANUX_VIRTIO
 
 /*
  * Du réseau
  */
-#define MANUX_VIRTIO_NET
+//#define MANUX_VIRTIO_NET
 
 /*
  * Une console
  */
-#define MANUX_VIRTIO_CONSOLE
+//#define MANUX_VIRTIO_CONSOLE
 
 /*
  * Le numéro majeur des consoles virtio
  */
-#define MANUX_VIRTIO_CONSOLE_MAJEUR 1
+//#define MANUX_VIRTIO_CONSOLE_MAJEUR 1
 
 /*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */
