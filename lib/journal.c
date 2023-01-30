@@ -16,6 +16,7 @@
  */
 #include <manux/config.h>
 #include <manux/memoire.h>  // NULL
+#include <manux/kmalloc.h>  // NULL
 #include <manux/journal.h>
 
 /**

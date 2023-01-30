@@ -7,11 +7,12 @@
 /*    Pour le bon fonctionnement de cette procédure, il est impératif que les */
 /* macros en question débutent par le préfixe MANUX_                          */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 
 /*
  * On peut définir un autre fichier de configuration générale
+ * WARNING, vus les résultats, ça fonctione !!! Pourquoi ???
  */
 #ifdef MANUX_FICHIER_CONFIG
 #   error "Cette chose ne devrait pas se produire !"
@@ -280,6 +281,10 @@
 /*----------------------------------------------------------------------------*/
 /*   Gestion de la mémoire.                                                   */
 /*----------------------------------------------------------------------------*/
+/**
+ * A-t-on des outils de base de gestion de la mémoire ? On ne parle
+ * ici que d'une gestion par page.
+ */
 #define MANUX_GESTION_MEMOIRE
 
 /*
@@ -302,16 +307,16 @@
 #endif
 
 /*
- * Adresse de début de la zone gérée par malloc
- */
-#ifndef MANUX_ADRESSE_DEBUT_TAS
-#   define MANUX_ADRESSE_DEBUT_TAS 0x1000000
-#endif
-
-/*
  * Active-t-on la pagination ?
  */
 #define MANUX_PAGINATION
+
+/*----------------------------------------------------------------------------*/
+/* Implantation de kmalloc                                                    */
+/*----------------------------------------------------------------------------*/
+#define MANUX_KMALLOC kmalloc-zs
+#define MANUX_KMALLOC_STAT
+
 
 /*----------------------------------------------------------------------------*/
 /* Gestion du clavier.                                                        */
@@ -368,11 +373,16 @@
 #define MANUX_VIRTIO_CONSOLE_MAJEUR 1
 
 /*----------------------------------------------------------------------------*/
+/* La stdlib propose quelques fonctions standard                              */
+/*----------------------------------------------------------------------------*/
+#define MANUX_STDLIB
+
+/*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */
 /* Sans exhaustivité malheureusement.                                         */
 /*----------------------------------------------------------------------------*/
 /*
- * Le ramdisk ne sait pas trouver la taille seul
+ * Pour la première, je ne suis pas si sûr, ...
  */
 #ifdef MANUX_TACHES
 #   ifndef MANUX_GESTION_MEMOIRE

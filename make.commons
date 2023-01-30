@@ -53,6 +53,7 @@ ISO_FICHIER=manux.iso
 
 #--------------------------------------------------------------------------
 #   Les commandes pour lancer ManuX dans un émulateur
+# -nographic pour pas d'environnement graphique
 #--------------------------------------------------------------------------
 RUN_MANUX_RAMSIZE = 64M
 RUN_MANUX_FLOPPY = qemu-system-i386 \

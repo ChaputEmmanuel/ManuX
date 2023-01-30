@@ -25,15 +25,6 @@
 #define MANUX_JOURNAL_NIVEAU_INFORMATION  6
 #define MANUX_JOURNAL_NIVEAU_DEBUGAGE     7
 
-#define PRINTK_PANIQUE      "{0}"
-#define PRINTK_URGENCE      "{1}"
-#define PRINTK_CRITIQUE     "{2}"
-#define PRINTK_ERREUR       "{3}"
-#define PRINTK_ATTENTION    "{4}"
-#define PRINTK_NOTIFICATION "{5}"
-#define PRINTK_INFORMATION  "{6}"
-#define PRINTK_DEBUGAGE     "{7}"
-
 /**
  * @brief Initialisation du système de journalisation.
  */

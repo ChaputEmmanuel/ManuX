@@ -15,6 +15,12 @@
 #include <manux/io.h>
 #include <manux/segment.h>
 #include <manux/memoire.h>
+#ifdef MANUX_STDLIB
+#   include <manux/stdlib.h>
+#endif
+#ifdef MANUX_KMALLOC
+#   include <manux/kmalloc.h>
+#endif
 #include <manux/atomique.h>
 #include <manux/appelsysteme.h>
 #ifdef MANUX_PCI
@@ -68,6 +74,43 @@ Fichier fichierVirtioConsole;
  */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
+
+/* A mettre dans un fichier qui remplace init */
+#define NB_ELEMENTS 20
+#define NB_APPELS   500
+void testerKmalloc()
+{
+   void * elements[NB_ELEMENTS] = {NULL,};
+   int n, e;
+
+   printk(PRINTK_DEBUGAGE ">>>>\n");
+   for (e = 0; e<NB_ELEMENTS; e++){
+      elements[e] = NULL;
+   }
+   kmallocAfficherStatistiques();
+   for (n = 0; n < NB_APPELS; n++) {
+      e = rand() % NB_ELEMENTS;
+      printk("[%d]%d, ", n, e);
+     /*
+      if (elements[e] == NULL) {
+         elements[e] = kmalloc(rand() % 1024);
+	 printk(PRINTK_DEBUGAGE"B %d (0x%x)\n", e, elements[e]);
+      } else {
+         printk(PRINTK_DEBUGAGE"A %d (0x%x)\n", e, elements[e]);
+         kfree(elements[e]);
+         elements[e] = NULL;
+      }
+     */
+   }
+   kmallocAfficherStatistiques();
+   printk(PRINTK_DEBUGAGE "<<<<\n");
+}
+
+
+
+
+
+
 void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
 	    uint32_t adresseFinManuX)
@@ -114,6 +157,11 @@ void _start(InfoSysteme * infoSysteme,
 		      adresseDebutManuX,
 		      adresseFinManuX);
    printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
+#endif
+
+#ifdef MANUX_KMALLOC
+   printk(PRINTK_DEBUGAGE "Pouet\n");
+   kmallocInitialisation();
 #endif
 
    /* Initialisation de la pagination */
@@ -195,8 +243,8 @@ void _start(InfoSysteme * infoSysteme,
    initialiserHorloge();
 //   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
    
-//   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
-//   adresseDebutManuX, adresseFinManuX);
+   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
+   adresseDebutManuX, adresseFinManuX);
 
    /*
    //afficher le masque des PIC ?
@@ -213,6 +261,18 @@ void _start(InfoSysteme * infoSysteme,
    //printk_debug(DBG_KERNEL_START, "Deuxieme trame ...\n");
    //virtioNetTestDeuxiemeEmission();
 
+#ifdef MANUX_STDLIB_TST
+   for (int n = 0; n < 50; n++)
+     printk(PRINTK_DEBUGAGE "%d, ", rand());
+#endif
+
+   //   testerKmalloc();
+   /*
+   void * tst = kmalloc(32);
+   void * tst2 = kmalloc(32);
+   kfree(tst);
+   kfree(tst2);
+   */
    init();
 }   /* _start */
 

@@ -275,6 +275,25 @@ hors d'age !
 %-------------------------------------------------------------------------------
 \subsection{Création d'un entête}
 
+   Le système {\em Multiboot} nécessite un entête devant le noyau avec
+des caractéristiques bien définies. En ce qui concerne ManuX, il est
+implanté dans le fichier \fichier{boot}{mb-manux}{nasm}.
+
+   Ce fichier contient essentiellement quelques éléments permettant à
+{\em Multiboot} de le reconnaitre puis du code permettant de démarrer
+véritablement le noyau par un appel à la fonction \lstinline!_start()!
+qui sera implantée dans le fichier \fichier{noyau}{main}{c}.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{L'édition de liens}
+
+   Afin d'assembler tous les éléments en un seul fichier
+\lstinline!noyau.elf! qui pourra ensuite être utilisé par {\em
+  Multiboot}, nous allons utiliser l'éditeur de liens \lstinline!ld!.
+
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------

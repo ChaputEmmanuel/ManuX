@@ -29,28 +29,6 @@ En cours
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
    
-   A finaliser
-
-     (0) (C'est fait ! A documenter)  Prochain truc à faire pour le
-     point (2) : un journal qui fonctionne avec une console ET un
-     fichier ! 
-
-        . Initialisation avec une console possible (par exemple
-     iniitaliserJournal(Console * c) avec c = NULL si pas de Console
-        . Ajout d'un fichier avec journalAjouterFichier(Fichier *)
-	. Par défaut printk() affiche dans les deux (ou pas en
-     fonction d'une macro, voire d'une variable de config)
-        . Ajout d'un logeLevel optionnel en tête de printk :
-	printk("[1]" "Msg ", ...)     qui envoie sur la console
-	printk("(1)" "Msg ", ...)     qui envoie sur le fichier
-	printk("{1}" "Msg ", ...)     qui envoie sur les deux
-
-        avec un niveau de log inspiré de Linux.
-
-        Bon, c'est en cours ... C'est même utilisable ! Il reste des
-     choses à rêgler : ça serait bien que printk() prenne un niveau
-     par défaut qui affiche *uniquement* sur le fichier si dispo et
-     sur la console sinon par exemple.
 	
      (2) Réfléchir à utiliser tout de même la consoleNoyau pour certains
      messages spécifiques. Ce sera sûrement utile pour débuger la
@@ -330,3 +308,25 @@ make qui copie de include/manux vers usr/include/manux.
    différentes, par exemple pour des copies  d'écran pour la doc.
    Reste à voir quel est le comportement par défaut
    
+   A finaliser
+
+     (0) (C'est fait ! A documenter)  Prochain truc à faire pour le
+     point (2) : un journal qui fonctionne avec une console ET un
+     fichier ! 
+
+        . Initialisation avec une console possible (par exemple
+     iniitaliserJournal(Console * c) avec c = NULL si pas de Console
+        . Ajout d'un fichier avec journalAjouterFichier(Fichier *)
+	. Par défaut printk() affiche dans les deux (ou pas en
+     fonction d'une macro, voire d'une variable de config)
+        . Ajout d'un logeLevel optionnel en tête de printk :
+	printk("[1]" "Msg ", ...)     qui envoie sur la console
+	printk("(1)" "Msg ", ...)     qui envoie sur le fichier
+	printk("{1}" "Msg ", ...)     qui envoie sur les deux
+
+        avec un niveau de log inspiré de Linux.
+
+        Bon, c'est en cours ... C'est même utilisable ! Il reste des
+     choses à rêgler : ça serait bien que printk() prenne un niveau
+     par défaut qui affiche *uniquement* sur le fichier si dispo et
+     sur la console sinon par exemple.

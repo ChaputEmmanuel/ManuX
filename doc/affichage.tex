@@ -253,15 +253,14 @@ messages du noyau, même après l'arrêt du système (ce qui est affiché
 sur la console disparait, ce qui nest pas pratique pour une analyse a
 posteriori).
 
-   La signification de ces caractères est alors la suivante~:
-
-\begin{description}{XXXXX}
-   \item[\lstinline![n]!] le message sera envoyé sur la console ;
-   \item[\lstinline!(n)!] le message sera envoyé sur le fichier
+La signification de ces caractères est alors la suivante~:
+\begin{itemize}
+   \item \lstinline![n]! et le message sera envoyé sur la console ;
+   \item \lstinline!(n)! le message sera envoyé sur le fichier
      associé au journal ;
-   \item[\lstinline!{n}!] le message sera transmis sur les deux
-     destinations.
-\end{description}
+   \item \lstinline!{n}! le message sera transmis sur les deux
+      destinations.     
+\end{itemize}
 
    Le code de la fonction \lstinline!journaliser()! est donc modifier
 en conséquence. Elle utiliser dans un premier temps la fonction

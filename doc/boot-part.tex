@@ -1,6 +1,15 @@
 \documentclass{article}
 \usepackage{epsf, a4, makeidx, Manu}
 
+% Insertion d'un lien vers les sources
+%
+% \fichier{chemin}{nom}{ext} (eg \fichier{lib}{console}{c})
+%
+\newcommand{\fichier}[3]{
+\href{html/#2_8#3_source.html}{\lstinline!#1/#2.#3!}
+(\href{html/#2_8#3.html}{\sc dox})
+}
+
 \title{Le boot}
 
 \author{Chaput Emmanuel}

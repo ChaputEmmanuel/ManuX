@@ -42,8 +42,12 @@
   // | DBG_KERNEL_VIRTIO
 //  ;
 
-#define masqueDebugageConsole (0x00000000)
-#define masqueDebugageFichier (0x00000000)
+#define masqueDebugageConsole (0x00000000 \
+ | DBG_KERNEL_START      \
+			       )
+#define masqueDebugageFichier (0x00000000\
+ | DBG_KERNEL_START      \
+			       )
 
 /*
  | DBG_KERNEL_ERREUR     \
@@ -61,19 +65,15 @@
 /**
  * Une fonction permettant d'afficher des messages de debug thématiques
  * et avec un formatage homogène.
- * WARNING : je ne suis pas fier de moi sur l'utilisation faite de
- * l'aiguillage console/fichier !
  */
 #define printk_debug(lvl, fmt, args...)	 \
-  if ((lvl)& (masqueDebugageConsole | masqueDebugageFichier))		\
-     printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args)
-/*
-#define printk_debug(lvl, fmt, args...)	 \
-   if ((lvl)& masqueDebugageConsole)                    \
-     printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
-   if ((lvl)& masqueDebugageFichier)                    \
-     printk("(7) [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args)
-*/
+   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
+      printk("{7} [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
+   } else if ((lvl)& masqueDebugageFichier) {				\
+      printk("(7) [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
+   } else if ((lvl)& masqueDebugageConsole) {				\
+      printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
+   }
 /*
  * Affichage d'un message de panique
  */
