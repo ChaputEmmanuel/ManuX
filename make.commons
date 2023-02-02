@@ -27,7 +27,7 @@ LIBUSR    = $(ROOTDIR)/usr/libusr.a
 NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.bin
 NOYAU_ELF     = $(ROOTDIR)/noyau/noyau.elf
 
-# Le script de link pour ld
+# Le script de link pour ld (il est obtenu par un traitement de manux.ld)
 LD_SCRIPT     = manux.lds
 
 # Le fichier de boot pour multiboot

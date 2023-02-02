@@ -74,7 +74,7 @@ Fichier fichierVirtioConsole;
  */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
-
+#ifdef MANUX_KMALLOC
 /* A mettre dans un fichier qui remplace init */
 #define NB_ELEMENTS 20
 #define NB_APPELS   500
@@ -106,10 +106,7 @@ void testerKmalloc()
    printk(PRINTK_DEBUGAGE "<<<<\n");
 }
 
-
-
-
-
+#endif // MANUX_KMALLOC
 
 void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
@@ -246,33 +243,15 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
    adresseDebutManuX, adresseFinManuX);
 
-   /*
-   //afficher le masque des PIC ?
-   uint8_t c, m;
-   inb(0x20, c);
-   inb(0x21, m);
-   printk_debug(DBG_KERNEL_START, "Les masques tombent : 0x%x - 0x%x\n", c, m);
-   inb(0xa0, c);
-   inb(0xa1, m);
-   printk_debug(DBG_KERNEL_START, "Les masques tombent : 0x%x - 0x%x\n", c, m);
-   // __asm__ ("int %0\n" : :"N"(28));
-   */
-
-   //printk_debug(DBG_KERNEL_START, "Deuxieme trame ...\n");
-   //virtioNetTestDeuxiemeEmission();
-
 #ifdef MANUX_STDLIB_TST
    for (int n = 0; n < 50; n++)
      printk(PRINTK_DEBUGAGE "%d, ", rand());
 #endif
 
-   //   testerKmalloc();
-   /*
-   void * tst = kmalloc(32);
-   void * tst2 = kmalloc(32);
-   kfree(tst);
-   kfree(tst2);
-   */
+#ifdef MANUX_KMALLOC
+   testerKmalloc();
+#endif
+   
    init();
 }   /* _start */
 

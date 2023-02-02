@@ -1,4 +1,4 @@
-.SUFFIXES: .nasm .bin .obj .c
+.SUFFIXES: .nasm .bin .obj .c .ld .lds
 
 # Les principales valeurs globales
 include ../make.commons
@@ -26,7 +26,7 @@ OBJETS     +=   $(if $(MANUX_PCI), pci.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO), virtio.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_NET), virtio-net.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_CONSOLE), virtio-console.o)
-OBJETS     +=   $(MANUX_KMALLOC).o
+OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o
 
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)
@@ -62,6 +62,8 @@ symbols_elf : noyau.elf
 .c.o :
 	gcc $(CFLAGS) -DKERNEL_START_ADDRESS=$(KERNEL_START_ADDRESS) -c $<
 
+.ld.lds :
+	gcc $(CFLAGS) -E -P -x c $< >  $@
 
 clean :
-	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin symbols_elf
+	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin symbols_elf $(LD_SCRIPT)
