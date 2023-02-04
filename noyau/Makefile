@@ -14,8 +14,7 @@ include ../make.conf
 LIBRAIRIES_MANUX = $(LIBI386) $(LIBMANUX) $(LIBUSR)
 LIBRAIRIES_MANUX += $(if  $(MANUX_FS), $(LIBSF))
 
-OBJETS      = 	main.o
-
+OBJETS      = 	$(MANUX_FICHIER_MAIN).o
 OBJETS     +=   $(if $(MANUX_TACHES), listetaches.o tache.o)
 OBJETS     +=   $(if $(MANUX_TACHES), scheduler.o)
 OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), memoire.o)
@@ -26,7 +25,7 @@ OBJETS     +=   $(if $(MANUX_PCI), pci.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO), virtio.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_NET), virtio-net.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_CONSOLE), virtio-console.o)
-OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o
+OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o)
 
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)

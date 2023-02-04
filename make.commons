@@ -20,7 +20,7 @@ endif
 LIBI386   = $(ROOTDIR)/i386/libi386.a
 LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
 LIBSF     = $(ROOTDIR)/sf/libsf.a
-LIBUSR    = $(ROOTDIR)/usr/libusr.a
+LIBUSR    = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)
 
 # Une version du noyau linké en format binaire pour le boot floppy
 # (voir si l'ELF ne fonctionnerait pas !) et une en ELF

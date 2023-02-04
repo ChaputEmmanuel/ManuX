@@ -100,6 +100,16 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
+/* Définition du fichier main. Afin de ne pas le surcharger de #ifdef, j'en   */
+/* fais plusieurs versions qui me permettent de faire des tests sur des sous  */
+/* ensemble plus limités. A utiliser avec un fichier de config spécifique à   */
+/* chaque fois a priori.                                                      */
+/*----------------------------------------------------------------------------*/
+#ifndef MANUX_FICHIER_MAIN
+#   define MANUX_FICHIER_MAIN main
+#endif
+
+/*----------------------------------------------------------------------------*/
 /* Définition des indices de descripteurs dans la GDT.                        */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_CODE_SEG_SEL
@@ -229,6 +239,11 @@
  * associés à la tâche qui sont utilisés pour les entrées-sorties.
  */
 #define MANUX_TACHE_CONSOLE
+
+/*
+ * Implantation de printk
+ */
+#define MANUX_PRINTK
 
 /*
  * Utilise-t-on un mécanisme de journal des messages du noyau ?
@@ -376,6 +391,11 @@
 /* La stdlib propose quelques fonctions standard                              */
 /*----------------------------------------------------------------------------*/
 #define MANUX_STDLIB
+
+/*----------------------------------------------------------------------------*/
+/* Est-ce que l'on incorpore le monde utilisateur ?                           */
+/*----------------------------------------------------------------------------*/
+#define MANUX_USR
 
 /*----------------------------------------------------------------------------*/
 /*   Et maintenant quelques vérifications de cohérence de la configuration.   */

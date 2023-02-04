@@ -5,15 +5,18 @@ ASM_EXT  = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f elf
 
+include ../make.conf
+
+# Les objects compilés (éventuellement sous condition d'une variable)
 OBJETS      = interruptions.o \
               horloge.o \
               intel-8259a.o \
-	      segment.o \
               arith64.o \
               interBasNiveau.bin \
               gestionGDT.bin
 
-include ../make.conf
+OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), segment.o)
+
 
 ASM_DEF	     = -D MANUX_KERNEL_TASK_TSS_IND=$(MANUX_KERNEL_TASK_TSS_IND)
 ASM_DEF     += -D MANUX_DATA_SEG_SEL=$(MANUX_DATA_SEG_SEL)

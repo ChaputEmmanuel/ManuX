@@ -2,6 +2,11 @@
 
 # Les principales valeurs globales
 ROOTDIR := $(shell pwd)
+
+# Le ficher de configuration est généré par make en fonction du
+# contenu de include/manux/config.h
+-include make.conf
+
 include make.commons
 
 BSEC_SRC = bootsector.$(ASM_EXT)
@@ -20,13 +25,10 @@ USR_INC_D   = usr/include/manux
 USR_INC_F   = appelsystemenum.h config.h types.h string.h i386.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
-# Le ficher de configuration est généré par make en fonction du
-# contenu de include/manux/config.h
--include make.conf
-
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
-MANUX_PARTS  = i386 lib usr noyau  
+MANUX_PARTS  = i386 lib noyau  
 
+MANUX_PARTS += $(if $(MANUX_USR), usr)
 MANUX_PARTS += $(if $(MANUX_FS), sf)
 
 # Les sous-répertoires (pour le nettoyage par exemple)

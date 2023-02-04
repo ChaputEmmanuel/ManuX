@@ -102,6 +102,16 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
+/* Définition du fichier main. Afin de ne pas le surcharger de #ifdef, j'en   */
+/* fais plusieurs versions qui me permettent de faire des tests sur des sous  */
+/* ensemble plus limités. A utiliser avec un fichier de config spécifique à   */
+/* chaque fois a priori.                                                      */
+/*----------------------------------------------------------------------------*/
+#ifndef MANUX_FICHIER_MAIN
+#   define MANUX_FICHIER_MAIN main-console
+#endif
+
+/*----------------------------------------------------------------------------*/
 /*   Configuration des interruptions                                          */ 
 /*----------------------------------------------------------------------------*/
 
