@@ -192,7 +192,7 @@ Les Makefile
   
   apt-get install nasm
 
-  apt-get install xorriso mtools
+  apt-get install xorriso mtools grub-pc-bin
   
 ## Lancement
 
