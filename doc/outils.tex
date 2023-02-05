@@ -1,47 +1,77 @@
+%===============================================================================
+%
+%===============================================================================
 \section{Les outils de développement}
+
+   Le but de cette section est de décrire brièvement les outils
+utilisés pour compiler et exécuter \manux.
+
+   L'essentiel du code de \manux est écrit en C, et un peu
+d'assembleur est nécessaire ici ou là, \ldots Le processus de
+compilation est évidemment automatisé avec l'outil {\em make}. Je vais
+décire sommairement cette étape dans la sous-section
+\ref{subsection:compilation}.
+
+   \manux peut ensuite être exécuté sur une machine réelle, mais il
+est évidemment possible d'utiliser un émulateur. Nous évoquerons les
+possibilités dans la sous-section \ref{subsection:execution}.
+
+   Le débugage est un élément important dans la phase de développement
+d'un logiciel, et il se révèle parfois un peu délicat lorsqu'il s'agit
+de développer un noyau. Nous évoquerons des outils dans les
+sous-sections \ref{subsection:debugage_interne} et
+\ref{subsection:debugage_externe}.
 
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
 \subsection{La compilation}
+\label{subsection:compilation}
 
-Observons les principaux éléments du {\tt Makefile}.
+   Observons les principaux éléments du {\tt Makefile}.
 
 %...............................................................................
 %
 %...............................................................................
 \subsubsection{L'assembleur}
 
-   J'utilise NASM pour les quelques fichiers écrits en assembleur.
-
+   J'utilise \nasm \autocite{nasm-website}  pour les quelques fichiers
+écrits en assembleur.
+ 
 %...............................................................................
 %
 %...............................................................................
 \subsubsection{Le compilateur C}
+
+   Le compilateur GCC est utilisé, la version 11.3.0 avec une cible
+\lstinline!x86_64-linux-gnu! fonctionne parfaitement. Je n'ai jamais
+eu de problème avec aucune version de GCC jusqu'à présent.
 
 %...............................................................................
 %
 %...............................................................................
 \subsubsection{La création du noyau}
 
-   Sans grande surprise, on compile avec
+   Sans grande surprise, on compile avec la commande
 
-\begin{lstlisting}{}
+\begin{lstlisting}
   make
 \end{lstlisting}
 
-  Différentes cibles sont créées
+  Différentes cibles peuvent être créées
 
-\begin{description}
-   \item [{\tt manux}]
-   \item [{\tt run}]
-   \item [{\tt clean}]
-\end{description}
+\begin{itemize}
+   \item {\tt manux} permet de compiler une image du noyau ;
+   \item {\tt run} permet de lancer un émulateur (par défaut pour le moment c'est \qemu) ;
+   \item {\tt clean} permet d'effacer tous les fichiers issus de compilation ;
+   \item {\tt iso} permet de créer une image \iso.
+\end{itemize}
 
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
 \subsection{L'exécution}
+\label{subsection:execution}
 
    Le but n'est évidemment pas de faire tourner cette merveille sur du
 vrai matériel, mais plutôt dans un émulateur.
@@ -53,30 +83,58 @@ vrai matériel, mais plutôt dans un émulateur.
 
    J'utilisais initialement cet outil, mais les fichiers de
 configuration ne semblent plus convenir aux dernières versions de
-Bochs, il faudrait les mettre à jour ! Des volontaires ?
+Bochs {} \cite{bochs-website} il faudrait les mettre à jour !
 
 %...............................................................................
 %
 %...............................................................................
-\subsubsection{L'émulateur QEMU}
+\subsubsection{L'émulateur Qemu}
 
-   C'est maintenant {\tt qemu} que j'utilise, par exemple de la façon
+   C'est maintenant \qemu \cite{qemu-website}  que j'utilise, par exemple de la façon
 suivante
    
-\begin{lstlisting}{}
-qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
+\begin{lstlisting}
+   qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy -m 64M
 \end{lstlisting}
 
   C'est d'ailleurs la commande que lance
 
-\begin{lstlisting}{}
+\begin{lstlisting}
+   make runfloppy
+\end{lstlisting}
+
+   Une autre façon de démarrer \manux est la suivante
+
+\begin{lstlisting}
+   qemu-system-i386 -kernel noyau.elf -m 64M
+\end{lstlisting}
+
+  C'est ce que fait la commande
+
+\begin{lstlisting}
    make run
 \end{lstlisting}
 
+   Mais on préférera probablement passer par une image ISO :
+
+\begin{lstlisting}
+   qemu-system-i386 -m 64M -cdrom manux.iso
+\end{lstlisting}
+
+  C'est ce que fait la commande
+
+\begin{lstlisting}
+   make runiso
+\end{lstlisting}
+
+   De nombreuses options sont disponibles, mais ce n'est pas le moment
+d'en parler !
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
 \subsection{Le débugage ``interne''}
+\label{subsection:debugage_interne}
 
    Ce que j'appelle ici le débugage interne, c'est tous les outils que
 l'on peut utiliser dans le code lui-même pour essayer de comprendre ce
@@ -99,13 +157,19 @@ qui doit être construite dans {\tt manux/debug.h}.
 %...............................................................................
 \subsubsection{La macro {\tt assert}}
 
-   Voir {\tt manux/debug.h}
+   Elle est définie dans le fichier \fichier{include/manux}{debug}{h}
+et elle permet de vérifier {\em lors de l'exécution} qu'une propostion
+est vérifiée ou non. Si elle ne l'est pas, un message est affiché.
 
 %...............................................................................
 %
 %...............................................................................
 \subsubsection{Le handler {\tt handlerPanique}}
- 
+
+   La fonction {\tt handlerPanique} est définie dans le fichier
+\fichier{include/manux}{debug}{h} et permet d'afficher un état du
+système qui peut être utile à des fin de débugage.
+
 %...............................................................................
 %
 %...............................................................................
@@ -118,24 +182,25 @@ est généré à la compilation du noyau.
 %
 %-------------------------------------------------------------------------------
 \subsection{Le débugage ``externe''}
+\label{subsection:debugage_externe}
 
    Une technique pour débuguer est d'utiliser {\tt qemu} couplé avec
 {\tt gdb}. Pour cela, je lance par exemple {\tt qemu} de la façon suivante
 
-\begin{lstlisting}{}
-qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc
+\begin{lstlisting}
+   qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc
 base=localtime -m 64M -gdb tcp::1234  -S 
 \end{lstlisting}
 
    Je lance ensuite {\tt gdb} dans un autre terminal avec un
-\lstinline!.gdbinit! qui contient :
+\lstinline!.gdbinit! qui contient~:
 
-\begin{lstlisting}{}
+\begin{verbatim}
   target remote :1234
   dir noyau
   dir lib
   file noyau/noyau.elf
-\end{lstlisting}
+\end{verbatim}
 
    La commande \lstinline!dir! permet de dire à {\tt gdb} où trouver
 les fichiers sources et la command \lstinline:file: lui permet de
@@ -150,17 +215,17 @@ format {\sc elf} !).
 
    Quelques commandes de base pour l'exécution de code dans {\tt gdb}
 
-\begin{description}
-     \item[{\tt {\bf r} un}] permet de lancer l'exécution d'un
+\begin{itemize}
+     \item {\tt {\bf r} un} permet de lancer l'exécution d'un
        programme (inutilisable ici étant donné notre fonctionnement :
        on débogue à distance) ;
-     \item[{\tt {\bf c} ontinue}] permet de poursuivre l'exécution jusqu'au
+     \item {\tt {\bf c} ontinue} permet de poursuivre l'exécution jusqu'au
        prochain point d'arrêt/bug/fin/\ldots ;
-     \item[{\tt {\bf s} tep}] avance d'une instruction dans le code ;
-     \item[{\tt {\bf n} ext}]
-     \item[{\tt {\bf b} reakpoint fonction}]
-     \item[{\tt {\bf b} reakpoint fichier:ligne}]
-\end{description}
+     \item {\tt {\bf s} tep} avance d'une instruction dans le code ;
+     \item {\tt {\bf n} ext}
+     \item {\tt {\bf b} reakpoint fonction}
+     \item {\tt {\bf b} reakpoint fichier:ligne}
+\end{itemize}
 
 %...............................................................................
 %
@@ -169,9 +234,9 @@ format {\sc elf} !).
 
    Il peut être intéressant de consulter le contenu des registres
 
-\begin{description}
-     \item[{\tt info registers}] donne le contenu des principaux registres.
-\end{description}
+\begin{itemize}
+     \item {\tt info registers} donne le contenu des principaux registres.
+\end{itemize}
 
 %...............................................................................
 %
@@ -180,9 +245,9 @@ format {\sc elf} !).
 
    {\tt Gdb} permet également de consulter le contenu des variables :
 
-\begin{description}
-   \item[{\tt p toto}] affiche le contenu de la variable {\tt toto}.
-\end{description}
+\begin{itemize}
+   \item {\tt p toto} affiche le contenu de la variable {\tt toto}.
+\end{itemize}
 
 %...............................................................................
 %
@@ -194,8 +259,8 @@ assembleur, ce qui peut permettre de comprendre certains comportements
 étranges, tels que les conséquences de choix d'optimisation du
 compilateur :
 
-\begin{description}
-   \item[{\tt disassemble fonc}] affiche le code assembleur de la
+\begin{itemize}
+   \item {\tt disassemble fonc} affiche le code assembleur de la
      fonction {\tt fonc}.
-\end{description}
+\end{itemize}
 

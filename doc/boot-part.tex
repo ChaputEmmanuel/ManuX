@@ -1,14 +1,8 @@
 \documentclass{article}
-\usepackage{epsf, a4, makeidx, Manu}
+\usepackage{epsf, a4, makeidx, Manu, hyperref}
+\usepackage{graphicx} 
 
-% Insertion d'un lien vers les sources
-%
-% \fichier{chemin}{nom}{ext} (eg \fichier{lib}{console}{c})
-%
-\newcommand{\fichier}[3]{
-\href{html/#2_8#3_source.html}{\lstinline!#1/#2.#3!}
-(\href{html/#2_8#3.html}{\sc dox})
-}
+\input{manux}
 
 \title{Le boot}
 
@@ -17,8 +11,8 @@
 \usepackage{graphicx} 
 \usepackage{listings}
 \input{lstasm}
+\usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
-%\usepackage[utf8]{inputenc}
 
 
 \title{Le processus de boot}

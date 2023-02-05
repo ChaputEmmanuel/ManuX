@@ -42,12 +42,15 @@ construire chaque partie.
 
    Afin de permettre un démarrage ``à l'ancienne'' par un boot sur
 disquette du \textsc{ pc}, nous allons donc construire une image de disquette
-dont la structure est décrite par la figure \ref{fig:image-disquette}.
+dont la structure est décrite par la figure suivante.
 
-\begin{figure}[htbp]
-\includegraphics[width=0.8\textwidth]{image-disquette}
-\caption{\label{fig:image-disquette}Le fichier de démarage}
-\end{figure} 
+\includegraphics{images/image-disquette.png}
+
+
+%\begin{figure}
+%  \includegraphics{images/image-disquette.png}
+%\caption{\label{fig:image-disquette}Le fichier de démarage}
+%\end{figure} 
 
    Ce que j'appelle ici le boot du système se passera donc en deux
 temps. D'abord le secteur de boot est chargé en mémoire par le
@@ -69,7 +72,7 @@ opération puis démarre enfin le noyau.
 \end{itemize}
 
    Avant de regarder en détail comment ils sont mis en \oe{}uvre,
-regardons les interactions entre les rois éléments.
+regardons les interactions entre les trois éléments.
    
 %-------------------------------------------------------------------------------
 %

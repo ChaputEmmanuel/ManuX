@@ -4,7 +4,6 @@
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
-#include <manux/errno.h>
 #include <manux/console.h>
 /*
  * Structure passée en paramètre par la phase d'init
@@ -23,8 +22,11 @@ void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
 	    uint32_t adresseFinManuX)
 {
-   /* Initialisation de la console noyau */
+  // Initialisation de la console noyau
    consoleInitialisation();
 
+   // Un petit message
+   consoleAfficher(consoleNoyau(), "Bonjour le monde !\n");
+   
 }   /* _start */
 

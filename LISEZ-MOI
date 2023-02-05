@@ -191,6 +191,8 @@ Les Makefile
   * nasm : l'assembleur
   
   apt-get install nasm
+
+  apt-get install xorriso mtools
   
 ## Lancement
 
@@ -216,15 +218,21 @@ Les Makefile
    écrire, par exemple celle sur l'affichage. Parmis les questions qui
    se posent
 
+   . Comment se comportent les images ? C'est pas gagné. J'arrive à
+   les inclure, mais il y a un soucis de chemin je pense. Je le
+   contourne en les mettant dans un répertoire images sur lequel
+   pointe un lien dans docs (comme ça pour le latex comme pour le md
+   généré, les images sont dans ./images, ...)
+      Restent les légendes. Là je sature, mais la solution est
+   peut-être sur https://tex.stackexchange.com/questions/101725/latex-figures-appear-before-text-in-pandoc-markdown
    . (OK) Soucis d'encodage de certains fichiers 
    . Comment connaître l'URL d'une cible doxygen pour pouvoir
    l'atteindre depuis la doc LaTeX/Pandoc ?
-   . (OK) Comment se comportent les images ?
 
   A faire sur la doc (à part la généraliser, l'écrire, répondre à ces
   questions, ...) :
 
-   . Un plan avec des liens vers chaque partie, et une barre de
+   . (FAIT) Un plan avec des liens vers chaque partie, et une barre de
    navigation à gauche
 
    . Pour mettre des liens internes vers les fonctions dans les

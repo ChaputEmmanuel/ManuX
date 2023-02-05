@@ -278,7 +278,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    if (i8259aAjouterHandler(pciEquip->interruption,
 			virtioNetGestionInt,
 			    &virtioReseau)){
-      printk(PRINTK_CRITIQUE "Trop de handler sur l'interruprtion %d\n", pciEquip->interruption);
+      printk(PRINTK_CRITIQUE "Trop de handler sur l'interruption %d\n", pciEquip->interruption);
       paniqueNoyau("Pas possible");
       return ENOENT;
    }

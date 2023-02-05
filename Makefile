@@ -26,8 +26,9 @@ USR_INC_F   = appelsystemenum.h config.h types.h string.h i386.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
-MANUX_PARTS  = i386 lib noyau  
+MANUX_PARTS  = lib noyau  
 
+MANUX_PARTS += $(if $(MANUX_LIBI386), i386)
 MANUX_PARTS += $(if $(MANUX_USR), usr)
 MANUX_PARTS += $(if $(MANUX_FS), sf)
 
@@ -137,7 +138,7 @@ multiso :
 run : bootgrub
 	$(RUN_MANUX_ELF)
 
-oldrun : manux
+runfloppy : manux
 	$(RUN_MANUX_FLOPPY)
 
 runiso : #$(ISO_FICHIER)

@@ -9,8 +9,7 @@
  *      La seule fonction dans laquelle ces appels sont effectués est celle   
  *   permettant le basculement de console active.                             
  *                                                                            
- *                                                (C) Manu Chaput 2000 - 2023 
-                                                                              */
+ *                                                (C) Manu Chaput 2000 - 2023 */
 
 #ifndef MANUX_CONSOLE_DEF
 #define MANUX_CONSOLE_DEF

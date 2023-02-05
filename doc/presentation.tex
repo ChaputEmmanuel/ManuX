@@ -12,43 +12,23 @@ d'exploitation.
    Ces notes me sont purement personelles et je vous invite donc, qui que
 vous soyez, arrêtez de lire ça ! Vous êtes encore là ? C'est pas sympa \ldots
 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
 \subsection{Présentation}
 
    Ce document rassemble quelques notes prises durant ma tentative de
-dévelop\-pement de {\em ManuX} ("Misérable Approximation de Noyau
-Un*X"). Mon but en développant cette chose est uniquement de mieux
+dévelop\-pement de \manux (``Misérable Approximation de Noyau
+Un*X''). Mon but en développant cette chose est uniquement de mieux
 comprendre les problèmes liés à l'implantation d'un système
 d'exploitation. Je n'ai en aucun cas comme objectif d'arriver à un
 {\sc os} utilisable à d'autres fins que tester des mécanismes
 systèmes. 
 
    De plus, je ne recherche absolument pas la performance dans le code 
-que j'écris, mais plutôt la lisibilité et la compréhensibilité. \,Ca
+que j'écris, mais plutôt la lisibilité et la compréhensibilité. Ça
 peut ne pas sauter aux yeux dans les parties de code encore en
 développement (c'est à dire partout pour le moment) \ldots 
-
-   J'essaie de plus de coder les choses aussi proprement que
-possible. Je trouve par exemple pitoyable des structures du genre 
-
-\begin{lstlisting}{}
-   struct processus {
-      int pid;
-      ...
-      struct processus * suivant; /* de la liste */
-   }
-\end{lstlisting}
-
-   dans lesquelles on mélange allègrement le contenu (ici un
-processus) et le contenant (une liste par exemple) ; c'est ce que
-j'appelle le ``syndrome du poisson pané''.
-
-   Personnellement je définirai donc d'abord les caractéristiques du
-processus sans contrainte extérieure puis celle du contenant sans se
-préoccuper du contenu. Une telle façon de programmer me parait
-beaucoup plus structurée, simple et compréhensible ; de plus elle se
-prète à la mise en \oe{}uvre de structures ``génériques'', même si en
-C cela reste un peu du bricolage. Qui plus est, une telle
-programmation peut se faire sans nuire aux performances.
 
 %===============================================================================
 %       Organisation générale

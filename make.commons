@@ -17,7 +17,7 @@ MANUX_FICHIER_CONFIG = $(ROOTDIR)/include/manux/config.h
 endif
 
 # Position des librairies
-LIBI386   = $(ROOTDIR)/i386/libi386.a
+LIBI386   = $(if $(MANUX_LIBI386), $(ROOTDIR)/i386/libi386.a)
 LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
 LIBSF     = $(ROOTDIR)/sf/libsf.a
 LIBUSR    = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)

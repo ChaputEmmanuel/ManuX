@@ -1,0 +1,15 @@
+% Insertion d'un lien vers les sources
+%
+% \fichier{chemin}{nom}{ext} (eg \fichier{lib}{console}{c})
+%
+\newcommand{\fichier}[3]{
+\href{../doxy/html/#2_8#3_source.html}{\lstinline!#1/#2.#3!}
+(\href{../doxy/html/#2_8#3.html}{\sc dox})
+}
+
+\renewcommand{\labelitemi}{X}
+
+\newcommand{\qemu}{{\em Qemu}}
+\newcommand{\nasm}{{NASM} {}}
+\newcommand{\iso}{{\sc iso}}
+\newcommand{\manux}{{\em ManuX} {}}
