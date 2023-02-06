@@ -37,6 +37,7 @@ typedef struct VirtioConsole_t {
  * WARNING : pour le moment on crée un unique périphérique
  */
 VirtioConsole virtioConsole; 
+ static int    nbPageAlloueesIci = 0;
 
 /**
  * Gestion des buffers utilisés par le périphérique
@@ -52,16 +53,20 @@ void virtioConsoleTraiterBuffers()
    nbLu = virtioFileRecupererBuffers(
 	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]),
 			      bf, lg, NB_BUFF_TRAITES);
-   
-   // Récupération des buffers émis et consommés
-   nbLu = virtioFileRecupererBuffers(
-	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
-			      bf, lg, NB_BUFF_TRAITES);
 
-   // WARNING Pas top
-   for (int n = 0; n < nbLu; n++) {
-      libererPage(bf[n]);
-   }
+   do {
+      // Récupération des buffers émis et consommés
+      nbLu = virtioFileRecupererBuffers(  
+	     &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
+	     bf, lg, NB_BUFF_TRAITES);
+
+      // WARNING Pas top
+      for (int n = 0; n < nbLu; n++) {
+	//libererPage(bf[n]);
+         nbPageAlloueesIci --;
+	 //	 printk("[7] virtioConsoleTraiterBuffers libere page 0x%x (reste %d)\n", bf[n], nbPageAlloueesIci);
+      }
+   } while (nbLu > 0);
 }
 
 /**
@@ -160,6 +165,9 @@ size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
 
    // WARNING Pas top
    bf[0] = allouerPage();
+   nbPageAlloueesIci ++;
+   printk("[7] virtioConsoleTraiterBuffers allouee page 0x%x (donc %d)\n", bf[0], nbPageAlloueesIci);
+   
    memcpy(bf[0], b, l);
 
    lg[0] = l;

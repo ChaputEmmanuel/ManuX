@@ -161,7 +161,8 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    // On va chercher une trame, a priori dans une chaîne de buffers
    nbLu = virtioFileRecupererBuffers(fv, (void*)buffers, longueurs, 2);
 
-   printk(" G %d recu %d/%d+%d\n", vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
+   printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
+		vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
 
    /*
    if (nbLu) {

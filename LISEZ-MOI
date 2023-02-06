@@ -8,8 +8,8 @@ Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
 Feuille de route
 ----------------
 
-   . Un malloc, parce qu'il y en a marre de tout déclarer en statique !
-      . Un buddy area dans un premier temps
+   . [FAIT] Un malloc, parce qu'il y en a marre de tout déclarer en statique !
+      . [FAIT] Un buddy area dans un premier temps
       . Pourquoi pas un slab allocator plus tard
    . Mémoire virtuelle
    . Bottom halves
@@ -22,9 +22,24 @@ Feuille de route
    
 En cours
 --------
-   EN COURS : mise en place de la documentation. Voir ci dessous
-   (cherche Documentation)
 
+   BON, il y a un soucis : il faut clairement éclaircir les
+   dépendances. L'initialisation de la mémoire (occupation des pages)
+   est une des premières choses à faire, mais si on veut y mettre des
+   printk (ce qui est actuellement le cas) il faut être sûr que printk
+   et les fonctions invoquées puissent se passer d'allocation, ce qui
+   n'est pas le cas !!! Il me semble difficile de m'interdire des
+   printk au plus tôt, donc soit j'en fais une version "statique"
+   utilisée dans memoire.c (par exemple un printk_console) soit,
+   ... ben je sais pas !
+   
+   EN COURS : virtio a un soucis : voir main.c:testerVirtioConsole
+   qui affiche les 128 premiers messages et reboucle. La gestion de
+   la mémoire n'est pas très claire. Il faut se décider ! En gros,
+   est-ce qu'on refait une allocation/free ou est-ce qu'on alloue une
+   première fois et on réutilise ? Voir virtioConsoleEcrire qui est à
+   revoir !
+   
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
@@ -38,7 +53,7 @@ En cours
       . toujours avoir une console active (si on a une console !)
       . plus de consoleNoyau(), on doit pouvoir faire avec
       consoleActive() ? Pas si sûr, si on peut garder les printk du
-      noyau sans journal. Mais onpeut aussi dire que le journal n'est
+      noyau sans journal. Mais on peut aussi dire que le journal n'est
       pas une option, ...
 
    Il faut alors s'attaquer à un premier système de fichiers ! Là
@@ -65,10 +80,13 @@ dans make.conf make.commons make.rules, ...
    pas !? OUF, pas de soucis pour le second point, mais la première
    question reste posée !
    
-EN COURS : allocation mémoire (dont doc à restructurer).
+   EN COURS : allocation mémoire (dont doc à restructurer).
    Changer le tabeau de proprio en un bitmap ? Permet de gagner plein
    de place et peut utiliser bsf comme ffsl ...
    Mettre le vrai propriétaire de la page (pour le moment c'est 1)
+
+   EN COURS : mise en place de la documentation. Voir ci dessous
+   (cherche Documentation)
 
    WARNING : la première tâche conserve la pile initialement
    construite par mb-manux, ... Pas forcément un drame (elle fait 16K

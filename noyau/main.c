@@ -90,23 +90,30 @@ void testerKmalloc()
    kmallocAfficherStatistiques();
    for (n = 0; n < NB_APPELS; n++) {
       e = rand() % NB_ELEMENTS;
-      printk("[%d]%d, ", n, e);
-     /*
-      if (elements[e] == NULL) {
+      /*  if (elements[e] == NULL) {*/
          elements[e] = kmalloc(rand() % 1024);
 	 printk(PRINTK_DEBUGAGE"B %d (0x%x)\n", e, elements[e]);
-      } else {
+	 /*      } else {
          printk(PRINTK_DEBUGAGE"A %d (0x%x)\n", e, elements[e]);
          kfree(elements[e]);
          elements[e] = NULL;
-      }
-     */
+	 }*/
    }
    kmallocAfficherStatistiques();
    printk(PRINTK_DEBUGAGE "<<<<\n");
 }
 
 #endif // MANUX_KMALLOC
+
+#ifdef MANUX_VIRTIO_CONSOLE
+#define NB_LIGNES 2
+void testerVirtioConsole()
+{
+   for (int n = 0; n < NB_LIGNES; n++) {
+     printk(PRINTK_DEBUGAGE "[%3d] Une ligne de texte ...\n", n);
+   }
+}
+#endif // MANUX_VIRTIO_CONSOLE
 
 void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
@@ -120,6 +127,19 @@ void _start(InfoSysteme * infoSysteme,
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
+
+#ifdef MANUX_GESTION_MEMOIRE
+   /* Affichage de la mémoire disponible */
+   //   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
+
+   /* Initialisation de la gestion mémoire */
+   //   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
+   initialiserMemoire(infoSysteme->memoireDeBase,
+		      infoSysteme->memoireEtendue,
+		      adresseDebutManuX,
+		      adresseFinManuX);
+   //printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
+#endif
 
    /* Initialisation de la console noyau */
    consoleInitialisation(&iNoeudConsole);
@@ -142,24 +162,6 @@ void _start(InfoSysteme * infoSysteme,
 
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
 		descriptionProc.caracteres);
-
-#ifdef MANUX_GESTION_MEMOIRE
-   /* Affichage de la mémoire disponible */
-   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
-
-   /* Initialisation de la gestion mémoire */
-   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
-   initialiserMemoire(infoSysteme->memoireDeBase,
-		      infoSysteme->memoireEtendue,
-		      adresseDebutManuX,
-		      adresseFinManuX);
-   printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
-#endif
-
-#ifdef MANUX_KMALLOC
-   printk(PRINTK_DEBUGAGE "Pouet\n");
-   kmallocInitialisation();
-#endif
 
    /* Initialisation de la pagination */
 #ifdef MANUX_PAGINATION
@@ -243,12 +245,18 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
    adresseDebutManuX, adresseFinManuX);
 
-#ifdef MANUX_STDLIB_TST
+#ifdef MANUX_STDLIB_NON
    for (int n = 0; n < 50; n++)
      printk(PRINTK_DEBUGAGE "%d, ", rand());
 #endif
 
+#ifdef MANUX_VIRTIO_CONSOLE
+   testerVirtioConsole();
+#endif
+
 #ifdef MANUX_KMALLOC
+   printk(PRINTK_DEBUGAGE "Pouet\n");
+   kmallocInitialisation();
    testerKmalloc();
 #endif
    

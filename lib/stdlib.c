@@ -10,7 +10,7 @@ uint32_t factMult = 742938285;
  */
 uint32_t rand()
 {
-   valeurAleatoire = valeurAleatoire * factMult;
+   valeurAleatoire = (valeurAleatoire * factMult) % 2147483647;
    return valeurAleatoire % (RAND_MAX + 1);
 }
 
