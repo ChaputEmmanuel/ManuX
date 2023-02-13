@@ -39,7 +39,7 @@ void journalAffecterFichier(Fichier * pc);
 /**
  * @brief Journalisation d'un message.
  */
-void journaliser(char * message, int len);
+void journaliser(char * message);
 
 booleen journalOperationnel();
 

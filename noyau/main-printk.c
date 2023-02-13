@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
 #include <manux/console.h>
+#include <manux/printk.h>
 /*
  * Structure passée en paramètre par la phase d'init
  * (cf init-manux.nasm)
@@ -26,7 +27,7 @@ void _start(InfoSysteme * infoSysteme,
    consoleInitialisation();
 
    // Un petit message
-   consoleNoyauAfficher("Bonjour le monde !\n");
+   printk("Printk dit bonjour !\n");
   
 }   /* _start */
 

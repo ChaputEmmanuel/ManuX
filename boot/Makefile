@@ -22,7 +22,6 @@ ASM_DEF     = -D MANUX_INIT_START_ADDRESS=$(MANUX_INIT_START_ADDRESS) \
               -D MANUX_SEGMENT_TRANSIT_RAMDISK=$(MANUX_SEGMENT_TRANSIT_RAMDISK) \
               -D MANUX_portDonneesClavier=$(MANUX_portDonneesClavier) \
               -D MANUX_portCmdClavier=$(MANUX_portCmdClavier) \
-              -D MANUX_PARAM_NOYAU=$(MANUX_PARAM_NOYAU) \
               -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK)
 
 ASM_BIN_OPT = -f bin

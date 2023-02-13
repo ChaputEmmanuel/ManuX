@@ -219,7 +219,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       if (tacheEnCours != NULL) {
          cons = tacheEnCours->console;
       } else { // Pour la première a priori
-         cons = consoleNoyau();
+         cons = NULL;//consoleNoyau();
       }
    }   
 #   endif // MANUX_CONSOLES_VIRTUELLES

@@ -25,16 +25,26 @@
 #include <manux/errno.h>
 #include <manux/io.h>      // outb
 
+static int nbFournis =0;
+static int nbAcceptes =0;
+static int nbRendus =0;
+
 /**
  * Affichage de l état d'une file, à des fins de debug
  */
 void virtioAfficherFile(VirtioFileVirtuelle * fv)
 {
-   printk("File 0x%x (lg %d, %d desc)\n",
+   printk("[7]File 0x%x (lg %d nxt %d), used idx %d, dispo idx %d fr %d %d/%d/%d\n",
 		fv,
 		fv->taille,
-		fv->prochainDescripteur);
-   printk("Desc [@/l f n] : [%llx %ld %d %d][%llx %ld %d %d][%llx %ld %d %d]\n",
+                fv->prochainDescripteur,
+		fv->buffersUtilises->indice,
+	  fv->buffersDisponibles->indice,
+	  fv->nbDescripteursLibres,
+	  nbFournis, nbAcceptes, nbRendus
+	  );
+   /*
+   printk("[7]Desc [@/l f n] : [%llx %ld %d %d][%llx %ld %d %d][%llx %ld %d %d]\n",
 		fv->tableDescripteurs[0].adresse,
 		fv->tableDescripteurs[0].longueur,
 		fv->tableDescripteurs[0].flags,
@@ -50,7 +60,7 @@ void virtioAfficherFile(VirtioFileVirtuelle * fv)
 		fv->tableDescripteurs[2].flags,
 		fv->tableDescripteurs[2].suivant
 		);
-   printk("Used fl 0x%x, idx %d (i/l) : [%d/%ld][%d/%ld][%d/%ld]\n",
+   printk("[7]Used fl 0x%x, idx %d (i/l) : [%d/%ld][%d/%ld][%d/%ld]\n",
 		fv->buffersUtilises->flags,
 		fv->buffersUtilises->indice,
 		fv->buffersUtilises->elementsUtilises[0].indiceBuffer,
@@ -60,13 +70,14 @@ void virtioAfficherFile(VirtioFileVirtuelle * fv)
 		fv->buffersUtilises->elementsUtilises[2].indiceBuffer,
 		fv->buffersUtilises->elementsUtilises[2].longueur
 		);
-   printk("Dispo fl 0x%x, idx %d (i) : [%d][%d][%d]\n",
+   printk("[7]Dispo fl 0x%x, idx %d (i) : [%d][%d][%d]\n",
 		fv->buffersDisponibles->flags,
 		fv->buffersDisponibles->indice,
 		fv->buffersDisponibles->indicesDesBuffer[0],
 		fv->buffersDisponibles->indicesDesBuffer[1],
 		fv->buffersDisponibles->indicesDesBuffer[2]
 		);
+   */
 }
 
 /**
@@ -282,17 +293,21 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
 			 void * bu[], int lg[], int nb,
 			 uint16_t fl)
 {
-   int n;
-   VirtioFileVirtuelle * fv = &(vp->filesVirtuelles[id]);
+   int                       n;
+   VirtioFileVirtuelle     * fv = &(vp->filesVirtuelles[id]);
    VirtioDescripteurBuffer * vb;
-   int prochainDesc = fv->prochainDescripteur;
-   uint32_t ad;
-
+   int                       prochainDesc = fv->prochainDescripteur;
+   uint32_t                  ad;
+   
+   nbFournis+=nb;
+   
    for (n = 0 ; (n < nb) && (fv->nbDescripteursLibres); n++) {
       // On va chercher un descripteur de buffer (2.4.1.1 (a))
       // on sait qu'il en reste puisqu'on les compte
       vb = &(fv->tableDescripteurs[(prochainDesc + n)%fv->taille]);
 
+      //      printk("[7](0x%x) ", vb);
+      
       // L'adresse des données (2.4.1.1 (b))
       ad = (uint32_t)bu[n];
       vb->adresse = (uint64_t)ad;
@@ -300,10 +315,10 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
       // La longueur des données (2.4.1.1 (c))
       vb->longueur = lg[n]; 
    
-      // On l'initialise en lecture/écriture
+      // On l'initialise en lecture/écriture (2.4.1.1 (d))
       vb->flags = fl;
 
-      // On chaîne
+      // On chaîne (2.4.1.1 (e))
       if ((n < nb -1) && (fv->nbDescripteursLibres > 1)) {
          vb->flags |= VRING_DESC_F_NEXT;
          vb->suivant = (fv->prochainDescripteur + n + 1)%fv->taille;
@@ -312,7 +327,7 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
       }
       
       // On le met dans les disponibles (2.4.1.2)
-      if (n == 0) {
+      if (n == 0) {   // WARNING pour moi il y a doute ici !
          fv->buffersDisponibles->indicesDesBuffer
            [(fv->buffersDisponibles->indice+n)%fv->taille] =
             prochainDesc;
@@ -322,6 +337,11 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
       fv->nbDescripteursLibres--;
    }
 
+   if (n == 0) {
+     //printk("[7]x");
+      return n;
+   }
+   
    barriereMemoire();  // WARNING, c'est là ?
 
    // On incremente le nombre de dispo (2.4.1.3)
@@ -334,7 +354,8 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    
    // On prévient l'équipement
    outw((uint16_t)(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF), id);
-
+   nbAcceptes += n;
+   
    return n;
 }
 
@@ -365,7 +386,7 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
    while ((fv->dernierIndiceUtilise != fv->buffersUtilises->indice) && (result < nb)) {
       // Récupération de l'indice du descripteur libéré
       indiceBuffer = fv->buffersUtilises->elementsUtilises
-	                      [fv->dernierIndiceUtilise].indiceBuffer;
+	                      [fv->dernierIndiceUtilise % fv->taille].indiceBuffer;
       do {
          // On récupère les données et leur longueur
          longueur = fv->tableDescripteurs[indiceBuffer].longueur;
@@ -383,13 +404,20 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
 	 // les fournir
       } while ((result < nb)
 	       && (!finDeChaine));
-      
+      if (!finDeChaine) {
+	printk("[7] Ca pue du cul !\n");
+      } else {
+	//	printk("[7] Ouf !\n");
+      }
       // On vient de traiter un buffer (peut-être une chaîne)
       fv->dernierIndiceUtilise++;  
    }
    // On a donc récupérer result descripteurs
    fv->nbDescripteursLibres += result;
-   
+   nbRendus += result;
+
+   //   virtioAfficherFile(fv);
+   //printk("[7] f %d, a %d, r %d\n", nbFournis, nbAcceptes, nbRendus);
    return result;
 }
 
@@ -401,6 +429,6 @@ void virtioFileInterdireInterruption(VirtioFileVirtuelle * fv)
 
 void virtioFileAutoriserInterruption(VirtioFileVirtuelle * fv)
 {
-  //  fv->buffersUtilises->flags = 0;
+  fv->buffersUtilises->flags = 0;
   fv->buffersDisponibles->flags = 0;
 }

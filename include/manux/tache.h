@@ -87,7 +87,7 @@ typedef struct _Tache {
 #ifdef MANUX_TACHE_CONSOLE
    struct _Console  * console;
 #endif
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
   Fichier             fichiers[MANUX_NB_MAX_FICHIERS]; // WARNING à généraliser
 #endif
    uint32_t           nbActivations;   // Décompte du nombre d'activations

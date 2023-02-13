@@ -30,7 +30,7 @@ MANUX_PARTS  = lib noyau
 
 MANUX_PARTS += $(if $(MANUX_LIBI386), i386)
 MANUX_PARTS += $(if $(MANUX_USR), usr)
-MANUX_PARTS += $(if $(MANUX_FS), sf)
+MANUX_PARTS += $(if $(MANUX_FICHIER), sf)
 
 # Les sous-répertoires (pour le nettoyage par exemple)
 SOUS_REP  = $(MANUX_PARTS) $(DEMARAGE) 

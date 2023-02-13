@@ -43,7 +43,7 @@ VirtioConsole virtioConsole;
  * Gestion des buffers utilisés par le périphérique
  */
 #define NB_BUFF_TRAITES 16
-void virtioConsoleTraiterBuffers()
+void virtioConsoleTraiterBuffers(VirtioConsole * vc)
 {
    void *bf [NB_BUFF_TRAITES];
    int lg[NB_BUFF_TRAITES];
@@ -51,14 +51,15 @@ void virtioConsoleTraiterBuffers()
 
    // Récupération d'une éventuelle entrée
    nbLu = virtioFileRecupererBuffers(
-	  &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]),
+	  &(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]),
 			      bf, lg, NB_BUFF_TRAITES);
-
+   //printk("[7] FQ %d\n", nbLu);
    do {
       // Récupération des buffers émis et consommés
       nbLu = virtioFileRecupererBuffers(  
-	     &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
+	     &(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]),
 	     bf, lg, NB_BUFF_TRAITES);
+      //printk("[7] OK !\n");
 
       // WARNING Pas top
       for (int n = 0; n < nbLu; n++) {
@@ -67,7 +68,13 @@ void virtioConsoleTraiterBuffers()
 	 //	 printk("[7] virtioConsoleTraiterBuffers libere page 0x%x (reste %d)\n", bf[n], nbPageAlloueesIci);
       }
    } while (nbLu > 0);
-}
+   /*
+   printk("[7] Apres lecture ...\n");
+   virtioAfficherFile(&(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]));
+   */
+   virtioFileAutoriserInterruption(&(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]));
+   virtioFileAutoriserInterruption(&(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]));
+				   }
 
 /**
  *  Cf [3] section 2.4.2
@@ -102,8 +109,7 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
    PCIEquipement       * pciEquip = PCIEquipementNumero(PCINumeroPeripherique);
    void                * pointeur; // Pour allouer de la mémoire en
 				   // réception
-
-   VirtioFileVirtuelle * fr;      // réception
+   VirtioFileVirtuelle * fr;       // réception
    // On va construire un tableau de buffers (et un de leurs
    // longueurs) pour passer à virtioFournirBuffers
    void                * buffers[1];
@@ -119,7 +125,7 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
 
    // La suite est à mettre dans virtio (ou à virer ?)
    if (i8259aAjouterHandler(pciEquip->interruption,
-			virtioConsoleGestionInt,
+                            virtioConsoleGestionInt,
 			    &virtioConsole)){
       printk(PRINTK_CRITIQUE "Trop de handler sur l'interruption %d\n", pciEquip->interruption);
       paniqueNoyau("Pas possible");
@@ -149,7 +155,7 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
    return ESUCCES;
 }
 
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 MethodesFichier virtioConsoleMethodesFichier;
 
 /**
@@ -163,10 +169,17 @@ size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
    int lg[1];
    int nb;
 
+   // On essaie d'aller chercher des buffers WARNING :pas sûr de la logique !
+   virtioConsoleTraiterBuffers(vc);
+
+   /*
+   printk("[7] Avant ecriture ...\n");
+   virtioAfficherFile(&(vc->virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_OUT]));
+   */
    // WARNING Pas top
    bf[0] = allouerPage();
    nbPageAlloueesIci ++;
-   printk("[7] virtioConsoleTraiterBuffers allouee page 0x%x (donc %d)\n", bf[0], nbPageAlloueesIci);
+   //   printk("[7] virtioConsoleTraiterBuffers allouee page 0x%x (donc %d)\n", bf[0], nbPageAlloueesIci);
    
    memcpy(bf[0], b, l);
 
@@ -212,7 +225,7 @@ MethodesFichier virtioConsoleMethodesFichier = {
    .lire = virtioConsoleLire,
    .ecrire = virtioConsoleEcrire
 };
-#endif // MANUX_FS
+#endif // MANUX_FICHIER
 
 /**
  * @brief Initialisation des périphériques
@@ -238,7 +251,7 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
       printk_debug(DBG_KERNEL_VIRTIO, "Console virtio initialisee !\n");
    }
 
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
    iNoeudVirtioConsole->typePeripherique.majeur = MANUX_VIRTIO_CONSOLE_MAJEUR;
    iNoeudVirtioConsole->typePeripherique.mineur = 0;
    iNoeudVirtioConsole->prive = NULL;

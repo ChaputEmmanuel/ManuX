@@ -132,9 +132,11 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* Utilisation d'un système de fichiers                                       */
+/* Définition d'une interface de type fichiers. Elle pourra permettre un accès*/
+/* homogène à différentes ressources (par exemple la console), et elle sera   */
+/* évidemment nécessaire pour implanter un système de fichiers.               */
 /*----------------------------------------------------------------------------*/
-#define MANUX_FS
+#define MANUX_FICHIER
 
 /*
  * Le nombre maximal de fichiers manipulés par un processus
@@ -387,7 +389,7 @@
 /*
  * Du réseau
  */
-#define MANUX_VIRTIO_NET
+//#define MANUX_VIRTIO_NET
 
 /*
  * Une console
@@ -438,7 +440,7 @@
 #   error "VIRTIO est un système nécessitant MANUX_PCI"
 #endif
 
-#if defined(MANUX_PERIPHERIQUE_CARACTERE) && !defined(MANUX_FS)
+#if defined(MANUX_PERIPHERIQUE_CARACTERE) && !defined(MANUX_FICHIER)
 #   error "Les périphériques caractères nécessitent le type fichier"
 #endif
 

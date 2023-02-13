@@ -126,15 +126,9 @@ affent :          switch (prefixe) {
 
    /* On affiche  */
 #ifdef MANUX_JOURNAL
-   // Si le journal n'est pas encore actif, on envoie directement sur la console
-   // Ce n'est pas génial, voir le commentaire au début de journal.c
-   if (journalOperationnel()) {
-      journaliser(chaine, indice);
-   } else {
-      consoleAfficherN(consoleNoyau(), chaine, indice);
-   }
+   journaliser(chaine);
 #else
-   consoleAfficherN(consoleNoyau(), chaine, indice);
+   consoleNoyauAfficher(chaine);
 #endif
    
    va_end(argList);

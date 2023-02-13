@@ -20,7 +20,7 @@
 #include <manux/atomique.h>   // Accés unique à la console
 #include <manux/ecran.h>
 
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 #   include <manux/fichier.h> // Une console est un fichier
 #endif
 
@@ -60,7 +60,7 @@ typedef struct _Console {
   
 } Console;
 
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 /**
  * Les méthodes permettant de traiter une console comme un fichier
  */
@@ -89,12 +89,17 @@ void consoleAffecterCouleurFond(Console * cons, Couleur coul);
 void consoleAffecterCouleurTexte(Console * cons, Couleur coul);
 
 /**
- * @brief Affichage d'un message sur la console
+ * @brief Affichage d'un message sur une console
  *
  * Attention, aucun formatage n'est fait. En revanche, la chaine de
  * caractères doit être terminée par un zéro.
  */
 void consoleAfficher(Console * cons, char * msg);
+
+/**
+ * @brief Affichage d'un message sur la console noyau
+ */
+void consoleNoyauAfficher(char * msg);
 
 /*
  * Affichage d'un message à l'écran. Attention, aucun formatage
@@ -150,15 +155,6 @@ void basculerVersConsole(Console * cons);
 void basculerVersConsoleSuivante();
 
 #endif  // MANUX_CONSOLES_VIRTUELLES
-
-/**
- * @brief obtention d'un pointeur du la console noyau
- *
- * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
- * console afficher. C'est essentiellement pour ça que cette fonction
- * est publique.
- */
-Console * consoleNoyau();
 
 /*
  * Écriture sur une console

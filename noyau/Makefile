@@ -12,7 +12,7 @@ ASM_BIN_OPT = -f bin
 include ../make.conf
 
 LIBRAIRIES_MANUX = $(LIBI386) $(LIBMANUX) $(LIBUSR)
-LIBRAIRIES_MANUX += $(if  $(MANUX_FS), $(LIBSF))
+LIBRAIRIES_MANUX += $(if  $(MANUX_FICHIER), $(LIBSF))
 
 OBJETS      = 	$(MANUX_FICHIER_MAIN).o
 OBJETS     +=   $(if $(MANUX_TACHES), listetaches.o tache.o)

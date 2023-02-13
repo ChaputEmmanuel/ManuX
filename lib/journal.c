@@ -16,18 +16,19 @@
  */
 #include <manux/config.h>
 #include <manux/memoire.h>  // NULL
-#include <manux/kmalloc.h>  // NULL
 #include <manux/journal.h>
+#include <manux/string.h>   // strlen
 
 /**
- * Le journal utilise la console. Si MANUX_JOURNAL_DIRECT_CONSOLE est
- * activée, il l'accède directement. Sinon il passe par l'interface
- * fichier.
+ * Le journal utilise la console en passant par l'interface fichier
+ * qu'elle propose si cette interface est configurée.
+ * Si ce n'est pas le cas, la console est accédée directement.
  */
-#ifdef MANUX_JOURNAL_DIRECT_CONSOLE
-Console * consoleJournal = NULL;
+#ifdef MANUX_FICHIER
+Fichier _consoleFichier; // Pour éviter un kmalloc pour le moment
+Fichier * consoleFichier = NULL;
 #else
-Fichier consoleFichier;
+Console * consoleJournal = NULL;
 #endif
 
 /**
@@ -36,6 +37,9 @@ Fichier consoleFichier;
  */
 static booleen journalInitialise = FALSE;
 
+//static ExclusionMutuelle emj;
+
+#ifdef MANUX_FICHIER
 /**
  * Le journal utilise également éventuellement un second fichier, par
  * exemple pour envoyer sur l'écran de l'hôte via un virtio-console,
@@ -43,22 +47,16 @@ static booleen journalInitialise = FALSE;
  */
 Fichier * fichierJournal = NULL;
 
-//static ExclusionMutuelle emj;
-
+/**
+ * @brief Initialisation du journal en profitant de l'interface fichier
+ */
 void journalInitialiser(INoeud * iNoeudConsole)
 {
     //   initialiserExclusionMutuelle(&emj);
     //   entrerExclusionMutuelle(&emj);
 
-#ifdef MANUX_JOURNAL_DIRECT_CONSOLE
-   consoleJournal = iNoeudConsole->prive;
-   consoleAffecterCouleurTexte(consoleJournal, COUL_TXT_BLANC);
-
-   // Affichons un petit message   
-   consoleAfficher(consoleJournal, "Journal de ManuX-32\n");
-#else
-   ouvrirFichier(iNoeudConsole, &consoleFichier);
-#endif
+   consoleFichier = &_consoleFichier; // WARNING, en vrai, il faudra un kmalloc
+   ouvrirFichier(iNoeudConsole, consoleFichier);
 
    // A partir de maintenant, le journal est opérationnel
    journalInitialise = TRUE;
@@ -71,30 +69,53 @@ void journalAffecterFichier(Fichier * pc)
    fichierJournal = pc;
 }
 
+#else
+/**
+ * @brief Initialisation du journal sans interface fichier
+ */
+void journalInitialiser()
+{
+    //   initialiserExclusionMutuelle(&emj);
+    //   entrerExclusionMutuelle(&emj);
+
+   // consoleAffecterCouleurTexte(consoleJournal, COUL_TXT_BLANC);
+
+   // Affichons un petit message   
+   consoleNoyauAfficher("Journal de ManuX-32\n");
+
+   // A partir de maintenant, le journal est opérationnel
+   journalInitialise = TRUE;
+   
+   //   sortirExclusionMutuelle(&emj);
+}
+#endif
+
 /**
  * @brief Journalisation d'un message avec un niveau d'urgence
  */
 void journaliserNiveau(booleen console, booleen fichier,
 		       uint8_t niveau,
-		       char * message, int len)
+		       char * message)
 {
     //   entrerExclusionMutuelle(&emj);
 
+   // Sur la console
    if ((console) && (niveau <= MANUX_JOURNAL_NIVEAU_DEFAUT)) {
-#ifdef MANUX_JOURNAL_DIRECT_CONSOLE
-      if (consoleJournal) {
-         consoleAfficherN(consoleJournal, message, len);
-      } 
+#ifdef MANUX_FICHIER
+      if (consoleFichier) {
+         fichierEcrire(consoleFichier, message, strlen(message));
+      } else {
+         consoleNoyauAfficher(message);
+      }
 #else
-      // WARNING, pas de test d'état ! Si j'essaie de journaliser avant
-      // la création de la console, ça plante !
-      fichierEcrire(&consoleFichier, message, len);   
+      consoleNoyauAfficher(message);
 #endif
    }
-   
+
+   // Sur le fichier s'il y en a un
    if (fichierJournal) {
       if ((fichier) && (niveau <= MANUX_JOURNAL_NIVEAU_DEFAUT)) {
-         fichierEcrire(fichierJournal, message, len);   
+	fichierEcrire(fichierJournal, message, strlen(message));   
       }
    }
    
@@ -104,14 +125,13 @@ void journaliserNiveau(booleen console, booleen fichier,
 /**
  * @brief Gestion des niveaux d'affichage
  */
-void aiguillerMessage(char ** message, int * lg,
+void aiguillerMessage(char ** message,
 		      booleen * cons, booleen * fic, uint8_t * niv)
 {
    int longueurPrefixe = 0;
    *cons = FALSE;
    *fic = FALSE;
    *niv = 0;
-
 
    switch ((*message)[0]) {
       case '[' :
@@ -138,22 +158,23 @@ void aiguillerMessage(char ** message, int * lg,
       }
    }
    (*message) += longueurPrefixe;
-   *lg -= longueurPrefixe;
 }
 
 /**
  * @brief Journalisation d'un message
  */
-void journaliser(char * message, int len)
+void journaliser(char * message)
 {
    booleen console;
    booleen fichier;
    uint8_t niveau;
 
-   aiguillerMessage(&message, &len, &console, &fichier, &niveau);
+   // On détermine où il doit être envoyé pour affichage
+   aiguillerMessage(&message, &console, &fichier, &niveau);
 
+   // On l'envoie
    journaliserNiveau(console, fichier, niveau, 
-		    message, len);
+		     message);
 }
 
 /**

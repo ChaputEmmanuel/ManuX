@@ -1,7 +1,7 @@
-/*----------------------------------------------------------------------------*/
-/*      Un exemple pitoyable de début de noyau.                               */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/**---------------------------------------------------------------------------*/
+/**     Un exemple pitoyable de début de noyau.                               
+ *                                                                            
+ *                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
 #include <manux/errno.h>
@@ -38,7 +38,7 @@
 #ifdef MANUX_JOURNAL
 #   include <manux/journal.h>       /* initialiserJournal() */
 #endif
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 #   include <manux/fichier.h>
 #endif
 #ifdef MANUX_RESEAU
@@ -106,11 +106,12 @@ void testerKmalloc()
 #endif // MANUX_KMALLOC
 
 #ifdef MANUX_VIRTIO_CONSOLE
-#define NB_LIGNES 2
+#define NB_LIGNES 1280
 void testerVirtioConsole()
 {
    for (int n = 0; n < NB_LIGNES; n++) {
-     printk(PRINTK_DEBUGAGE "[%3d] Une ligne de texte ...\n", n);
+     printk("(7)" "(%3d) Une ligne de texte ...\n", n);
+     //     for (int i = 0; i<10000000; i+=1){asm("");};     
    }
 }
 #endif // MANUX_VIRTIO_CONSOLE
@@ -119,18 +120,35 @@ void _start(InfoSysteme * infoSysteme,
 	    uint32_t adresseDebutManuX,
 	    uint32_t adresseFinManuX)
 {
-#ifdef MANUX_RAMDISK
-   uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
-                         + infoSysteme->adresseRamdiskLo;
-#endif
    union {
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
 
+#ifdef MANUX_RAMDISK
+   uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
+                         + infoSysteme->adresseRamdiskLo;
+#endif
+
+   // Initialisation de la console noyau
+#ifdef MANUX_FICHIER   
+   consoleInitialisation(&iNoeudConsole);
+#else
+   consoleInitialisation();
+#endif
+
+   // Affichage du premier message
+   descriptionProcesseur(0, descriptionProc.registres);
+   descriptionProc.caracteres[12] = 0;
+
+   printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
+		descriptionProc.caracteres);
+
 #ifdef MANUX_GESTION_MEMOIRE
-   /* Affichage de la mémoire disponible */
-   //   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n", infoSysteme->memoireDeBase, infoSysteme->memoireEtendue);
+   // Affichage de la mémoire disponible 
+   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
+		infoSysteme->memoireDeBase,
+		infoSysteme->memoireEtendue);
 
    /* Initialisation de la gestion mémoire */
    //   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
@@ -140,9 +158,6 @@ void _start(InfoSysteme * infoSysteme,
 		      adresseFinManuX);
    //printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
 #endif
-
-   /* Initialisation de la console noyau */
-   consoleInitialisation(&iNoeudConsole);
 
    i8259aInit(MANUX_INT_BASE_IRQ);
 
@@ -156,12 +171,6 @@ void _start(InfoSysteme * infoSysteme,
 #ifdef MANUX_JOURNAL
     journalInitialiser(&iNoeudConsole);
 #endif
-
-   descriptionProcesseur(0, descriptionProc.registres);
-   descriptionProc.caracteres[12] = 0;
-
-   printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
-		descriptionProc.caracteres);
 
    /* Initialisation de la pagination */
 #ifdef MANUX_PAGINATION
@@ -203,7 +212,7 @@ void _start(InfoSysteme * infoSysteme,
 #endif
 
    /* Initialisation de la gestion des systèmes de fichiers */
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
    printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers ...\n");
    sfInitialiser();
    printk_debug(DBG_KERNEL_START, "Systeme de fichiers initialise\n");
@@ -244,11 +253,6 @@ void _start(InfoSysteme * infoSysteme,
    
    printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
    adresseDebutManuX, adresseFinManuX);
-
-#ifdef MANUX_STDLIB_NON
-   for (int n = 0; n < 50; n++)
-     printk(PRINTK_DEBUGAGE "%d, ", rand());
-#endif
 
 #ifdef MANUX_VIRTIO_CONSOLE
    testerVirtioConsole();

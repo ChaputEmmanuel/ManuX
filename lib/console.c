@@ -209,6 +209,14 @@ void consoleAfficher(Console * cons, char * msg)
    consoleAfficherN(cons, msg, n);
 }
 
+/**
+ * @brief Affichage d'un message sur la console noyau
+ */
+void consoleNoyauAfficher(char * msg)
+{
+   consoleAfficher(&_consoleNoyau, msg);
+}
+
 void consoleAfficherEntier(Console * cons, int n)
 {
    char nombre[12];
@@ -452,16 +460,7 @@ int consoleLire(Fichier * f, void * buffer, int nbOctets)
 }
 #endif
 
-/*
- * Si l'on n'utilise pas le journal, printk() doit savoir sur quelle
- * console afficher.
- */
-Console * consoleNoyau()
-{
-   return &_consoleNoyau;
-};
-
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 /**
  * @brief Ouverture d'une Console en tant que Fichier 
  */
@@ -486,7 +485,7 @@ size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
 }
 
 /**
- * @brief Déclaratio des méthodes permettant de traiter une console
+ * @brief Déclaration des méthodes permettant de traiter une console
  * comme un fichier
  */
 MethodesFichier consoleMethodesFichier = {
@@ -494,7 +493,7 @@ MethodesFichier consoleMethodesFichier = {
    .ecrire = consoleEcrire,
    .lire = consoleLire
 };
-#endif // MANUX_FS
+#endif // MANUX_FICHIER
 
 /**
  * @brief Initialisation de la console du noyau
@@ -523,7 +522,7 @@ void initialiserConsoleNoyau()
 #   endif
 }
 
-#ifdef MANUX_FS
+#ifdef MANUX_FICHIER
 /**
  * Initialisation du système de console. 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
@@ -536,7 +535,7 @@ int consoleInitialisation(INoeud * iNoeudConsole)
    //! On initialise l'INoeud qui la décrit
    iNoeudConsole->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
    iNoeudConsole->typePeripherique.mineur = 0;
-   iNoeudConsole->prive = consoleNoyau();
+   iNoeudConsole->prive = &_consoleNoyau;
    iNoeudConsole->methodesFichier = &consoleMethodesFichier;
 
    return ESUCCES;
@@ -567,7 +566,7 @@ int sys_ecrireConsole(ParametreAS as, void * msg, int n)
    assert(tacheEnCours != NULL);
    Console * cons = tacheEnCours->console;
 #else
-   Console * cons = consoleNoyau();
+   Console * cons = &_consoleNoyau;
 #endif
    
    assert(cons != NULL);

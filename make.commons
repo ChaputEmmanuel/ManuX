@@ -55,35 +55,43 @@ ISO_FICHIER=manux.iso
 #   Les commandes pour lancer ManuX dans un émulateur
 # -nographic pour pas d'environnement graphique
 #--------------------------------------------------------------------------
-RUN_MANUX_RAMSIZE = 64M
-RUN_MANUX_FLOPPY = qemu-system-i386 \
-                   -drive format=raw,file=manux,index=0,if=floppy \
-		   -m $(RUN_MANUX_RAMSIZE)
-RUN_MANUX_ELF    = qemu-system-i386 \
-                   -kernel $(ROOTDIR)/noyau/noyau.elf \
-		   -m $(RUN_MANUX_RAMSIZE)
-
 # Pour debuger le virtio
 #                   -trace "virtio_*" \
-
 # Pour la console virtio
 #                   -device virtio-serial-pci \
 #                   -device virtio-serial-pci,id=virtio-console0 \
 #                   -device virtconsole,chardev=stdio,id=serial0 \
-
 # Pour le réseau virtio
 #                   -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
 #                   -device virtio-net-pci,disable-legacy=off,tx_queue_size=256,rx_queue_size=256,indirect_desc=off,ctrl_vq=off,page-per-vq=on,mac=c0:ff:ee:de:ad:be,netdev=v1 \
+#--------------------------------------------------------------------------
+RUN_MANUX_RAMSIZE = 64M
+QEMU_RAMSIZE      = -m $(RUN_MANUX_RAMSIZE)
 
-RUN_MANUX_ISO    = qemu-system-i386 \
-		   -chardev stdio,id=cons1 \
+QEMU_VIRTIO_CONSOLE = -chardev stdio,id=cons1 \
                    -device virtio-serial-pci \
-                   -device virtconsole,chardev=cons1 \
-                   -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
+                   -device virtconsole,chardev=cons1
+		   
+QEMU_VIRTIO_NET     = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
-                   -object filter-dump,id=f1,netdev=v1,file=dump.dat \
-		   -m $(RUN_MANUX_RAMSIZE) \
+                   -object filter-dump,id=f1,netdev=v1,file=dump.dat
+
+RUN_MANUX_FLOPPY = qemu-system-i386 \
+                   -drive format=raw,file=manux,index=0,if=floppy \
+		   $(QEMU_RAMSIZE)
+		   
+RUN_MANUX_ELF    = qemu-system-i386 \
+                   -kernel $(ROOTDIR)/noyau/noyau.elf \
+		   $(QEMU_VIRTIO_CONSOLE) \
+		   $(QEMU_VIRTIO_NET) \
+		   $(QEMU_RAMSIZE)
+		   
+RUN_MANUX_ISO    = qemu-system-i386 \
+		   $(QEMU_VIRTIO_CONSOLE) \
+		   $(QEMU_VIRTIO_NET) \
+		   $(QEMU_RAMSIZE) \
 		   -cdrom
+
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX
 
 #--------------------------------------------------------------------------

@@ -109,7 +109,7 @@ Tache * creerTache(CorpsTache corpsTache)
    assert(cons != NULL);
    tache->console = cons;
 
-#   ifdef MANUX_FS
+#   ifdef MANUX_FICHIER
    // WARNING pourquoi distinguer 0 et 1 ?
    tache->fichiers[0].prive = (void*)cons;
    tache->fichiers[0].methodes = &consoleMethodesFichier;

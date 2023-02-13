@@ -9,9 +9,12 @@
 #include <manux/config.h>
 #include <manux/printk.h>
 #include <manux/stdarg.h>
-#include <manux/i386.h>       // halt()
-#include <manux/scheduler.h>  // tacheEnCours
-#include <manux/horloge.h>    // nbTopHorloge
+#include <manux/scheduler.h>     // tacheEnCours
+#ifdef MANUX_LIBI386
+#   include <manux/i386.h>       // halt()
+#   include <manux/horloge.h>    // nbTopHorloge
+#endif
+
 
 #define DBG_KERNEL_ERREUR   0x00000001
 #define DBG_KERNEL_START    0x00000002
@@ -43,10 +46,9 @@
 //  ;
 
 #define masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_START      \
+ | DBG_KERNEL_MEMOIRE    \
 			       )
 #define masqueDebugageFichier (0x00000000\
- | DBG_KERNEL_START      \
 			       )
 
 /*
@@ -66,6 +68,7 @@
  * Une fonction permettant d'afficher des messages de debug thématiques
  * et avec un formatage homogène.
  */
+#ifdef MANUX_LIBI386
 #define printk_debug(lvl, fmt, args...)	 \
    if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
       printk("{7} [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
@@ -74,6 +77,16 @@
    } else if ((lvl)& masqueDebugageConsole) {				\
       printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
    }
+#else
+#define printk_debug(lvl, fmt, args...)	 \
+   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
+      printk("{7} %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
+   } else if ((lvl)& masqueDebugageFichier) {				\
+      printk("(7) %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
+   } else if ((lvl)& masqueDebugageConsole) {				\
+      printk("[7] %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
+   }
+#endif
 /*
  * Affichage d'un message de panique
  */
