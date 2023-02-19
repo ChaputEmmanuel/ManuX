@@ -4,6 +4,7 @@
  *                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
+#include <manux/multiboot.h>
 #include <manux/errno.h>
 #include <manux/console.h>
 #include <manux/clavier.h>
@@ -52,17 +53,32 @@
 
 extern void init(); // Faire un init.h
 
-/*
- * Structure passée en paramètre par la phase d'init
+/**
+ * @brief Structure passée en paramètre par la phase d'init
  * (cf init-manux.nasm)
  */
 typedef struct _InfoSysteme {
    uint32_t flags;           // Pour compatibilité avec multiboot
    uint32_t memoireDeBase;   // En Ko
    uint32_t memoireEtendue;  // En Ko
-   uint32_t tailleRamdisk;   // En Ko (0 si pas de ramdisk)
-   uint32_t adresseRamdisk;
 } InfoSysteme;
+
+/**
+ * @brief La récupération des variables du script du linker est un peu
+ * ésotérique. Voir par exemple
+ * https://stackoverflow.com/questions/48561217/how-to-get-value-of-variable-defined-in-ld-linker-script-from-c
+ * pour un exemple, et surtout la doc pour une explication 
+ * https://sourceware.org/binutils/docs/ld/Source-Code-Reference.html
+ */
+extern uint32_t _adresseDebutManuX[],
+                _adresseFinManuX[],
+                _adressePileManuX[],
+                _adresseLimitePileManuX[];
+
+uint32_t adresseDebutManuX = (uint32_t)_adresseDebutManuX;
+uint32_t adresseFinManuX = (uint32_t)_adresseFinManuX;
+uint32_t adressePileManuX = (uint32_t)_adressePileManuX;
+uint32_t adresseLimitePileManuX = (uint32_t)_adresseLimitePileManuX;
 
 #ifdef MANUX_VIRTIO_CONSOLE
 INoeud iNoeudVirtioConsole;
@@ -76,60 +92,64 @@ INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
 #ifdef MANUX_KMALLOC
 /* A mettre dans un fichier qui remplace init */
-#define NB_ELEMENTS 20
-#define NB_APPELS   500
+#define NB_ELEMENTS 200
+#define NB_APPELS   10000
 void testerKmalloc()
 {
    void * elements[NB_ELEMENTS] = {NULL,};
-   int n, e;
+   int n, e, a=1, d=1;
 
-   printk(PRINTK_DEBUGAGE ">>>>\n");
+   printk(PRINTK_DEBUGAGE "Avant :\n");
    for (e = 0; e<NB_ELEMENTS; e++){
       elements[e] = NULL;
    }
-   kmallocAfficherStatistiques();
+   kmallocAfficherStatistiques("");
    for (n = 0; n < NB_APPELS; n++) {
       e = rand() % NB_ELEMENTS;
-      /*  if (elements[e] == NULL) {*/
+      if (elements[e] == NULL) {
          elements[e] = kmalloc(rand() % 1024);
-	 printk(PRINTK_DEBUGAGE"B %d (0x%x)\n", e, elements[e]);
-	 /*      } else {
-         printk(PRINTK_DEBUGAGE"A %d (0x%x)\n", e, elements[e]);
+      } else {
          kfree(elements[e]);
          elements[e] = NULL;
-	 }*/
+      }
    }
-   kmallocAfficherStatistiques();
-   printk(PRINTK_DEBUGAGE "<<<<\n");
+   printk(PRINTK_DEBUGAGE "Apres :\n");
+   kmallocAfficherStatistiques("");
 }
 
 #endif // MANUX_KMALLOC
 
 #ifdef MANUX_VIRTIO_CONSOLE
-#define NB_LIGNES 1280
+#define NB_LIGNES 12800
 void testerVirtioConsole()
 {
    for (int n = 0; n < NB_LIGNES; n++) {
      printk("(7)" "(%3d) Une ligne de texte ...\n", n);
-     //     for (int i = 0; i<10000000; i+=1){asm("");};     
    }
 }
 #endif // MANUX_VIRTIO_CONSOLE
 
-void _start(InfoSysteme * infoSysteme,
-	    uint32_t adresseDebutManuX,
-	    uint32_t adresseFinManuX)
+void _startManuX()
 {
+   uint32_t magic; // Pour vérifier si on a été démarré par multiboot
+   InfoSysteme * infoSysteme;
    union {
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
 
+   // Multiboot laisse une signature : une valeur prédéfinie dans eax
+   __asm__("movl %%eax,%0" : "=r"(magic));
+
+   // Obtention du pointeur vers les informations fournies par l'outil
+   // de chargement en mémoire
+   __asm__("movl %%ebx,%0" : "=r"(infoSysteme));
+
 #ifdef MANUX_RAMDISK
    uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
                          + infoSysteme->adresseRamdiskLo;
 #endif
-
+   
    // Initialisation de la console noyau
 #ifdef MANUX_FICHIER   
    consoleInitialisation(&iNoeudConsole);
@@ -137,36 +157,46 @@ void _start(InfoSysteme * infoSysteme,
    consoleInitialisation();
 #endif
 
-   // Affichage du premier message
+   // Lecture du nom du processeur
    descriptionProcesseur(0, descriptionProc.registres);
    descriptionProc.caracteres[12] = 0;
 
+   // Affichage du premier message
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
 		descriptionProc.caracteres);
+   if (magic == MULTIBOOT_MAGIC) {
+      printk_debug(DBG_KERNEL_START, "(chargeur multiboot)\n");
+   } else {
+      printk_debug(DBG_KERNEL_START, "(chargeur inconnu)\n");
+   }
 
 #ifdef MANUX_GESTION_MEMOIRE
    // Affichage de la mémoire disponible 
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
 		infoSysteme->memoireDeBase,
 		infoSysteme->memoireEtendue);
+   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
+          adresseDebutManuX, adresseFinManuX);
+   printk_debug(DBG_KERNEL_START, "La pile actuelle va de 0x%x a 0x%x\n",
+          adressePileManuX,
+          adresseLimitePileManuX);
 
    /* Initialisation de la gestion mémoire */
-   //   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
+   printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme->memoireDeBase,
 		      infoSysteme->memoireEtendue,
-		      adresseDebutManuX,
-		      adresseFinManuX);
-   //printk_debug(DBG_KERNEL_START, "Memoire initialisee\n");
+		      adresseDebutManuX, adresseFinManuX,
+		      adressePileManuX, adresseLimitePileManuX);
 #endif
-
-   i8259aInit(MANUX_INT_BASE_IRQ);
-
+   
    /* Initilisation des descripteurs de segments */
    initialiserGDT();
 
    /* Initialisation de la table des interruptions */
-   initialiserIDT();
-   
+   initialiserIDT();   
+
+   i8259aInit(MANUX_INT_BASE_IRQ);
+
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
     journalInitialiser(&iNoeudConsole);
@@ -235,11 +265,6 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
 #endif
 
-   /*
-   printk_debug(DBG_KERNEL_START, "Console noyau = 0x%x\n", consoleNoyau());
-   printk_debug(DBG_KERNEL_START, "Adresse de _start : 0x%x\n", _start);
-   */
-   
    /* Initialisation de la gestion des processus */
 #ifdef MANUX_TACHES
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
@@ -254,16 +279,18 @@ void _start(InfoSysteme * infoSysteme,
    printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
    adresseDebutManuX, adresseFinManuX);
 
-#ifdef MANUX_VIRTIO_CONSOLE
+#ifdef MANUX_VIRTIO_CONSOLE_NON
    testerVirtioConsole();
 #endif
 
 #ifdef MANUX_KMALLOC
-   printk(PRINTK_DEBUGAGE "Pouet\n");
+   printk(PRINTK_DEBUGAGE "************************ Test kmalloc *************************\n");
    kmallocInitialisation();
    testerKmalloc();
+   printk(PRINTK_DEBUGAGE "********************** Fin test kmalloc ***********************\n");
 #endif
-   
+
    init();
-}   /* _start */
+}   /* _startManuX */
+
 

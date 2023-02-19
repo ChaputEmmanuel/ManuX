@@ -38,8 +38,9 @@ SOUS_REP  = $(MANUX_PARTS) $(DEMARAGE)
 export CFLAGS ROOTDIR
 
 #    Les cibles voulues, ce sera probablement des images finales
-all : manux bootgrub
-	(cd noyau; make all)
+default : manux
+
+all : manux iso
 
 .$(ASM_EXT).bin :
 	$(ASM) $(ASM_BIN_OPT) $< -o $@
@@ -103,22 +104,24 @@ bourrage:
 #-------------------------------------------------------------------------------
 #    Dernière phase : les images utilisables directement
 #-------------------------------------------------------------------------------
+manux : noyau.elf # manux.bin
+
 #...............................................................................
 # L'image sur disquette est obtenue en concaténant les fichiers de boot, d'init,
 # et le noyau
 #...............................................................................
-manux : configuration composants $(NOYAU_BIN) bootfloppy 
-	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN) $(BOURRAGE) > manux
+manux.bin : configuration composants $(NOYAU_BIN)
+	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN) $(BOURRAGE) > manux.bin
 
 #...............................................................................
 #  L'image bootgrub est en fait un noyau linké avec le code pour
 # la compatibilité bootgrub
 #...............................................................................
-bootgrub : configuration  grubinit  composants 
+noyau.elf : configuration  grubinit  composants 
 	(cd noyau ; make noyau.elf)
 
 # Une image ISO
-iso : bootgrub
+iso : noyau.elf
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) $(NOYAU_ELF)
 
 $(ISO_FICHIER) : iso
@@ -129,14 +132,17 @@ $(ISO_FICHIER) : iso
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" bootgrub ; cp noyau/noyau.elf noyaux/`basename $$c .h` ) ; done )
+	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" noyau.elf ; cp noyau/noyau.elf noyaux/`basename $$c .h` ) ; done )
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------
 #    Lancement du noyau
 #-------------------------------------------------------------------------------
-run : bootgrub
+run : noyau.elf
 	$(RUN_MANUX_ELF)
+
+rundbg : noyau.elf
+	$(RUN_MANUX_ELF) -gdb tcp::1234 -S 
 
 runfloppy : manux
 	$(RUN_MANUX_FLOPPY)

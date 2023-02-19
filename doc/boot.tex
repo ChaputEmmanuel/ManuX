@@ -9,7 +9,7 @@ mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
 \begin{itemize}
    \item Nous commencerons par nous fonder sur une situation ``à
      l'ancienne'' avec un \textsc{pc} doté d'un lecteur de
-     disquettes. Nous utiliserons alors le  \textsc{bios} du \textsc{ pc}
+     disquettes. Nous utiliserons alors le  \textsc{bios} du \textsc{pc}
      pour charger le noyau en mémoire, lui passer quelques
      informations et le faire démarrer.
 
@@ -265,7 +265,7 @@ de base dont il aura besoin.
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
 par la {\em Free Software Foundation} qui va nous permettre d'utiliser
-les services d'outils tels que \textsc{ grub} afin de grandement simplifier
+les services d'outils tels que \textsc{grub} afin de grandement simplifier
 le chargement du noyau de ManuX.
 
    Cela nous permettra également d'utiliser des outils un peu plus
@@ -276,16 +276,54 @@ hors d'age !
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Création d'un entête}
+\subsection{Structure du fichier chargé par {\em Multiboot}}
 
-   Le système {\em Multiboot} nécessite un entête devant le noyau avec
-des caractéristiques bien définies. En ce qui concerne ManuX, il est
+   Nous devons construire un fichier qui sera fourni à {\em
+Multiboot}.  Nous allons utiliser ici la version 1 de {\em Multiboot} et
+non {\em Multiboot2}. On trouvera la spécification par exemple
+\href{ici}{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html}.
+
+   Un tel fichier contient essentiellementnotre noyau, mais doit avoir
+une structure particulière afin d'être pris en charge~:
+
+\begin{itemize}
+   \item Il doit être composé d'un entête suivi d'un programme
+     exécutable.
+   \item L'entête, qui permet à l'outil de boot (comme {\sc grub})
+     d'identifier le fichier, a une structure bien définie, que nous
+     allons décrire ci dessous. Il doit être dans les 8192 premiers
+     octets du fichier.
+   \item Le programme exécutable peut être à n'importe quel format. Il
+     doit évidemment être ``auto-suffisant'' (pas de librairies
+     dynamiques !). Il doit pouvoir être positionné à n'importe quelle
+     adresse physique en mémoire. 
+\end{itemize}
+
+   Le programme exécutable, c'est évidemment ManuX. Nous allons
+décrire maintenant la structure de l'entête.
+     
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Structure de l'entête}
+
+   Le système {\em Multiboot} nécessite donc un entête devant le noyau
+avec des caractéristiques bien définies.
+
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{L'entête de ManuX}
+
+   En ce qui concerne ManuX, il est
 implanté dans le fichier \fichier{boot}{mb-manux}{nasm}.
 
    Ce fichier contient essentiellement quelques éléments permettant à
 {\em Multiboot} de le reconnaitre puis du code permettant de démarrer
 véritablement le noyau par un appel à la fonction \lstinline!_start()!
 qui sera implantée dans le fichier \fichier{noyau}{main}{c}.
+
 
 %-------------------------------------------------------------------------------
 %
@@ -295,7 +333,49 @@ qui sera implantée dans le fichier \fichier{noyau}{main}{c}.
    Afin d'assembler tous les éléments en un seul fichier
 \lstinline!noyau.elf! qui pourra ensuite être utilisé par {\em
   Multiboot}, nous allons utiliser l'éditeur de liens \lstinline!ld!.
+Le comportement de \lstinline!ld! est conditionné par un fichier qui
+s'appelle un {\em linker script}. Un tel script décrit en particulier
+comment les différentes sections des fichiers d'entrée sont disposées
+dans le fichier de sortie et comment la mémoire est organisée.
 
+%https://wiki.osdev.org/Linker_Scripts
+
+Le code suivant montre un exemple simple de script :
+
+\begin{lstlisting}
+ENTRY(start)
+SECTIONS {
+    . = 1M 
+    .boot :
+    {
+        *(.multiboot)
+    }
+    adresseDebutManuX = .;
+    .text : {
+       *(.text)
+    }        
+    .rodata : {
+       *(.rodata)
+    }
+    .data : {
+       *(.data)
+    }
+    .bss : {
+       *(.bss)
+    }
+}
+\end{lstlisting}
+
+Dans ce script, nous avous défini le nom du point d'entrée (ici {\tt
+  start}), et nous avons décrit un certain nombre de sections avec
+leur ordre d'apparition dans le fichier de sortie et leur
+contenu. Vous remarquerez également que l'on utilise la notation
+``{\tt .}'' pour spécifier l'adresse courante et que cette adresse
+peut être consultée mais également modifiée. Ainsi la ligne {\tt . =
+  1M} stipule que l'on se place ) l'adresse 1M. D'un autre côté la
+ligne {\tt adresseDebutManuX = .} stipule que l'on enregistre dans la
+variable {\tt adresseDebutManuX} la valeur de l'adresse courante
+(celle du début de la section {\tt . text} donc).
 
 %-------------------------------------------------------------------------------
 %

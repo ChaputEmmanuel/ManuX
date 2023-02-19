@@ -63,7 +63,7 @@ void virtioConsoleTraiterBuffers(VirtioConsole * vc)
 
       // WARNING Pas top
       for (int n = 0; n < nbLu; n++) {
-	//libererPage(bf[n]);
+	 libererPage(bf[n]);
          nbPageAlloueesIci --;
 	 //	 printk("[7] virtioConsoleTraiterBuffers libere page 0x%x (reste %d)\n", bf[n], nbPageAlloueesIci);
       }

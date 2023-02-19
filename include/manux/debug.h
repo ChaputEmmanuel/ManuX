@@ -46,9 +46,12 @@
 //  ;
 
 #define masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_MEMOIRE    \
+ | DBG_KERNEL_START     \
+ | DBG_KERNEL_MEMOIRE   \
 			       )
 #define masqueDebugageFichier (0x00000000\
+ | DBG_KERNEL_START     \
+ | DBG_KERNEL_MEMOIRE    \
 			       )
 
 /*

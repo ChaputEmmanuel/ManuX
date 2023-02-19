@@ -28,7 +28,9 @@ extern int nombrePagesSysteme;
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue,
 			uint32_t adresseDebutManuX,
-			uint32_t adresseFinManuX);
+			uint32_t adresseFinManuX,
+			uint32_t adressePileManuX,
+			uint32_t adresseLimitePileManuX);
 /*
  * Initialisation de la mémoire. Nécessaire avant toute
  * demande d'allocation.

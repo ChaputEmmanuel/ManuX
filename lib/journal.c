@@ -112,12 +112,14 @@ void journaliserNiveau(booleen console, booleen fichier,
 #endif
    }
 
+#ifdef MANUX_FICHIER
    // Sur le fichier s'il y en a un
    if (fichierJournal) {
       if ((fichier) && (niveau <= MANUX_JOURNAL_NIVEAU_DEFAUT)) {
 	fichierEcrire(fichierJournal, message, strlen(message));   
       }
    }
+#endif
    
   //   sortirExclusionMutuelle(&emj);
 }

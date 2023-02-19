@@ -80,14 +80,19 @@ static void inline demarquerPage(uint32_t i)
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue,
 			uint32_t adresseDebutManuX,
-			uint32_t adresseFinManuX)
+			uint32_t adresseFinManuX,
+			uint32_t adressePileManuX,
+			uint32_t adresseLimitePileManuX)
 {
    uint32_t i;                  // Pour compter les pages initialisées 
    uint32_t tailleProprietaire; // Taille nécessaire pour les gérer
-   uint32_t nbrePagesManuX;
+   uint32_t nbrePagesManuX, nbrePagesPile;
    
    printk_debug(DBG_KERNEL_MEMOIRE, "base = %d, et = %d\n",
 		tailleMemoireDeBase, tailleMemoireEtendue);
+
+   printk_debug(DBG_KERNEL_MEMOIRE, "noyau d = 0x%x , f = 0x%x\n", adresseDebutManuX, adresseFinManuX);
+   printk_debug(DBG_KERNEL_MEMOIRE, "pile  d = 0x%x , f = 0x%x\n", adressePileManuX, adresseLimitePileManuX);
 
    /* Les tailles sont données en Ko */
    nombrePages = (tailleMemoireDeBase + tailleMemoireEtendue) / 4;
@@ -103,17 +108,6 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    assert((void*)(proprietairePage + tailleProprietaire*MANUX_TAILLE_PAGE)
 	  < (void *)MANUX_KERNEL_START_ADDRESS);
 
-#ifdef CETAITMIEUXAVANT
-   /* On considère le 1er méga occupé par le noyau */
-   for (i = 0; i < MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i++) {
-      proprietairePage[i] = (TacheID) 1;
-   }
-   /* Tout le reste (au delà du premier méga) est libre */
-   for (i = MANUX_DEBUT_MEMOIRE_ETENDUE/MANUX_TAILLE_PAGE; i < nombrePages; i++) {
-      proprietairePage[i] = (TacheID) 0;
-   }
-#else
-
    // Par défaut tout est libre
    for (i = 0; i < nombrePages; i++) {
       demarquerPage(i);      
@@ -122,16 +116,19 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    // Les handlers : WARNING est-ce utile ?
    reserverPage(0);
 
-   printk_debug(DBG_KERNEL_MEMOIRE, "Page 0x0 pour les gestionnaires\n");
+   printk_debug(DBG_KERNEL_MEMOIRE, "Page  0x0         pour les gestionnaires\n");
    
-   // Le BIOS (indéboulonable !)
-   for (i=0 ; i < MANUX_BIOS_NB_PAGES; i++) {
-      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%2x a 0x%2x pour la gestion memoire\n",
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
+   // La table d'allocation de la mémoire
+   for (i=0 ; i < tailleProprietaire; i++){
+     reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour le BIOS\n",
-		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS),
-		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+MANUX_BIOS_NB_PAGES-1);
-
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%2x a 0x%2x pour la gestion memoire\n",
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
+   
    // Le noyau
    nbrePagesManuX = (adresseFinManuX-adresseDebutManuX)/MANUX_TAILLE_PAGE
      + (((adresseFinManuX-adresseDebutManuX)%MANUX_TAILLE_PAGE)?1:0);
@@ -142,21 +139,15 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 		ADDR_VERS_PAGE(adresseDebutManuX),
 		ADDR_VERS_PAGE(adresseDebutManuX)+nbrePagesManuX-1);
 
-   // La table d'allocation de la mémoire
-   for (i=0 ; i < tailleProprietaire; i++){
-     reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
+   // La pipile
+   nbrePagesPile = (adresseLimitePileManuX-adressePileManuX)/MANUX_TAILLE_PAGE
+     + (((adresseLimitePileManuX-adressePileManuX)%MANUX_TAILLE_PAGE)?1:0);
+   for (i=0 ; i < nbrePagesPile; i++) {
+      reserverPage(ADDR_VERS_PAGE(adressePileManuX)+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la gestion memoire\n",
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
-   
-   // La GDT
-   for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
-      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
-   }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la GDT\n",
-		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT),
-		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT) + MANUX_GDT_NB_PAGES-1);
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la pile\n",
+		ADDR_VERS_PAGE(adressePileManuX),
+		ADDR_VERS_PAGE(adresseLimitePileManuX)+nbrePagesPile-1);
 
    // La IDT
    for (i=0 ; i < MANUX_IDT_NB_PAGES; i++) {
@@ -165,7 +156,23 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la IDT\n",
 		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT),
 		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT) + MANUX_IDT_NB_PAGES-1);
-#endif   
+
+   // La GDT
+   for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
+   }
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la GDT\n",
+		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT),
+		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT) + MANUX_GDT_NB_PAGES-1);
+
+   // Le BIOS (indéboulonable !)
+   for (i=0 ; i < MANUX_BIOS_NB_PAGES; i++) {
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
+   }
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour le BIOS\n",
+		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS),
+		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+MANUX_BIOS_NB_PAGES-1);
+
 }
 
 /*

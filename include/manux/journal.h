@@ -28,7 +28,11 @@
 /**
  * @brief Initialisation du système de journalisation.
  */
+#ifdef MANUX_FICHIER
 void journalInitialiser(INoeud * iNoeudConsole);
+#else
+void journalInitialiser();
+#endif
 
 /**
  * @brief Affectation d'un fichier sur lequel seront envoyés les

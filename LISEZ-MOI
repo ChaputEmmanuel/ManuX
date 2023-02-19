@@ -33,13 +33,6 @@ En cours
    utilisée dans memoire.c (par exemple un printk_console) soit,
    ... ben je sais pas !
    
-   EN COURS : virtio a un soucis : voir main.c:testerVirtioConsole
-   qui affiche les 128 premiers messages et reboucle. La gestion de
-   la mémoire n'est pas très claire. Il faut se décider ! En gros,
-   est-ce qu'on refait une allocation/free ou est-ce qu'on alloue une
-   première fois et on réutilise ? Voir virtioConsoleEcrire qui est à
-   revoir !
-   
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
@@ -356,3 +349,20 @@ make qui copie de include/manux vers usr/include/manux.
      choses à rêgler : ça serait bien que printk() prenne un niveau
      par défaut qui affiche *uniquement* sur le fichier si dispo et
      sur la console sinon par exemple.
+
+   ETRANGETES en cours  : soucis dans la gestion de la memoire. La ca
+   plante en essayant d'acceder à 0x800000, pourtant correctement
+   allouée ! Même dbg dit que ce n'est pas accessible !!! Et si on
+   joue a changer la taille de la RAM dans le Makefile, c'est la
+   panique  !!! De toutes façons, on ne peut pas aller très loin pour
+   le moment car je place le mapping de l'allocation des pages en
+   dessous du noyau. Tant que je n'utilise pas 1 bit pour chaque page,
+   on reste limité ou il faut déplacer ça et/ou le noyau.
+
+   EN COURS : virtio a un soucis : voir main.c:testerVirtioConsole
+   qui affiche les 128 premiers messages et reboucle. La gestion de
+   la mémoire n'est pas très claire. Il faut se décider ! En gros,
+   est-ce qu'on refait une allocation/free ou est-ce qu'on alloue une
+   première fois et on réutilise ? Voir virtioConsoleEcrire qui est à
+   revoir !
+   

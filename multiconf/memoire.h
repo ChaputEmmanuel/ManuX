@@ -125,6 +125,13 @@
 #   define MANUX_AFFECTATION_PAGES 0x1000
 #endif
 
+/**
+ * @brief Taille réservée pour la pile lors du boot
+ */
+#ifndef MANUX_TAILLE_PILE
+#   define MANUX_TAILLE_PILE 16384
+#endif
+
 /*----------------------------------------------------------------------------*/
 /* Définition du fichier main. Afin de ne pas le surcharger de #ifdef, j'en   */
 /* fais plusieurs versions qui me permettent de faire des tests sur des sous  */

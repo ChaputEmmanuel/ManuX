@@ -6,22 +6,8 @@
 #include <manux/config.h>
 #include <manux/console.h>
 #include <manux/printk.h>
-/*
- * Structure passée en paramètre par la phase d'init
- * (cf init-manux.nasm)
- */
-typedef struct _InfoSysteme {
-   uint32_t flags;           // Pour compatibilité avec multiboot
-   uint32_t memoireDeBase;   // En Ko
-   uint32_t memoireEtendue;  // En Ko
-   uint32_t tailleRamdisk;   // En Ko (0 si pas de ramdisk)
-   uint32_t adresseRamdisk;
-} InfoSysteme;
 
-
-void _start(InfoSysteme * infoSysteme,
-	    uint32_t adresseDebutManuX,
-	    uint32_t adresseFinManuX)
+void _startManuX()
 {
   // Initialisation de la console noyau
    consoleInitialisation();
@@ -29,5 +15,7 @@ void _start(InfoSysteme * infoSysteme,
    // Un petit message
    printk("Printk dit bonjour !\n");
   
-}   /* _start */
+   while (1){};   // A remplacer par un halt() 
+}   /* _startManuX */
+
 

@@ -5,7 +5,7 @@
 /* inclus.                                                                    */
 /*                                                                            */
 /*    Pour le bon fonctionnement de cette procédure, il est impératif que les */
-/* macros en question débutent par le préfixe MANUX_                          */
+/* macr3xuos en question débutent par le préfixe MANUX_                          */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
@@ -100,6 +100,13 @@
 
 #ifndef MANUX_NB_SECT_INIT
 #   define MANUX_NB_SECT_INIT 0x02
+#endif
+
+/**
+ * @brief Taille réservée pour la pile lors du boot
+ */
+#ifndef MANUX_TAILLE_PILE
+#   define MANUX_TAILLE_PILE 16384
 #endif
 
 /*============================================================================*/
@@ -286,7 +293,7 @@
 /*
  * Utilisation des outils de synchronisation (mutex, semaphore, ...)
  */
-#define MANUX_OUTILS_SYNCHRO
+//#define MANUX_OUTILS_SYNCHRO
 
 /*
  * Définition des appels système
@@ -342,10 +349,8 @@
 /*----------------------------------------------------------------------------*/
 /* Implantation de kmalloc                                                    */
 /*----------------------------------------------------------------------------*/
-/*
 #define MANUX_KMALLOC kmalloc-zs
 #define MANUX_KMALLOC_STAT
-*/
 
 /*----------------------------------------------------------------------------*/
 /* Gestion du clavier.                                                        */
@@ -424,8 +429,20 @@
 #   endif
 #endif
 
+#if defined(MANUX_VIRTIO_CONSOLE) && !defined(MANUX_FICHIER)
+#   error "MANUX_VIRTIO_CONSOLE nécessite MANUX_FICHIER"
+#endif
+
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
+#endif
+
+#if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_TACHES)
+#   error "MANUX_APPELS_SYSTEME nécessite MANUX_TACHES"
+#endif
+
+#if defined(MANUX_OUTILS_SYNCHRO) && !defined(MANUX_TACHES)
+#   error "MANUX_OUTILS_SYNCHRO nécessite MANUX_TACHES"
 #endif
 
 #if defined(MANUX_VIRTIO_NET) && !defined(MANUX_RESEAU)
@@ -442,6 +459,14 @@
 
 #if defined(MANUX_PERIPHERIQUE_CARACTERE) && !defined(MANUX_FICHIER)
 #   error "Les périphériques caractères nécessitent le type fichier"
+#endif
+
+#if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_CLAVIER)
+#   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_CLAVIER"
+#endif
+
+#if defined(MANUX_KMALLOC_STAT) && !defined(MANUX_KMALLOC)
+#   error "MANUX_KMALLOC_STAT nécessite MANUX_KMALLOC"
 #endif
 
 #endif  // MANUX_CONFIG

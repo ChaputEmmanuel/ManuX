@@ -125,7 +125,7 @@ void afficherEtatUneTache(Tache * tache)
 #ifdef MANUX_TACHE_CONSOLE
           tache->console,
 #else
-          consoleNoyau(),
+          0x00, // WARNING : bof
 #endif
           tache->ldt);
 }
@@ -138,9 +138,13 @@ void afficherEtatTaches()
 	  totalMinutesDansTemps(nbTopHorloge),
 	  secondesDansTemps(nbTopHorloge),
 	  nbTopHorloge);
+#ifdef MANUX_KMALLOC_STAT
+   kmallocAfficherStatistiques("");
+#else
    printk(" Memoire : %d / %d pages allouees\n",
 	  nombrePagesAllouees(), nombrePagesTotal());
-   printk(" Num prochaine tache : %d\n", numeroProchaineTache);
+#endif
+   printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
    afficheEtatSystemeDemande = FALSE;
    printk(" [num] et   nbAc  tpsEx     tache    console       ldt\n");
    afficherEtatUneTache(tacheEnCours);
@@ -149,7 +153,7 @@ void afficherEtatTaches()
       celluleTache = celluleTache->suivant){
         afficherEtatUneTache(celluleTache->tache);
    }
-   printk("\n ------------------------------------------------------------------------------\n");
+   printk("\n------------------------------------------------------------------------------\n");
 }
 
 /**
@@ -161,9 +165,6 @@ void aDummyKernelTask()
 
    while(1) {
       if (afficheEtatSystemeDemande) {
-#ifdef MANUX_VIRTIO_CONSOLE
-	 virtioConsoleTraiterBuffers(); // WARNING à virer !!!
-#endif
 #ifdef MANUX_VIRTIO_NET
          virtioReseauPoll(); // WARNING à virer !!!
 #endif
