@@ -4,7 +4,14 @@
 \section{Introduction}
 
    Nous allons ici voir comment en arriver à un noyau présent dans la
-mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
+mémoire de la machine, prêt à être exécuté. La procédure peut varier
+d'un système à l'autre : le code peut être sur un support amovible,
+dans une zone mémoire non volatile, sur une machine distante, \ldots
+
+
+   Dans les cas les plus simples, l'auteur du noyau n'a (presque) pas
+à s'en préoccuper, dans les cas les plus tordus, il ou elle va devoir
+(presque) tout faire. Nous décrirons ici deux variantes :
 
 \begin{itemize}
    \item Nous commencerons par nous fonder sur une situation ``à
@@ -13,9 +20,19 @@ mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
      pour charger le noyau en mémoire, lui passer quelques
      informations et le faire démarrer.
 
+     Dans cette situation, nous devrons donc (presque) tout faire
+     puisqu'il va falloir aller charger le noyau depuis la disquette
+     vers la mémoire. Heureusement le BIOS nous fourni des fonctions
+     pour cela.
+
    \item Nous observerons ensuite des outils un peu plus modernes
      permettant de démarrer de façon un peu plus simple et plus
      indépendante du matériel sous-jacent.
+
+     Dans cette situation, nous utiliserons par exemple GRUB qui fera
+     le travail de charger le noyau depuis le support (disque dur,
+     \ldots) vers la mémoire. Nous aurons juste quelques informations
+     à lui fournir.
   
 \end{itemize}
 

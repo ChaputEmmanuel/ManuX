@@ -4,13 +4,17 @@
 ;      Ce code doit tenir dans un secteur (512 octets). Il se contente donc de
 ;   charger en mémoire le code de init puis le code du noyau et de faire un
 ;   saut à l'adrese de init.
-;                                                           (C) Manu Chaput 2000
+;                                                      (C) Manu Chaput 2000-2023
 ;-------------------------------------------------------------------------------
-extern InitManuX
 
-org MANUX_BOOT_START_ADDRESS ; Le secteur de boot est chargé à cette adresse
+; La directive suivante permet de dire à NASM que le secteur de boot
+; est chargé à cette adresse. Cela lui permet de déterminer à quelle
+; adresse exacte se situe chaque élément.
+org MANUX_BOOT_START_ADDRESS 
 
 [bits 16]
+        ; On se prépare une pile
+	;-----------------------
         cli                        ; Pas d'interruption SVP
         mov ax, MANUX_STACK_SEG_16 ; Initialisation du segment de pile
         mov ss, ax
@@ -31,7 +35,7 @@ ChargeInit :
         mov dx, 0                  ; head=0, drive=0
         int 13h                    ; On place ça en ES:BX
 
-        jc InitDisquette
+        jc InitDisquette           ; En cas d'erreur, on réinitialise
 
         ; Chargement du noyau depuis le disque. Attention, l'adresse est
 	; probablement exprimée sur plus de 16 bits, d'où le décalage à
@@ -61,14 +65,8 @@ ChargeInit :
         ; On saute à l'adresse de l'init
         ;-------------------------------
         jmp MANUX_INIT_START_ADDRESS
-        mov ax, MANUX_INIT_START_ADDRESS
-        mov es,ax
-        mov ds,ax
-        push ax
-        mov ax,0x0000
-        push ax
-        retf                       ; @ : 0x7c49
 
+BoucleFolle:
 	jmp BoucleFolle            ; Inutile a priori !
 
         ; Réinitialisation du lecteur de disquette (en cas de pb)
@@ -79,8 +77,7 @@ InitDisquette :
         int 13h
         jnc ChargeInit             ; Si erreur carry = 0
 
-BoucleFolle:
-        jmp BoucleFolle
+; On complète par des 0 pour faire 512 octets
 
 times 512-($-$$)-2 db 0
         dw 0AA55h

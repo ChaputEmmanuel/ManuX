@@ -82,6 +82,18 @@
 #   define MANUX_ELF_HEADER_SIZE 0x80
 #endif
 
+#ifndef MANUX_NB_SECT_INIT
+#   define MANUX_NB_SECT_INIT 0x02
+#endif
+
+#ifndef MANUX_portCmdClavier
+#   define MANUX_portCmdClavier  0x64
+#endif
+
+#ifndef MANUX_portDonneesClavier
+#   define MANUX_portDonneesClavier  0x60
+#endif
+
 /*
  * Adresse de l'écran
  */

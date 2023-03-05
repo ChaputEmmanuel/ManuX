@@ -93,6 +93,14 @@
 #   define MANUX_NB_SECT_INIT 0x02
 #endif
 
+#ifndef MANUX_portCmdClavier
+#   define MANUX_portCmdClavier  0x64
+#endif
+
+#ifndef MANUX_portDonneesClavier
+#   define MANUX_portDonneesClavier  0x60
+#endif
+
 /*----------------------------------------------------------------------------*/
 /* Définition des indices de descripteurs dans la GDT.                        */
 /*----------------------------------------------------------------------------*/
@@ -173,15 +181,5 @@
  * La fréquence du timer
  */
 #define MANUX_FREQUENCE_HORLOGE 100
-
-
-
-#ifndef MANUX_portCmdClavier
-#   define MANUX_portCmdClavier  0x64
-#endif
-
-#ifndef MANUX_portDonneesClavier
-#   define MANUX_portDonneesClavier  0x60
-#endif
 
 #endif  // MANUX_CONFIG
