@@ -7,7 +7,7 @@
 /*    Pour le bon fonctionnement de cette procédure, il est impératif que les */
 /* macros en question débutent par le préfixe MANUX_                          */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
@@ -20,8 +20,11 @@
  * réutiliser cette mémoire dans le noyau, puisque le code d'init est terminé
  * lorsque le noyau est initialisé.
  */
+#ifndef MANUX_BOOT_START_ADDRESS
+#   define MANUX_BOOT_START_ADDRESS  0x7c00
+#endif
 #ifndef MANUX_INIT_START_ADDRESS
-#   define MANUX_INIT_START_ADDRESS  0x1000
+#   define MANUX_INIT_START_ADDRESS  0x7e00
 #endif
 
 /*----------------------------------------------------------------------------*/

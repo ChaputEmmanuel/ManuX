@@ -51,6 +51,9 @@ livre : ManuX.pdf
 build :
 	mkdocs build -d ManuX
 
+serve :
+	mkdocs serve
+
 install :
 	scp -r ManuX root@www:/var/www/html/
 

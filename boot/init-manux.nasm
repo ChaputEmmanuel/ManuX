@@ -2,10 +2,11 @@
 ;      Initialisation de ManuX
 ;                                                           (C) Manu Chaput 2000
 ;-------------------------------------------------------------------------------
+org  MANUX_INIT_START_ADDRESS
 global InitManuX
 
 InitManuX :
-        mov ax, MANUX_INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
+        mov ax, 0 ; MANUX_INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
         mov ds, ax
         mov es, ax
         mov si, MsgChargement       ; AfficheBIOS le message de chargement
@@ -29,7 +30,7 @@ InitManuX :
         out 70h,al                ; mémoire étendue (poids fort).
         in al,71h                 ;  Lecture et
         mov bh, al                ; stockage dans bh
-        mov [MemoireEtendue], bx
+        mov [MemoireEtendue], bx  ; @ 0x10028
 
         ; Vérifions que nous sommes bien en mode réel
         ;--------------------------------------------
@@ -48,7 +49,7 @@ InitManuX :
 
 ModeReelOK :
         mov si, MsgModeReel
-        call AfficheBIOS
+        call AfficheBIOS        ; @ 0x10048
 
         ; Activation de la ligne A20
         ;---------------------------
@@ -60,51 +61,7 @@ ModeReelOK :
         sti
 
 %ifdef MANUX_RAMDISK
-        ; Chargement du RamDisk, si nécessaire
-        ;-------------------------------------
-        mov ax, MANUX_NB_SECT_RAMDISK
-        cmp ax, 0h
-        je PasDeRamdisk
-
-        mov si, MsgLoadRamDisk
-        call AfficheBIOS
-
-        mov ax, MANUX_NB_SECT_RAMDISK
-        shr ax, 1
-        mov [TailleRamdisk], ax
-        xor ebx, ebx
-        mov bx, [MemoireEtendue]    ; OK, bx = taille de la mémoire étendue
-        add bx, 0400h               ; on lui ajoute le Méga de base ...
-        mov ax, MANUX_NB_SECT_RAMDISK     ; ... et on lui enlève la taille du ramdisk
-        shr ax, 1                   ; 1 secteur = 1/2 Ko
-        sub bx, ax
-        shl ebx, 10                 ; 1 Ko = 2^10 Octets ...
-        mov [AdresseRamdisk], ebx    ; On stoque l'adresse de début du RamDisk
-
-        ; Chargement effectif
-        mov ax, MANUX_SEGMENT_TRANSIT_RAMDISK ; Adresse de destination ...
-        mov es,ax                       ; ... dans es:bx
-        mov bx, 0
-
-        mov ah, 2                 ; Lecture = fonction 2
-        mov al, MANUX_NB_SECT_RAMDISK
-        mov cx, MANUX_NB_SECT_INIT + MANUX_NB_SECT_KERNEL + 2
-        mov dx, 0                 ; head=0, drive=0
-        int 13h                   ; On place ça en ES:BX
-
-        jc ErreurChargeRamDisk
-
-        jmp SuiteRamdisk
-
-ErreurChargeRamDisk :
-        mov si, MsgErreurRamDisk
-        call AfficheBIOS
-
-PasDeRamdisk :
-        mov si, MsgNoRamDisk
-        call AfficheBIOS
-
-SuiteRamdisk:
+        call ChargerRamdisk
 %endif
 
         ; Passage en mode protégé
@@ -114,15 +71,9 @@ SuiteRamdisk:
 
         ; Chargement de la GDT
         ;---------------------
-        mov     eax, 0              ; C'est à cette adresse qu'est
-        mov     ax, ds              ; actuellement la GDT
-        shl     eax, 4              ; Il faut transformer
-        add     eax, SegCodeNul     ; en adresse "flat"
-        mov     [AdresseGDT],eax    ; et enregistrer dans la GDT
+	cli
 
         lgdt [LaGDT]                ; Chargement de la GDT
-
-        cli
 
         ; Changement effectif de mode
         ;----------------------------
@@ -130,66 +81,52 @@ SuiteRamdisk:
         or eax, 01       ; à un le bit pmode
         mov cr0, eax     ; du registre cr0
 
-        jmp Vidage       ; Pour vider le pipe
-Vidage : 
-        db 066h, 0eah
-        dw VidageTer, 01h
-        dw 08h
+
+        jmp IndSegCode32:Mode32       ; Pour vider le pipe
+
+%ifdef MANUX_RAMDISK
+%include "gestion-ramdisk.nasm"
+%endif
 
 [bits 32]
 
-VidageTer:
+Mode32:
 
         ; Initialisation des segments
         ;----------------------------
-        mov ax, IndSegData32
+	mov ax, IndSegData32    ; @ 0x7e71
         mov ds, ax
+        mov ss, ax
         mov es, ax
         mov fs, ax
         mov gs, ax
 
         ; La pile ...
-        mov ebx, IndSegStack32
+        mov bx, IndSegStack32
         mov ss, bx
         mov eax, 90000h - 4
         mov esp, eax
 
+	sti
+;        mov si, MsgProut
+;        call AfficheBIOS   ; Aucune raison que ça marche maintenant !
+
 %ifdef MANUX_RAMDISK
-
-        ; On déplace ensuite le RamDisk vers le haut de la mémoire
-
-        mov eax, MANUX_SEGMENT_TRANSIT_RAMDISK ; Calcul de l'adresse "flat" ...
-        shl eax, 0x4                     ; ... du transit du ramdisk.
-        mov esi, eax
-
-        mov eax, MANUX_INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
-        shl eax, 0x4                  ; ... de la variable ...
-        add eax, AdresseRamdisk       ; ... AdresseRamdisk .
-        mov edi, [eax]
-
-        mov eax, MANUX_INIT_START_ADDRESS   ; Calcul de l'adresse "flat" ...
-        shl eax, 0x4                  ; ... de la variable ...
-        add eax, TailleRamdisk        ; ... TailleRamdisk .
-
-        mov ecx, [eax]
-        shl ecx, 10
-
-        cld
-        rep movsb                     ; [ES:ESI]->[DS:EDI] ECX fois
+        call DeplaceRamDisk
 %endif
 
         ; Calcul de l'adresse des infos Système
         ;--------------------------------------
-        mov eax, 0                   ; C'est à cette adresse que
-        mov ax, MANUX_INIT_START_ADDRESS   ; sont actuellement les infos
-        shl eax, 4                   ; Il faut transformer
-        add eax, InfoSysteme         ; en adresse "flat"
-        push eax
+;        mov eax, 0                   ; C'est à cette adresse que
+;        mov ax, 0x10000 ; MANUX_INIT_START_ADDRESS   ; sont actuellement les infos
+;        shl eax, 4                   ; Il faut transformer
+;        add eax, InfoSysteme         ; en adresse "flat"
+;        push eax   ; Non, on ne passe rien en paramètre en fait
 
         ; Annonce du saut ...
         ;--------------------
-        mov si, MsgRunningManux
-        call AfficheBIOS
+;        mov si, MsgRunningManux
+;        call AfficheBIOS
 
         ; Et c'est parti, on saute sur le noyau !
         ;----------------------------------------
@@ -264,68 +201,17 @@ InfoSysteme :
         dd 0h           ; compatibles avec multiboot
    MemoireEtendue :     ; mais la suite (ramdisk) ne l'est
         dd 0h           ; absolument pas
+
 %ifdef MANUX_RAMDISK
    TailleRamdisk :
         dd 0
    AdresseRamdisk :
         dd 0
 %endif
+
 [bits 16]
 
-; La GDT ( [1] p 3-11, [2] )
-;-------
-LaGDT :
-        dw TailleGDT  ; Taille de notre GDT
-   AdresseGDT :
-        dd LaGDT      ; Son Adresse
-   SegCodeNul :        ; Un descripteur de segment nul obligatoire
-        dw 0
-        dw 0
-        db 0
-        db 0
-        db 0
-        db 0
-
-   SegCode32 :         ; Descripteur pour le segment de code 32 bits
-        dw 0ffffh        ; Segment limit 15:00  (4 GB)
-        dw 00000h        ; Segment base address 15:00
-        db 00            ; Segment base address 23:16
-        db 09ah          ; P=1 (present) DPL=0 (privilège) S=1 Type=Code Read/Exec
-        db 0cfh          ; Segment limit 19:16 AVL=0 D/B=1 G=1 (4GB)
-        db 0             ; Segment base address 31:24
-
-   SegData32 :         ; Descripteur pour le segment de données 32 bits
-        dw 0ffffh        ; Segment limit 15:00  (4 GB)
-        dw 00000h        ; Segment base address 15:00
-        db 00            ; Segment base address 23:16
-        db 092h          ; P=1 (present) DPL=0 (privilège) S=1 Type=Data r/w
-        db 0cfh          ; Segment limit 19:16 AVL=0 D/B=1 G=1 (4GB)
-        db 0             ; Segment base address 31:24
-
-   SegStack32 :         ; Descripteur pour le segment de pile 32 bits
-        dw 0ffffh        ; Segment limit 15:00  (4 GB)
-        dw 00000h        ; Segment base address 15:00
-        db 00            ; Segment base address 23:16
-        db 092h          ; P=1 (present) DPL=0 (privilège) S=1 Type=Data r/w
-        db 0cfh          ; Segment limit 19:16 AVL=0 D/B=1 G=1 (4GB)
-        db 0             ; Segment base address 31:24
-
-   SegTask :            ; Descripteur pour la première tache (WARNING à virer)
-        dw 0ffffh        ; Segment limit 15:00  (4 GB)
-        dw 00000h        ; Segment base address 15:00
-        db 00            ; Segment base address 23:16
-        db 089h          ; P=1 (present) DPL=0 (privilège) S=1 Type=Data r/w
-        db 08fh          ; Segment limit 19:16 AVL=0 G=1 (4GB)
-        db 0             ; Segment base address 31:24
-
-        TailleGDT equ $-SegCodeNul-1
-; Fin de la GDT
-
-; Calcul des indices des différents descripteurs
-IndSegCode32  equ SegCode32 - SegCodeNul
-IndSegData32  equ SegData32 - SegCodeNul
-IndSegStack32 equ SegStack32 - SegCodeNul
-IndSegTask32  equ SegTask - SegCodeNul
+%include "gdt.nasm"
 
 ; Les messages
 ;-------------
@@ -342,6 +228,7 @@ MsgNoRamDisk      db      'Pas de RamDisk ...', 13, 10, 0
 MsgErreurRamDisk  db      'Erreur de chargement RamDisk ...', 13, 10, 0
 %endif
 MsgRunningManux   db      'On lance ManuX, ...', 13, 10, 0
+MsgProut          db      'Surprise suprise mother fucker !', 13, 10, 0
 
 ; Le bourrage (pour faire 2 blocs)
 ;---------------------------------

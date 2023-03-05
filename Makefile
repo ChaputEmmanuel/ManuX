@@ -6,13 +6,8 @@ ROOTDIR := $(shell pwd)
 # Le ficher de configuration est généré par make en fonction du
 # contenu de include/manux/config.h
 -include make.conf
-
 include make.commons
-
-BSEC_SRC = bootsector.$(ASM_EXT)
-BSEC_BIN = boot/bootsector.bin
-INIT_BIN = boot/init-manux.bin
-BOOT_SRC =  boot/bootsector.nasm boot/init-manux.nasm
+include make.rules
 
 DEMARAGE    = outils boot
 BOURRAGE    = ./boot/bourrage ./boot/ramdisk.ram
@@ -38,15 +33,10 @@ SOUS_REP  = $(MANUX_PARTS) $(DEMARAGE)
 export CFLAGS ROOTDIR
 
 #    Les cibles voulues, ce sera probablement des images finales
+# WARNING : sont-ce bien les bonnes cibles ?
 default : manux
 
 all : manux iso
-
-.$(ASM_EXT).bin :
-	$(ASM) $(ASM_BIN_OPT) $< -o $@
-
-.c.o :
-	gcc $(CFLAGS) -c $<
 
 #-------------------------------------------------------------------------------
 #    Première phase : la configuration générale
@@ -80,13 +70,15 @@ $(LIBSF) :
 $(LIBMANUX) :
 	(cd lib ; make)
 
-$(NOYAU_BIN) :
-	(cd noyau ; make noyau.bin)
+$(NOYAU_ELF) : configuration  composants 
+	(cd noyau ; make noyau.elf)
 
 #-------------------------------------------------------------------------------
 #    Troisième phase : le code d'initialisation (dépend de l'image)
 #-------------------------------------------------------------------------------
 bootfloppy : $(OUTILS) bourrage bootage
+
+floppyelf : $(OUTILS) bootagelf
 
 # L'image bootgrub nécessite un code d'initialisation spécifique
 grubinit :
@@ -101,28 +93,35 @@ bootage :
 bourrage: 
 	(cd boot ; make bourrage)
 
+bootagelf : 
+	(cd boot ; make floppybootelf)
+
 #-------------------------------------------------------------------------------
 #    Dernière phase : les images utilisables directement
 #-------------------------------------------------------------------------------
-manux : noyau.elf # manux.bin
+manux : $(NOYAU_ELF) # manux.bin
 
 #...............................................................................
 # L'image sur disquette est obtenue en concaténant les fichiers de boot, d'init,
-# et le noyau
+# et le noyau, puis en plaçant le tout en début d'un fichier de 1.44 Mo
 #...............................................................................
-manux.bin : configuration composants $(NOYAU_BIN)
-	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN) $(BOURRAGE) > manux.bin
+manux.img : manux.bin
+	dd if=/dev/zero of=$@ bs=1024 count=1440
+	dd if=$< of=$@ bs=512 conv=notrunc
+
+manux.bin : $(NOYAU_ELF) bootfloppy
+	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_ELF) $(BOURRAGE) > manux.bin
 
 #...............................................................................
 #  L'image bootgrub est en fait un noyau linké avec le code pour
 # la compatibilité bootgrub
 #...............................................................................
-noyau.elf : configuration  grubinit  composants 
-	(cd noyau ; make noyau.elf)
+$(NOYAUMB_ELF) : configuration  grubinit  composants 
+	(cd noyau ; make noyaumb.elf)
 
 # Une image ISO
-iso : noyau.elf
-	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) $(NOYAU_ELF)
+iso : $(NOYAUMB_ELF)
+	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) $(NOYAUMB_ELF)
 
 $(ISO_FICHIER) : iso
 
@@ -132,7 +131,7 @@ $(ISO_FICHIER) : iso
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" noyau.elf ; cp noyau/noyau.elf noyaux/`basename $$c .h` ) ; done )
+	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) ; done )
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------
@@ -144,7 +143,7 @@ run : noyau.elf
 rundbg : noyau.elf
 	$(RUN_MANUX_ELF) -gdb tcp::1234 -S 
 
-runfloppy : manux
+runfloppy : manux.img
 	$(RUN_MANUX_FLOPPY)
 
 runiso : #$(ISO_FICHIER)
@@ -164,7 +163,7 @@ dump :
 
 clean :
 	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
-	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf
+	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf *.img
 
 distclean :
 	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)

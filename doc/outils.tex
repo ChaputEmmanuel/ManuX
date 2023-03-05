@@ -47,6 +47,58 @@ sous-sections \ref{subsection:debugage_interne} et
 \lstinline!x86_64-linux-gnu! fonctionne parfaitement. Je n'ai jamais
 eu de problème avec aucune version de GCC jusqu'à présent.
 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{L'édition de liens}
+
+   Afin d'assembler tous les éléments en un seul fichier
+\lstinline!noyau.elf! qui pourra ensuite être utilisé par {\em
+  Multiboot}, nous allons utiliser l'éditeur de liens \lstinline!ld!.
+Le comportement de \lstinline!ld! est conditionné par un fichier qui
+s'appelle un {\em linker script}. Un tel script décrit en particulier
+comment les différentes sections des fichiers d'entrée sont disposées
+dans le fichier de sortie et comment la mémoire est organisée.
+
+%https://wiki.osdev.org/Linker_Scripts
+
+Le code suivant montre un exemple simple de script :
+
+\begin{lstlisting}
+ENTRY(start)
+SECTIONS {
+    . = 1M 
+    .boot :
+    {
+        *(.multiboot)
+    }
+    adresseDebutManuX = .;
+    .text : {
+       *(.text)
+    }        
+    .rodata : {
+       *(.rodata)
+    }
+    .data : {
+       *(.data)
+    }
+    .bss : {
+       *(.bss)
+    }
+}
+\end{lstlisting}
+
+Dans ce script, nous avous défini le nom du point d'entrée (ici {\tt
+  start}), et nous avons décrit un certain nombre de sections avec
+leur ordre d'apparition dans le fichier de sortie et leur
+contenu. Vous remarquerez également que l'on utilise la notation
+``{\tt .}'' pour spécifier l'adresse courante et que cette adresse
+peut être consultée mais également modifiée. Ainsi la ligne {\tt . =
+  1M} stipule que l'on se place ) l'adresse 1M. D'un autre côté la
+ligne {\tt adresseDebutManuX = .} stipule que l'on enregistre dans la
+variable {\tt adresseDebutManuX} la valeur de l'adresse courante
+(celle du début de la section {\tt . text} donc).
+
 %...............................................................................
 %
 %...............................................................................

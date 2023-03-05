@@ -6,9 +6,11 @@
 ;   saut à l'adrese de init.
 ;                                                           (C) Manu Chaput 2000
 ;-------------------------------------------------------------------------------
+extern InitManuX
 
-        org 0x7C00                 ; Le secteur de boot est chargé à cette adresse
+org MANUX_BOOT_START_ADDRESS ; Le secteur de boot est chargé à cette adresse
 
+[bits 16]
         cli                        ; Pas d'interruption SVP
         mov ax, MANUX_STACK_SEG_16 ; Initialisation du segment de pile
         mov ss, ax
@@ -19,15 +21,15 @@
         ; Chargement de l'init depuis le disque 
         ;--------------------------------------
 ChargeInit :
-        mov ax, MANUX_INIT_START_ADDRESS ; Adresse de destination
-        mov es,ax                 ; es:bx
-        mov bx, 0
+        mov ax, 0
+        mov es, ax                        ; es:bx
+        mov bx, MANUX_INIT_START_ADDRESS ; Adresse de destination
 
-        mov ah, 2                 ; Lecture = fonction 2
-        mov al, MANUX_NB_SECT_INIT      ; taille d'init
-        mov cx, 2                 ; à partir du secteur 2
-        mov dx, 0                 ; head=0, drive=0
-        int 13h                   ; On place ça en ES:BX
+        mov ah, 2                  ; Lecture = fonction 2
+        mov al, MANUX_NB_SECT_INIT ; taille d'init
+        mov cx, 2                  ; à partir du secteur 2
+        mov dx, 0                  ; head=0, drive=0
+        int 13h                    ; On place ça en ES:BX
 
         jc InitDisquette
 
@@ -47,7 +49,7 @@ ChargeInit :
         mov dx, 0                   ; head=0, drive=0
         int 13h                     ; On place ça en ES:BX
 
-        jc InitDisquette
+        jc InitDisquette            ; 0x7c34
 
         ; Arret du lecteur de disquette WARNING violent et pas beau
         ;------------------------------
@@ -58,13 +60,14 @@ ChargeInit :
 
         ; On saute à l'adresse de l'init
         ;-------------------------------
+        jmp MANUX_INIT_START_ADDRESS
         mov ax, MANUX_INIT_START_ADDRESS
         mov es,ax
         mov ds,ax
         push ax
         mov ax,0x0000
         push ax
-        retf
+        retf                       ; @ : 0x7c49
 
 	jmp BoucleFolle            ; Inutile a priori !
 

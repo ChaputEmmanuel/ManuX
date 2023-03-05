@@ -24,14 +24,12 @@ LIBUSR    = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)
 
 # Une version du noyau linké en format binaire pour le boot floppy
 # (voir si l'ELF ne fonctionnerait pas !) et une en ELF
-NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.bin
+NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.elf
 NOYAU_ELF     = $(ROOTDIR)/noyau/noyau.elf
+NOYAUMB_ELF   = $(ROOTDIR)/noyau/noyaumb.elf
 
 # Le script de link pour ld (il est obtenu par un traitement de manux.ld)
 LD_SCRIPT     = manux.lds
-
-# Le fichier de boot pour multiboot
-MB_MANUX_ELF  = $(ROOTDIR)/boot/mb-manux.elf
 
 #--------------------------------------------------------------------------
 #   Gestion de l'assembleur
@@ -39,17 +37,39 @@ MB_MANUX_ELF  = $(ROOTDIR)/boot/mb-manux.elf
 ASM_EXT     = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f bin
+ASM_ELF_OPT = -f elf32 #-g3 -F dwarf
 
-TAILLE_CONF = taille.conf
-
-COMPRESS = gzip
+ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
+              -D MANUX_INIT_START_ADDRESS=$(MANUX_INIT_START_ADDRESS) \
+              -D MANUX_KERNEL_START_ADDRESS=$(MANUX_KERNEL_START_ADDRESS) \
+              -D MANUX_STACK_SEG_16=$(MANUX_STACK_SEG_16) \
+              -D MANUX_ELF_HEADER_SIZE=$(MANUX_ELF_HEADER_SIZE) \
+              -D MANUX_ADRESSE_ECRAN=$(MANUX_ADRESSE_ECRAN) \
+              -D MANUX_NB_SECT_INIT=$(MANUX_NB_SECT_INIT) \
+              -D MANUX_NB_SECT_KERNEL=$(MANUX_NB_SECT_KERNEL) \
+              -D MANUX_NB_SECT_RAMDISK=$(MANUX_NB_SECT_RAMDISK) \
+              -D MANUX_SEGMENT_TRANSIT_RAMDISK=$(MANUX_SEGMENT_TRANSIT_RAMDISK) \
+              -D MANUX_portDonneesClavier=$(MANUX_portDonneesClavier) \
+              -D MANUX_portCmdClavier=$(MANUX_portCmdClavier) \
+              -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK)
 
 #--------------------------------------------------------------------------
 #   Création des images
 #--------------------------------------------------------------------------
+# Le fichier de boot pour multiboot
+MB_MANUX_ELF  = $(ROOTDIR)/boot/mb-manux.elf
+
 CREER_ISO=$(ROOTDIR)/outils/creationISO
 ISO_REP_BASE=$(HOME)/tmp/isodir
 ISO_FICHIER=manux.iso
+
+# Pour le boot sur disquette
+MANUX_FLOPPY = manux.img
+TAILLE_CONF = taille.conf
+BSEC_BIN = $(ROOTDIR)/boot/bootsector.bin
+INIT_BIN = $(ROOTDIR)/boot/init-manux.bin
+
+COMPRESS = gzip
 
 #--------------------------------------------------------------------------
 #   Les commandes pour lancer ManuX dans un émulateur
@@ -77,7 +97,7 @@ QEMU_VIRTIO_NET     = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -object filter-dump,id=f1,netdev=v1,file=dump.dat
 
 RUN_MANUX_FLOPPY = qemu-system-i386 \
-                   -drive format=raw,file=manux,index=0,if=floppy \
+                   -drive format=raw,file=$(MANUX_FLOPPY),index=0,if=floppy \
 		   $(QEMU_RAMSIZE)
 		   
 RUN_MANUX_ELF    = qemu-system-i386 \

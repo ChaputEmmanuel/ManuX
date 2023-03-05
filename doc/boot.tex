@@ -28,9 +28,30 @@ mémoire de la machine, prêt à être exécuté. Nous décrirons deux pistes
    Nous allons donc devoir mettre en \oe{}uvre le boot du noyau dans
 cette configuration. Pour cela, nous allons construire un fichier qui
 sera placé sur une disquette à partir de laquelle notre système pourra
-démarrer. Ntons que nous utiliserons ici un émulateur comme Qemu
+démarrer. Notons que nous utiliserons ici un émulateur comme Qemu ou bochs
 auquel nous donnerons le chemin vers ce fichier et à qui nous
-demanderons de démarrer depuis cette disquette.
+demanderons de démarrer depuis cette disquette. Mais nous pouvons
+également copier ce fichier sur une disquette pour démarrer une vraie
+machine.
+
+   La première étape d'un tel démarrage est assuré par le système
+lui-même : il s'agit de récupérer notre code sur la disquette, le
+mettre en mémoire puis lui donner la main. C'est le BIOS qui va faire
+cela. Malheureusement, son action est assez limitée, et il ne va
+charger que 512 octets en mémoire. De ce fait,
+notre code doit, d'une part être d'une taille inférieure à 512 octets
+et d'autre part charger en mémoire le noyau lui-même.
+
+   Nous allons donc construire un fichier composé essentiellement de
+trois parties :
+
+\begin{itemize}
+     \item un {\em secteur de boot} sera un code de moins de 512
+       octets qui va s'occuper de charger le noyau ;
+     \item un code d'initiaisation qui va préparer le terrain pour le
+       noyau avant de démarrer celui-ci ;
+     \item le noyau lui-même.
+\end{itemize}
 
    Observons la structure de ce fichier puis regardons comment en
 construire chaque partie.
@@ -46,7 +67,6 @@ dont la structure est décrite par la figure suivante.
 
 \includegraphics{images/image-disquette.png}
 
-
 %\begin{figure}
 %  \includegraphics{images/image-disquette.png}
 %\caption{\label{fig:image-disquette}Le fichier de démarage}
@@ -54,7 +74,7 @@ dont la structure est décrite par la figure suivante.
 
    Ce que j'appelle ici le boot du système se passera donc en deux
 temps. D'abord le secteur de boot est chargé en mémoire par le
-\textsc{ bios} qui lui donne la main.
+\textsc{bios} qui lui donne la main.
 
    Le secteur de boot  s'occupe alors de charger en mémoire le code
 d'initialisation ainsi que le code du noyau. Il donne alors à son tour
@@ -143,12 +163,14 @@ profond, les plus curieuses et curieux n'ont qu'à lire le code !
 \subsection{État de la mémoire après le chargement}
 
    L'état de la mémoire à la fin du boot est décrite par la figure
-\ref{etat-memoire-boot}.
+suivante.
 
-\begin{figure}[htbp]
-\includegraphics[width=\textwidth]{etat-memoire-boot}
-\caption{\label{fig:etat-memoire-boot}État de la mémoire après le boot}
-\end{figure} 
+\includegraphics{images/etat-memoire-boot.png}
+
+%\begin{figure}[htbp]
+%\includegraphics[width=\textwidth]{etat-memoire-boot}
+%\caption{\label{fig:etat-memoire-boot}État de la mémoire après le boot}
+%\end{figure} 
 
    Une fois qu'il a terminé son travail, le code du secteur de boot
 donne la main au code d'initialisation.
@@ -170,7 +192,8 @@ comme :
 
 \begin{itemize}
    \item Vérifier la mémoire disponible (cette information sera passée au
-  noyau).
+     noyau).
+   \item Passer en mode protégé.
    \item Charger en mémoire un ramdisk qui nous permettra de jouer avec
     des systèmes de fichiers  sans avoir besoin d'implanter la gestion
     de matériel.
@@ -178,6 +201,21 @@ comme :
 
    Voyons rapidement quelques points.
 
+%...............................................................................
+%      Passage en mode protégé
+%...............................................................................
+\subsubsection{Passage en mode protégé}
+
+   Les processeurs Intel démarre dans un mode de fonctionnement appelé
+le {\em mode réel} (real mode). Dans ce mode, la mémoire est accédé de
+façon linéaire. En mode protégé, l'utilisation de la mémoire est un
+peu plus complexe (mais également plus puissante). Je ne vais pas
+rentrer dans les détails ici, vous trouverez énormément de
+documentation sur le sujet, par exemple les manuels Intel !
+
+   Le basculement du mode réel vers le mode protégé n'est pas
+immédiat, il nécessite un peu de travail.
+   
 %...............................................................................
 %      Passage des informations au noyau
 %...............................................................................
@@ -265,7 +303,7 @@ de base dont il aura besoin.
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
 par la {\em Free Software Foundation} qui va nous permettre d'utiliser
-les services d'outils tels que \textsc{grub} afin de grandement simplifier
+les services d'outils tels que GRUB afin de grandement simplifier
 le chargement du noyau de ManuX.
 
    Cela nous permettra également d'utiliser des outils un peu plus
@@ -283,7 +321,7 @@ Multiboot}.  Nous allons utiliser ici la version 1 de {\em Multiboot} et
 non {\em Multiboot2}. On trouvera la spécification par exemple
 \href{ici}{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html}.
 
-   Un tel fichier contient essentiellementnotre noyau, mais doit avoir
+   Un tel fichier contient essentiellement notre noyau, mais doit avoir
 une structure particulière afin d'être pris en charge~:
 
 \begin{itemize}
@@ -323,59 +361,6 @@ implanté dans le fichier \fichier{boot}{mb-manux}{nasm}.
 {\em Multiboot} de le reconnaitre puis du code permettant de démarrer
 véritablement le noyau par un appel à la fonction \lstinline!_start()!
 qui sera implantée dans le fichier \fichier{noyau}{main}{c}.
-
-
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{L'édition de liens}
-
-   Afin d'assembler tous les éléments en un seul fichier
-\lstinline!noyau.elf! qui pourra ensuite être utilisé par {\em
-  Multiboot}, nous allons utiliser l'éditeur de liens \lstinline!ld!.
-Le comportement de \lstinline!ld! est conditionné par un fichier qui
-s'appelle un {\em linker script}. Un tel script décrit en particulier
-comment les différentes sections des fichiers d'entrée sont disposées
-dans le fichier de sortie et comment la mémoire est organisée.
-
-%https://wiki.osdev.org/Linker_Scripts
-
-Le code suivant montre un exemple simple de script :
-
-\begin{lstlisting}
-ENTRY(start)
-SECTIONS {
-    . = 1M 
-    .boot :
-    {
-        *(.multiboot)
-    }
-    adresseDebutManuX = .;
-    .text : {
-       *(.text)
-    }        
-    .rodata : {
-       *(.rodata)
-    }
-    .data : {
-       *(.data)
-    }
-    .bss : {
-       *(.bss)
-    }
-}
-\end{lstlisting}
-
-Dans ce script, nous avous défini le nom du point d'entrée (ici {\tt
-  start}), et nous avons décrit un certain nombre de sections avec
-leur ordre d'apparition dans le fichier de sortie et leur
-contenu. Vous remarquerez également que l'on utilise la notation
-``{\tt .}'' pour spécifier l'adresse courante et que cette adresse
-peut être consultée mais également modifiée. Ainsi la ligne {\tt . =
-  1M} stipule que l'on se place ) l'adresse 1M. D'un autre côté la
-ligne {\tt adresseDebutManuX = .} stipule que l'on enregistre dans la
-variable {\tt adresseDebutManuX} la valeur de l'adresse courante
-(celle du début de la section {\tt . text} donc).
 
 %-------------------------------------------------------------------------------
 %

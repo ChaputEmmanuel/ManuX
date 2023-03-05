@@ -22,6 +22,25 @@ Feuille de route
    
 En cours
 --------
+   ACTUELLEMENT : je tente un revival du bootfloppy. Je pense qu'on
+   peut se passer de noyau.bin.
+
+                      ATTENTION !!!!
+
+
+   J'ai deplacer config.h dans NePasVirer. Je tente une compilation d'un
+   noyau minimaliste pour le mettre sur disquette. Pour le moment
+   c'est pas top ... Plus rien ne boot !!!!!
+
+   A voir donc: en l'état, ça doit repartir avec du multiboot, donc
+   reconstruire un noyau avec mb (en plus de un sans)
+   Bon multiboot OK, make runiso OK make run ne marche pas mais en
+   fait il lui faut un mb, donc normal.
+   Reste à revoir le process de création du floppy qui semble foireux.
+
+
+
+
 
    BON, il y a un soucis : il faut clairement éclaircir les
    dépendances. L'initialisation de la mémoire (occupation des pages)
