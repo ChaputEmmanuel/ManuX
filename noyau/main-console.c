@@ -14,6 +14,6 @@ void _startManuX()
    // Affichage d'un message
    consoleNoyauAfficher("La console vous salue ...\n");
 
-   while (1){};   // A remplacer par un halt() 
+   while (1){asm( "hlt" );};   // A remplacer par un halt() 
 }   /* _startManuX */
 

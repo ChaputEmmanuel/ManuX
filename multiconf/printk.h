@@ -101,17 +101,6 @@
 #   define MANUX_ADRESSE_ECRAN 0xb8000
 #endif
 
-/*----------------------------------------------------------------------------*/
-/* Définition des indices de descripteurs dans la GDT.                        */
-/*----------------------------------------------------------------------------*/
-#ifndef MANUX_CODE_SEG_SEL
-#   define MANUX_CODE_SEG_SEL 0x08
-#endif
-
-#ifndef MANUX_DATA_SEG_SEL
-#   define MANUX_DATA_SEG_SEL 0x10
-#endif
-
 /**
  * @brief Taille réservée pour la pile lors du boot
  */

@@ -16,20 +16,20 @@
 #endif
 
 
-#define DBG_KERNEL_ERREUR   0x00000001
-#define DBG_KERNEL_START    0x00000002
-#define DBG_KERNEL_PAGIN    0x00000004
-#define DBG_KERNEL_SYSFI    0x00000008
-#define DBG_KERNEL_ORDON    0x00000010
-#define DBG_KERNEL_TACHE    0x00000020
-#define DBG_KERNEL_MEMOIRE  0x00000040
-#define DBG_KERNEL_AS       0x00000080
-#define DBG_KERNEL_PCI      0x00000100
-#define DBG_KERNEL_NET      0x00000200
-#define DBG_KERNEL_VIRTIO   0x00000400
-#define DBG_KERNEL_A_FAIRE  0x00000800
-
-#define DBG_KERNEL_ALL      0xFFFFFFFF
+#define DBG_KERNEL_ERREUR     0x00000001
+#define DBG_KERNEL_START      0x00000002
+#define DBG_KERNEL_PAGIN      0x00000004
+#define DBG_KERNEL_SYSFI      0x00000008
+#define DBG_KERNEL_ORDON      0x00000010
+#define DBG_KERNEL_TACHE      0x00000020
+#define DBG_KERNEL_MEMOIRE    0x00000040
+#define DBG_KERNEL_AS         0x00000080
+#define DBG_KERNEL_PCI        0x00000100
+#define DBG_KERNEL_NET        0x00000200
+#define DBG_KERNEL_VIRTIO     0x00000400
+#define DBG_KERNEL_A_FAIRE    0x00000800
+#define DBG_KERNEL_BOOTLOADER 0x00001000
+#define DBG_KERNEL_ALL        0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
 // Pour être plus précis, sa valeur ne change rien ... sauf lorsque
@@ -46,6 +46,7 @@
 //  ;
 
 #define masqueDebugageConsole (0x00000000 \
+ | DBG_KERNEL_BOOTLOADER     \
  | DBG_KERNEL_START     \
  | DBG_KERNEL_MEMOIRE   \
 			       )
@@ -71,7 +72,7 @@
  * Une fonction permettant d'afficher des messages de debug thématiques
  * et avec un formatage homogène.
  */
-#ifdef MANUX_LIBI386
+#ifdef MANUX_LIBI386  // pour les tops horloge
 #define printk_debug(lvl, fmt, args...)	 \
    if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
       printk("{7} [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \

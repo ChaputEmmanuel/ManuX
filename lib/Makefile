@@ -15,7 +15,7 @@ OBJETS     += $(if $(MANUX_CLAVIER), clavier.o)
 OBJETS     += $(if $(MANUX_STDLIB), stdlib.o)
 #OBJETS     += $(if $(MANUX_GESTION_MEMOIRE), malloc.o)
 
-libmanux.a : $(OBJETS)
+libmanux.a : $(MANUX_FICHIER_CONFIG) $(OBJETS)
 	ar rf libmanux.a $(OBJETS)
 
 .$(ASM_EXT).bin :

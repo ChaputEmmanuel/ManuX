@@ -89,32 +89,20 @@
 #   define MANUX_ADRESSE_ECRAN 0xb8000
 #endif
 
-/*----------------------------------------------------------------------------*/
-/*   Gestion de la mémoire.                                                   */
-/*----------------------------------------------------------------------------*/
-/**
- * A-t-on des outils de base de gestion de la mémoire ? On ne parle
- * ici que d'une gestion par page.
- */
-#define MANUX_GESTION_MEMOIRE
+#ifndef MANUX_NB_SECT_INIT
+#   define MANUX_NB_SECT_INIT 0x02
+#endif
 
-/*
- * Taille d'une page mémoire (4 Ko)
- */
-#define MANUX_TAILLE_PAGE           0x1000
+#ifndef MANUX_portCmdClavier
+#   define MANUX_portCmdClavier  0x64
+#endif
 
-/*
- * Nombres de pages "système" c'est-à-dire communes à toutes les tâches.
- * WARNING, il serait bon de le calculer en fonction de la taille de la
- * mémoire physique. 
- */
-#define MANUX_NOMBRE_PAGES_SYSTEME 0x800   /* 8 Mo */
+#ifndef MANUX_portDonneesClavier
+#   define MANUX_portDonneesClavier  0x60
+#endif
 
-/*
- * Adresse utilisée pour le tableau d'affectation des pages
- */
-#ifndef MANUX_AFFECTATION_PAGES
-#   define MANUX_AFFECTATION_PAGES 0x1000
+#ifndef MANUX_INIT_MAGIC
+#   define MANUX_INIT_MAGIC 0x01c0ffee
 #endif
 
 /**
@@ -131,12 +119,65 @@
 /* chaque fois a priori.                                                      */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_FICHIER_MAIN
-#   define MANUX_FICHIER_MAIN main-memoire
+#   define MANUX_FICHIER_MAIN main-bootparam
+#endif
+
+/**
+ * On va utiliser printk pour les messages
+ */
+#define MANUX_PRINTK
+
+/*----------------------------------------------------------------------------*/
+/*   Configuration des interruptions                                          */ 
+/*----------------------------------------------------------------------------*/
+
+/**
+ * Combien d'interuptions ?
+ */
+#ifndef MANUX_NB_INTERUPTIONS
+#   define MANUX_NB_INTERUPTIONS 256
 #endif
 
 /*
- * Implantation de printk
+ * On utilise ici des intel 8259a
  */
-#define MANUX_PRINTK
+#ifndef MANUX_HANDLER_IRQ
+#   define MANUX_HANDLER_IRQ i8259aGestionIRQ
+#endif
+
+/*
+ * Combien de handlers peut-on greffer sur une interruption ?
+ */
+#ifndef MANUX_NB_HANDLER_PAR_IRQ
+#   define MANUX_NB_HANDLER_PAR_IRQ 1
+#endif
+
+/*
+ * Premier numéro d'interruption utilisé pour repositionner les IRQs
+ */
+#ifndef MANUX_INT_BASE_IRQ
+#   define MANUX_INT_BASE_IRQ 0x20
+#endif
+
+/*
+ * On a deux circuits et donc 16 IRQ potentielles
+ */
+#ifndef I8259A_NB_IRQ
+#   define I8259A_NB_IRQ 16
+#endif
+
+/*
+ * Les IRQ des matériels pris en charge
+ */
+#define IRQ_HORLOGE   0
+
+/*----------------------------------------------------------------------------*/
+/*   Configuration générale du noyau                                          */ 
+/*----------------------------------------------------------------------------*/
+
+/*
+ * La fréquence du timer
+ */
+#define MANUX_FREQUENCE_HORLOGE 100
 
 #endif  // MANUX_CONFIG

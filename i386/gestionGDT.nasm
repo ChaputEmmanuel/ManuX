@@ -1,8 +1,14 @@
 ;-------------------------------------------------------------------------------
 ;                                                      (C) Manu Chaput 2000-2021
+;
+; Obsolète : codé directement dans segment.c
+; si je dois le réutiliser, attention à définir
+;MANUX_CODE_SEG_SEL 0x08
+;MANUX_DATA_SEG_SEL 0x10
 ;-------------------------------------------------------------------------------
 ;   // http://www.osdever.net/bkerndev/Docs/gdt.htm
 ;   // https://stackoverflow.com/questions/23978486/far-jump-in-gdt-in-bootloader~
+
 
 global _chargerGDT
 

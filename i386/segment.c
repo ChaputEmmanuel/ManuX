@@ -3,11 +3,18 @@
 /*                                                                            */
 /*                                                       (C) Manu Chaput 2000 */
 /*----------------------------------------------------------------------------*/
+#include <manux/errno.h>    // ENOMEM
+#include <manux/debug.h>    // paniqueNoyau
 #include <manux/i386.h>
 #include <manux/segment.h>
 #include <manux/printk.h>
 
 DescriptorTable * gdtSysteme;
+
+  struct __attribute__((__packed__)) {
+      uint16_t taille;
+      uint32_t adresse;
+   } descripteurGDT;
 
 int setDescripteurSegment(DescriptorTable * dt,
                           uint32_t adresse, uint32_t limite,
@@ -19,7 +26,7 @@ int setDescripteurSegment(DescriptorTable * dt,
  */
 {
    if (dt->taille >= dt->capacite) {
-      return -1;
+      return -ENOMEM;
    }
    dt->descripteur[dt->taille].ds.limiteFaible = (uint16_t)((limite)&0xFFFF);
    dt->descripteur[dt->taille].ds.baseFaible = (uint16_t)((adresse)&0xFFFF); 
@@ -53,7 +60,7 @@ int setDescripteurTSS(DescriptorTable * dt,
    return (dt->taille++)<<3;
 }
 
-void chargerGDT(DescriptorTable * gdt)
+void inline chargerGDT(DescriptorTable * gdt)
 /*
  * Chargement effectif de la GDT ; lgdt prend en paramètre l'adresse
  * d'une zone contenant la taille puis l'adresse de la GDT.
@@ -61,9 +68,18 @@ void chargerGDT(DescriptorTable * gdt)
  * couvrent 4G)
  */
 {
+#define USE_LEGACY_NO
+
+#ifdef USE_LEGACY
    uint16_t limite = 8*gdt->taille - 1;
-   /*   volatile uint8_t argument[6];
+#else
+   descripteurGDT.taille = 8*gdt->taille - 1;
+   descripteurGDT.adresse = (uint32_t)&gdt->descripteur[0];
+#endif
    
+#ifdef USE_LEGACY
+   /*   volatile uint8_t argument[6];
+  
    argument[0] = (limite) & 0xFF;
    argument[1] = (limite>>8) & 0xFF;
    argument[2] = ((uint32_t)(&gdt->descripteur[0]) & 0xFF);
@@ -72,6 +88,48 @@ void chargerGDT(DescriptorTable * gdt)
    argument[5] = (((uint32_t)(&gdt->descripteur[0])>>24) & 0xFF);
    */
   _chargerGDT((uint32_t)(&gdt->descripteur[0]), limite);
+
+#else
+   /*
+   asm volatile (
+      "movl %0, %%eax \n\t"
+      "lgdt (%%eax) \n\t"
+      "movl %%cr0, %%eax \n\t"
+      "or $1, %%eax \n\t"
+      "movl %%eax, %%cr0 \n\t"
+      "movw $0x08, %%ax \n\t"
+      "movw %%ax, %%cs \n\t"
+      "movw $0x10, %%ax \n\t"
+      "movw %%ax, %%ds \n\t"
+      "movw %%ax, %%es \n\t"
+      "movw %%ax, %%fs \n\t"
+      "movw %%ax, %%gs \n\t"
+      "movw $0x18, %%ax \n\t"
+      "movw %%ax, %%ss \n\t"
+      "ljmp $0x08,$vidageCache \n\t"
+      "vidageCache : \n\t"
+      ::"r"((uint32_t)&descripteurGDT):"eax"
+   );
+
+    */   
+   asm volatile (
+      "movl %0, %%eax \n\t"
+      "lgdt (%%eax) \n\t"
+      "ljmp $0x08,$vidageCache \n\t"
+      "vidageCache : \n\t"
+      "movw $0x10, %%ax \n\t"
+      "movw %%ax, %%ds \n\t"
+      "movw %%ax, %%es \n\t"
+      "movw %%ax, %%fs \n\t"
+      "movw %%ax, %%gs \n\t"
+      "movw $0x18, %%ax \n\t"
+      "movw %%ax, %%ss \n\t"
+      "movl %%cr0, %%eax \n\t"
+      "or $1, %%eax \n\t"
+      "movl %%eax, %%cr0 \n\t"
+      ::"r"((uint32_t)&descripteurGDT):"eax"
+   );
+#endif
 }
 
 void chargerLDT(DescriptorTable * ldt)
@@ -96,6 +154,9 @@ void chargerLDT(DescriptorTable * ldt)
 void initialiserGDT()
 {
    int resultat;
+#define MANUX_GDT_CS 0x08
+#define MANUX_GDT_DS 0x10
+#define MANUX_GDT_SS 0x18
 
    gdtSysteme = (DescriptorTable *) MANUX_ADRESSE_GDT;
 
@@ -105,7 +166,7 @@ void initialiserGDT()
    /* Le segment nul (obligatoire) */
    resultat = setDescripteurSegment(gdtSysteme, 0, 0, 0, 0);
    if (resultat != 0x00) {
-      printk("Probleme sur le segment nul en %d\n", resultat);
+      paniqueNoyau("Probleme sur le segment nul en %d\n", resultat);
    }
 
    // WARNING pour quoi si je change l'ordre de création (et donc bien
@@ -117,8 +178,8 @@ void initialiserGDT()
    // type = 10011010
    //    present, priv=0, code/data, exec, dir up, read, access = 0
    resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x9A, 0xC0);
-   if (resultat != MANUX_CODE_SEG_SEL) {
-      printk("Probleme sur le segment de code en %d\n", resultat);
+   if (resultat != MANUX_GDT_CS) {
+      paniqueNoyau("Probleme sur le segment de code en %d\n", resultat);
    }
 
    // Le segment de data qui commmence à l'adresse 0, avec une limite
@@ -127,8 +188,8 @@ void initialiserGDT()
    // type = 10010010
    //    present, priv=0, code/data, noexec, dir up, rw, access = 0
    resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x92, 0xC0);
-   if (resultat != MANUX_DATA_SEG_SEL) {
-      printk("Probleme sur le segment de donnees en %d\n", resultat);
+   if (resultat != MANUX_GDT_DS) {
+      paniqueNoyau("Probleme sur le segment de donnees en %d\n", resultat);
    }
 
    // Le segment de pile qui commmence à l'adresse 0, avec une limite
@@ -137,8 +198,8 @@ void initialiserGDT()
    // type = 10010010
    //    present, priv=0, code/data, noexec, dir up, rw, access = 0
    resultat = setDescripteurSegment(gdtSysteme, 0, 0xFFFFFFFF, 0x92, 0xC0);
-   if (resultat != 0x18) {
-      printk("Probleme sur le segment de pile en %d\n", resultat);
+   if (resultat != MANUX_GDT_SS) {
+      paniqueNoyau("Probleme sur le segment de pile en %d\n", resultat);
    }
 
    /* On charge la GDT */

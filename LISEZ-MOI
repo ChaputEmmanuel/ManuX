@@ -22,36 +22,17 @@ Feuille de route
    
 En cours
 --------
-   ACTUELLEMENT : je tente un revival du bootfloppy. Je pense qu'on
-   peut se passer de noyau.bin.
-
-                      ATTENTION !!!!
 
 
-   J'ai deplacer config.h dans NePasVirer. Je tente une compilation d'un
-   noyau minimaliste pour le mettre sur disquette. Pour le moment
-   c'est pas top ... Plus rien ne boot !!!!!
+   A faire
+      une config avec des morceaux déjà faits. C'est trop galère de
+      modifier tous les fichiers de multiconf à chaque changement !
 
-   A voir donc: en l'état, ça doit repartir avec du multiboot, donc
-   reconstruire un noyau avec mb (en plus de un sans)
-   Bon multiboot OK, make runiso OK make run ne marche pas mais en
-   fait il lui faut un mb, donc normal.
-   Reste à revoir le process de création du floppy qui semble foireux.
+   Côté boot : il faut réécrire le code du bootloader qui ne sait pas
+   charger plus de 256 secteurs, ... et voir pourquoi sous qemu ça
+   reboot !?
 
 
-
-
-
-   BON, il y a un soucis : il faut clairement éclaircir les
-   dépendances. L'initialisation de la mémoire (occupation des pages)
-   est une des premières choses à faire, mais si on veut y mettre des
-   printk (ce qui est actuellement le cas) il faut être sûr que printk
-   et les fonctions invoquées puissent se passer d'allocation, ce qui
-   n'est pas le cas !!! Il me semble difficile de m'interdire des
-   printk au plus tôt, donc soit j'en fais une version "statique"
-   utilisée dans memoire.c (par exemple un printk_console) soit,
-   ... ben je sais pas !
-   
    EN COURS : virtio semble fonctionner, il faut donc finaliser ça
    ainsi que le journal (voir ci-dessous) de sorte à être bien pour
    passer à IP, ou au SGF, ou à la gestion de la mémoire, au choix !
@@ -208,7 +189,14 @@ outils, mais c'est moins génant, il n'utilise rien !
 Les Makefile
 ------------
 
-   -fno-builtin  pour éviter les prédéfinitions de printf et autres
+   Attention, si on change de fichier de config, il faut absolument
+refaire un "make clean". En effet make.conf conditionne la compilation
+et dépend du fichier de config. Or le fait de prendre un nouveau
+fichier de config ne rend pas make.conf obsolète (il est probablement
+plus récent que le fichier de config !).
+
+   C'est une des raisons du "make clean" à chaque étape du "make
+multiso".
 
 # Les outils nécessaires
 
@@ -385,3 +373,12 @@ make qui copie de include/manux vers usr/include/manux.
    première fois et on réutilise ? Voir virtioConsoleEcrire qui est à
    revoir !
    
+   BON, il y a un soucis : il faut clairement éclaircir les
+   dépendances. L'initialisation de la mémoire (occupation des pages)
+   est une des premières choses à faire, mais si on veut y mettre des
+   printk (ce qui est actuellement le cas) il faut être sûr que printk
+   et les fonctions invoquées puissent se passer d'allocation, ce qui
+   n'est pas le cas !!! Il me semble difficile de m'interdire des
+   printk au plus tôt, donc soit j'en fais une version "statique"
+   utilisée dans memoire.c (par exemple un printk_console) soit,
+   ... ben je sais pas !

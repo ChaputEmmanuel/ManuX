@@ -4,7 +4,7 @@
  *                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
-#include <manux/multiboot.h>
+#include <manux/bootloader.h>
 #include <manux/errno.h>
 #include <manux/console.h>
 #include <manux/clavier.h>
@@ -54,16 +54,6 @@
 extern void init(); // Faire un init.h
 
 /**
- * @brief Structure passée en paramètre par la phase d'init
- * (cf init-manux.nasm)
- */
-typedef struct _InfoSysteme {
-   uint32_t flags;           // Pour compatibilité avec multiboot
-   uint32_t memoireDeBase;   // En Ko
-   uint32_t memoireEtendue;  // En Ko
-} InfoSysteme;
-
-/**
  * @brief La récupération des variables du script du linker est un peu
  * ésotérique. Voir par exemple
  * https://stackoverflow.com/questions/48561217/how-to-get-value-of-variable-defined-in-ld-linker-script-from-c
@@ -97,7 +87,7 @@ INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 void testerKmalloc()
 {
    void * elements[NB_ELEMENTS] = {NULL,};
-   int n, e, a=1, d=1;
+   int n, e;
 
    printk(PRINTK_DEBUGAGE "Avant :\n");
    for (e = 0; e<NB_ELEMENTS; e++){
@@ -131,24 +121,13 @@ void testerVirtioConsole()
 
 void _startManuX()
 {
-   uint32_t magic; // Pour vérifier si on a été démarré par multiboot
-   InfoSysteme * infoSysteme;
    union {
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
 
-   // Multiboot laisse une signature : une valeur prédéfinie dans eax
-   __asm__("movl %%eax,%0" : "=r"(magic));
-
-   // Obtention du pointeur vers les informations fournies par l'outil
-   // de chargement en mémoire
-   __asm__("movl %%ebx,%0" : "=r"(infoSysteme));
-
-#ifdef MANUX_RAMDISK
-   uint32_t adresseRamdisk = infoSysteme->adresseRamdiskHi * 65536
-                         + infoSysteme->adresseRamdiskLo;
-#endif
+   // Récupération des informations depuis le bootloader
+   bootloaderLireInfo();
    
    // Initialisation de la console noyau
 #ifdef MANUX_FICHIER   
@@ -157,6 +136,13 @@ void _startManuX()
    consoleInitialisation();
 #endif
 
+   bootloaderInitialiser();
+   
+#ifdef MANUX_RAMDISK
+   uint32_t adresseRamdisk = infoSysteme.adresseRamdiskHi * 65536
+                         + infoSysteme.adresseRamdiskLo;
+#endif
+   
    // Lecture du nom du processeur
    descriptionProcesseur(0, descriptionProc.registres);
    descriptionProc.caracteres[12] = 0;
@@ -164,17 +150,12 @@ void _startManuX()
    // Affichage du premier message
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
 		descriptionProc.caracteres);
-   if (magic == MULTIBOOT_MAGIC) {
-      printk_debug(DBG_KERNEL_START, "(chargeur multiboot)\n");
-   } else {
-      printk_debug(DBG_KERNEL_START, "(chargeur inconnu)\n");
-   }
 
 #ifdef MANUX_GESTION_MEMOIRE
    // Affichage de la mémoire disponible 
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
-		infoSysteme->memoireDeBase,
-		infoSysteme->memoireEtendue);
+		infoSysteme.memoireDeBase,
+		infoSysteme.memoireEtendue);
    printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
           adresseDebutManuX, adresseFinManuX);
    printk_debug(DBG_KERNEL_START, "La pile actuelle va de 0x%x a 0x%x\n",
@@ -183,8 +164,8 @@ void _startManuX()
 
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
-   initialiserMemoire(infoSysteme->memoireDeBase,
-		      infoSysteme->memoireEtendue,
+   initialiserMemoire(infoSysteme.memoireDeBase,
+		      infoSysteme.memoireEtendue,
 		      adresseDebutManuX, adresseFinManuX,
 		      adressePileManuX, adresseLimitePileManuX);
 #endif
@@ -205,7 +186,7 @@ void _startManuX()
    /* Initialisation de la pagination */
 #ifdef MANUX_PAGINATION
    printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
-   initialiserPagination(infoSysteme->memoireEtendue);
+   initialiserPagination(infoSysteme.memoireEtendue);
    printk_debug(DBG_KERNEL_START, "Paginiation initialisee\n");
 #endif
    
@@ -250,10 +231,10 @@ void _startManuX()
    
    /* Initialisation du ramdisk */
 #ifdef MANUX_RAMDISK
-   if (infoSysteme->tailleRamdisk > 0) {
+   if (infoSysteme.tailleRamdisk > 0) {
       printk_debug(DBG_KERNEL_START, "Ramdisk (a %d de taille %d Ko) ...\n",
-	     adresseRamdisk, infoSysteme->tailleRamdisk);
-      initialiserRamDisk(adresseRamdisk, infoSysteme->tailleRamdisk);
+	     adresseRamdisk, infoSysteme.tailleRamdisk);
+      initialiserRamDisk(adresseRamdisk, infoSysteme.tailleRamdisk);
       printk_debug(DBG_KERNEL_START, "Ramdisk initilise\n");
    }
 #endif
@@ -290,6 +271,7 @@ void _startManuX()
    printk(PRINTK_DEBUGAGE "********************** Fin test kmalloc ***********************\n");
 #endif
 
+   //   while (1) {};
    init();
 }   /* _startManuX */
 

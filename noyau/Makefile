@@ -8,6 +8,7 @@ LIBRAIRIES_MANUX = $(LIBI386) $(LIBMANUX) $(LIBUSR)
 LIBRAIRIES_MANUX += $(if  $(MANUX_FICHIER), $(LIBSF))
 
 OBJETS      = 	$(MANUX_FICHIER_MAIN).o
+OBJETS     +=   $(if $(MANUX_BOOTLOADER), bootloader.o)
 OBJETS     +=   $(if $(MANUX_TACHES), listetaches.o tache.o)
 OBJETS     +=   $(if $(MANUX_TACHES), scheduler.o)
 OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), memoire.o)
@@ -26,18 +27,11 @@ binaries :  $(OBJETS)
 all : binaries noyau.elf symbols_elf # noyau.bin symbols_bin
 
 #----------------------------------------------------------------------------------
-# Une fois qu'on a tout compilé, il est temps de construire les noyau
+# Une fois qu'on a tout compilé, il est temps de construire les noyaux
 #----------------------------------------------------------------------------------
-# Création d'un noyau "binaire", utilisé pour le moment pour le boot sur disquette
-#noyau.bin : $(OBJETS) $(LIBRAIRIES_MANUX)
-#	ld -m elf_i386 -N -t mini.lds $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
-#	ld -m elf_i386 -N --section-start=.text=$(MANUX_KERNEL_START_ADDRESS) --oformat binary  $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
-
-# Création d'un noyau "elf", pour une utilisation de Multiboot
+# Création d'un noyau "elf"
 noyau.elf  : $(LD_SCRIPT) $(OBJETS) $(LIBRAIRIES_MANUX)
-#	ld -m elf_i386 -nmagic -T $(LD_SCRIPT) $(MB_MANUX_ELF) $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
 	ld -m elf_i386 --section-start=.text=$(MANUX_KERNEL_START_ADDRESS) -nmagic -T $(LD_SCRIPT) $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
-	ld -m elf_i386 -nmagic -T $(LD_SCRIPT) $(OBJETS) $(LIBRAIRIES_MANUX) -o $@ --oformat binary
 
 # Le même avec un entête multiboot (pas top !)
 noyaumb.elf  : $(LD_SCRIPT) $(MB_MANUX_ELF) $(OBJETS) $(LIBRAIRIES_MANUX)
@@ -53,10 +47,6 @@ symbols_elf : noyau.elf
 	nm noyau.elf | sort > symbols_elf
 
 #----------------------------------------------------------------------------------
-
-#.c.o :
-#	gcc $(CFLAGS) -DKERNEL_START_ADDRESS=$(KERNEL_START_ADDRESS) -c $<
-
 
 clean :
 	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin symbols_elf $(LD_SCRIPT)

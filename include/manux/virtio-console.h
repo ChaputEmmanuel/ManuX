@@ -1,5 +1,7 @@
 /**
  * @file virtio-console.h
+ * @brief Définition des éléments de base des consoles virtio
+ *
  */
 #ifndef VIRTIO_CONSOLE_DEF
 #define VIRTIO_CONSOLE_DEF

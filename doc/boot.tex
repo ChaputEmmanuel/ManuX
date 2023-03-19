@@ -15,8 +15,8 @@ dans une zone mémoire non volatile, sur une machine distante, \ldots
 
 \begin{itemize}
    \item Nous commencerons par nous fonder sur une situation ``à
-     l'ancienne'' avec un \textsc{pc} doté d'un lecteur de
-     disquettes. Nous utiliserons alors le  \textsc{bios} du \textsc{pc}
+     l'ancienne'' avec un PC doté d'un lecteur de
+     disquettes. Nous utiliserons alors le \bios du \pc
      pour charger le noyau en mémoire, lui passer quelques
      informations et le faire démarrer.
 
@@ -91,7 +91,7 @@ dont la structure est décrite par la figure suivante.
 
    Ce que j'appelle ici le boot du système se passera donc en deux
 temps. D'abord le secteur de boot est chargé en mémoire par le
-\textsc{bios} qui lui donne la main.
+\bios qui lui donne la main.
 
    Le secteur de boot  s'occupe alors de charger en mémoire le code
 d'initialisation ainsi que le code du noyau. Il donne alors à son tour
@@ -145,12 +145,12 @@ plus précis, c'est à l'adresse {\tt 0x7C00} que ce secteur est chargé.
    Un secteur étant composé traditionnellement de 512 octets, on ne
 peut pas faire des folies avec le secteur de boot ! On va donc se
 contenter de charger en mémoire d'autres secteurs du disque. Pour
-cela, on peut utiliser le \textsc{ bios} et plus particulièrement
+cela, on peut utiliser le \bios et plus particulièrement
 l'interruption 13h qu'il nous fournit pour manipuler les lecteurs.
 
    Le secteur de boot de ManuX est codé dans le fichier
-\lstinline!boot/bootsector.nasm! et il est donc écrit en NASM. Il est
-très simple et se contente d'utiliser le \textsc{ bios} pour charger le
+\lstinline!boot/bootsector.nasm! et il est donc écrit en \nasm. Il est
+très simple et se contente d'utiliser le \bios pour charger le
 noyau en mémoire puis de faire un saut au début de la mémoire ainsi
 initialisée.
 
@@ -172,7 +172,8 @@ noyau et sur l'adresse à laquelle le placer !
 code d'initialisation.
 
    Je ne décris pas plus ce code qui ne présente pas un intérêt
-profond, les plus curieuses et curieux n'ont qu'à lire le code !
+profond, les plus curieuses et curieux n'ont qu'à lire le code ! Vous
+pourrez le trouver dans le fichier \fichier{boot}{bootsector}{nasm}.
    
 %-------------------------------------------------------------------------------
 %
@@ -180,7 +181,10 @@ profond, les plus curieuses et curieux n'ont qu'à lire le code !
 \subsection{État de la mémoire après le chargement}
 
    L'état de la mémoire à la fin du boot est décrite par la figure
-suivante.
+suivante. Les nombres sous les différentes zones expriment leur taille
+en nobre de pages (la taille d'une page est de 4 Ko). Les macros sont
+définies dans le fichier de configuration de \manux :
+\fichier{include/manux}{config}{h}.
 
 \includegraphics{images/etat-memoire-boot.png}
 
@@ -198,20 +202,20 @@ donne la main au code d'initialisation.
 \subsection{L'initialisation}
 
    Le "programme" d'initialisation est traditionnellement consacré à la détection
-et à l'initialisation (original, vu son nom !) du matériel. Sur un \textsc{ pc} de
-base, on peut là encore se faire aider du \textsc{ bios}. 
+et à l'initialisation (original, vu son nom !) du matériel. Sur un \pc de
+base, on peut là encore se faire aider du \bios. 
 
-   En ce qui concerne ManuX, cette phase d'initialisation va profiter
+   En ce qui concerne \manux, cette phase d'initialisation va profiter
 du fait qu'elle n'a pas les mêmes limites de taille que le secteur de
 boot (un seul secteur comme le nom au singulier le suggère). On va
 donc pouvoir y réaliser certaines actions un peu plus confortablement,
 comme :
 
 \begin{itemize}
-   \item Vérifier la mémoire disponible (cette information sera passée au
-     noyau).
-   \item Passer en mode protégé.
-   \item Charger en mémoire un ramdisk qui nous permettra de jouer avec
+   \item vérifier la mémoire disponible (cette information sera passée au
+     noyau) ; 
+   \item passer en mode protégé ;
+   \item charger en mémoire un ramdisk qui nous permettra de jouer avec
     des systèmes de fichiers  sans avoir besoin d'implanter la gestion
     de matériel.
 \end{itemize}
@@ -243,44 +247,51 @@ révéler particulièrement intéressantes pour le noyau. Il est donc important 
 se définir un mécanisme permettant de faire passer ces informations depuis la
 phase d'initialisation jusqu'au noyau.
 
-   Pour cela, nous déclarons la "fonction principale" du noyau comme prenant
-en paramètre l'adresse d'une structure dans laquelle seront enregistrées ces
-différentes informations. Nous aurons donc par exemple la définition suivante
+   Nous allons utilise deux registres pour faire passer de
+l'information au noyau :
 
-\begin{lstlisting}{}
+\begin{itemize}
+   \item Le registre \lstinline!eax! contiendra un ``nombre magique'',
+     c'est-à-dire une valeur prédéfinie permettant au noyau
+     d'identifier avec une bonne confiance le {\em bootloader}
+     utilisé.
+   \item Le registre \lstinline!ebx! contiendra l'adresse d'une
+     structure dans laquelle seront enregistrées les différentes
+     informations vraiment utiles pour le noyau.
+\end{itemize}
+
+   (Notons que ce choix (tout comme la structure qui va suivre) est
+largement inspiré du fonctionnement de {\em Multiboot}). Nous aurons
+donc par exemple la définition suivante dans le fichier
+\fichier{include/manux}{multiboot}{h} 
+
+\lstset{language=C}
+\begin{lstlisting}
 typedef struct _InfoSysteme {
-   uint16 memoireDeBase;
-   uint16 memoireEtendue;
-   /* ... */
+   uint32_t flags;           // Pour compatibilité avec multiboot
+   uint32_t memoireDeBase;   // En Ko
+   uint32_t memoireEtendue;  // En Ko
+   uint32_t peripheriqueDemarrage ;
+   char *   ligneCommande;
 } InfoSysteme;
- 
-void _start(InfoSysteme * infoSysteme)
-{
-   /* ... */
-}
 \end{lstlisting}
 
    Naturellement, pour que tout cela fonctionne, il est nécessaire, à la fin
-de la phase d'initialisation, d'empiler l'adresse de la structure dans laquelle
-les informations ont été enregistrées. Voici donc par exemple à quoi peuvent
-ressembler les dernières lignes de la phase d'initialisation :
+de la phase d'initialisation, d'initialiser correctement ces
+registres. Voici donc par exemple à quoi peuvent ressembler les
+dernières lignes de la phase d'initialisation :
 
 \lstset{language=nasm}
 
-\begin{lstlisting}{}
-; Calcul de l'adresse des infos Systeme
-;--------------------------------------
-mov   eax, 0                   ; C'est a cette adresse que
-mov   ax, MANUX_INIT_SEG_16    ; sont actuellement les infos
-shl   eax, 4                   ; Il faut transformer
-add   eax, InfoSysteme         ; en adresse "flat"
-push  eax
- 
-; Et c'est parti, on saute sur le noyau !
-;----------------------------------------
-mov   eax, MANUX_KERNEL_SEG_16
-shl   eax, 4
-call  eax 
+\begin{lstlisting}
+        ; On passe au noyau quelques infos
+        ;---------------------------------
+        mov eax, MANUX_INIT_MAGIC
+        mov ebx, InfoSysteme
+
+        ; Et c'est parti, on saute sur le noyau !
+        ;----------------------------------------
+        jmp MANUX_KERNEL_START_ADDRESS  
 \end{lstlisting}
 
    Notons que, bien sûr, aucun contôle de type ne peut être fait entre les deux
@@ -292,30 +303,17 @@ cohérente la structure C et la zone mémoire gérée en assembleur.
 %...............................................................................
 \subsubsection{Détection de la mémoire}
 
-%...............................................................................
-%      Détection du processeur
-%...............................................................................
-\subsubsection{Détection du processeur}
+   En ce qui concerne cette détection, nous allons encore une fois
+utiliser un service du \bios, au travers de l'interruption 0x12 qui va
+nous fournir ces informations.
 
-%...............................................................................
-%      
-%...............................................................................
-\subsubsection{Démarrage du noyau ({\tt noyau/main.c})}
+   Vous trouverez le code correspondant dans le fichier
+\fichier{boot}{init-manux}{nasm}. 
 
-   La dernière action du programme d'initalisation est donc l'exécution
-de la fonction \lstinline!_start()!. Comme je l'ai dit précédemment,
-il ne s'agit pas d'un appel de foncion C classique, puisque les deux
-morceaux de code ne sont pas liés entre eux, mais d'un saut à
-l'adresse de la fonction (le tout après avoir empilé les paramètres).
 
-   Ceci termine donc la description de toute la quincailleire qui nous
-permet d'arriver au début de l'exécution du code du noyau. Nous allons
-commencer la description de ce dernier par la mise en place des outils
-de base dont il aura besoin.
-
-%-------------------------------------------------------------------------------
+%===============================================================================
 %
-%-------------------------------------------------------------------------------
+%===============================================================================
 \section{Utilisation de {\em Multiboot}}
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
@@ -392,4 +390,29 @@ machine physique ou virtuelle.
 générer une image {\sc iso} intégrant un noyau pour chaque fichier de
 configuration présent dans le répertoire {\tt multiconf}.
 
+%===============================================================================
+%
+%===============================================================================
+\section{Démarrage du noyau}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Démarrage du noyau ({\tt noyau/main.c})}
+
+   La dernière action du programme d'initalisation est donc l'exécution
+de la fonction \lstinline!_start()!. Comme je l'ai dit précédemment,
+il ne s'agit pas d'un appel de foncion C classique, puisque les deux
+morceaux de code ne sont pas liés entre eux, mais d'un saut à
+l'adresse de la fonction (le tout après avoir empilé les paramètres).
+
+   Ceci termine donc la description de toute la quincailleire qui nous
+permet d'arriver au début de l'exécution du code du noyau. Nous allons
+commencer la description de ce dernier par la mise en place des outils
+de base dont il aura besoin.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Obtention des paramètres passés par le {\em bootloader}}
 

@@ -5,7 +5,7 @@
 /* inclus.                                                                    */
 /*                                                                            */
 /*    Pour le bon fonctionnement de cette procédure, il est impératif que les */
-/* macr3xuos en question débutent par le préfixe MANUX_                          */
+/* macros en question débutent par le préfixe MANUX_                          */
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
@@ -42,7 +42,7 @@
 /*----------------------------------------------------------------------------*/
 /* Organisation de la mémoire au démarrage.                                   */
 /*----------------------------------------------------------------------------*/
-/*
+/**
  * La position et la taille du BIOS. Par prudence, j'y intègre tout l'EBDA, même
  * s'il est peu probable que ce soit utile ! Voir 
  *    https://wiki.osdev.org/Memory_Map_(x86)
@@ -56,7 +56,14 @@
 #   define MANUX_BIOS_NB_PAGES 0x80
 #endif
 
-/*
+/**
+ * Adresse de l'écran
+ */
+#ifndef MANUX_ADRESSE_ECRAN
+#   define MANUX_ADRESSE_ECRAN 0xb8000
+#endif
+
+/**
  * Position de l'IDT (Interrupt Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_IDT
@@ -67,7 +74,7 @@
 #   define MANUX_IDT_NB_PAGES 1
 #endif
 
-/*
+/**
  * Position de la GDT (Global Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_GDT
@@ -78,9 +85,8 @@
 #   define MANUX_GDT_NB_PAGES 1
 #endif
 
-/*
- * Adresse de la fonction _start de main.c attention, les 4 bits de
- * poids faible doivent être nuls (voir bootsector.nasm)
+/**
+ * Adresse de la fonction _startManuX de main.c
  */
 #ifndef MANUX_KERNEL_START_ADDRESS
 #   define MANUX_KERNEL_START_ADDRESS 0x20000
@@ -90,27 +96,21 @@
 #   define MANUX_STACK_SEG_16 0x9000
 #endif
 
-#ifndef MANUX_ELF_HEADER_SIZE
-#   define MANUX_ELF_HEADER_SIZE 0x80
-#endif
-
-/*
- * Adresse de l'écran
- */
-#ifndef MANUX_ADRESSE_ECRAN
-#   define MANUX_ADRESSE_ECRAN 0xb8000
-#endif
-
-#ifndef MANUX_NB_SECT_INIT
-#   define MANUX_NB_SECT_INIT 0x02
-#endif
-
 /**
  * @brief Taille réservée pour la pile lors du boot
  */
 #ifndef MANUX_TAILLE_PILE
 #   define MANUX_TAILLE_PILE 16384
 #endif
+
+#ifndef MANUX_ELF_HEADER_SIZE
+#   define MANUX_ELF_HEADER_SIZE 0x80
+#endif
+
+#ifndef MANUX_NB_SECT_INIT
+#   define MANUX_NB_SECT_INIT 0x02
+#endif
+
 
 /*============================================================================*/
 /*   Définitions liées au processeur.                                         */
@@ -131,15 +131,9 @@
 #endif
 
 /*----------------------------------------------------------------------------*/
-/* Définition des indices de descripteurs dans la GDT.                        */
+/* Utilisation dans le noyau, d'outils de communication avec le bootloader.   */
 /*----------------------------------------------------------------------------*/
-#ifndef MANUX_CODE_SEG_SEL
-#   define MANUX_CODE_SEG_SEL 0x08
-#endif
-
-#ifndef MANUX_DATA_SEG_SEL
-#   define MANUX_DATA_SEG_SEL 0x10
-#endif
+#define MANUX_BOOTLOADER
 
 /*----------------------------------------------------------------------------*/
 /* Définition d'une interface de type fichiers. Elle pourra permettre un accès*/

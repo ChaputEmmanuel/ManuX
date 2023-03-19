@@ -13,14 +13,14 @@ OBJETS      = interruptions.o \
               intel-8259a.o \
               arith64.o \
               interBasNiveau.bin \
-              gestionGDT.bin
+#              gestionGDT.bin
 
 OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), segment.o)
 
 
 ASM_DEF	     = -D MANUX_KERNEL_TASK_TSS_IND=$(MANUX_KERNEL_TASK_TSS_IND)
-ASM_DEF     += -D MANUX_DATA_SEG_SEL=$(MANUX_DATA_SEG_SEL)
-ASM_DEF     += -D MANUX_CODE_SEG_SEL=$(MANUX_CODE_SEG_SEL)
+#ASM_DEF     += -D MANUX_DATA_SEG_SEL=$(MANUX_DATA_SEG_SEL)
+#ASM_DEF     += -D MANUX_CODE_SEG_SEL=$(MANUX_CODE_SEG_SEL)
 ASM_DEF     += -D MANUX_HANDLER_IRQ=$(MANUX_HANDLER_IRQ)
 ASM_DEF     += $(if $(MANUX_APPELS_SYSTEME), -D MANUX_APPELS_SYSTEME)
 ASM_DEF     += $(if $(MANUX_CLAVIER), -D MANUX_CLAVIER)

@@ -1,6 +1,6 @@
 ;-------------------------------------------------------------------------------
 ;      Initialisation de ManuX
-;                                                           (C) Manu Chaput 2000
+;                                                      (C) Manu Chaput 2000-2023
 ;-------------------------------------------------------------------------------
 org  MANUX_INIT_START_ADDRESS
 global InitManuX
@@ -81,7 +81,6 @@ ModeReelOK :
         or eax, 01       ; à un le bit pmode
         mov cr0, eax     ; du registre cr0
 
-
         jmp IndSegCode32:Mode32       ; Pour vider le pipe
 
 %ifdef MANUX_RAMDISK
@@ -94,7 +93,7 @@ Mode32:
 
         ; Initialisation des segments
         ;----------------------------
-	mov ax, IndSegData32    ; @ 0x7e71
+	mov ax, IndSegData32    ; @ 0x7e70
         mov ds, ax
         mov ss, ax
         mov es, ax
@@ -108,32 +107,19 @@ Mode32:
         mov esp, eax
 
 	sti
-;        mov si, MsgProut
-;        call AfficheBIOS   ; Aucune raison que ça marche maintenant !
 
 %ifdef MANUX_RAMDISK
         call DeplaceRamDisk
 %endif
 
-        ; Calcul de l'adresse des infos Système
-        ;--------------------------------------
-;        mov eax, 0                   ; C'est à cette adresse que
-;        mov ax, 0x10000 ; MANUX_INIT_START_ADDRESS   ; sont actuellement les infos
-;        shl eax, 4                   ; Il faut transformer
-;        add eax, InfoSysteme         ; en adresse "flat"
-;        push eax   ; Non, on ne passe rien en paramètre en fait
-
-        ; Annonce du saut ...
-        ;--------------------
-;        mov si, MsgRunningManux
-;        call AfficheBIOS
+        ; On passe au noyau quelques infos
+        ;---------------------------------
+        mov eax, MANUX_INIT_MAGIC
+        mov ebx, InfoSysteme
 
         ; Et c'est parti, on saute sur le noyau !
         ;----------------------------------------
-        mov eax, MANUX_KERNEL_START_ADDRESS 
-        ;shl eax, 4
-        call eax
-
+        jmp MANUX_KERNEL_START_ADDRESS  
 [bits 16]
 
 ;-------------------------------------------------------------------------------
@@ -195,12 +181,12 @@ BoucleFolle :
 ; Les infos sur le système pour passer au noyau
 ;----------------------------------------------
 InfoSysteme :
-   PourFlagsMB :        ; Attention 
-        dd 0h           ;
-   MemoireDeBase :      ; seuls les deux premiers sont
-        dd 0h           ; compatibles avec multiboot
-   MemoireEtendue :     ; mais la suite (ramdisk) ne l'est
-        dd 0h           ; absolument pas
+   PourFlagsMB :      ; Attention 
+        dd 0x02       ; On ne fournit que les info mémoire       
+   MemoireDeBase :    ; seuls les deux premiers sont
+        dd 0x00       ; compatibles avec multiboot
+   MemoireEtendue :   ; mais la suite (ramdisk) ne l'est
+        dd 0x00       ; absolument pas
 
 %ifdef MANUX_RAMDISK
    TailleRamdisk :
@@ -228,7 +214,6 @@ MsgNoRamDisk      db      'Pas de RamDisk ...', 13, 10, 0
 MsgErreurRamDisk  db      'Erreur de chargement RamDisk ...', 13, 10, 0
 %endif
 MsgRunningManux   db      'On lance ManuX, ...', 13, 10, 0
-MsgProut          db      'Surprise suprise mother fucker !', 13, 10, 0
 
 ; Le bourrage (pour faire 2 blocs)
 ;---------------------------------

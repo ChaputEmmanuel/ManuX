@@ -22,10 +22,11 @@ LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
 LIBSF     = $(ROOTDIR)/sf/libsf.a
 LIBUSR    = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)
 
-# Une version du noyau linké en format binaire pour le boot floppy
-# (voir si l'ELF ne fonctionnerait pas !) et une en ELF
-NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.elf
+# Les fichiers contenant le noyau. Le premier est l'ELF sorti de LD,
+# le second en est une version binaire pour "mon" loader, et le
+# troisième est la version avec un en-tête pour multiboot
 NOYAU_ELF     = $(ROOTDIR)/noyau/noyau.elf
+NOYAU_BIN     = $(ROOTDIR)/noyau/noyau.bin
 NOYAUMB_ELF   = $(ROOTDIR)/noyau/noyaumb.elf
 
 # Le script de link pour ld (il est obtenu par un traitement de manux.ld)
@@ -41,7 +42,8 @@ ASM_ELF_OPT = -f elf32 #-g3 -F dwarf
 
 ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
               -D MANUX_INIT_START_ADDRESS=$(MANUX_INIT_START_ADDRESS) \
-              -D MANUX_KERNEL_START_ADDRESS=$(MANUX_KERNEL_START_ADDRESS) \
+	      -D MANUX_INIT_MAGIC=$(MANUX_INIT_MAGIC) \
+	      -D MANUX_KERNEL_START_ADDRESS=$(MANUX_KERNEL_START_ADDRESS) \
               -D MANUX_STACK_SEG_16=$(MANUX_STACK_SEG_16) \
               -D MANUX_ELF_HEADER_SIZE=$(MANUX_ELF_HEADER_SIZE) \
               -D MANUX_ADRESSE_ECRAN=$(MANUX_ADRESSE_ECRAN) \
@@ -64,8 +66,8 @@ ISO_REP_BASE=$(HOME)/tmp/isodir
 ISO_FICHIER=manux.iso
 
 # Pour le boot sur disquette
-MANUX_FLOPPY = manux.img
-TAILLE_CONF = taille.conf
+FLOPPY_IMG = manux.img
+TAILLE_CONF = $(ROOTDIR)/boot/taille.conf
 BSEC_BIN = $(ROOTDIR)/boot/bootsector.bin
 INIT_BIN = $(ROOTDIR)/boot/init-manux.bin
 
@@ -87,6 +89,7 @@ COMPRESS = gzip
 #--------------------------------------------------------------------------
 RUN_MANUX_RAMSIZE = 64M
 QEMU_RAMSIZE      = -m $(RUN_MANUX_RAMSIZE)
+QEMU_DEBUG        = -gdb tcp::1234 -S
 
 QEMU_VIRTIO_CONSOLE = -chardev stdio,id=cons1 \
                    -device virtio-serial-pci \
@@ -97,8 +100,10 @@ QEMU_VIRTIO_NET     = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -object filter-dump,id=f1,netdev=v1,file=dump.dat
 
 RUN_MANUX_FLOPPY = qemu-system-i386 \
-                   -drive format=raw,file=$(MANUX_FLOPPY),index=0,if=floppy \
-		   $(QEMU_RAMSIZE)
+		   $(QEMU_VIRTIO_CONSOLE) \
+		   $(QEMU_VIRTIO_NET) \
+		   $(QEMU_RAMSIZE) \
+                   -drive format=raw,file=$(FLOPPY_IMG),index=0,if=floppy
 		   
 RUN_MANUX_ELF    = qemu-system-i386 \
                    -kernel $(ROOTDIR)/noyau/noyau.elf \
@@ -112,13 +117,23 @@ RUN_MANUX_ISO    = qemu-system-i386 \
 		   $(QEMU_RAMSIZE) \
 		   -cdrom
 
+RUN_MANUX_ISO_DBG= qemu-system-i386 \
+		   $(QEMU_VIRTIO_CONSOLE) \
+		   $(QEMU_VIRTIO_NET) \
+		   $(QEMU_RAMSIZE) \
+		   $(QEMU_DEBUG) \
+		   -cdrom
+
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX
 
 #--------------------------------------------------------------------------
 # Les paramètres du gcc
 #
-#   -fno-stack-protector permet d'éviter les "undefined references to
+#   "-fno-stack-protector" permet d'éviter les "undefined references to
 # `__stack_chk_fail'" sur les GCC récents
+#
+#   "-nostdinc -fno-builtin -nodefaultlibs -nostartfiles" permettent
+# de n'utiliser aucune fonctions prédéfinies ou de librairies standard
 #
 #   Optimisation
 #     -O2 par défaut
