@@ -7,7 +7,7 @@
 #include <manux/config.h>
 #include <manux/console.h>
 #include <manux/printk.h>
-#include <manux/multiboot.h>
+#include <manux/bootloader.h>
 
 void _startManuX()
 {

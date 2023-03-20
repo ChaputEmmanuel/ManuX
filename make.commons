@@ -12,9 +12,14 @@
 # configurés
 #
 
+# Le fichier de configuration général
 ifndef MANUX_FICHIER_CONFIG
 MANUX_FICHIER_CONFIG = $(ROOTDIR)/include/manux/config.h
 endif
+
+# L'ensemble des fichiers de configuration qui peuvent être utilisés
+#pour construire le fichier de configuration général
+CONFIG_FILES=$(ROOTDIR)/include/config/*.h
 
 # Position des librairies
 LIBI386   = $(if $(MANUX_LIBI386), $(ROOTDIR)/i386/libi386.a)
@@ -162,4 +167,4 @@ UCFLAGS   = -fno-pie -m32 -march=i686 -Wall \
            -fno-stack-protector \
            -O2
 
-UCFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))
+#UCFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))

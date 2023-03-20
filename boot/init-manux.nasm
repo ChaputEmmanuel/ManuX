@@ -2,6 +2,9 @@
 ;      Initialisation de ManuX
 ;                                                      (C) Manu Chaput 2000-2023
 ;-------------------------------------------------------------------------------
+%define portCmdClavier  0x64
+%define portDonneesClavier  0x60
+
 org  MANUX_INIT_START_ADDRESS
 global InitManuX
 
@@ -132,12 +135,12 @@ ValideA20 :
         call AttenteClavierPret
         jnz ValideA20Fin          ; Si pas pret, on arrète
         mov al, 0d1h              ; On veut écrire dans le port de sortie
-        out MANUX_portCmdClavier, al
+        out portCmdClavier, al
 
         call AttenteClavierPret
         jnz ValideA20Fin           ; Si pas pret, on arrète
         mov al, 0dfh               ; Activation ligne A20
-        out MANUX_portDonneesClavier, al ;
+        out portDonneesClavier, al ;
 
 ValideA20Fin :
         ret
@@ -147,7 +150,7 @@ ValideA20Fin :
 AttenteClavierPret :
         mov ecx, 0ffffffffh
 AttenteClavierBcle :
-        in al, MANUX_portCmdClavier     ;  On attend que la mémoire du contrôleur
+        in al, portCmdClavier     ;  On attend que la mémoire du contrôleur
         test al, 2                ; ne soit pas pleine.
         loopnz AttenteClavierBcle ;
         ret

@@ -6,7 +6,8 @@ include ../make.conf
 
 ASM_BIN_OPT = -f bin
 
-OBJETS      = console.o string.o 
+OBJETS      = string.o 
+OBJETS     += $(if $(MANUX_CONSOLE), console.o)
 OBJETS     += $(if $(MANUX_PRINTK), printk.o)
 OBJETS     += $(if $(MANUX_JOURNAL), journal.o)
 OBJETS     += $(if $(MANUX_RAMDISK), ramdisk.o)

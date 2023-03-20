@@ -8,16 +8,7 @@
 #include <manux/console.h>
 #include <manux/printk.h>
 #include <manux/debug.h>
-
-/**
- * @brief Structure passée en paramètre par la phase d'init
- * (cf init-manux.nasm)
- */
-typedef struct _InfoSysteme {
-   uint32_t flags;           // Pour compatibilité avec multiboot
-   uint32_t memoireDeBase;   // En Ko
-   uint32_t memoireEtendue;  // En Ko
-} InfoSysteme;
+#include <manux/bootloader.h>
 
 /**
  * @brief La récupération des variables du script du linker est un peu
@@ -31,7 +22,10 @@ extern uint32_t _adresseDebutManuX[],
                 _adressePileManuX[],
                 _adresseLimitePileManuX[];
 
+/*
 uint32_t adresseDebutManuX = (uint32_t)_adresseDebutManuX;
+*/
+#define adresseDebutManuX ((uint32_t)_adresseDebutManuX)
 uint32_t adresseFinManuX = (uint32_t)_adresseFinManuX;
 uint32_t adressePileManuX = (uint32_t)_adressePileManuX;
 uint32_t adresseLimitePileManuX = (uint32_t)_adresseLimitePileManuX;
@@ -40,23 +34,21 @@ uint32_t adresseLimitePileManuX = (uint32_t)_adresseLimitePileManuX;
 
 void _startManuX()
 {
-   InfoSysteme * infoSysteme;
    void * p;
 
-   // Initialisation du pointeur de pile
-   __asm__("movl %0,%%esp" : : "a"(adresseLimitePileManuX));
-
-   // Obtention du pointeur vers les informations fournies par l'outil
-   // de chargement en mémoire
-   __asm__("movl %%ebx,%0" : "=r"(infoSysteme));
-
+   // Récupération des informations depuis le bootloader
+   bootloaderLireInfo();
+   
    // Initialisation de la console noyau
    consoleInitialisation();
 
+   // Initialisation des informations depuis le bootloader
+   bootloaderInitialiser();
+
    // Affichage de la mémoire disponible 
    printk("Memoire : %d + %d Ko\n",
-	  infoSysteme->memoireDeBase,
-	  infoSysteme->memoireEtendue);
+	  infoSysteme.memoireDeBase,
+	  infoSysteme.memoireEtendue);
    printk("Le noyau va de 0x%x a 0x%x\n",
           adresseDebutManuX, adresseFinManuX);
    printk("La pile actuelle va de 0x%x a 0x%x\n",
@@ -64,8 +56,8 @@ void _startManuX()
           adresseLimitePileManuX);
 
    /* Initialisation de la gestion mémoire */
-   initialiserMemoire(infoSysteme->memoireDeBase,
-		      infoSysteme->memoireEtendue,
+   initialiserMemoire(infoSysteme.memoireDeBase,
+		      infoSysteme.memoireEtendue,
 		      adresseDebutManuX, adresseFinManuX,
 		      adressePileManuX, adresseLimitePileManuX);
 

@@ -53,8 +53,8 @@ usrinc : $(USR_INC)
 #...............................................................................
 #    Le fichier de configuration (une des premières choses à faire !)
 #...............................................................................
-make.conf :  $(MANUX_FICHIER_CONFIG)
-	cpp -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
+make.conf :  $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
+	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
 
 FORCE:
 

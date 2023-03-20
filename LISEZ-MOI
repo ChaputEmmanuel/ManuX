@@ -24,9 +24,11 @@ En cours
 --------
 
 
-   A faire
-      une config avec des morceaux déjà faits. C'est trop galère de
-      modifier tous les fichiers de multiconf à chaque changement !
+   Fichiers de configuration
+   
+      . Très génant, j'ai du faire un lien de include/config vers
+      usr/include mais l'usr ne devrait avoir que quelques éléments !
+
 
    Côté boot : il faut réécrire le code du bootloader qui ne sait pas
    charger plus de 256 secteurs, ... et voir pourquoi sous qemu ça
