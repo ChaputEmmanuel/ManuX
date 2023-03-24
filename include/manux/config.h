@@ -21,13 +21,6 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-/**
- * Nom du fichier qui contient _startManuX()
- */
-#ifndef MANUX_FICHIER_MAIN
-#   define MANUX_FICHIER_MAIN main
-#endif
-
 #include <config/base.h>
 #include <config/plan-memoire.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader

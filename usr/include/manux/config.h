@@ -1,50 +1,24 @@
-/*----------------------------------------------------------------------------*/
-/*      Définition des éléments de configuration de ManuX. Les options et     */
-/* valeurs définies ici sont utilisées dans le code C mais également parfois  */
-/* ailleurs. Le Makefile génère pour cela un fichier make.conf qui est ensuite*/
-/* inclus.                                                                    */
-/*                                                                            */
-/*    Pour le bon fonctionnement de cette procédure, il est impératif que les */
-/* macros en question débutent par le préfixe MANUX_                          */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
-
-/*
- * On peut définir un autre fichier de configuration générale
- * WARNING, vus les résultats, ça fonctione !!! Pourquoi ???
- */
-#ifdef MANUX_FICHIER_CONFIG
-#   error "Cette chose ne devrait pas se produire !"
-#   include MANUX_FICHIER_CONFIG
-#else
-#ifndef MANUX_CONFIG
-#define MANUX_CONFIG
-
-/**
- * Nom du fichier qui contient _startManuX()
- */
-#ifndef MANUX_FICHIER_MAIN
-#   define MANUX_FICHIER_MAIN main
-#endif
-
-#include <config/base.h>
-#include <config/plan-memoire.h>
-#include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
-#include <config/systeme-fichiers.h>
-#include <config/ramdisk.h>
-#include <config/pc-i386.h>
-#include <config/consoles-virtuelles.h>
-#include <config/printk.h>
-#include <config/journal.h>
-#include <config/noyau.h>
-#include <config/gestion-memoire.h>
-#include <config/clavier.h>
-#include <config/reseau.h>
-#include <config/pci.h>
-#include <config/stdlib.h>
-#include <config/usr.h>
-#include <config/verifications.h>
-
-#endif  // MANUX_CONFIG
-#endif  // MANUX_FICHIER_CONFIG
+#define MANUX_CONSOLE 
+#define MANUX_CONFIG 
+#define MANUX_INIT_MAGIC 0x01c0ffee
+#define MANUX_APPELS_SYSTEME 
+#define MANUX_ADRESSE_IDT 0x41000
+#define MANUX_TAILLE_PILE 16384
+#define MANUX_IDT_NB_PAGES 1
+#define MANUX_BOOT_START_ADDRESS 0x7c00
+#define MANUX_ELF_HEADER_SIZE 0x80
+#define MANUX_ADRESSE_BIOS 0x80000
+#define MANUX_INIT_START_ADDRESS 0x7e00
+#define MANUX_PRINTK 
+#define MANUX_CONSOLE_MAJEUR 0
+#define MANUX_KERNEL_START_ADDRESS 0x20000
+#define MANUX_NB_SECT_INIT 0x02
+#define MANUX_FREQUENCE_HORLOGE 100
+#define MANUX_USR 
+#define MANUX_STACK_SEG_16 0x9000
+#define MANUX_ADRESSE_GDT 0x42000
+#define MANUX_GDT_NB_PAGES 1
+#define MANUX_USR_INIT init-acces-concurrent.o
+#define MANUX_ADRESSE_ECRAN 0xb8000
+#define MANUX_FICHIER_MAIN main-acces-concurrent
+#define MANUX_BIOS_NB_PAGES 0x80

@@ -4,7 +4,7 @@
  *
  * Il s'agit de quelques macros et constantes de base sans conséquence
  * majeure sur la compilation du noyau. Ce ne sont pas des paramètres
- * qui permettent de sélectionner ou même parametrer les
+ * qui permettent de sélectionner ou même paramétrer les
  * sous-systèmes.
  *
  *                                                    (C) E. Chaput 2022-2023 */
@@ -14,4 +14,18 @@
  */
 #ifndef MANUX_INIT_MAGIC
 #   define MANUX_INIT_MAGIC 0x01c0ffee
+#endif
+
+/**
+ * @brief le nom du fichier qui contient _startManuX()
+ */
+#ifndef MANUX_FICHIER_MAIN
+#   define MANUX_FICHIER_MAIN main
+#endif
+
+/**
+ * La fréquence du timer
+ */
+#ifndef MANUX_FREQUENCE_HORLOGE
+#   define MANUX_FREQUENCE_HORLOGE 100
 #endif

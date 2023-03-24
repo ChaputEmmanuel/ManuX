@@ -2,10 +2,6 @@
 /*   Configuration générale du noyau                                          */ 
 /*----------------------------------------------------------------------------*/
 
-/*
- * La fréquence du timer
- */
-#define MANUX_FREQUENCE_HORLOGE 100
 
 /*
  * Doit-on activer les "assert" ? Si cette macro n'est pas définie,
@@ -18,10 +14,6 @@
  */
 //#define MANUX_OUTILS_SYNCHRO
 
-/*
- * Définition des appels système
- */
-#define MANUX_APPELS_SYSTEME
 
 /*----------------------------------------------------------------------------*/
 /*   Gestion des tâches et ordonnancement.                                    */

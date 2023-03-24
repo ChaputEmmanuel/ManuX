@@ -12,12 +12,7 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-/**
- * Nom du fichier qui contient _startManuX()
- */
-#ifndef MANUX_FICHIER_MAIN
-#   define MANUX_FICHIER_MAIN main-printk
-#endif
+#define MANUX_FICHIER_MAIN main-printk
 
 #include <config/base.h>
 #include <config/plan-memoire.h>

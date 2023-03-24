@@ -11,7 +11,9 @@
 #include <manux/scheduler.h>   // sys_basculerTache
 #include <manux/memoire.h>     // AS_obtenirPages, à virer aprés dispatch  
 #include <manux/console.h>     // Console
-#include <manux/tache.h>       // sysFork
+#ifdef MANUX_TACHES
+#   include <manux/tache.h>       // sysFork
+#endif
 
 void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 

@@ -1,4 +1,7 @@
-/*
+/**
+ * @file usr/init.c
+ * @brief L'init du monde utilisateur
+ * 
  * Attention, ici les include sont dans usr/include !!!
  */
 #include <manux/config.h>

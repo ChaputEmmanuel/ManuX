@@ -22,11 +22,11 @@
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
 #endif
-
+/*
 #if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_TACHES)
 #   error "MANUX_APPELS_SYSTEME nécessite MANUX_TACHES"
 #endif
-
+*/
 #if defined(MANUX_OUTILS_SYNCHRO) && !defined(MANUX_TACHES)
 #   error "MANUX_OUTILS_SYNCHRO nécessite MANUX_TACHES"
 #endif

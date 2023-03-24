@@ -18,7 +18,7 @@ OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 # ils sont édités dans l'arborescence du noyau et doivent donc être
 # mis à jour dans la partie usr
 USR_INC_D   = usr/include/manux
-USR_INC_F   = appelsystemenum.h config.h types.h string.h i386.h
+USR_INC_F   = appelsystemenum.h types.h string.h i386.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
@@ -48,7 +48,11 @@ configuration : usrinc make.conf
 usr/include/manux/%.h : include/manux/%.h
 	cp $< $@
 
-usrinc : $(USR_INC)
+# Le fichier config.h de usr, malheureusement nécessaire, est généré
+usrconf :   $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
+	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)   | awk '/^#define MANUX_/' > usr/include/manux/config.h
+
+usrinc : $(USR_INC) usrconf
 
 #...............................................................................
 #    Le fichier de configuration (une des premières choses à faire !)
