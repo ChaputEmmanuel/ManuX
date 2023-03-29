@@ -53,23 +53,6 @@
 
 extern void init(); // Faire un init.h
 
-/**
- * @brief La récupération des variables du script du linker est un peu
- * ésotérique. Voir par exemple
- * https://stackoverflow.com/questions/48561217/how-to-get-value-of-variable-defined-in-ld-linker-script-from-c
- * pour un exemple, et surtout la doc pour une explication 
- * https://sourceware.org/binutils/docs/ld/Source-Code-Reference.html
- */
-extern uint32_t _adresseDebutManuX[],
-                _adresseFinManuX[],
-                _adressePileManuX[],
-                _adresseLimitePileManuX[];
-
-uint32_t adresseDebutManuX = (uint32_t)_adresseDebutManuX;
-uint32_t adresseFinManuX = (uint32_t)_adresseFinManuX;
-uint32_t adressePileManuX = (uint32_t)_adressePileManuX;
-uint32_t adresseLimitePileManuX = (uint32_t)_adresseLimitePileManuX;
-
 #ifdef MANUX_VIRTIO_CONSOLE
 INoeud iNoeudVirtioConsole;
 Fichier fichierVirtioConsole;
@@ -156,18 +139,11 @@ void _startManuX()
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
 		infoSysteme.memoireDeBase,
 		infoSysteme.memoireEtendue);
-   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
-          adresseDebutManuX, adresseFinManuX);
-   printk_debug(DBG_KERNEL_START, "La pile actuelle va de 0x%x a 0x%x\n",
-          adressePileManuX,
-          adresseLimitePileManuX);
 
    /* Initialisation de la gestion mémoire */
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme.memoireDeBase,
-		      infoSysteme.memoireEtendue,
-		      adresseDebutManuX, adresseFinManuX,
-		      adressePileManuX, adresseLimitePileManuX);
+		      infoSysteme.memoireEtendue);
 #endif
    
    /* Initilisation des descripteurs de segments */
@@ -253,12 +229,9 @@ void _startManuX()
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
 
-//   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
+   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();
-//   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
-   
-   printk_debug(DBG_KERNEL_START, "Le noyau va de 0x%x a 0x%x\n",
-   adresseDebutManuX, adresseFinManuX);
+   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
 
 #ifdef MANUX_VIRTIO_CONSOLE_NON
    testerVirtioConsole();

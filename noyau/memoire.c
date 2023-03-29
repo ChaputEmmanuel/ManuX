@@ -16,6 +16,24 @@
 #include <manux/console.h>
 #include <manux/i386.h>       // ADDR_VERS_PAGE
 
+/**
+ * @brief Obtention des adresses de base.
+ * La récupération des variables du script du linker est un peu
+ * ésotérique. Voir par exemple
+ * https://stackoverflow.com/questions/48561217/how-to-get-value-of-variable-defined-in-ld-linker-script-from-c
+ * pour un exemple, et surtout la doc pour une explication 
+ * https://sourceware.org/binutils/docs/ld/Source-Code-Reference.html
+ */
+extern uint32_t _adresseDebutManuX[],
+                _adresseFinManuX[],
+                _adressePileManuX[],
+                _adresseLimitePileManuX[];
+
+uint32_t adresseDebutManuX = ((uint32_t)_adresseDebutManuX);
+uint32_t adresseFinManuX = ((uint32_t)_adresseFinManuX);
+uint32_t adressePileManuX = ((uint32_t)_adressePileManuX);
+uint32_t adresseLimitePileManuX = ((uint32_t)_adresseLimitePileManuX);
+
 /*
  * Début de la zone mémoire dans laquelle on mémorise l'occupation
  * des pages
@@ -78,11 +96,7 @@ static void inline demarquerPage(uint32_t i)
 }
 
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
-			uint32_t tailleMemoireEtendue,
-			uint32_t adresseDebutManuX,
-			uint32_t adresseFinManuX,
-			uint32_t adressePileManuX,
-			uint32_t adresseLimitePileManuX)
+			uint32_t tailleMemoireEtendue)
 {
    uint32_t i;                  // Pour compter les pages initialisées 
    uint32_t tailleProprietaire; // Taille nécessaire pour les gérer

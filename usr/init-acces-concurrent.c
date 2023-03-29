@@ -9,7 +9,7 @@
 
 void init()
 {
-  //printf("Sympa le mode utilisateur !\n");
+   printf("Sympa le mode utilisateur !\n");
 
    while(1){};
 }

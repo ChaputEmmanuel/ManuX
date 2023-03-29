@@ -27,10 +27,12 @@
 #include <config/systeme-fichiers.h>
 #include <config/ramdisk.h>
 #include <config/pc-i386.h>
+#include <config/appels-systeme.h>
 #include <config/consoles-virtuelles.h>
 #include <config/printk.h>
 #include <config/journal.h>
 #include <config/noyau.h>
+#include <config/taches.h>
 #include <config/gestion-memoire.h>
 #include <config/clavier.h>
 #include <config/reseau.h>

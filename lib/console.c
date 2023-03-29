@@ -454,7 +454,7 @@ size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
 /**
  * En l'absence de clavier, rien à lire !
  */
-int consoleLire(Fichier * f, void * buffer, int nbOctets)
+size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    return 0;
 }

@@ -7,7 +7,11 @@
 #ifndef MEMOIRE_DEF
 #define MEMOIRE_DEF
 
-#include <manux/appelsysteme.h> /* ParametreAS */
+#include <manux/types.h>
+
+#ifdef MANUX_AS
+#   include <manux/appelsysteme.h> /* ParametreAS */
+#endif
 
 #ifndef NULL
 #   define NULL 0
@@ -26,11 +30,7 @@
 extern int nombrePagesSysteme;
 
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
-			uint32_t tailleMemoireEtendue,
-			uint32_t adresseDebutManuX,
-			uint32_t adresseFinManuX,
-			uint32_t adressePileManuX,
-			uint32_t adresseLimitePileManuX);
+			uint32_t tailleMemoireEtendue);
 /*
  * Initialisation de la mémoire. Nécessaire avant toute
  * demande d'allocation.

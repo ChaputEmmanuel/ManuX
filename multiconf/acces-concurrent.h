@@ -15,14 +15,38 @@
 #define MANUX_FICHIER_MAIN main-acces-concurrent
 
 #define MANUX_USR_INIT init-acces-concurrent.o
+/*
 #include <config/usr.h>
 
 #include <config/base.h>
 #include <config/console.h>
 #include <config/printk.h>
-#include <config/appels-systeme.h>  // pour le mode utilsiateur
-//#include <config/systeme-fichiers.h>
+#include <config/journal.h>
+#include <config/appels-systeme.h>  // pour le mode utilisateur
+#include <config/systeme-fichiers.h>
+#include <config/pc-i386.h>         // Pour la segmentation
 #include <config/plan-memoire.h>
+#include <config/gestion-memoire.h> // Nécessaire pour les tâches
+#include <config/taches.h>          // Concurrence entre tâches
+*/
+#include <config/base.h>
+#include <config/plan-memoire.h>
+#include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
+#include <config/systeme-fichiers.h>
+#include <config/ramdisk.h>
+#include <config/pc-i386.h>
+#include <config/appels-systeme.h>
+#include <config/consoles-virtuelles.h>
+#include <config/printk.h>
+#include <config/journal.h>
+#include <config/noyau.h>
+#include <config/taches.h>
+#include <config/gestion-memoire.h>
+#include <config/clavier.h>
+#include <config/reseau.h>
+#include <config/pci.h>
+#include <config/stdlib.h>
+#include <config/usr.h>
 
 #include <config/verifications.h>
 

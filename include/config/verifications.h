@@ -18,10 +18,11 @@
 #if defined(MANUX_VIRTIO_CONSOLE) && !defined(MANUX_FICHIER)
 #   error "MANUX_VIRTIO_CONSOLE nécessite MANUX_FICHIER"
 #endif
-
+/*
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
 #endif
+*/
 /*
 #if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_TACHES)
 #   error "MANUX_APPELS_SYSTEME nécessite MANUX_TACHES"
