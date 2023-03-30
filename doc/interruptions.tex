@@ -7,23 +7,23 @@
 d'un système avec son environnement. Leur gestion, nécessaire, soulève
 quelques questions liées notemment au fil d'exécution.
 
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{Interruption et exception}
+%===============================================================================
+%      
+%===============================================================================
+\section{Interruption et exception}
 
    Une interruption peut être vue commme la manifestation d'un
 événement qui va perturber le fil d'exécution en cours sur un
 processeur. Nous pouvons les classifier en deux catégories
 
-\begin{description}
-   \item[Les interruptions asynchrones] (que nous appellerons
+\begin{itemize}
+   \item {\rb Les interruptions asynchrones} (que nous appellerons
      simplement {\rm interruptions}) sont le fait d'un élément
      extérieur au fil d'exécution en cours (une touche du clavier a
      été manipulée, une carte réseau a reçue une trame, \ldots). Nous
      parlerons également d'{\sc irq} (ou {\em Interrupt ReQuest} pour
      demande d'interruption).
-   \item[Les interruptions synchrones] (que nous appellerons {\em
+   \item {\bf Les interruptions synchrones} (que nous appellerons {\em
      exceptions}) sont déclanchées par le processeur lui-même comme
      conséquence de l'exécution (ou de la tentative d'exécution) d'une
      instruction. 
@@ -34,26 +34,52 @@ conséquence l'exécution par le processeur d'un code, appelé
 {\em handler} d'interruption. Ce code est en charge de traiter
 l'interruption.
 
-%...............................................................................
+%-------------------------------------------------------------------------------
 %
-%...............................................................................
-\subsection{Le {\em Programmable Interrupt Controller}}
-   Les interruptions peuvent arriver depuis plusieurs sources. Celles
-provenant de périphériques (clavier, cartes réseau, \ldots) sont
-éventuellement acheminées au travers de circuits spécialisés appelés
-{\sc pic}.
+%-------------------------------------------------------------------------------
+\subsection{Les interruptions}
 
-   Le {\sc pic} est donc un circuit électronique permettant de gérer les
-{\sc irq} provenant de l'environnement afin de les délivrer au
-processeur (c'est en fait une fonction du {\em southbridge}).
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Les exceptions}
 
-   Je ne m'étalerai pas ici sur les différents types de {\sc pic} ni
-sur leur fonctionnement. Ce qu'il est nécessaire de comprendre, c'est
-qu'il existe donc un circuit avec lequel le processeur va devoir
-dialoguer pour une partie de la gestion des interruptions.
+   Les exceptions permettent donc de traiter un comportement erroné du
+code en cours d'exécution (une tentative de division par zéro, un
+accès à une zone mémoire protégée, \ldots).
 
-   Nous verrons plus loin que ManuX gère le 8259A qui est un {\sc pic}
-conçu par Intel.
+   Elles sont traitées par le système de la même façon que les
+interruptions déclanchées par du matériel. L'essentiel de ce qui est
+dit ici pour les interruptions l'est donc en particulier pour les
+exceptions.
+
+   Sur les processeurs Intel,
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Les handlers d'interruption}
+
+   Quelle que soit la nature de l'interruption, lorsqu'elle se
+produit, un code spécifique (le ``handler'') est exécuté par le
+processeur. Ce code doit donc effectuer certaines tâches
+
+\begin{itemize}
+   \item Sauvegarder l'état du microprocesseur de sorte à pouvoir
+     ensuite reprendre l'activité qu'il menait.
+   \item Intéragir éventuellement avec le matériel responsable de
+     cette interruption pour le prévenir que le traitement est en
+     cours. 
+   \item Réaliser (ou reporter à un avenir proche) les opérations
+     nécessaires suite à l'interruption : recevoir une trame sur une
+     interface réseau par exemple.
+   \item Restaurer l'état du microprocesseur qui reprendra où il en
+     était avant l'interruption.
+\end{itemize}
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Le traitement différé}
 
 %-------------------------------------------------------------------------------
 %
@@ -89,11 +115,32 @@ disponibilité).
 s'exécute, les interruptions ont inhibées et ne peuvent donc plus être
 prises en compte\footnote{C'est un peu plus compliqué sur un système
   multiprocesseur.}. 
-    
+
 %===============================================================================
 %      
 %===============================================================================
-\section{Le {\sc pic} Intel 8259A}
+\section{Le {\em Programmable Interrupt Controller}}
+   Les interruptions peuvent arriver depuis plusieurs sources. Celles
+provenant de périphériques (clavier, cartes réseau, \ldots) sont
+éventuellement acheminées au travers de circuits spécialisés appelés
+{\sc pic}.
+
+   Le {\sc pic} est donc un circuit électronique permettant de gérer les
+{\sc irq} provenant de l'environnement afin de les délivrer au
+processeur (c'est en fait une fonction du {\em southbridge}).
+
+   Je ne m'étalerai pas ici sur les différents types de {\sc pic} ni
+sur leur fonctionnement. Ce qu'il est nécessaire de comprendre, c'est
+qu'il existe donc un circuit avec lequel le processeur va devoir
+dialoguer pour une partie de la gestion des interruptions.
+
+   Nous verrons plus loin que ManuX gère le 8259A qui est un {\sc pic}
+conçu par Intel.
+
+%...............................................................................
+%
+%...............................................................................
+\subsection{Le {\sc pic} Intel 8259A}
 
    Sur un (vieux) {\sc pc}, le {\sc pic} est un circuit Intel 8259A. Ce
 circuit permet de gérer 8 types d'interruptions et on en utilise
@@ -114,43 +161,6 @@ y en a deux, le {\sc pic} 2 étant derrière le {\sc pic} 1 (en
    Une phase d'initialisation est nécessaire afin de configurer
 correctement ces circuits.
    
-%...............................................................................
-%
-%...............................................................................
-\subsection{Gestion du {\sc pic} Intel 8259a dans ManuX}
-
-   Ce circuit est géré au travers de fonctions définies dans {\tt
-include/manux/intel-8259a.h} et implantées dans {\tt
-     i386/intel-8259a.c}.
-
-   L'objectif est assez simple : fournir (aux drivers des matériels
-utilisant un mécanisme d'interruption) une interface générique,
-c'est-à-dire indépendante du {\sc pic} utilisé. Nous allons donc
-définir quelques fonctions de base permettant à ces drivers de
-s'interfacer avec le système d'interruption. Si on souhaite utiliser
-un autre circuit {\sc pic} (par exemple un  {\sc apic}), il
-``suffira'' de réécrire ces fonctions, il n'y aura pas besoin de
-modifier le code des nombreux drivers (au moins deux, rendez-vous
-compte du boulot !) qui l'utilisent.
-
-   Le principe général consiste à définir un handler d'interruption
-unique qui va prendre en charge toutes les interruptions générées au
-travers du {\sc pic}. Ce handler traitera les aspects spécifiques au
-{\sc pic} puis invoquera le handler de chacun des ``clients''
-c'est-à-dire des drivers des matériels qui sont à la source des
-interrruptions.
-
-   Décrivons les fonctions principales. Vous retrouverez leur code
-dans {\tt i386/intel-8259a.c}.
-
-\paragraph{\tt i8259aInit} permet d'initialiser
-les circuits (le {\sc pic}) et de les configurer pour que les
-interruptions générées utilisent une plage de numéros commençant à une
-valeur passée en paramètre.
-\paragraph{\tt i8259aAjouterHandler} permet d'associer une fonction
-et des données à une {\sc irq}. C'est par le biais de cette fonction
-qu'un client va se faire connaître auprès de notre système.
-\paragraph{\tt i8259aGestionIRQ}
    
 %===============================================================================
 %      
@@ -170,9 +180,9 @@ et exceptionns. Cette table est enregistrée grâce à l'instruction
    \item[Task Gate Descriptor]       
 \end{description}
 
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
+%===============================================================================
+%      
+%===============================================================================
 \subsection{Gestion dans ManuX}
 
    Observons ici comment tout cela est mis en place dans ManuX.
@@ -281,7 +291,7 @@ chacune des interruptions.
 %-------------------------------------------------------------------------------
 %      Initialisation de la table
 %-------------------------------------------------------------------------------
-\subsection{Initialisation de la table}
+\subsection{Initialisation de la table IDT}
 
    Nous avons maintenant tous les éléments pour construire notre {\sc
 idt}. C'est le rôle de la fonction C \lstinline!initialiserIDT()!.
@@ -315,5 +325,40 @@ interruptions que peut nous générer le matériel
    positionnerHandlerInterruption(idt, intClavier, stubHandlerClavier);
 \end{lstlisting}
 
+%...............................................................................
+%
+%...............................................................................
+\subsection{Gestion du {\sc pic} Intel 8259a dans ManuX}
 
-   
+   Ce circuit est géré au travers de fonctions définies dans {\tt
+include/manux/intel-8259a.h} et implantées dans {\tt
+     i386/intel-8259a.c}.
+
+   L'objectif est assez simple : fournir (aux drivers des matériels
+utilisant un mécanisme d'interruption) une interface générique,
+c'est-à-dire indépendante du {\sc pic} utilisé. Nous allons donc
+définir quelques fonctions de base permettant à ces drivers de
+s'interfacer avec le système d'interruption. Si on souhaite utiliser
+un autre circuit {\sc pic} (par exemple un  {\sc apic}), il
+``suffira'' de réécrire ces fonctions, il n'y aura pas besoin de
+modifier le code des nombreux drivers (au moins deux, rendez-vous
+compte du boulot !) qui l'utilisent.
+
+   Le principe général consiste à définir un handler d'interruption
+unique qui va prendre en charge toutes les interruptions générées au
+travers du {\sc pic}. Ce handler traitera les aspects spécifiques au
+{\sc pic} puis invoquera le handler de chacun des ``clients''
+c'est-à-dire des drivers des matériels qui sont à la source des
+interrruptions.
+
+   Décrivons les fonctions principales. Vous retrouverez leur code
+dans {\tt i386/intel-8259a.c}.
+
+\paragraph{\tt i8259aInit} permet d'initialiser
+les circuits (le {\sc pic}) et de les configurer pour que les
+interruptions générées utilisent une plage de numéros commençant à une
+valeur passée en paramètre.
+\paragraph{\tt i8259aAjouterHandler} permet d'associer une fonction
+et des données à une {\sc irq}. C'est par le biais de cette fonction
+qu'un client va se faire connaître auprès de notre système.
+\paragraph{\tt i8259aGestionIRQ}
