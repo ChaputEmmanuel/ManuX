@@ -10,15 +10,15 @@ quelques questions liées notemment au fil d'exécution.
 %===============================================================================
 %      
 %===============================================================================
-\section{Interruption et exception}
+\section{Interruption, exception, code de traitement}
 
    Une interruption peut être vue commme la manifestation d'un
 événement qui va perturber le fil d'exécution en cours sur un
 processeur. Nous pouvons les classifier en deux catégories
 
 \begin{itemize}
-   \item {\rb Les interruptions asynchrones} (que nous appellerons
-     simplement {\rm interruptions}) sont le fait d'un élément
+   \item {\bf Les interruptions asynchrones} (que nous appellerons
+     simplement {\em interruptions}) sont le fait d'un élément
      extérieur au fil d'exécution en cours (une touche du clavier a
      été manipulée, une carte réseau a reçue une trame, \ldots). Nous
      parlerons également d'{\sc irq} (ou {\em Interrupt ReQuest} pour
@@ -31,8 +31,42 @@ processeur. Nous pouvons les classifier en deux catégories
 
    Une interruption, qu'elle soit synchrone ou non, aura pour
 conséquence l'exécution par le processeur d'un code, appelé
-{\em handler} d'interruption. Ce code est en charge de traiter
-l'interruption.
+{\em handler} d'interruption ou {\sc isr} (pour {\em Interrupt Service
+  Routine}). Ce code est en charge de traiter l'interruption.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Vecteurs d'interruption, table d'interruption}
+
+   Chaque interruption est associée à un {\em vecteur} qui va faire
+office d'identifiant. C'est {\em via} ce vecteur que le
+microprocesseur pourra déterminer où est le code du handler qu'il doit
+exécuter lorsqu'une interruption est déclanchée.
+
+   Concrètement, ce vecteur n'est pas directement l'adresse du
+handler, mais l'indice dans une table, d'un descripteur du code du
+handler. Il est ainsi possible d'avoir des descripteurs plus riches,
+qui ne sont pas réduits simplement à l'adresse du code.
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{La table d'interruptions x86}
+
+   Sur l'architecture x86, cette table est appelée {\sc idt} (pour
+{\em Interrupt Descriptor Table}) ; elle contient au maximum 256
+descripteurs. Chacun de ces descripteurs est constitué de 8 octets qui
+décrivent l'adresse du handler, le niveau de privilège requis, le type
+d'interruption, etc \ldots
+
+   Cette table peut se situer n'importe où en mémoire, c'est au
+système d'exploitation de l'initialiser et d'informer le
+microprocesseur de l'adresse à laquelle elle se trouve et de sa
+taille. Le noyau utilise pour cela l'instruction {\tt lidt}.
+
+%350 flux initial centrale vers 400 voire 450
+%Actuellement 970 diplômés/an, c'est l'objectif pour 2030/31
 
 %-------------------------------------------------------------------------------
 %
@@ -53,7 +87,13 @@ interruptions déclanchées par du matériel. L'essentiel de ce qui est
 dit ici pour les interruptions l'est donc en particulier pour les
 exceptions.
 
-   Sur les processeurs Intel,
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Les exceptions x86}
+
+   Sur les processeurs Intel, les 32 premiers vecteurs sont attribués
+aux exceptions.
 
 %-------------------------------------------------------------------------------
 %
@@ -120,6 +160,7 @@ prises en compte\footnote{C'est un peu plus compliqué sur un système
 %      
 %===============================================================================
 \section{Le {\em Programmable Interrupt Controller}}
+
    Les interruptions peuvent arriver depuis plusieurs sources. Celles
 provenant de périphériques (clavier, cartes réseau, \ldots) sont
 éventuellement acheminées au travers de circuits spécialisés appelés
@@ -183,7 +224,7 @@ et exceptionns. Cette table est enregistrée grâce à l'instruction
 %===============================================================================
 %      
 %===============================================================================
-\subsection{Gestion dans ManuX}
+\section{Gestion dans ManuX}
 
    Observons ici comment tout cela est mis en place dans ManuX.
 
