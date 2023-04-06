@@ -1,0 +1,39 @@
+/*----------------------------------------------------------------------------*/
+/*      Un exemple pitoyable de début de noyau.                               */
+/*                                                                            */
+/*                                                  (C) Manu Chaput 2000-2023 */
+/*----------------------------------------------------------------------------*/
+#include <manux/config.h>
+#include <manux/console.h>
+#include <manux/printk.h>
+#include <manux/interruptions.h>
+#include <manux/intel-8259a.h>
+
+void _startManuX()
+{
+   int a, b = 0;
+   
+   // Initialisation de la console noyau
+   consoleInitialisation();
+
+   // Initilisation des descripteurs de segments 
+   initialiserGDT();
+
+   // Initialisation de la table des interruptions
+   initialiserIDT();   
+
+   // Initialisation de la table des interruptions
+   initialiserIDT();   
+
+   i8259aInit(MANUX_INT_BASE_IRQ);
+   
+   // Un petit message
+   printk("ManuX et les interruptions ...\n");
+
+   // On déclanche une exception "division par zéro"
+   a = 1/b;
+   
+   printk("Ciao ...\n");
+   
+   while (1){};   // A remplacer par un halt() 
+}   /* _startManuX */
