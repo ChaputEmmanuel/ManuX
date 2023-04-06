@@ -29,11 +29,6 @@ void _startManuX()
    printk("Memoire : %d + %d Ko\n",
 	  infoSysteme.memoireDeBase,
 	  infoSysteme.memoireEtendue);
-   printk("Le noyau va de 0x%x a 0x%x\n",
-          adresseDebutManuX, adresseFinManuX);
-   printk("La pile actuelle va de 0x%x a 0x%x\n",
-          adressePileManuX,
-          adresseLimitePileManuX);
 
    /* Initialisation de la gestion mémoire */
    initialiserMemoire(infoSysteme.memoireDeBase,

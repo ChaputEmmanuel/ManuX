@@ -22,13 +22,19 @@ Feuille de route
    
 En cours
 --------
-
+   A FAIRE : des handlers en assembleur : 2 macros (avec et
+   sans paramètres). Les instancier pour tous les vecteurs et passer
+   par une fonction d'aiguillage pour les interruptions et une pour
+   les exceptions.
 
    Fichiers de configuration
       . Est-il normal que la segmentation soit dans pc-i386 ?
       . En faire d'autres et les documenter ! Par exemple
       appels-systeme.h 
-
+      . petite incohérence : pour les interruptions il faut
+      gestion-memoire (à cause du tss dans panique) alors que ce
+      devrait être tache.h ! Il faut être capable d'afficher des
+      choses même s'il n'y a pas de tâche en cours, ...
 
    A voir
       . Pourquoi printf ne fonctionne pas sans système de fichiers ?

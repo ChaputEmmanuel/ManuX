@@ -34,6 +34,14 @@ conséquence l'exécution par le processeur d'un code, appelé
 {\em handler} d'interruption ou {\sc isr} (pour {\em Interrupt Service
   Routine}). Ce code est en charge de traiter l'interruption.
 
+   Notons qu'il est également possible de générer volontairement une
+interruption dans le code en cours d'exécution grâce à
+l'instruction assembleur \lstinline!int n! (qui déclancher
+l'interruption de vecteur \lstinline!n!). Nous utiliserons cette
+option (ajouté au fait que le déclanchement d'une interruption à de
+sconséquences plus complexes que le ``simple'' déroutement de
+l'exécution) pour mettre en place le mécanisme des appels système.
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------

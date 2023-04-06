@@ -150,6 +150,7 @@ void ecranDeLaMort(uint32_t itNum, TousRegistres registres,
       ecran[i]   = ecranPanique[i/2];
       ecran[i+1] = COUL_FOND_BLEU | COUL_TXT_JAUNE;
    }
+
    __asm__ __volatile__("str %%eax" : "=a" (indice));
    
    Descripteur desc = gdtSysteme->descripteur[indice>>3];
@@ -158,14 +159,7 @@ void ecranDeLaMort(uint32_t itNum, TousRegistres registres,
        + (((uint32_t)desc.dt.baseInter) << 16)
        + desc.dt.baseFaible
      );
-   /*
-   Descripteur descP = gdtSysteme->descripteur[tssDuFautif->TSSPrecedent >> 3];
-   tssDuFautif = (IntelTSS *)(
-         (((uint32_t)descP.dt.baseFort) << 24)
-       + (((uint32_t)descP.dt.baseInter) << 16)
-       + descP.dt.baseFaible
-     );
-   */
+
    // Première ligne
    afficherHexa(itNum, 2, 1, 9);
    afficherHexa(tssDuFautif, 8, 1, 25);
