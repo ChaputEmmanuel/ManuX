@@ -1,49 +1,167 @@
 ;===============================================================================
-;      DÈfinition des fonctions de bas niveau permettant la gestion des
+;      D√©finition des fonctions de bas niveau permettant la gestion des
 ;   interruptions.
-;      Sauf indication contraire, les paramËtres (s'il y en a) sont passÈs "‡ la
-;   C", c'est ‡ dire empilÈs en ordre inverse et dÈpilÈs par l'appelant.
+;      Sauf indication contraire, les param√®tres (s'il y en a) sont pass√©s "√† la
+;   C", c'est √† dire empil√©s en ordre inverse et d√©pil√©s par l'appelant.
 ;
-;                                                      (C) Manu Chaput 2000-2021
+;                                                      (C) Manu Chaput 2000-2023
 ;===============================================================================
-bits 32
 
-extern handlerPanique
-extern gestionGeneraleInterruption
 
-;--------------------------------------------------------------------------------
-;   Exportation des fonctions dÈfinies dans ce fichier
-;--------------------------------------------------------------------------------
-%assign i 0
-%rep 16
-global stubHandlerIRQ%[i]
-%assign i i+1
-%endrep
+;===============================================================================
+;   Gestion des exceptions
+;
+;   Certaines exceptions empilent un code d'erreur (32 bits), d'autres
+; non. Nous allons les traiter en passant par une fonction commune,
+;   √©crite en C et nomm√©e "handlerException". C'est elle qui
+;   aiguillera ensuite vers la fonction de traitement sp√©fifique √†
+;   chaque exception.
+; Il est donc n√©cessaire de d√©finir deux types de handler "bas niveau".
+; Un handler associ√© √† une exception avec un code d'erreurs va empiler
+;   le num√©ro de l'exception (qui servira √† handlerException pour
+;   r√©aliser l'aiguillage). Un handler associ√© √† une exception sans
+;   code d'erreur
 
-%assign i 0
-%rep 32
-global stubHandlerPanique_%[i]
-%assign i i+1
-%endrep
+;
+;===============================================================================
+%macro stubHandlerException 1
+       push dword 0x0           ; On empile un "code"
+       push dword %1            ; On empile le num√©ro de l'exception
+       jmp versHandlerException ; On invoque la fonction d'aiguillage
+%endmacro
+%macro stubHandlerExceptionCode 1
+       push dword %1            ; On empile le num√©ro de l'exception
+       jmp versHandlerException ; On invoque la fonction d'aiguillage
+%endmacro
 
-global handlerAppelSysteme          ; WARNING, ‡ mettre ailleurs
-global halt                         ; WARNING, ‡ mettre ailleurs
+versHandlerException :
+       pushad                   ; On sauvegarde les registres
+       call handlerException    ; On invoque la fonction d'aiguillage
+       popad                    ; On restaure les registres
+       add esp, 0x08            ; On "d√©pile" le code et le num√©ro
+       iret
+
+; Et maintenant on d√©finit tous les handlers d'exception
+;-------------------------------------------------------
+golbal stubHandlerExceptionDivO
+stubHandlerExceptionDivO :                ; Exception "division par z√©ro"
+       stubHandlerException 0x00
+
+global stubHandlerExceptionDebug
+stubHandlerExceptionDebug :               ; Exception "debug"
+       stubHandlerException 0x01
+       
+stubHandlerExceptionNMI :                 ; Exception "non maskable interrupt"
+       stubHandlerException 0x02
+       
+stubHandlerExceptionBreakpoint:           ;
+       stubHandlerException 0x03
+       
+stubHandlerExceptionOverflow :            ;
+       stubHandlerException 0x04
+       
+stubHandlerExceptionBoundExceeded :       ;
+       stubHandlerException 0x05
+
+stubHandlerExceptionDeviceInvalidOpcode : ; Exception "invalid opcode"
+       stubHandlerException 0x06
+              
+stubHandlerExceptionDeviceUnavailable :   ; Exception "device unavailable"
+       stubHandlerException 0x07
+              
+stubHandlerExceptionDoubleFault :
+       stubHandlerExceptionCode 0x08
+
+stubHandlerExceptionCoproOverrun :        ; Exception "Coprocessor Segment Overrun"
+       stubHandlerException 0x09
+
+stubHandlerExceptionInvalidTSS :
+       stubHandlerExceptionCode 0x0a
+
+stubHandlerExceptionSegmentNotPresent :
+       stubHandlerExceptionCode 0x0b
+       
+stubHandlerExceptionStackSegmentFault :
+       stubHandlerExceptionCode 0x0c
+
+stubHandlerExceptionGeneralProtectionFault :
+       stubHandlerExceptionCode 0x0d
+       
+stubHandlerExceptionPageFault :
+       stubHandlerExceptionCode 0x0e
+
+stubHandlerExceptionReserved :
+       stubHandlerException 0x0f
+
+stubHandlerExceptionFloatingPoint :
+       stubHandlerException 0x10
+
+stubHandlerExceptionAlignmentCheck :
+       stubHandlerExceptionCode 0x11
+       
+stubHandlerExceptionFloatingMachineCheck :
+       stubHandlerException 0x12
+
+stubHandlerExceptionFloatingSIMDFPE :
+       stubHandlerException 0x13
+
+stubHandlerExceptionFloatingVirtualization :
+       stubHandlerException 0x14
+
+stubHandlerExceptionControlProtection :
+      stubHandlerExceptionCode 0x15
+
+stubHandlerExceptionReserved2 :
+       stubHandlerException 0x16
+
+stubHandlerExceptionReserved3 :
+       stubHandlerException 0x17
+
+stubHandlerExceptionReserved4 :
+       stubHandlerException 0x18
+
+stubHandlerExceptionReserved5 :
+       stubHandlerException 0x19
+
+stubHandlerExceptionReserved6 :
+       stubHandlerException 0x1a
+
+stubHandlerExceptionReserved7 :
+       stubHandlerException 0x1b
+
+stubHandlerExceptionHypervisionInjection :
+       stubHandlerException 0x1c
+
+stubHandlerExceptionVMMCommunication :
+      stubHandlerExceptionCode 0x1d
+
+stubHandlerExceptionSecurity :
+      stubHandlerExceptionCode 0x1e
+
+stubHandlerExceptionReserved8 :
+      stubHandlerException 0x1f
 
 ;===============================================================================
 ;   Gestion des IRQ.
 ;
-;   On dÈfinit (‡ l'aide de la macro stubHandlerIRQn) un handler pour chacune
-; des IRS (16 max). Ce handler empile le numÈro de l'IRQ (pas de l'interruption,
-; qui dÈpend du remapping configurÈ sur le PIC) puis invoque le gestionnaire
-; global (une fonction C rÈpondant au doux nom de handlerIRQ).
+:   Ces IRQ sont transmises par un PIC. Nous supposerons que ce dernier g√®re
+; un nombre d'IRQ d√©fini dans MANUX_NB_IRQ et que la fonction de gestion
+; associ√©e est d√©finie dans MANUX_HANDLER_IRQ.
+;
+;   On d√©finit (√† l'aide de la macro stubHandlerIRQn) un handler pour chacune
+; des IRQ. Ce handler empile le num√©ro de l'IRQ (pas de l'interruption,
+; qui d√©pend du remapping configur√© sur le PIC) puis invoque le gestionnaire
+; global (la fonction C dont le nom est donn√© par MANUX_HANDLER_IRQ).
+;
+;    Ces handlers ont pour nom stubHandlerIRQ1, stubHandlerIRQ2, ...
 ;===============================================================================
 
-extern MANUX_HANDLER_IRQ            ; La fonction de gestion, liÈe au PIC
+extern MANUX_HANDLER_IRQ            ; La fonction de gestion, li√©e au PIC
 
 ; Un handler pour l'IRQ n
 ;------------------------
 %macro stubHandlerIRQn 1
-        push dword %1               ; On empile le numÈro de l'IRQ
+        push dword %1               ; On empile le num√©ro de l'IRQ
 	jmp  handlerIRQ
 %endmacro
 
@@ -53,11 +171,12 @@ handlerIRQ :
         call MANUX_HANDLER_IRQ
 
 	popa
-        add esp, 4                  ; DÈpile le numÈro d'IRQ
+        add esp, 4                  ; D√©pile le num√©ro d'IRQ
 
         iret
 
-; GÈnÈration des 16 handlers
+; G√©n√©ration des MANUX_NB_IRQ handlers
+;--------------------------------------
 %assign i 0
 %rep 16
 stubHandlerIRQ%[i] : stubHandlerIRQn i
@@ -65,14 +184,21 @@ stubHandlerIRQ%[i] : stubHandlerIRQn i
 %endrep
 
 ;===============================================================================
-;   Gestion des appels systËme
+;   Gestion des appels syst√®me
+;
+;   Le m√©canisme des appels syst√®me est fond√© sur l'utilisation d'une
+; interruption logicielle. Son handler est un peu particulier : il va s'occuper
+; de sauvegarder l'√©tat du processeur et invoquer la fonction de traitement de
+; l'appel syst√®me vis√©.
+;   Deux fonctions suppl√©mentaires d'entr√©e et sortie du noyau sont invoqu√©es,
+; qui pourront servir par exemple √† de l'audit, √† verouiller le noyau, ....
 ;===============================================================================
 %ifdef MANUX_APPELS_SYSTEME
 extern vecteurAppelsSysteme
 extern entrerAppelSysteme
 extern sortirAppelSysteme
 
-; Le handler des appels systËmes
+; Le handler des appels syst√®mes
 ;-------------------------------
 handlerAppelSysteme :
         push edi
@@ -86,7 +212,7 @@ handlerAppelSysteme :
         shl eax, 02h
         push eax
 	
-        ; On verouille le noyau WARNING : non rÈentrance
+        ; On verouille le noyau WARNING : non r√©entrance
         call entrerAppelSysteme
 	
         ; On autorise les IT WARNING, est-ce bien raisonable ?
@@ -94,9 +220,9 @@ handlerAppelSysteme :
 	
         ; On invoque l'AS
 	pop eax
-        call [vecteurAppelsSysteme+eax] ; Le numÈro est dans EAX (cf appelsysteme.h)
+        call [vecteurAppelsSysteme+eax] ; Le num√©ro est dans EAX (cf appelsysteme.h)
 
-        ; On dÈverouille le noyau WARNING : non rÈentrance
+        ; On d√©verouille le noyau WARNING : non r√©entrance
         call sortirAppelSysteme
 
         pop ecx
@@ -108,54 +234,3 @@ handlerAppelSysteme :
         pop edi
         iret
 %endif
-
-; Un handler qui ne fait rien ...
-;--------------------------------
-global stubHandlerNop 
-stubHandlerNop :
-        iret                        ; On revient ...
-
-; Un handler qui va afficher un message (WARNING ‡ virer dËs que la suite est validÈe)
-;--------------------------------------
-%macro   stubHandlerPanique 1
-
-         pusha                ; Je pense qu'on peut s'en passer, ...
-	 push dword %1        ; On push le numÈro en 32 bits
-
-         call handlerPanique
-	 
-         add esp, 4           ; On pop le numÈro
-	 popa
-
-         iret
-%endmacro
-
-; Un handler gÈnÈral pour toutes les interruptions
-;-------------------------------------------------
-%macro   baseGestionGeneraleInterruption 1
-
-         pusha                ; Je pense qu'on peut s'en passer, ...
-	 push dword %1        ; On push le numÈro en 32 bits
-
-         call gestionGeneraleInterruption
-	 
-         add esp, 4           ; On pop le numÈro
-	 popa
-
-         iret
-%endmacro
-
-
-; GÈnÈration de tous les handlers de panique
-%assign i 0
-%rep 32
-stubHandlerPanique_%[i]: stubHandlerPanique i
-%assign i i+1
-%endrep
-
-; Arret du systËme
-;-----------------
-halt :
-        hlt
-        jmp halt
-

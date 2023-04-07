@@ -1,8 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*      Implémentation des sous-programmes de gestion des déroutements.       */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file : interruptions.c
+ * @brief: Implémentation des sous-programmes de gestion des déroutements
+ *
+ *                                                    (C) Manu Chaput 2000-2023
+ */
 #include <manux/config.h>
 #include <manux/interruptions.h>
 #include <manux/intel-8259a.h>
@@ -26,6 +27,11 @@
 #ifdef MANUX_APPELS_SYSTEME
 extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
 #endif
+
+/**
+ * @brief : la table de gestion des exceptions
+ */
+FonctionGestionException fonctionDeGestionException[MANUX_NB_EXCEPTIONS];
 
 /**
  * La table des fonctions de gestion des interuptions
@@ -83,13 +89,14 @@ int definirFonctionGestionInteruption(int num,
    return 0;
 }
 
-void gestionGeneraleInterruption(uint32_t itNum, TousRegistres registres,
-                                 uint32_t eip, uint32_t cs, uint32_t eFlags)
 /**
- * Fonction de base de gestion d'un interruption. Elle va se charger
+ * @brief : Fonction de base de gestion d'un interruption.
+ * Elle va se charger
  * de rediriger sur la bonne fonction de gestion de l'interruption
  * s'il en existe une, et sur la fonction de panique sinon.
  */
+void gestionGeneraleInterruption(uint32_t itNum, TousRegistres registres,
+                                 uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    fonctionDeGestionInteruption[itNum](itNum, registres, eip, cs, eFlags);
 }

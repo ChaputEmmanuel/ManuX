@@ -236,15 +236,35 @@ et exceptionns. Cette table est enregistrée grâce à l'instruction
 
    Observons ici comment tout cela est mis en place dans ManuX.
 
-   Nous ne pouvons pas ici faire l'impasse sur un peu d'assembleur, si
+   Nous ne pouvons pas faire l'impasse sur un peu d'assembleur, si
 bien que les fonctions ``bas niveau'' seront implantées dans les
 fichiers {\tt manux/i386/interBasNiveau.h
   i386/interBasNiveau.nasm}. Tout le reste sera en C dans {\tt
   manux/interruptions.h} et {\tt i386/interruptions.c}.
 
-   C'est la fonction C \lstinline!initialiserIDT()! qui est invoquée
-par \lstinline!main()! pour initialiser la table.
-   
+   Nous allons traiter séparément les trois types d'interruptions
+suivants~:
+
+\begin{itemize}
+   \item les exceptions seront gérées ensemble via une fonction
+     commune ;
+   \item les \irq seront traitées par une fonction liée au \pic
+     utilisé ;
+   \item les exceptions logicielles seront elles aussi regroupées dans
+     une seule fonction de traitement.
+\end{itemize}
+
+   Dans les trois cas, la stratégie sera la même :
+
+\begin{itemize}
+   \item définir en assembleur une fonction de traitement spécifique à
+   chaque interruption qui sera chargée d'invoquer une fonction
+   d'aguillage ;
+   \item définir en C une fonction commune d'aguillage ;
+   \item défnir ensuite la fonction C de chaque interruption que l'on
+    souhaite traiter.
+\end{itemize}
+
 %-------------------------------------------------------------------------------
 %      
 %-------------------------------------------------------------------------------
@@ -342,6 +362,9 @@ chacune des interruptions.
 %-------------------------------------------------------------------------------
 \subsection{Initialisation de la table IDT}
 
+   C'est la fonction C \lstinline!initialiserIDT()! qui est invoquée
+par \lstinline!main()! pour initialiser la table.
+   
    Nous avons maintenant tous les éléments pour construire notre {\sc
 idt}. C'est le rôle de la fonction C \lstinline!initialiserIDT()!.
    
