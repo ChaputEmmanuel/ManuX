@@ -188,9 +188,10 @@ void i8259aAckIRQ(uint8_t numIRQ)
    outb(PIC_MAITRE_PORT_COMMANDE, PIC_EOI);
 }
 
-/*
- * Le handler de gestion effective des IRQ. C'est cette fonction qui
- * est invoquée lors d'une interruption matérielle.
+/**
+ * @brief Le handler de gestion effective des IRQ.
+ *
+ * C'est cette fonction qui est invoquée lors d'une interruption matérielle.
  */
 void i8259aGestionIRQ(TousRegistres registres, uint32_t numIRQ, 
                       uint32_t eip, uint32_t cs, uint32_t eFlags)

@@ -247,9 +247,9 @@ suivants~:
 
 \begin{itemize}
    \item les exceptions seront gérées ensemble via une fonction
-     commune ;
-   \item les \irq seront traitées par une fonction liée au \pic
-     utilisé ;
+     commune : \lstinline!gestionException! ;
+   \item les \irq seront traitées par une fonction commune, liée au \pic
+     utilisé (;
    \item les exceptions logicielles seront elles aussi regroupées dans
      une seule fonction de traitement.
 \end{itemize}
@@ -270,40 +270,54 @@ suivants~:
 %-------------------------------------------------------------------------------
 \subsection{Définition ``bas niveau'' d'un handler}
 
-   Voici par exemple comment est écrit un handler pour l'interruption
-7 (mais c'est sans intérêt ici) dont le rôle est d'invoquer une
-fonction C nommée \lstinline!handlerPanique!. Notez que ce handler
-empile tous les registres ainsi que le numéro de l'interruption
-concernée. 
+   Nous allons observer à titre d'exemple les fonctions de gestion des
+exceptions. Certaines exceptions empilent un code d'erreur de 32 bits
+et d'autres ne le font pas. Comme nous faisons le choix de passer par
+une fonction unique d'aiguillage, nous allons empiler une valeur nulle
+sur 32 bits pour les exceptions qui n'utilisent pas de code d'erreur.
+
+   Voici par exemple comment est écrit le gestionnaire bas niveau de
+l'exception 0 (``division par zéro'') qui n'empile pas de code
+d'erreur~:
 
 \begin{lstlisting}{language=nasm}
-; Un handler qui va afficher un message
-;--------------------------------------
-stubHandlerPanique 7
-  
-         pusha
-	 push dword 07h
-
-         call handlerPanique
-	 
-         add esp, 4
-	 popa
-
-         iret
+golbal stubHandlerExceptionDivO
+stubHandlerExceptionDivO :                ; Exception "division par zéro"
+       push dword 0x0           ; On empile un "code"
+       push dword 0x0           ; On empile le numéro de l'exception
+       pushad                   ; sauvegarde des registres
+       call gestionException    ; appel de la fonction d'aiguillage
+       popad                    ; restauration des registres
+       add esp, 0x08            ; on "dépile" le code et le numéro
+       iret
 \end{lstlisting}
 
-   Vous trouverez également un handler qui ne fait rien :
+   Et voici maintenant le code du gestionnaire bas niveau de
+l'exception 0x0a (``TSS invalde'') qui empile l'indice du TSS en
+erreur~:
 
 \begin{lstlisting}{language=nasm}
-; Un handler qui ne fait rien ...
-;--------------------------------
-stubHandlerNop :
-        iret                        ; On revient ...
+global stubHandlerExceptionInvalidTSS
+stubHandlerExceptionInvalidTSS :
+       push dword 0x0a          ; On empile le numéro de l'exception
+       pushad                   ; sauvegarde des registres
+       call gestionException    ; appel de la fonction d'aiguillage
+       popad                    ; restauration des registres
+       add esp, 0x08            ; on "dépile" le code et le numéro
+       iret
 \end{lstlisting}
 
    Notons que lors d'une interruption, le microprocesseur empile les
 valeurs de {\tt EFLAGS}, {\tt CS} et {\tt EIP} (voir par exemple
 \cite{intel386pru1986} page 159).
+
+   Si vous observez le fichier \lstinline!interBasNiveau.nasm!, vous
+verrez que les 32 gestionnaires d'exception sont générées de la sorte
+grâce à deux macros.
+
+   En ce qui concerne les \irq, les choses sont encore plus simples
+car toutes les interruptions ont le même comportement et les fonctions
+sont générées (encore via une macro) avec des noms génériques.
 
    Voyons maintenant comment écrire la suite plus confortablement en
 C.

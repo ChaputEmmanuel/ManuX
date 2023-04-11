@@ -11,6 +11,46 @@ void stubHandlerNop();
  * Un handler de bas niveau qui ne fait rien
  */
 
+/**
+ * Les gestionnaires bas niveau des exceptions
+ */
+void stubHandlerExceptionDiv0();
+void stubHandlerExceptionDebug();
+void stubHandlerExceptionNMI();
+void stubHandlerExceptionBreakpoint();
+void stubHandlerExceptionOverflow();
+void stubHandlerExceptionBoundExceeded();
+void stubHandlerExceptionDeviceInvalidOpcode();
+void stubHandlerExceptionDeviceUnavailable();
+void stubHandlerExceptionDoubleFault();
+void stubHandlerExceptionCoproOverrun();
+void stubHandlerExceptionInvalidTSS();
+void stubHandlerExceptionSegmentNotPresent();
+void stubHandlerExceptionStackSegmentFault();
+void stubHandlerExceptionGeneralProtectionFault();
+void stubHandlerExceptionPageFault();
+void stubHandlerExceptionReserved();
+void stubHandlerExceptionFloatingPoint();
+void stubHandlerExceptionAlignmentCheck();
+void stubHandlerExceptionFloatingMachineCheck();
+void stubHandlerExceptionFloatingSIMDFPE();
+void stubHandlerExceptionFloatingVirtualization();
+void stubHandlerExceptionControlProtection();
+void stubHandlerExceptionReserved2();
+void stubHandlerExceptionReserved3();
+void stubHandlerExceptionReserved4();
+void stubHandlerExceptionReserved5();
+void stubHandlerExceptionReserved6();
+void stubHandlerExceptionReserved7();
+void stubHandlerExceptionHypervisionInjection();
+void stubHandlerExceptionVMMCommunication();
+void stubHandlerExceptionSecurity();
+void stubHandlerExceptionReserved8();
+
+
+/**
+ * Les gestionnaires bas niveau des IRQ
+ */
 void stubHandlerIRQ0();
 void stubHandlerIRQ1();
 void stubHandlerIRQ2();
@@ -28,40 +68,7 @@ void stubHandlerIRQ13();
 void stubHandlerIRQ14();
 void stubHandlerIRQ15();
 
-void stubHandlerPanique_0();
-/*
- * Un handler de bas niveau qui affiche quelques informations
- */
-void stubHandlerPanique_1();
-void stubHandlerPanique_2();
-void stubHandlerPanique_3();
-void stubHandlerPanique_4();
-void stubHandlerPanique_5();
-void stubHandlerPanique_6();
-void stubHandlerPanique_7();
-void stubHandlerPanique_8();
-void stubHandlerPanique_9();
-void stubHandlerPanique_10();
-void stubHandlerPanique_11();
-void stubHandlerPanique_12();
-void stubHandlerPanique_13();
-void stubHandlerPanique_14();
-void stubHandlerPanique_15();
-void stubHandlerPanique_16();
-void stubHandlerPanique_17();
-void stubHandlerPanique_18();
-void stubHandlerPanique_19();
-void stubHandlerPanique_20();
-void stubHandlerPanique_21();
-void stubHandlerPanique_22();
-void stubHandlerPanique_23();
-void stubHandlerPanique_24();
-void stubHandlerPanique_25();
-void stubHandlerPanique_26();
-void stubHandlerPanique_27();
-void stubHandlerPanique_28();
-void stubHandlerPanique_29();
-void stubHandlerPanique_30();
-void stubHandlerPanique_31();
+void stubHandlerInt66();
 
+void initialiserHandlersInterruption(void * table, uint32_t taille);
 #endif

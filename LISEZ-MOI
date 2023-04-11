@@ -22,10 +22,8 @@ Feuille de route
    
 En cours
 --------
-   EN COURS : des handlers en assembleur : 2 macros (avec et
-   sans paramètres). Les instancier pour tous les vecteurs et passer
-   par une fonction d'aiguillage pour les interruptions et une pour
-   les exceptions.
+   EN COURS : refonte du système de gestion des interruptions.
+   Ca semble OK pour les IRQ, pas pour les interruptions.
 
    Fichiers de configuration
       . Est-il normal que la segmentation soit dans pc-i386 ?

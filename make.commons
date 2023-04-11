@@ -58,6 +58,10 @@ ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
               -D MANUX_SEGMENT_TRANSIT_RAMDISK=$(MANUX_SEGMENT_TRANSIT_RAMDISK) \
               -D MANUX_portDonneesClavier=$(MANUX_portDonneesClavier) \
               -D MANUX_portCmdClavier=$(MANUX_portCmdClavier) \
+	      -D MANUX_NB_IRQ=$(MANUX_NB_IRQ) \
+	      -D MANUX_INT_BASE_IRQ=$(MANUX_INT_BASE_IRQ) \
+	      -D MANUX_NB_INTERRUPTIONS=$(MANUX_NB_INTERRUPTIONS) \
+	      -D MANUX_NB_EXCEPTIONS=$(MANUX_NB_EXCEPTIONS) \
               -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK)
 
 #--------------------------------------------------------------------------
