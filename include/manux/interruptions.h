@@ -65,15 +65,16 @@ void initialiserIDT();
 /**
  * Le type d'une fonction de gestion d'exception
  */
-typedef void (* FonctionGestionException)(uint32_t errCode, uint32_t numEx,
-					  TousRegistres registres,
-					  uint32_t eip, uint32_t cs, uint32_t eFlags);
+typedef void (* FonctionGestionException)(TousRegistres registres,
+					  uint32_t eip, uint32_t cs, uint32_t eFlags,
+					  uint32_t numEx,uint32_t errCode);
 
 /**
  * Le type d'une fonction de gestion d'interruption
  */
-typedef void (* FonctionGestionInterruption)(uint32_t itNum, TousRegistres registres,
-         uint32_t eip, uint32_t cs, uint32_t eFlags);
+typedef void (* FonctionGestionInterruption)(TousRegistres registres,
+					     uint32_t eip, uint32_t cs, uint32_t eFlags,
+					     uint32_t numIt);
 
 int definirFonctionGestionInterruption(int num,
                                        FonctionGestionInterruption fg);

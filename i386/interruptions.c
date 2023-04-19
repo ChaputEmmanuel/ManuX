@@ -47,32 +47,48 @@ void * handlerBasNiveauInterruption[MANUX_NB_SOFT_INT];
 FonctionGestionException fonctionDeGestionException[MANUX_NB_EXCEPTIONS];
 
 /**
+ * @brief : En cas de division par zéro
+ *
+ */
+void gestionExceptionDiv0(TousRegistres registres,
+			  uint32_t eip, uint32_t cs, uint32_t eFlags,
+			  uint32_t itNum,uint32_t errCode)
+{
+  printk("Vers l'infini et au dela (%d), ...\n", errCode);
+}
+
+/**
  * @brief : Fonction de base de gestion d'une exception
  *
  */
-void gestionException(uint32_t errCode, uint32_t numEx, TousRegistres registres,
-                      uint32_t eip, uint32_t cs, uint32_t eFlags)
+void gestionException(TousRegistres registres,
+                      uint32_t eip, uint32_t cs, uint32_t eFlags,
+		      uint32_t numIt,uint32_t errCode)
 {
-  fonctionDeGestionException[numEx](errCode, numEx, registres, eip, cs, eFlags);
+  fonctionDeGestionException[numIt](registres, eip, cs, eFlags, numIt, errCode);
 }
 
-void gestionExceptionPanique(uint32_t errCode, uint32_t itNum, TousRegistres registres,
-				uint32_t eip, uint32_t cs, uint32_t eFlags);
+void gestionExceptionPanique(TousRegistres registres,
+			     uint32_t eip, uint32_t cs, uint32_t eFlags,
+			     uint32_t itNum,uint32_t errCode);
 
 /**
  * @frief La table des fonctions de gestion des interruptions
  */
-FonctionGestionInterruption fonctionDeGestionInterruption[MANUX_NB_INTERRUPTIONS];
+FonctionGestionInterruption fonctionDeGestionInterruption[MANUX_NB_SOFT_INT];
 
 /**
  * @brief : Fonction de base de gestion d'une exception
  *
  */
-void gestionInterruption(uint32_t numInt, TousRegistres registres,
-                      uint32_t eip, uint32_t cs, uint32_t eFlags)
+void gestionInterruption(TousRegistres registres,
+			 uint32_t eip, uint32_t cs, uint32_t eFlags,
+			 uint32_t numIt)
 {
-  int idx = numInt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
-  fonctionDeGestionInterruption[idx](numInt, registres, eip, cs, eFlags);
+   int idx = numIt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
+
+   printk(" Plouf %d -> %d\n", numIt, idx);
+   fonctionDeGestionInterruption[idx](registres, eip, cs, eFlags, numIt);
 }
 
 /**
@@ -114,10 +130,11 @@ void chargerIDT(IDT idt)
 /**
  * Une fonction de gestion qui ne fait rien !
  */
-void neRienFaire(uint32_t itNum, TousRegistres registres,
-                                 uint32_t eip, uint32_t cs, uint32_t eFlags)
+void neRienFaire(TousRegistres registres,
+		 uint32_t eip, uint32_t cs, uint32_t eFlags,
+		 uint32_t numIt)
 {
-  printk("Pouet %d\n", itNum);
+   printk("neRienFaire %d\n", numIt);
 }
 
 /**
@@ -139,10 +156,11 @@ int definirFonctionGestionInterruption(int num,
  * de l'interruption s'il en existe une, et sur la fonction de panique
  * sinon.
  */
-void gestionGeneraleInterruption(uint32_t itNum, TousRegistres registres,
-                                 uint32_t eip, uint32_t cs, uint32_t eFlags)
+void gestionGeneraleInterruption(TousRegistres registres,
+                                 uint32_t eip, uint32_t cs, uint32_t eFlags,
+				 uint32_t numIt)
 {
-   fonctionDeGestionInterruption[itNum](itNum, registres, eip, cs, eFlags);
+  fonctionDeGestionInterruption[numIt](registres, eip, cs, eFlags, numIt);
 }
  
 /**
@@ -194,7 +212,8 @@ void initialiserIDT()
 
    // Maintenant, les exceptions que l'on veut gérer
    // (pour le moment aucune !)
-
+   fonctionDeGestionException[0] = gestionExceptionDiv0;
+   
    // Les IRQs sont gérées au travers du PIC. On positionne les
    // handlers bas niveau
    positionnerHandlerInterruption(idt, MANUX_INT_BASE_IRQ +  0, stubHandlerIRQ0);
@@ -238,9 +257,11 @@ void initialiserIDT()
       fonctionDeGestionInterruption[i] = neRienFaire;
    }
 
-   printk("-> 0x%x <-\n", handlerBasNiveauInterruption[18]);
-   printk(" ( 0x%x )\n",  stubHandlerInt66);
-   
+   /* Ca c'est ok, sauf les paramètres de neRienFaire évidemment
+    positionnerHandlerInterruption(idt,
+				  MANUX_INT_BASE_IRQ + MANUX_NB_IRQ + 20,
+				  neRienFaire);
+   */
 #ifdef MANUX_APPELS_SYSTEME
    /* Le handler de l'interruption utilisée pour les appels système */
    positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
@@ -343,14 +364,15 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
  *
  * On affichera ce que l'on peut à l'écran pour aider l'utilisateur, ...
  */
-void gestionExceptionPanique(uint32_t errCode, uint32_t itNum, TousRegistres registres,
-		    uint32_t eip, uint32_t cs, uint32_t eFlags)
+void gestionExceptionPanique(TousRegistres registres,
+			     uint32_t eip, uint32_t cs, uint32_t eFlags,
+			     uint32_t numIt, uint32_t errCode)
 {
    char * ecran = MANUX_CON_SCREEN;
    int d = 1;
    char c;
 
-   ecranDeLaMort(errCode, itNum, registres, eip, cs, eFlags);
+   ecranDeLaMort(errCode, numIt, registres, eip, cs, eFlags);
 
    while (1) {
       inb(0x60, c);
@@ -366,7 +388,7 @@ void gestionExceptionPanique(uint32_t errCode, uint32_t itNum, TousRegistres reg
          case 0x39: // SPACE On alterne entre l'écran bleu et l'écran au moment du drame 
             d = 1-d;
 	    if (d) {
-  	      ecranDeLaMort(errCode, itNum, registres, eip, cs, eFlags);
+  	      ecranDeLaMort(errCode, numIt, registres, eip, cs, eFlags);
  	    }else{
 	      // On restaure l'écran
               memcpy(ecran, bufferEcran, 4000);

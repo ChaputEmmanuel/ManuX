@@ -245,9 +245,9 @@ void _startManuX()
 #endif
 
    //   while (1) {};
-   //   asm volatile("int $66" : : );
+    asm volatile("int $76" : : ); 
    int a = 0;
-   int b = 1/a;
+   //	 int b = 1/a;
    init();
 }   /* _startManuX */
 

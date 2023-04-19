@@ -22,9 +22,24 @@ Feuille de route
    
 En cours
 --------
+
+   ATTENTION !  make run ne marche plus !?
+
+   Je veux faire un debug pour les IRQ, ..
+
    EN COURS : refonte du système de gestion des interruptions.
    Ca semble OK pour les IRQ, pas pour les interruptions.
 
+   ENSUITE : remplacer i8269... par IRQ... et affecter les fonctions
+   avec celles du PIC, dans l'init, le clavier, l'horloge, les virtio, ...
+
+   struct picMethodes {
+      init
+      autoriserIRQ
+      ajouterHandler
+      ...
+   }
+   
    Fichiers de configuration
       . Est-il normal que la segmentation soit dans pc-i386 ?
       . En faire d'autres et les documenter ! Par exemple

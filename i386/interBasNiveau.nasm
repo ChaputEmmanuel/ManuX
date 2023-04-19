@@ -21,8 +21,7 @@
 ;   le numéro de l'exception (qui servira à handlerException pour
 ;   réaliser l'aiguillage). Un handler associé à une exception sans
 ;   code d'erreur
-
-;
+;   
 ;===============================================================================
 
 extern gestionException    ; La fonction générale de gestion
@@ -221,7 +220,7 @@ stubHandlerIRQ%[i] : stubHandlerIRQn i
 ;   Gestion des interruptions logicielles
 ;
 ;===============================================================================
-extern gestionInterruption
+extern  neRienFaire  ;  gestionInterruption ;
 
 %macro stubHandlerInt 1
         push dword %1               ; On empile le numéro de l'interruption
@@ -229,13 +228,12 @@ extern gestionInterruption
 %endmacro
 
 handlerInt :
-	pusha
+	pushad
 	
-        call gestionInterruption
+        call neRienFaire ;  gestionInterruption ; 
 
-	popa
+	popad
         add esp, 4                  ; Dépile le numéro d'interruption
-
         iret
 
 ; On génère les gestionnaires bas niveau

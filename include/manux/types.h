@@ -55,7 +55,7 @@ typedef struct _TousRegistres {
    uint32_t edx;
    uint32_t ecx;
    uint32_t eax;
-} TousRegistres;
+} __attribute__((packed)) TousRegistres;
 
 /*
  * Type des identificateurs de tâche
