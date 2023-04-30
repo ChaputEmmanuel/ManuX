@@ -39,6 +39,12 @@ extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
  */
 #define MANUX_NB_SOFT_INT \
   (MANUX_NB_INTERRUPTIONS - (MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ))
+
+/**
+ * @brief Une table (initialisée par la fonction
+ * initialiserHandlersInterruption de interBasNiveau.nasm) des
+ * handlers bas niveau des interruptions logicielles.
+ */
 void * handlerBasNiveauInterruption[MANUX_NB_SOFT_INT];
 
 /**
@@ -47,14 +53,26 @@ void * handlerBasNiveauInterruption[MANUX_NB_SOFT_INT];
 FonctionGestionException fonctionDeGestionException[MANUX_NB_EXCEPTIONS];
 
 /**
+ * @brief Décompte des interruptions reçues
+ */
+#ifdef MANUX_INT_AUDIT
+uint32_t nbItRecues[MANUX_NB_INTERRUPTIONS] = {0};
+#endif // MANUX_INT_AUDIT
+
+void gestionExceptionPanique(TousRegistres registres,
+			     uint32_t numEx, uint32_t errCode,
+			     uint32_t eip, uint32_t cs, uint32_t eFlags);
+
+/**
  * @brief : En cas de division par zéro
  *
  */
 void gestionExceptionDiv0(TousRegistres registres,
-			  uint32_t eip, uint32_t cs, uint32_t eFlags,
-			  uint32_t itNum,uint32_t errCode)
+			  uint32_t numEx, uint32_t errCode,
+			  uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-  printk("Vers l'infini et au dela (%d), ...\n", errCode);
+   printk("Vers l'infini et au dela, ...\n");
+   gestionExceptionPanique(registres, numEx, errCode, eip, cs, eFlags);
 }
 
 /**
@@ -62,15 +80,14 @@ void gestionExceptionDiv0(TousRegistres registres,
  *
  */
 void gestionException(TousRegistres registres,
-                      uint32_t eip, uint32_t cs, uint32_t eFlags,
-		      uint32_t numIt,uint32_t errCode)
+		      uint32_t numEx, uint32_t errCode,
+                      uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-  fonctionDeGestionException[numIt](registres, eip, cs, eFlags, numIt, errCode);
+#ifdef MANUX_INT_AUDIT
+   nbItRecues[numEx] ++;
+#endif
+   fonctionDeGestionException[numEx](registres, numEx, errCode, eip, cs, eFlags);
 }
-
-void gestionExceptionPanique(TousRegistres registres,
-			     uint32_t eip, uint32_t cs, uint32_t eFlags,
-			     uint32_t itNum,uint32_t errCode);
 
 /**
  * @frief La table des fonctions de gestion des interruptions
@@ -78,16 +95,29 @@ void gestionExceptionPanique(TousRegistres registres,
 FonctionGestionInterruption fonctionDeGestionInterruption[MANUX_NB_SOFT_INT];
 
 /**
+ * Une fonction de gestion qui ne fait rien !
+ */
+void neRienFaire(TousRegistres registres,
+		 uint32_t eip, uint32_t cs, uint32_t eFlags,
+		 uint32_t numIt)
+{
+   printk("neRienFaire %d\n", numIt);
+}
+
+/**
  * @brief : Fonction de base de gestion d'une exception
  *
  */
 void gestionInterruption(TousRegistres registres,
-			 uint32_t eip, uint32_t cs, uint32_t eFlags,
-			 uint32_t numIt)
+			 uint32_t numIt,
+			 uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    int idx = numIt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
 
-   printk(" Plouf %d -> %d\n", numIt, idx);
+#ifdef MANUX_INT_AUDIT
+   nbItRecues[numIt] ++;
+#endif
+
    fonctionDeGestionInterruption[idx](registres, eip, cs, eFlags, numIt);
 }
 
@@ -128,16 +158,6 @@ void chargerIDT(IDT idt)
 }
 
 /**
- * Une fonction de gestion qui ne fait rien !
- */
-void neRienFaire(TousRegistres registres,
-		 uint32_t eip, uint32_t cs, uint32_t eFlags,
-		 uint32_t numIt)
-{
-   printk("neRienFaire %d\n", numIt);
-}
-
-/**
  * Définition de la fonction de gestion d'une interruption
  * @return : 0 si c'est bon
  */
@@ -147,20 +167,6 @@ int definirFonctionGestionInterruption(int num,
    fonctionDeGestionInterruption[num] = fg;
 
    return 0;
-}
-
-/**
- * @brief : Fonction de base de gestion d'un interruption.
- *
- * Elle va se charger de rediriger sur la bonne fonction de gestion
- * de l'interruption s'il en existe une, et sur la fonction de panique
- * sinon.
- */
-void gestionGeneraleInterruption(TousRegistres registres,
-                                 uint32_t eip, uint32_t cs, uint32_t eFlags,
-				 uint32_t numIt)
-{
-  fonctionDeGestionInterruption[numIt](registres, eip, cs, eFlags, numIt);
 }
  
 /**
@@ -172,38 +178,38 @@ void initialiserIDT()
    IDT idt = (IDT) MANUX_ADRESSE_IDT;
 
    // On commence par positionner les handlers "stub" des exceptions
-   positionnerHandlerInterruption(idt, 0x00, stubHandlerExceptionDiv0);
-   positionnerHandlerInterruption(idt, 0x01, stubHandlerExceptionDebug);
-   positionnerHandlerInterruption(idt, 0x02, stubHandlerExceptionNMI);
-   positionnerHandlerInterruption(idt, 0x03, stubHandlerExceptionBreakpoint);
-   positionnerHandlerInterruption(idt, 0x04, stubHandlerExceptionOverflow);
-   positionnerHandlerInterruption(idt, 0x05, stubHandlerExceptionBoundExceeded);
-   positionnerHandlerInterruption(idt, 0x06, stubHandlerExceptionDeviceInvalidOpcode);
-   positionnerHandlerInterruption(idt, 0x07, stubHandlerExceptionDeviceUnavailable);
-   positionnerHandlerInterruption(idt, 0x08, stubHandlerExceptionDoubleFault);
-   positionnerHandlerInterruption(idt, 0x09, stubHandlerExceptionCoproOverrun);
-   positionnerHandlerInterruption(idt, 0x0a, stubHandlerExceptionInvalidTSS);
-   positionnerHandlerInterruption(idt, 0x0b, stubHandlerExceptionSegmentNotPresent);
-   positionnerHandlerInterruption(idt, 0x0c, stubHandlerExceptionStackSegmentFault);
-   positionnerHandlerInterruption(idt, 0x0d, stubHandlerExceptionGeneralProtectionFault);
-   positionnerHandlerInterruption(idt, 0x0e, stubHandlerExceptionPageFault);
-   positionnerHandlerInterruption(idt, 0x0f, stubHandlerExceptionReserved);
-   positionnerHandlerInterruption(idt, 0x10, stubHandlerExceptionFloatingPoint);
-   positionnerHandlerInterruption(idt, 0x11, stubHandlerExceptionAlignmentCheck);
-   positionnerHandlerInterruption(idt, 0x12, stubHandlerExceptionFloatingMachineCheck);
-   positionnerHandlerInterruption(idt, 0x13, stubHandlerExceptionFloatingSIMDFPE);
-   positionnerHandlerInterruption(idt, 0x14, stubHandlerExceptionFloatingVirtualization);
-   positionnerHandlerInterruption(idt, 0x15, stubHandlerExceptionControlProtection);
-   positionnerHandlerInterruption(idt, 0x16, stubHandlerExceptionReserved2);
-   positionnerHandlerInterruption(idt, 0x17, stubHandlerExceptionReserved3);
-   positionnerHandlerInterruption(idt, 0x18, stubHandlerExceptionReserved4);
-   positionnerHandlerInterruption(idt, 0x19, stubHandlerExceptionReserved5);
-   positionnerHandlerInterruption(idt, 0x1a, stubHandlerExceptionReserved6);
-   positionnerHandlerInterruption(idt, 0x1b, stubHandlerExceptionReserved7);
-   positionnerHandlerInterruption(idt, 0x1c, stubHandlerExceptionHypervisionInjection);
-   positionnerHandlerInterruption(idt, 0x1d, stubHandlerExceptionVMMCommunication);
-   positionnerHandlerInterruption(idt, 0x1e, stubHandlerExceptionSecurity);
-   positionnerHandlerInterruption(idt, 0x1f, stubHandlerExceptionReserved8);
+   positionnerHandlerInterruption(idt, 0x00, stubHandlerExDiv0);
+   positionnerHandlerInterruption(idt, 0x01, stubHandlerExDebug);
+   positionnerHandlerInterruption(idt, 0x02, stubHandlerExNMI);
+   positionnerHandlerInterruption(idt, 0x03, stubHandlerExBreakpoint);
+   positionnerHandlerInterruption(idt, 0x04, stubHandlerExOverflow);
+   positionnerHandlerInterruption(idt, 0x05, stubHandlerExBoundExceeded);
+   positionnerHandlerInterruption(idt, 0x06, stubHandlerExDeviceInvalidOpcode);
+   positionnerHandlerInterruption(idt, 0x07, stubHandlerExDeviceUnavailable);
+   positionnerHandlerInterruption(idt, 0x08, stubHandlerExDoubleFault);
+   positionnerHandlerInterruption(idt, 0x09, stubHandlerExCoproOverrun);
+   positionnerHandlerInterruption(idt, 0x0a, stubHandlerExInvalidTSS);
+   positionnerHandlerInterruption(idt, 0x0b, stubHandlerExSegmentNotPresent);
+   positionnerHandlerInterruption(idt, 0x0c, stubHandlerExStackSegmentFault);
+   positionnerHandlerInterruption(idt, 0x0d, stubHandlerExGeneralProtectionFault);
+   positionnerHandlerInterruption(idt, 0x0e, stubHandlerExPageFault);
+   positionnerHandlerInterruption(idt, 0x0f, stubHandlerExReserved);
+   positionnerHandlerInterruption(idt, 0x10, stubHandlerExFloatingPoint);
+   positionnerHandlerInterruption(idt, 0x11, stubHandlerExAlignmentCheck);
+   positionnerHandlerInterruption(idt, 0x12, stubHandlerExFloatingMachineCheck);
+   positionnerHandlerInterruption(idt, 0x13, stubHandlerExFloatingSIMDFPE);
+   positionnerHandlerInterruption(idt, 0x14, stubHandlerExFloatingVirtualization);
+   positionnerHandlerInterruption(idt, 0x15, stubHandlerExControlProtection);
+   positionnerHandlerInterruption(idt, 0x16, stubHandlerExReserved2);
+   positionnerHandlerInterruption(idt, 0x17, stubHandlerExReserved3);
+   positionnerHandlerInterruption(idt, 0x18, stubHandlerExReserved4);
+   positionnerHandlerInterruption(idt, 0x19, stubHandlerExReserved5);
+   positionnerHandlerInterruption(idt, 0x1a, stubHandlerExReserved6);
+   positionnerHandlerInterruption(idt, 0x1b, stubHandlerExReserved7);
+   positionnerHandlerInterruption(idt, 0x1c, stubHandlerExHypervisionInjection);
+   positionnerHandlerInterruption(idt, 0x1d, stubHandlerExVMMCommunication);
+   positionnerHandlerInterruption(idt, 0x1e, stubHandlerExSecurity);
+   positionnerHandlerInterruption(idt, 0x1f, stubHandlerExReserved8);
 
    // On configure l'aiguillage des exceptions. Par défaut, on panique !
    for (i = 0; i < MANUX_NB_EXCEPTIONS; i++) {
@@ -211,7 +217,6 @@ void initialiserIDT()
    }
 
    // Maintenant, les exceptions que l'on veut gérer
-   // (pour le moment aucune !)
    fonctionDeGestionException[0] = gestionExceptionDiv0;
    
    // Les IRQs sont gérées au travers du PIC. On positionne les
@@ -257,11 +262,6 @@ void initialiserIDT()
       fonctionDeGestionInterruption[i] = neRienFaire;
    }
 
-   /* Ca c'est ok, sauf les paramètres de neRienFaire évidemment
-    positionnerHandlerInterruption(idt,
-				  MANUX_INT_BASE_IRQ + MANUX_NB_IRQ + 20,
-				  neRienFaire);
-   */
 #ifdef MANUX_APPELS_SYSTEME
    /* Le handler de l'interruption utilisée pour les appels système */
    positionnerHandlerInterruption(idt, MANUX_AS_INT, handlerAppelSysteme);
@@ -269,6 +269,8 @@ void initialiserIDT()
    
    // On charge finalement l'IDT !
    chargerIDT(idt);
+
+   asm( "sti" );
 }
 
 
@@ -365,8 +367,8 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
  * On affichera ce que l'on peut à l'écran pour aider l'utilisateur, ...
  */
 void gestionExceptionPanique(TousRegistres registres,
-			     uint32_t eip, uint32_t cs, uint32_t eFlags,
-			     uint32_t numIt, uint32_t errCode)
+		      uint32_t numIt,uint32_t errCode,
+                      uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    char * ecran = MANUX_CON_SCREEN;
    int d = 1;
@@ -401,3 +403,24 @@ void gestionExceptionPanique(TousRegistres registres,
    }
    halt();
 }
+
+
+
+
+/**
+ * @brief : Fonction de base de gestion d'un interruption.
+ *
+ * Elle va se charger de rediriger sur la bonne fonction de gestion
+ * de l'interruption s'il en existe une, et sur la fonction de panique
+ * sinon.
+
+void gestionGeneraleInterruption(TousRegistres registres,
+                                 uint32_t eip, uint32_t cs, uint32_t eFlags,
+				 uint32_t numIt)
+{
+   int idx = numIt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
+   printk(" Patatras %d -> %d\n", numIt, idx);
+
+   fonctionDeGestionInterruption[numIt](registres, eip, cs, eFlags, 19);
+}
+ */

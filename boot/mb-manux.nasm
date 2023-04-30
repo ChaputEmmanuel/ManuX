@@ -29,4 +29,21 @@ align 4
 	dd FLAGS
 	dd CHECKSUM
      
+;-------------------------------------------------------------------------------
+; Le code de démarrage. On se contente d'initialiser le pointeur de pile, car
+; ce n'est pas prévu par multiboot. Apparemment GRUB le fait, mais pas le
+; loader de qemu par exemple.
+;-------------------------------------------------------------------------------
+global _startManuX
+extern _adresseLimitePileManuX
+extern startManuX
+
+_startManuX :
+	mov esp, _adresseLimitePileManuX
+ 
+	call startManuX
+ 
+	cli
+.FinDesTemps:	hlt
+	jmp .FinDesTemps
 

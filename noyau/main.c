@@ -102,7 +102,7 @@ void testerVirtioConsole()
 }
 #endif // MANUX_VIRTIO_CONSOLE
 
-void _startManuX()
+void startManuX()
 {
    union {
       uint32_t registres[3];
@@ -246,8 +246,11 @@ void _startManuX()
 
    //   while (1) {};
     asm volatile("int $76" : : ); 
-   int a = 0;
-   //	 int b = 1/a;
+    asm volatile("int $77" : : ); 
+    asm volatile("int $78" : : );
+    int a = 0;
+    int b = 1/a;
+
    init();
 }   /* _startManuX */
 

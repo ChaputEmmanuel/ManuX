@@ -24,7 +24,7 @@ OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o)
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)
 
-all : binaries noyau.elf symbols_elf # noyau.bin symbols_bin
+all : binaries noyau.elf symbols_elf noyaumb.elf # noyau.bin symbols_bin
 
 #----------------------------------------------------------------------------------
 # Une fois qu'on a tout compilé, il est temps de construire les noyaux

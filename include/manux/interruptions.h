@@ -104,4 +104,11 @@ void setFrequenceTimer(uint16_t freqHz);
  * Positionne la fréquence du timer 0
  */
 
+/**
+ * @brief Décompte des interruptions reçues
+ */
+#ifdef MANUX_INT_AUDIT
+extern uint32_t nbItRecues[MANUX_NB_INTERRUPTIONS];
+#endif // MANUX_INT_AUDIT
+
 #endif

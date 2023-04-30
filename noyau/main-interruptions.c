@@ -9,7 +9,7 @@
 #include <manux/interruptions.h>
 #include <manux/intel-8259a.h>
 
-void _startManuX()
+void startManuX()
 {
    int a, b = 0;
    
@@ -35,5 +35,4 @@ void _startManuX()
    
    printk("Ciao ...\n");
    
-   while (1){};   // A remplacer par un halt() 
-}   /* _startManuX */
+}   /* startManuX */

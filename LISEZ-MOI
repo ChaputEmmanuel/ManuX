@@ -3,7 +3,8 @@
 
    Le but de ce document est de stocker quelques informations sur Manux-32.
 Je ne stockerai ici que les informations concernant les points instables.
-Dès qu'un élément se stabilise à peu près, il est documenté dans la doc.
+Dès qu'un élément se stabilise à peu près, il est documenté dans la
+doc (ok, ça c'est la théorie !).
 
 Feuille de route
 ----------------
@@ -22,13 +23,19 @@ Feuille de route
    
 En cours
 --------
+   Tranquile sur les interruptions :
+   
+   . Audit des IT en cours. A faire dans intel 8259, ainsi que
+   l'affichage.
+   . Remplacer i8259a* par pic* et initialiser une structure
+   picFonctions. (COMMENCE mas en STAND BY : pas urgent !) 
+   . Séparer exception et soft ints ?
 
-   ATTENTION !  make run ne marche plus !?
+   Gérer le clavier du noyau dans le noyau, ... Ne laisser que ESC
+   pour changer de console puis par exemple les F* pour afficher les
+   informations.
 
    Je veux faire un debug pour les IRQ, ..
-
-   EN COURS : refonte du système de gestion des interruptions.
-   Ca semble OK pour les IRQ, pas pour les interruptions.
 
    ENSUITE : remplacer i8269... par IRQ... et affecter les fonctions
    avec celles du PIC, dans l'init, le clavier, l'horloge, les virtio, ...
@@ -39,7 +46,12 @@ En cours
       ajouterHandler
       ...
    }
-   
+
+   A faire : le boot par disquette ne fonctionne plus. Il faut le
+   revoir et en particulier l'initialisation de la pile qui y est
+   faite. Il faut en profiter pour revoir le Makefile, je pense que la
+   cible noyau.elf est à revoir (avec un ld spécifique ?).
+
    Fichiers de configuration
       . Est-il normal que la segmentation soit dans pc-i386 ?
       . En faire d'autres et les documenter ! Par exemple
@@ -406,3 +418,12 @@ make qui copie de include/manux vers usr/include/manux.
    printk au plus tôt, donc soit j'en fais une version "statique"
    utilisée dans memoire.c (par exemple un printk_console) soit,
    ... ben je sais pas !
+
+   BUG repéré : l'emplacement du bitmap de gestion des pages (défini
+   en memoire.c:55) n'est pas à un emplacement correct actuellement,
+   puisqu'avec une adresse de 0x1000, il déborde sur
+   tailleProprietaire, même si je ne comprends pas ce que ce dernier
+   fout à une adresse de 0x6eb8 !? Peut-être dans la pile !! Attention
+   grub ne crée pas de pile pour le noyau, il faut se débrouiller ! A
+   priori c'est rêglé pour les noyaux utilisant multiboot.
+

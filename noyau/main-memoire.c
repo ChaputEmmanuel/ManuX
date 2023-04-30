@@ -12,7 +12,7 @@
 
 #define NB_PAGES_ALLOC 128
 
-void _startManuX()
+void startManuX()
 {
    void * p;
 
