@@ -244,13 +244,6 @@ void startManuX()
    printk(PRINTK_DEBUGAGE "********************** Fin test kmalloc ***********************\n");
 #endif
 
-   //   while (1) {};
-    asm volatile("int $76" : : ); 
-    asm volatile("int $77" : : ); 
-    asm volatile("int $78" : : );
-    int a = 0;
-    int b = 1/a;
-
    init();
 }   /* _startManuX */
 
