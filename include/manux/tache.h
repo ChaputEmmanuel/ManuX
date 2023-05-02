@@ -94,21 +94,33 @@ typedef struct _Tache {
    Temps              tempsExecution;  // Cumul du temps d'exécution
 } Tache;
 
-/*
- * Chaque tâche pourra voir les infos la concernant à cette adresse
+/**
+ * @brief Chaque tâche pourra voir les infos la concernant via cette
+ * variable
  */
 extern Tache * tacheCourante;
-
+/*
 #ifdef MANUX_TACHE_CONSOLE
 Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
 #else
 Tache * creerTache(CorpsTache corpsTache);
 #endif
-
-/*
- * Création d'une nouvelle tâche. Attention, elle doit ensuite être
- * insérée dans la liste des tâches en cours.
+*/
+/**
+ * @brief Création d'une nouvelle tâche.
+ * @param corpsTache pointeur vers la fonction à exécuter par la tâche
+ * @return pointeur vers la tâche créée, NULL en cas d'erreur.
+ *
+ * Attention, elle doit ensuite être insérée dans la liste des tâches en cours.
  */
+Tache * tacheCreer(CorpsTache corpsTache);
+
+#ifdef MANUX_TACHE_CONSOLE
+/**
+ * @brief Affectation d'une console à une tâche
+ */
+void tacheSetConsole(Tache * tache, struct _Console * cons);
+#endif
 
 void basculerVersTache(Tache * tache);
 /*

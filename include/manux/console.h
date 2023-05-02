@@ -126,6 +126,18 @@ void consoleAfficherEntier(Console * cons, int n);
  */
 void consoleAfficherRegistre(Console * cons, int nbOctets, int reg);
 
+/**
+ * @brief Obtention d'un pointeur sur la console par défaut
+ */
+Console * consoleNoyau();
+
+#ifdef MANUX_CLAVIER_CONSOLE
+/**
+ * @brief Lecture d'octets depuis une console
+ */
+int consoleLire(Console * cons, void * buffer, int nbOctets);
+#endif
+
 /*
  * La notion de console virtuelle permet de gérer plusieurs affichages
  * disjoints. Chaque console est donc gérée indépendemment des autres.

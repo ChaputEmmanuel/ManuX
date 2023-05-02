@@ -282,16 +282,6 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
    // Un peu de ménage
    consoleEffacer(cons);
 
-   /*
-   afficherConsole(cons, "Console ");   
-   afficherConsoleEntierHex(cons, 4, (int)cons);
-   afficherConsole(cons, " creee a ");   
-   afficherConsoleEntier(cons, (int)cons);
-   afficherConsole(cons, ", ecran a ");   
-   afficherConsoleEntier(cons, (int)adresseEcran);
-   afficherConsole(cons, "\n");   
-   */
-   
 #ifdef MANUX_CONSOLES_VIRTUELLES
    /* On l'insère après la console active dans la liste des consoles gérées */
    cons->suivante = consoleActive->suivante;
@@ -332,6 +322,10 @@ Console * creerConsoleVirtuelle()
    //! On initialise ensuite la console
    consoleInitialiser(result, page + sizeof(Console));
 
+#ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
+    basculerVersConsole(result);
+#endif
+   
    return result;
 }
 
@@ -411,16 +405,13 @@ void basculerVersConsoleSuivante()
 
 #endif  // CONSOLES_VIRTUELLES
 
-/**
- * @brief : Implantation de l'appel système de lecture pour la console
- *
- * On va chercher des données éventuellement mises à dispo par le
- * clavier. 
- */
 #ifdef MANUX_CLAVIER_CONSOLE
 #define min(a, b) (((a)<(b)) ? (a) : (b))
 
-int lireConsoleN(Console * cons, void * buffer, int nbOctets)
+/**
+ * @brief Lecture d'octets depuis une console
+ */
+int consoleLire(Console * cons, void * buffer, int nbOctets)
 {
    // On ne peut pas en lire plus qu'il y en a !
    uint16_t nb = min(nbOctets, cons->nbCarAttente);
@@ -444,17 +435,23 @@ int lireConsoleN(Console * cons, void * buffer, int nbOctets)
    return lu;
 }
 
-size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
+/**
+ * @brief : Implantation de l'appel système de lecture pour la console
+ *
+ * On va chercher des données éventuellement mises à dispo par le
+ * clavier. 
+ */
+size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Console * con = f->prive;
 
-   return lireConsoleN(con, buffer, nbOctets);
+   return consoleLire(con, buffer, nbOctets);
 }
 #else
 /**
  * En l'absence de clavier, rien à lire !
  */
-size_t consoleLire(Fichier * f, void * buffer, size_t nbOctets)
+size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    return 0;
 }
@@ -491,7 +488,7 @@ size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
 MethodesFichier consoleMethodesFichier = {
    .ouvrir = consoleOuvrir,
    .ecrire = consoleEcrire,
-   .lire = consoleLire
+   .lire = consoleFichierLire
 };
 #endif // MANUX_FICHIER
 
@@ -515,11 +512,14 @@ void initialiserConsoleNoyau()
    consoleActive->suivante = consoleActive;
    consoleActive->precedente = consoleActive;
 #endif
+}
 
-#   ifdef MANUX_CLAVIER_CONSOLE
-   // La console noyau n'a pas de buffer clavier
-   _consoleNoyau.bufferClavier = NULL;
-#   endif
+/**
+ * @brief Obtention d'un pointeur sur la console par défaut
+ */
+Console * consoleNoyau()
+{
+   return &_consoleNoyau;
 }
 
 #ifdef MANUX_FICHIER

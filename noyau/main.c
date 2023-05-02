@@ -244,10 +244,10 @@ void _startManuX()
    printk(PRINTK_DEBUGAGE "********************** Fin test kmalloc ***********************\n");
 #endif
 
-   //   while (1) {};
-    asm volatile("int $76" : : ); 
-   int a = 0;
-   //	 int b = 1/a;
+   // On va maintenant faire de la tâche en cours une tâche "banale"
+#ifdef MANUX_CONSOLES_VIRTUELLES
+   tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
+#endif
    init();
 }   /* _startManuX */
 

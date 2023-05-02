@@ -39,7 +39,10 @@ En cours
       ajouterHandler
       ...
    }
-   
+
+   Standardiser un peu les noms (objetCreer(), objetSetPropriete(), ...)
+      creerConsoleVirtuelle()  -> consoleVirtuelleCreer()
+      
    Fichiers de configuration
       . Est-il normal que la segmentation soit dans pc-i386 ?
       . En faire d'autres et les documenter ! Par exemple

@@ -23,12 +23,7 @@
 /*
  * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
  */
-TacheID numeroProchaineTache;
-
-/*
- * Chaque tâche pourra voir les infos la concernant à cette adresse
- */
-Tache * tacheCourante = (Tache*)(MANUX_TAILLE_PAGE * MANUX_NOMBRE_PAGES_SYSTEME);
+TacheID numeroProchaineTache = 0;
 
 unsigned int nbActivations = 0; //  Nombre d'appels à activerTache
 
@@ -43,11 +38,13 @@ void basculerVersTache(Tache * tache)
 
 }
 
-#ifdef MANUX_TACHE_CONSOLE
+/*#ifdef MANUX_TACHE_CONSOLE
 Tache * creerTache(CorpsTache corpsTache, struct _Console * cons)
 #else
 Tache * creerTache(CorpsTache corpsTache)
 #endif
+*/
+Tache * tacheCreer(CorpsTache corpsTache)
 {
    void  * unePage;
    Tache * tache;
@@ -105,18 +102,8 @@ Tache * creerTache(CorpsTache corpsTache)
    tache->numero = numeroProchaineTache++;
 
 #ifdef MANUX_TACHE_CONSOLE   
-   /* On lui affecte sa console */
-   assert(cons != NULL);
-   tache->console = cons;
-
-#   ifdef MANUX_FICHIER
-   // WARNING pourquoi distinguer 0 et 1 ?
-   tache->fichiers[0].prive = (void*)cons;
-   tache->fichiers[0].methodes = &consoleMethodesFichier;
-
-   tache->fichiers[1].prive = (void*)cons;
-   tache->fichiers[1].methodes = &consoleMethodesFichier;
-#   endif
+   // Pas de console pour le moment
+   tache->console = NULL;
 #endif
    
    /* Elle n'a pas encore été activée */
@@ -173,3 +160,21 @@ Tache * creerTache(CorpsTache corpsTache)
    return tache;
 }
 
+#ifdef MANUX_TACHE_CONSOLE   
+/**
+ * @brief Affectation d'une console à une tâche
+ */
+void tacheSetConsole(Tache * tache, struct _Console * cons)
+{
+   tache->console = cons;
+
+#   ifdef MANUX_FICHIER
+   // WARNING pourquoi distinguer 0 et 1 ?
+   tache->fichiers[0].prive = (void*)cons;
+   tache->fichiers[0].methodes = &consoleMethodesFichier;
+
+   tache->fichiers[1].prive = (void*)cons;
+   tache->fichiers[1].methodes = &consoleMethodesFichier;
+#   endif
+}
+#endif

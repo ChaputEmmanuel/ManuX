@@ -36,6 +36,7 @@ void printk(char * format, ...)
    long long int       n;   // valeur associée à un %[l]d
    char      nombre[10];    // chaîne du nombre
    char    * s;             // valeur associée à un %s
+   char      c;             // Affichage d'un caractère
    int       in;            // indice pour les boucles internes
    int       nbChiffres;    // pour les %[n]d
    int       base;          // de l'affichage entier
@@ -108,6 +109,11 @@ affent :          switch (prefixe) {
                   while (s[in]) {
                      chaine[indice++] = s[in++];
 		  }
+               break;
+               case 'c' :
+                  c = va_arg(argList, char );
+                  in = 0;
+                  chaine[indice++] = c;
                break;
                default :
                break; 

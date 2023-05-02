@@ -58,8 +58,8 @@ Atomique verrouScheduler;
  */
 ListeTache listeTaches;
 
-/*
- * La tache en cours
+/**
+ * La tche en cours
  */
 Tache * tacheEnCours = NULL;
 
@@ -157,6 +157,21 @@ void afficherEtatTaches()
 }
 
 /**
+ * @brief Gestion du clavier pour la dummy
+ */
+void dummyTraiterClavier()
+{
+   Console * cons = tacheEnCours->console;
+   char c[1] ;
+
+   //   printk("[DTC 0x%x]\n", cons);
+   while (cons->nbCarAttente) {
+      consoleLire(cons, c, 1);
+      printk("/%c/", c[0]);
+   }
+}
+
+/**
  * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
  */
 void aDummyKernelTask()
@@ -164,6 +179,7 @@ void aDummyKernelTask()
    printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
    while(1) {
+     //dummyTraiterClavier();
       if (afficheEtatSystemeDemande) {
 #ifdef MANUX_VIRTIO_NET
          virtioReseauPoll(); // WARNING à virer !!!
@@ -175,36 +191,59 @@ void aDummyKernelTask()
    }
 }
 
-void initialiserScheduler()
+/**
+ * @brief Ajout d'une tâche dans l'ordonnanceur
+ *
+ * On se contente de l'insérer dans la liste des tâches de l'ordonnanceur. 
+ */
+void ordonnanceurAddTache(Tache * tache)
 {
-   /* Les valeurs initiales */
-   numeroProchaineTache = 1;
-   tacheEnCours = NULL;
-   dateDernierOrdonnancement = nbTopHorloge;
-
-   //   printk_debug(DBG_KERNEL_START, "AAAAA\n");
-   /* Initialisation de la liste des taches en cours */
-   initialiserListeTache(&listeTaches);
-   //   printk_debug(DBG_KERNEL_START, "BBBBBB\n");
-
-   /* Création d'une tâche pour le fil actuel */
-   if (ordonnancerTache(NULL, TRUE) < 0) {
-      paniqueNoyau("impossible de creer la premiere tache !\n");
-   }
-   //   printk_debug(DBG_KERNEL_START, "CCCCCC\n");
-
-   /* Initialisation de la tache "aDummyKernelTask" */
-   if (ordonnancerTache(aDummyKernelTask, FALSE)  < 0) {
-      paniqueNoyau("impossible de creer la seconde tache !\n");
-   }
-   // printk("DDDDD\n");
+   insererCelluleTache(&listeTaches,
+		       tache,
+		       (CelluleTache*)tache+sizeof(Tache));
 }
 
+/**
+ * @brief Iniitalisation de l'ordonnanceur
+ */
+void initialiserScheduler()
+{
+   Tache * t0, *t1;
+
+   dateDernierOrdonnancement = nbTopHorloge;
+
+   // Initialisation de la liste (vide) des tâches en cours
+   initialiserListeTache(&listeTaches);
+
+   // Création d'une tâche pour le fil actuel (numéro 0)
+   t0 = tacheCreer(NULL);
+   if (t0 == NULL) {
+      paniqueNoyau("impossible de creer la premiere tache !\n");
+   }
+   tacheSetConsole(t0, consoleNoyau());
+   /* Cas particulier de la première tâche : */
+   /*   . on charge son task register ;      */
+   ltr(t0->indiceTSSDescriptor);
+   /*   . et on la déclare comme en cours.   */
+   tacheEnCours = t0;
+			
+   // Initialisation de la tache "aDummyKernelTask" (numéro 1)
+   t1 = tacheCreer(aDummyKernelTask);
+   
+   if (t1 == NULL) {
+      paniqueNoyau("impossible de creer la seconde tache !\n");
+   }
+   tacheSetConsole(t1, consoleNoyau());
+   ordonnanceurAddTache(t1);
+}
+
+#ifdef SUPPRIME
 /*
  * Insertion d'une nouvelle tâche dans l'ordonnanceur. La valeur
  * retournée est l'id de la tâche ou un code d'erreur.
+ * WARNING a virer dès que la précédente est OK
  */
-TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
+TacheID ordonnancerTache(CorpsTache corpsTache, console * cons)
 {
    Tache   * tache;
 
@@ -213,9 +252,6 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
 #   ifdef MANUX_CONSOLES_VIRTUELLES
    if (nouvelleConsole) {
       cons = creerConsoleVirtuelle();
-#      ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
-	 basculerVersConsole(cons);
-#      endif
    } else {
       if (tacheEnCours != NULL) {
          cons = tacheEnCours->console;
@@ -236,7 +272,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
       return -ENOMEM;
    }
 
-   /* On insère la nouvelle tache à la fin de la liste */
+   /* On insère la nouvelle tâche à la fin de la liste */
    if (corpsTache) {
       insererCelluleTache(&listeTaches,
                           tache,
@@ -255,6 +291,8 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole)
    
    return tache->numero;
 }
+#endif
+
 
 #ifdef MANUX_APPELS_SYSTEME
 
@@ -298,10 +336,34 @@ int sys_basculerTache(ParametreAS as)
 
 TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConsole)
 {
+   Tache * tache;
+   
    assert(tacheEnCours != NULL);
 
    printk_debug(DBG_KERNEL_ORDON, "corpsTache = 0x%x, share=%d\n", corpsTache, shareConsole);
-   return ordonnancerTache(corpsTache, !shareConsole);
+
+   // Création de la tâche
+   tache = tacheCreer(corpsTache);
+   if (tache == NULL) {
+      return -ENOENT;
+   }
+
+#ifdef MANUX_TACHE_CONSOLE
+   // Affectation de la console
+#   ifdef MANUX_CONSOLES_VIRTUELLES
+   if (shareConsole) {
+      tache->console = tacheEnCours->console;
+   } else {
+      tache->console = creerConsoleVirtuelle();
+   }
+#else
+   tache->console = consoleNoyau();
+#   endif // MANUX_CONSOLES_VIRTUELLES
+#endif
+
+   ordonnanceurAddTache(tache);
+   
+   return tache->numero;
 }
 
 #endif // MANUX_APPELS_SYSTEME

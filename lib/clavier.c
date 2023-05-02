@@ -103,6 +103,7 @@ void handlerClavier(void * toto)
 #   else
       cons = consoleNoyau();
 #   endif
+      printk("[KBD-cons 0x%x]\n", cons);
       if (codeClavier & 0x80) {
       } else {
          if (cons->bufferClavier){ 
