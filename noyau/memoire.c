@@ -117,6 +117,7 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    /* De combien de pages a-t-on besoin pour les gérer ? */
    /* Pour le moment, la gestion d'une page demande 4 octets (bientôt 1 bit !) */
    tailleProprietaire = 4 * nombrePages  / MANUX_TAILLE_PAGE; 
+   printk_debug(DBG_KERNEL_MEMOIRE, "tp %d\n", tailleProprietaire);
    
    /* Le tableau d'allocation des pages ne doit pas télescoper le noyau !*/
    assert((void*)(proprietairePage + tailleProprietaire*MANUX_TAILLE_PAGE)
@@ -132,9 +133,10 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 
    printk_debug(DBG_KERNEL_MEMOIRE, "Page  0x0         pour les gestionnaires\n");
    
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%2x a 0x%2x pour la gestion memoire\n",
+   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la gestion memoire\n",
 		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
 		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
+
    // La table d'allocation de la mémoire
    for (i=0 ; i < tailleProprietaire; i++){
      reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
@@ -234,10 +236,10 @@ void * allouerPage()
       reserverPage(numeroPage);
       pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
    }
-   /*
+
    printk_debug(DBG_KERNEL_MEMOIRE, "Page 0x%x allouee\n",
 		numeroPage);
-   */
+
    return pageAllouee;
 }
 

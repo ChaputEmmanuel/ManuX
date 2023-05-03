@@ -7,7 +7,7 @@
 #include <manux/console.h>
 #include <manux/printk.h>
 
-void _startManuX()
+void startManuX()
 {
   // Initialisation de la console noyau
    consoleInitialisation();
@@ -15,7 +15,6 @@ void _startManuX()
    // Un petit message
    printk("Printk dit bonjour !\n");
   
-   while (1){};   // A remplacer par un halt() 
-}   /* _startManuX */
+}   /* startManuX */
 
 

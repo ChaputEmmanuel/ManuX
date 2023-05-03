@@ -137,11 +137,11 @@ multiso :
 #-------------------------------------------------------------------------------
 #    Lancement du noyau
 #-------------------------------------------------------------------------------
-run : $(NOYAU_ELF)
-	$(RUN_MANUX_ELF)
+run : $(NOYAUMB_ELF)
+	$(RUN_MANUXMB_ELF)
 
-rundbg : $(NOYAU_ELF)
-	$(RUN_MANUX_ELF) -gdb tcp::1234 -S 
+rundbg : $(NOYAUMB_ELF)
+	$(RUN_MANUXMB_ELF_DBG) #-gdb tcp::1234 -S 
 
 runfloppy : manux.img
 	$(RUN_MANUX_FLOPPY)

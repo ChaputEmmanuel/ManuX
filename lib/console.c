@@ -45,6 +45,10 @@ Console * consoleActive;
  */
 static char copieEcranConsoleNoyau[2*MANUX_CON_COLONNES*MANUX_CON_LIGNES];
 
+#ifdef MANUX_CLAVIER_CONSOLE
+static char bufferClavierNoyau[4096]; // WARNING taille 1 page, pas joli de le harcoder !
+#endif
+
 
 #endif // MANUX_CONSOLES_VIRTUELLES
 
@@ -251,6 +255,17 @@ void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
    }
 }
 
+#ifdef MANUX_CLAVIER_CONSOLE
+void consoleSetClavier(Console * cons, void * buffer)
+{
+   // Le buffer accueillant le clavier
+   cons->bufferClavier = buffer;
+   cons->nbCarAttente = 0;
+   cons->indiceProchainCar = 0;
+   initialiserExclusionMutuelle(&(cons->accesBufferClavier));
+}
+#endif
+
 /**
  * @brief Initialisation d'une nouvelle console virtuelle.
  *
@@ -289,16 +304,12 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
    cons->precedente = consoleActive;
    cons->suivante->precedente = cons;
 #endif
-
 #ifdef MANUX_CLAVIER_CONSOLE
-   // Le buffer accueillant le clavier
-   cons->bufferClavier = allouerPage();
-   cons->nbCarAttente = 0;
-   cons->indiceProchainCar = 0;
-   initialiserExclusionMutuelle(&(cons->accesBufferClavier));
+   consoleSetClavier(cons, NULL);
 #endif
-
 }
+
+
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
 /**
@@ -322,8 +333,12 @@ Console * creerConsoleVirtuelle()
    //! On initialise ensuite la console
    consoleInitialiser(result, page + sizeof(Console));
 
+#ifdef MANUX_CLAVIER_CONSOLE
+   consoleSetClavier(result, allouerPage());
+#endif
+
 #ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
-    basculerVersConsole(result);
+   basculerVersConsole(result);
 #endif
    
    return result;
@@ -417,7 +432,7 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
    uint16_t nb = min(nbOctets, cons->nbCarAttente);
    uint16_t lu = 0;   // Le cumul des lectures
    uint16_t aLire;    // Combien on en lit à chaque passage
-   
+
    while (lu < nb) {
      // On lit sur la "fin" du tableau circulaire
      aLire = min(nb-lu, 4096 - cons->indiceProchainCar);
@@ -501,6 +516,10 @@ void initialiserConsoleNoyau()
    //! Le gros du travail est fait par initialiserConsole
    consoleInitialiser(&_consoleNoyau, MANUX_CON_SCREEN);
 
+#ifdef MANUX_CLAVIER_CONSOLE
+   consoleSetClavier(&_consoleNoyau, bufferClavierNoyau);
+#endif
+   
 #ifdef MANUX_CONSOLES_VIRTUELLES
    //! Si on utilise plusieurs consoles, on doit pouvoir sauvegarder
    //! leur contenu, y compris pour celle du noyau

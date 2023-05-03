@@ -34,6 +34,7 @@
 #include <config/noyau.h>
 #include <config/taches.h>
 #include <config/gestion-memoire.h>
+#include <config/kmalloc.h>
 #include <config/clavier.h>
 #include <config/reseau.h>
 #include <config/pci.h>

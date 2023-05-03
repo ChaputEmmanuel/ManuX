@@ -44,6 +44,11 @@
 #   error "Pas de PIC !?"
 #endif
 
+/**
+ * @brief Décompte des interruptions
+ */
+#define MANUX_INT_AUDIT
+
 /*
  * Les IRQ des matériels pris en charge
  */

@@ -9,7 +9,7 @@
 #include <manux/printk.h>
 #include <manux/bootloader.h>
 
-void _startManuX()
+void startManuX()
 {
    uint32_t magic; // Pour vérifier si on a été démarré par multiboot
    InfoSysteme * infoSysteme;
@@ -56,7 +56,6 @@ void _startManuX()
 
    printk("That's all she wrote\n");
 
-   while (1){asm( "hlt" );};   // A remplacer par un halt() 
-}   /* _startManuX */
+}   /* startManuX */
 
 

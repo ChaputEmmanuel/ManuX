@@ -21,7 +21,9 @@
 #include <manux/i386.h>          /* ltr */
 #include <manux/appelsysteme.h>  /* console() */
 #include <manux/temps.h>         /* secondesDansTemps */
-
+#ifdef MANUX_KMALLOC_STAT
+#   include <manux/kmalloc.h>    // kmallocAfficherStatistiques
+#endif
 #ifdef MANUX_VIRTIO_CONSOLE
 #   include <manux/virtio-console.h> // A virer
 #endif
@@ -43,7 +45,6 @@ Atomique schedulerEnCours = 0;
  * Ce qui suit n'est pas trés joli, mais ça ne devrait pas rester.
  */
 booleen basculeConsoleDemandee = FALSE;
-booleen afficheEtatSystemeDemande = FALSE;
 
 booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
 				     // faire du "pas à pas"
@@ -115,7 +116,7 @@ void ordonnanceur()
 
 void afficherEtatUneTache(Tache * tache)
 {
-  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x \n",
+  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
        tache->numero,
          (tache->etat == Tache_En_Cours)?"c":((tache->etat == Tache_Prete)?"p":"b"),
           tache->nbActivations,
@@ -130,6 +131,9 @@ void afficherEtatUneTache(Tache * tache)
           tache->ldt);
 }
 
+/**
+ * @brief Affichage des tâches
+ */
 void afficherEtatTaches()
 {
    CelluleTache * celluleTache;
@@ -138,15 +142,9 @@ void afficherEtatTaches()
 	  totalMinutesDansTemps(nbTopHorloge),
 	  secondesDansTemps(nbTopHorloge),
 	  nbTopHorloge);
-#ifdef MANUX_KMALLOC_STAT
-   kmallocAfficherStatistiques("");
-#else
-   printk(" Memoire : %d / %d pages allouees\n",
-	  nombrePagesAllouees(), nombrePagesTotal());
-#endif
+
    printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
-   afficheEtatSystemeDemande = FALSE;
-   printk(" [num] et   nbAc  tpsEx     tache    console       ldt\n");
+   printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
    afficherEtatUneTache(tacheEnCours);
    for (celluleTache = listeTaches.tete;
       celluleTache != NULL;
@@ -157,17 +155,77 @@ void afficherEtatTaches()
 }
 
 /**
+ * @brief Affichage des IT reçues
+ *
+ * Le but est de présenter un écran synthétique avec le nombre
+ * d'occurences de chacune des interruptions.
+ */
+void interruptionAfficher()
+{
+   int i;
+
+   printk("----[ Exceptions ]--------------------------\n");
+   for (i = 0; i < MANUX_NB_EXCEPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+   
+   printk("----[ IRQ ]---------------------------------\n");
+   for (i = MANUX_NB_EXCEPTIONS; i < MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+   
+   printk("----[ Interruptions ]-----------------------\n");
+   for (i = MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ; i < MANUX_NB_INTERRUPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+}
+
+/**
  * @brief Gestion du clavier pour la dummy
  */
 void dummyTraiterClavier()
 {
    Console * cons = tacheEnCours->console;
    char c[1] ;
-
-   //   printk("[DTC 0x%x]\n", cons);
+   int i;
+   
    while (cons->nbCarAttente) {
       consoleLire(cons, c, 1);
-      printk("/%c/", c[0]);
+      switch (c[0]) {
+         case 'c' :
+	   for (i = 0; i < 24; i++)
+	       printk("\n");
+	 break;
+         case 'h' :
+	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\n");
+	 break;
+         case 'i' :
+            interruptionAfficher();
+	 break;
+         case 'p' :
+            afficherEtatTaches();
+	 break;
+         case 'm' :
+#ifdef MANUX_KMALLOC_STAT
+            kmallocAfficherStatistiques("");
+#else
+            printk(" Memoire : %d / %d pages allouees\n",
+	    nombrePagesAllouees(), nombrePagesTotal());
+#endif
+	 break;
+         default :
+            printk("Unkown [0x%x] pressed\n", c[0]);
+         break;
+      }
    }
 }
 
@@ -179,15 +237,13 @@ void aDummyKernelTask()
    printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
    while(1) {
-     //dummyTraiterClavier();
-      if (afficheEtatSystemeDemande) {
+      dummyTraiterClavier();
 #ifdef MANUX_VIRTIO_NET
-         virtioReseauPoll(); // WARNING à virer !!!
+      virtioReseauPoll(); // WARNING à virer !!!
 #endif
-         afficherEtatTaches();
-      }
- for (int i = 0; i<10000000; i+=1){asm("");};
- //      ordonnanceur();
+      for (int i = 0; i<100000000; i+=1){asm("");};
+   //      ordonnanceur();
+
    }
 }
 
@@ -334,9 +390,20 @@ int sys_basculerTache(ParametreAS as)
    return 0;
 }
 
+/**
+ * @brief Implantation de l'appel système de création d'une nouvelle
+ * tâche
+ * @param as le numéro de l'appel système
+ * @param corpsTache un pointeur vers la fonction a exécuter
+ * @param shareConsole pour partager la console de la tâche en cours
+ * (ou en crééer une nouvelle sinon)
+ */
 TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConsole)
 {
-   Tache * tache;
+   Tache   * tache;
+#ifdef MANUX_TACHE_CONSOLE
+   Console * console;
+#endif
    
    assert(tacheEnCours != NULL);
 
@@ -352,13 +419,14 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
    // Affectation de la console
 #   ifdef MANUX_CONSOLES_VIRTUELLES
    if (shareConsole) {
-      tache->console = tacheEnCours->console;
+      console = tacheEnCours->console;
    } else {
-      tache->console = creerConsoleVirtuelle();
+      console = creerConsoleVirtuelle();
    }
 #else
-   tache->console = consoleNoyau();
+   console = consoleNoyau();
 #   endif // MANUX_CONSOLES_VIRTUELLES
+   tacheSetConsole(tache, console);
 #endif
 
    ordonnanceurAddTache(tache);

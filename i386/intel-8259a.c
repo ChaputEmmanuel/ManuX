@@ -14,10 +14,11 @@
 #include <manux/types.h>
 #include <manux/errno.h>
 
+#include <manux/interruptions.h> // nbItRecues
 #include <manux/intel-8259a.h>
 
-/*
- * Structure permettant de définir un matériel "client"
+/**
+ * @brief Structure permettant de définir un matériel "client"
  */
 typedef struct {
    void (* handler)(void *);
@@ -151,8 +152,8 @@ void i8259aInterdireIRQ(uint8_t numIRQ)
    outb(port, masque & (0x01 << numIRQ));
 }
 
-/*
- * Masquage d'une IRQ
+/**
+ * @brief Masquage d'une IRQ
  */
 void i8259aAutoriserIRQ(uint8_t numIRQ)
 {
@@ -172,8 +173,8 @@ void i8259aAutoriserIRQ(uint8_t numIRQ)
    outb(port, masque & ~(0x01 << numIRQ));
 }
 
-/*
- * Accusé de réception d'une IRQ
+/**
+ * @brief Accusé de réception d'une IRQ
  *
  * Note : on envoie ici un EOI non spécifique (cf [5] p 15) alors que
  * Linux semble faire du specifique.
@@ -197,6 +198,10 @@ void i8259aGestionIRQ(TousRegistres registres, uint32_t numIRQ,
                       uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
    int i;
+
+#ifdef MANUX_INT_AUDIT
+   nbItRecues[numIRQ] ++;
+#endif
    
    // On accuse réception auprès du PIC
    i8259aAckIRQ(numIRQ);

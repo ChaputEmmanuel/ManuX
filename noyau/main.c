@@ -102,7 +102,7 @@ void testerVirtioConsole()
 }
 #endif // MANUX_VIRTIO_CONSOLE
 
-void _startManuX()
+void startManuX()
 {
    union {
       uint32_t registres[3];
@@ -248,6 +248,7 @@ void _startManuX()
 #ifdef MANUX_CONSOLES_VIRTUELLES
    tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
 #endif
+
    init();
 }   /* _startManuX */
 

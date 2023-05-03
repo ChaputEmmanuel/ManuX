@@ -6,7 +6,7 @@
 #include <manux/config.h>
 #include <manux/console.h>
 
-void _startManuX()
+void startManuX()
 {
    // Initialisation de la console noyau
    consoleInitialisation();

@@ -114,11 +114,18 @@ RUN_MANUX_FLOPPY = qemu-system-i386 \
 		   $(QEMU_RAMSIZE) \
                    -drive format=raw,file=$(FLOPPY_IMG),index=0,if=floppy
 		   
-RUN_MANUX_ELF    = qemu-system-i386 \
-                   -kernel $(ROOTDIR)/noyau/noyau.elf \
+RUN_MANUXMB_ELF  = qemu-system-i386 \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
-		   $(QEMU_RAMSIZE)
+		   $(QEMU_RAMSIZE) \
+                   -kernel $(NOYAUMB_ELF)
+		   
+RUN_MANUXMB_ELF_DBG = qemu-system-i386 \
+		   $(QEMU_VIRTIO_CONSOLE) \
+		   $(QEMU_VIRTIO_NET) \
+		   $(QEMU_RAMSIZE) \
+		   $(QEMU_DEBUG) \
+                   -kernel $(NOYAUMB_ELF)
 		   
 RUN_MANUX_ISO    = qemu-system-i386 \
 		   $(QEMU_VIRTIO_CONSOLE) \

@@ -86,10 +86,7 @@ void handlerClavier(void * toto)
 	 return;
       }
 #endif
-      if (codeClavier == KEYCODE_TAB) {
- 	 afficheEtatSystemeDemande = TRUE;
-	 return;
-      }
+
 #ifdef MANUX_TACHES
       if (codeClavier == KEYCODE_F1) {
  	 basculerTacheDemande = TRUE;
@@ -103,7 +100,8 @@ void handlerClavier(void * toto)
 #   else
       cons = consoleNoyau();
 #   endif
-      printk("[KBD-cons 0x%x]\n", cons);
+      //      printk("[KBD-cons 0x%x : %d]\n", cons, cons->nbCarAttente);
+
       if (codeClavier & 0x80) {
       } else {
          if (cons->bufferClavier){ 
@@ -111,8 +109,11 @@ void handlerClavier(void * toto)
                cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] =
 		 shiftActif ?keymapShift[codeClavier]:keymap[codeClavier];
 	       cons->nbCarAttente++;
-             }
- 	 }
+	       //               printk("[KBD-cons 0x%x : %d]\n", cons, cons->nbCarAttente);
+	    }
+	    /* 	 } else {
+		 printk("[KBD-cons 0x%x : NO BUF]\n", cons);*/
+	 }
       }
 #endif
    }

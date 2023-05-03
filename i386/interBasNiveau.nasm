@@ -45,132 +45,132 @@ versHandlerException :
 
 ; Et maintenant on définit tous les handlers d'exception
 ;-------------------------------------------------------
-global stubHandlerExceptionDiv0
-stubHandlerExceptionDiv0 :                ; Exception "division par zéro"
+global stubHandlerExDiv0
+stubHandlerExDiv0 :                ; Exception "division par zéro"
        stubHandlerException 0x00
 
-global stubHandlerExceptionDebug
-stubHandlerExceptionDebug :               ; Exception "debug"
+global stubHandlerExDebug
+stubHandlerExDebug :               ; Exception "debug"
        stubHandlerException 0x01
        
-global stubHandlerExceptionNMI
-stubHandlerExceptionNMI :                 ; Exception "non maskable interrupt"
+global stubHandlerExNMI
+stubHandlerExNMI :                 ; Exception "non maskable interrupt"
        stubHandlerException 0x02
        
-global stubHandlerExceptionBreakpoint
-stubHandlerExceptionBreakpoint:           ;
+global stubHandlerExBreakpoint
+stubHandlerExBreakpoint:           ;
        stubHandlerException 0x03
        
-global stubHandlerExceptionOverflow
-stubHandlerExceptionOverflow :            ; Exception "Overflow"
+global stubHandlerExOverflow
+stubHandlerExOverflow :            ; Exception "Overflow"
        stubHandlerException 0x04
 
-global stubHandlerExceptionBoundExceeded
-stubHandlerExceptionBoundExceeded :       ;
+global stubHandlerExBoundExceeded
+stubHandlerExBoundExceeded :       ;
        stubHandlerException 0x05
 
-global stubHandlerExceptionDeviceInvalidOpcode
-stubHandlerExceptionDeviceInvalidOpcode : ; Exception "invalid opcode"
+global stubHandlerExDeviceInvalidOpcode
+stubHandlerExDeviceInvalidOpcode : ; Exception "invalid opcode"
        stubHandlerException 0x06
               
-global stubHandlerExceptionDeviceUnavailable
-stubHandlerExceptionDeviceUnavailable :   ; Exception "device unavailable"
+global stubHandlerExDeviceUnavailable
+stubHandlerExDeviceUnavailable :   ; Exception "device unavailable"
        stubHandlerException 0x07
 
-global stubHandlerExceptionDoubleFault
-stubHandlerExceptionDoubleFault :
+global stubHandlerExDoubleFault
+stubHandlerExDoubleFault :
        stubHandlerExceptionCode 0x08
 
-global stubHandlerExceptionCoproOverrun
-stubHandlerExceptionCoproOverrun :        ; Exception "Coprocessor Segment Overrun"
+global stubHandlerExCoproOverrun
+stubHandlerExCoproOverrun :        ; Exception "Coprocessor Segment Overrun"
        stubHandlerException 0x09
 
-global stubHandlerExceptionInvalidTSS
-stubHandlerExceptionInvalidTSS :
+global stubHandlerExInvalidTSS
+stubHandlerExInvalidTSS :
        stubHandlerExceptionCode 0x0a
 
-global stubHandlerExceptionSegmentNotPresent
-stubHandlerExceptionSegmentNotPresent :
+global stubHandlerExSegmentNotPresent
+stubHandlerExSegmentNotPresent :
        stubHandlerExceptionCode 0x0b
 
-global stubHandlerExceptionStackSegmentFault
-stubHandlerExceptionStackSegmentFault :
+global stubHandlerExStackSegmentFault
+stubHandlerExStackSegmentFault :
        stubHandlerExceptionCode 0x0c
 
-global stubHandlerExceptionGeneralProtectionFault
-stubHandlerExceptionGeneralProtectionFault :
+global stubHandlerExGeneralProtectionFault
+stubHandlerExGeneralProtectionFault :
        stubHandlerExceptionCode 0x0d
 
-global stubHandlerExceptionPageFault
-stubHandlerExceptionPageFault :
+global stubHandlerExPageFault
+stubHandlerExPageFault :
        stubHandlerExceptionCode 0x0e
 
-global stubHandlerExceptionReserved
-stubHandlerExceptionReserved :
+global stubHandlerExReserved
+stubHandlerExReserved :
        stubHandlerException 0x0f
 
-global stubHandlerExceptionFloatingPoint
-stubHandlerExceptionFloatingPoint :
+global stubHandlerExFloatingPoint
+stubHandlerExFloatingPoint :
        stubHandlerException 0x10
 
-global stubHandlerExceptionAlignmentCheck
-stubHandlerExceptionAlignmentCheck :
+global stubHandlerExAlignmentCheck
+stubHandlerExAlignmentCheck :
        stubHandlerExceptionCode 0x11
 
-global stubHandlerExceptionFloatingMachineCheck
-stubHandlerExceptionFloatingMachineCheck :
+global stubHandlerExFloatingMachineCheck
+stubHandlerExFloatingMachineCheck :
        stubHandlerException 0x12
 
-global stubHandlerExceptionFloatingSIMDFPE
-stubHandlerExceptionFloatingSIMDFPE :
+global stubHandlerExFloatingSIMDFPE
+stubHandlerExFloatingSIMDFPE :
        stubHandlerException 0x13
 
-global stubHandlerExceptionFloatingVirtualization
-stubHandlerExceptionFloatingVirtualization :
+global stubHandlerExFloatingVirtualization
+stubHandlerExFloatingVirtualization :
        stubHandlerException 0x14
 
-global stubHandlerExceptionControlProtection
-stubHandlerExceptionControlProtection :
+global stubHandlerExControlProtection
+stubHandlerExControlProtection :
        stubHandlerExceptionCode 0x15
 
-global stubHandlerExceptionReserved2
-stubHandlerExceptionReserved2 :
+global stubHandlerExReserved2
+stubHandlerExReserved2 :
        stubHandlerException 0x16
 
-global stubHandlerExceptionReserved3
-stubHandlerExceptionReserved3 :
+global stubHandlerExReserved3
+stubHandlerExReserved3 :
        stubHandlerException 0x17
 
-global stubHandlerExceptionReserved4
-stubHandlerExceptionReserved4 :
+global stubHandlerExReserved4
+stubHandlerExReserved4 :
        stubHandlerException 0x18
 
-global stubHandlerExceptionReserved5
-stubHandlerExceptionReserved5 :
+global stubHandlerExReserved5
+stubHandlerExReserved5 :
        stubHandlerException 0x19
 
-global stubHandlerExceptionReserved6
-stubHandlerExceptionReserved6 :
+global stubHandlerExReserved6
+stubHandlerExReserved6 :
        stubHandlerException 0x1a
 
-global stubHandlerExceptionReserved7
-stubHandlerExceptionReserved7 :
+global stubHandlerExReserved7
+stubHandlerExReserved7 :
        stubHandlerException 0x1b
 
-global stubHandlerExceptionHypervisionInjection
-stubHandlerExceptionHypervisionInjection :
+global stubHandlerExHypervisionInjection
+stubHandlerExHypervisionInjection :
        stubHandlerException 0x1c
 
-global stubHandlerExceptionVMMCommunication
-stubHandlerExceptionVMMCommunication :
+global stubHandlerExVMMCommunication
+stubHandlerExVMMCommunication :
       stubHandlerExceptionCode 0x1d
 
-global stubHandlerExceptionSecurity
-stubHandlerExceptionSecurity :
+global stubHandlerExSecurity
+stubHandlerExSecurity :
       stubHandlerExceptionCode 0x1e
 
-global stubHandlerExceptionReserved8
-stubHandlerExceptionReserved8 :
+global stubHandlerExReserved8
+stubHandlerExReserved8 :
       stubHandlerException 0x1f
 
 ;===============================================================================
@@ -198,11 +198,11 @@ extern MANUX_HANDLER_IRQ            ; La fonction de gestion, liée au PIC
 %endmacro
 
 handlerIRQ :
-	pusha
+	pusha                       ; On empile les registres 
 	
-        call MANUX_HANDLER_IRQ
+        call MANUX_HANDLER_IRQ      ; On appelle la fonction d'aiguillage 
 
-	popa
+	popa                        ; On dépile les registres
         add esp, 4                  ; Dépile le numéro d'IRQ
 
         iret
@@ -220,20 +220,20 @@ stubHandlerIRQ%[i] : stubHandlerIRQn i
 ;   Gestion des interruptions logicielles
 ;
 ;===============================================================================
-extern  neRienFaire  ;  gestionInterruption ;
+extern  gestionInterruption 
 
 %macro stubHandlerInt 1
-        push dword %1               ; On empile le numéro de l'interruption
+        push dword %1            ; On empile le numéro de l'interruption
 	jmp  handlerInt
 %endmacro
 
 handlerInt :
-	pushad
+	pushad                   ; Sauvegarde des registres
 	
-        call neRienFaire ;  gestionInterruption ; 
+        call gestionInterruption ; Invocation de la focntion d'aiguillage
 
-	popad
-        add esp, 4                  ; Dépile le numéro d'interruption
+	popad                    ; Restauration des registres
+        add esp, 4               ; On dépile le numéro d'interruption
         iret
 
 ; On génère les gestionnaires bas niveau
@@ -246,6 +246,7 @@ stubHandlerInt%[i] : stubHandlerInt i
 %assign i i+1
 %endrep
 
+;------------------------------------------------------------------------------
 ; La fonction suivante initialise un tableau avec les addresses des
 ; gestionnaires bas niveau. Son interface C est la suivante
 ;

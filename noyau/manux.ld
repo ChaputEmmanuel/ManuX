@@ -9,7 +9,7 @@ SECTIONS {
         *(.multiboot)
     }
 
-    _adresseDebutManuX = .;          /* C'est ici que le noyau commence */
+    _adresseDebutManuX = .;         /* C'est ici que le noyau commence */
     .text : {
        *(.text)
     }        
@@ -22,7 +22,7 @@ SECTIONS {
     .bss : {
        *(.bss)
     }
-    _adresseFinManuX = .;            /* Repérage de la fin */
+    _adresseFinManuX = .;           /* Repérage de la fin */
     . = ALIGN(4096);
     _adressePileManuX = . ; 
     .stack (NOLOAD) :

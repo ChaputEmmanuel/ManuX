@@ -44,12 +44,14 @@ void calculerPremiers(int q)
 
       // Test du clavier et stdin
       nbLu = lire(0, txt, 31);
-      txt[nbLu] = 0;
-      printf("   Lu %d => '%s'\n", nbLu, txt);
+      if (nbLu) {
+	 txt[nbLu] = 0;
+         printf("   Lu %d => '%s'\n", nbLu, txt);
+      }
 
-      //#ifndef MANUX_PREEMPTIF
+#ifndef MANUX_PREEMPTIF
       basculerTache();
-      //#endif
+#endif
    }
 }
 
@@ -67,16 +69,8 @@ void deuxiemeTache()
 void init()
 {
    int n=2; // nombre de messages affichés
-   //printk("Pouet\n");
-   printf("Greetings from userland !\n");
-   
-   //while(1){};
 
-   //printk("Pouet\n");
-   //   appelSystemeInutile();
-   //printk("Repouet\n");
-   //appelSystemeInutile();
-   //printk("Et dix de pouet\n");
+   printf("Greetings from userland !\n");
    
    n = creerNouvelleTache(deuxiemeTache, FALSE);
 
