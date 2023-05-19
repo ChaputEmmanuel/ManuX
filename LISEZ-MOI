@@ -36,7 +36,9 @@ En cours
    Tranquile sur les interruptions :
    
    . Remplacer i8259a* par pic* et initialiser une structure
-   picFonctions. (COMMENCE mas en STAND BY : pas urgent !) 
+   picFonctions. (COMMENCE mas en STAND BY : pas urgent !)
+   . Le PIC ne devrait pas être visible hors de interruptions ! Pas
+   besoin d'include de i8259a ailleurs que dans interruptions.h
    . Séparer exception et soft ints ?
 
    ENSUITE : remplacer i8269... par IRQ... et affecter les fonctions

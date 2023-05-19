@@ -13,9 +13,16 @@
  */
 extern Temps nbTopHorloge;
 
-/*
- * Initialisation de la gestion de l'horloge matérielle
+/**
+ * @brief Initialisation de la gestion de l'horloge matérielle
  */
 void initialiserHorloge();
 
+/**
+ * @brief Attente active de n millisecondes
+ *
+ * Attention, ce n'est pas fiable !
+ */
+void attenteMilliSecondes(int n);
+ 
 #endif

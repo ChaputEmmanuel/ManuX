@@ -24,8 +24,21 @@
 #endif
 
 /**
- * La fréquence du timer
+ * @brief La fréquence du timer
  */
 #ifndef MANUX_FREQUENCE_HORLOGE
 #   define MANUX_FREQUENCE_HORLOGE 100
+#endif
+
+/**
+ * @brief Durée du calibrage des attentes actives en nombre de cycles
+ * du timer.
+ * 
+ * La valeur MANUX_FREQUENCE_HORLOGE conduit donc à un calibrage sur
+ * une seconde.
+ * Attention, on fait une boucle sur un uint32_t donc il faut
+ * s'assurer de ne pas dépasser 2^32 !
+ */
+#ifndef MANUX_NB_CYCLES_CALIBRAGE
+#   define MANUX_NB_CYCLES_CALIBRAGE MANUX_FREQUENCE_HORLOGE
 #endif

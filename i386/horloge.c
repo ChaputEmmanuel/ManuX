@@ -9,11 +9,16 @@
 #include <manux/io.h>           // outb
 #include <manux/memoire.h>      // NULL
 #include <manux/scheduler.h>    // ordonnanceur
-
+#include <manux/printk.h>
 /*
  * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
  */
 Temps nbTopHorloge = 0;
+
+/*
+ * Le calibre pour les attentes courtes actives
+ */
+uint32_t attenteCalibre;
 
 /*
  * Le handler du timer
@@ -42,18 +47,6 @@ void setFrequenceHorloge(uint16_t freqHz)
    outb(0x40, (decompte >> 8) & 0xFF);
 }
 
-void initialiserHorloge()
-{
-   // Initialisation de la fréquence de l'horloge matérielle
-   setFrequenceHorloge(MANUX_FREQUENCE_HORLOGE);
-
-   // Enregistrement auprès du PIC
-   i8259aAjouterHandler(IRQ_HORLOGE, handlerHorloge, NULL);
-
-   // Autorisation de l'IRQ
-   i8259aAutoriserIRQ(IRQ_HORLOGE);
-}
-
 /**
  * @brief Calibrage de la fonction mdelay()
  */
@@ -67,12 +60,37 @@ void attenteCalibrer()
    // On attend le prochain top
    do {
    } while (t == nbTopHorloge);
-   t++;
+   t += 1 + MANUX_NB_CYCLES_CALIBRAGE;
    
    // On compte le nombre de boucles entre deux tops
    do {
       n++;
    } while (nbTopHorloge < t);
+
+   // On a donc fait n boucles entre deux tops soit une durée de
+   // 1000*NB_CYCLES_CALIBRAGE/MANUX_FREQUENCE_HORLOGE ms. Donc pour
+   // une milliseconde il nous faut 
+   attenteCalibre = ((MANUX_FREQUENCE_HORLOGE/MANUX_NB_CYCLES_CALIBRAGE) * n)/1000;
+
+   //printk("Calibrage : n = %d, f = %d, c = %d\n", n, MANUX_FREQUENCE_HORLOGE, attenteCalibre);
+}
+
+/** 
+ * @brief Initialisation du système d'horloge
+ */
+void initialiserHorloge()
+{
+   // Initialisation de la fréquence de l'horloge matérielle
+   setFrequenceHorloge(MANUX_FREQUENCE_HORLOGE);
+
+   // Enregistrement auprès du PIC
+   i8259aAjouterHandler(IRQ_HORLOGE, handlerHorloge, NULL);
+
+   // Autorisation de l'IRQ
+   i8259aAutoriserIRQ(IRQ_HORLOGE);
+
+   // Calibrage du système d'attente active
+   attenteCalibrer();
 }
 
 /**
@@ -82,7 +100,7 @@ void attenteMilliSecondes(int n)
 {
    uint32_t m = n * attenteCalibre;
    uint32_t c = 0;
-   
+
    do {
       c++;
    } while (c < m);
