@@ -9,6 +9,13 @@ doc (ok, ça c'est la théorie !).
 Feuille de route
 ----------------
 
+   (pour les cours)
+   . dormir/réveiller
+   . verrou tournant
+   . mutex
+   . pipe
+
+
    . [FAIT] Un malloc, parce qu'il y en a marre de tout déclarer en statique !
       . [FAIT] Un buddy area dans un premier temps
       . Pourquoi pas un slab allocator plus tard
@@ -23,6 +30,9 @@ Feuille de route
    
 En cours
 --------
+
+   Horloge.c :  un délai en millisecondes
+
    Tranquile sur les interruptions :
    
    . Remplacer i8259a* par pic* et initialiser une structure
@@ -39,9 +49,9 @@ En cours
       ...
    }
 
-   A VOIR : comment permettre à printk() de commencer par un [ ou { ou ( ?
    A VOIR : Faire proprement un menu pour dummyTask (à renommer,
    d'ailleurs) 
+   A VOIR : comment permettre à printk() de commencer par un [ ou { ou ( ?
    A VOIR : gérer dans la console les échappement ascii (séquences
    ANSI \033) 
 

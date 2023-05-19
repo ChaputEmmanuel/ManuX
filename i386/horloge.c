@@ -53,3 +53,38 @@ void initialiserHorloge()
    // Autorisation de l'IRQ
    i8259aAutoriserIRQ(IRQ_HORLOGE);
 }
+
+/**
+ * @brief Calibrage de la fonction mdelay()
+ */
+void attenteCalibrer()
+{
+   Temps    t;
+   uint32_t n = 0;
+
+   t = nbTopHorloge;
+
+   // On attend le prochain top
+   do {
+   } while (t == nbTopHorloge);
+   t++;
+   
+   // On compte le nombre de boucles entre deux tops
+   do {
+      n++;
+   } while (nbTopHorloge < t);
+}
+
+/**
+ * @brief Attente active de n millisecondes
+ */
+void attenteMilliSecondes(int n)
+{
+   uint32_t m = n * attenteCalibre;
+   uint32_t c = 0;
+   
+   do {
+      c++;
+   } while (c < m);
+}
+
