@@ -10,10 +10,13 @@ Feuille de route
 ----------------
 
    (pour les cours)
-   . dormir/réveiller
-   . verrou tournant
-   . mutex
+   . dormir/réveiller      <- est-ce vraiment utile sous cette forme ?
+   . verrou tournant       <- quasiment fait dans atomique
+   . mutex                 <- idem
    . pipe
+      . appel système de création (en profiter pour documenter les AS
+   ?)
+   
 
 
    . [FAIT] Un malloc, parce qu'il y en a marre de tout déclarer en statique !
@@ -31,8 +34,18 @@ Feuille de route
 En cours
 --------
 
-   Horloge.c :  un délai en millisecondes
+   ATTENTION : les fonctions de manipulation de fichiers doivent être
+   trouvées dans l'iNoeud, pas dans le fichier
+   ATTENTION : la gestion de l'iNoeud dans la console n'est pas
+   bonne. Voir en particulier consoleOuvrir() ou fichierEcrire() dans fichier.c
+   il faudrait plutôt mettre les opérations de fichier dans l'iNoeud,
+   et il *faut* ajouter un pointeur vers l'iNoeud dans le fichier.
 
+   A FAIRE : fin d'une tâche :faire un "main" générique qui invoque la
+   fonction passée en paramètre puis qui détruit la tâche et libère
+   les ressources (c'est là que c'est un peu touchy : détruire une
+   structure alors qu'on est encore dans le contexte).
+   
    Tranquile sur les interruptions :
    
    . Remplacer i8259a* par pic* et initialiser une structure
@@ -447,4 +460,7 @@ make qui copie de include/manux vers usr/include/manux.
    Gérer le clavier du noyau dans le noyau, ... Ne laisser que ESC
    pour changer de console puis par exemple les F* pour afficher les
    informations.
+
+   Horloge.c :  un délai en millisecondes
+   A FAIRE immédiatement : séparer iNoeud et fichier
 

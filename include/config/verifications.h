@@ -55,3 +55,11 @@
 #if defined(MANUX_KMALLOC_STAT) && !defined(MANUX_KMALLOC)
 #   error "MANUX_KMALLOC_STAT nécessite MANUX_KMALLOC"
 #endif
+
+#if defined(MANUX_TUBES) && !defined(MANUX_GESTION_MEMOIRE)
+#   error "MANUX_TUBES nécessite MANUX_GESTION_MEMOIRE"
+#endif
+
+#if defined(MANUX_TUBES) && !defined(MANUX_KMALLOC)
+#   error "MANUX_TUBES nécessite MANUX_KMALLOC"
+#endif

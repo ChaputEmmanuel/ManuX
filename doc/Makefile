@@ -19,6 +19,7 @@ DOCS_PDF = \
            boot-part.pdf \
            affichage-part.pdf \
            inter-part.pdf \
+           appel-systeme-part.pdf \
            memoire-part.pdf 
 
 DOCS_HT = $(DOCS_PDF:.pdf=.ht)

@@ -101,6 +101,14 @@ Tache * tacheCreer(CorpsTache corpsTache)
    /* On lui affecte son numero */
    tache->numero = numeroProchaineTache++;
 
+#ifdef MANUX_FICHIER
+   // Pas de fichier ouvert pour le moment
+   for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
+     tache->fichiers[i] = NULL;
+   }
+   tache->nbFichiersOuverts = 0;
+#endif
+   
 #ifdef MANUX_TACHE_CONSOLE   
    // Pas de console pour le moment
    tache->console = NULL;
@@ -168,13 +176,67 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
 {
    tache->console = cons;
 
-#   ifdef MANUX_FICHIER
-   // WARNING pourquoi distinguer 0 et 1 ?
-   tache->fichiers[0].prive = (void*)cons;
-   tache->fichiers[0].methodes = &consoleMethodesFichier;
-
-   tache->fichiers[1].prive = (void*)cons;
-   tache->fichiers[1].methodes = &consoleMethodesFichier;
+#   ifdef MANUX_FICHIER   // et sinon !?
+   Fichier * f;
+   INoeud * i;
+   
+   i = consoleCreerINoeud(cons);
+   f = fichierCreer(i);
+   
+   tache->fichiers[0] =  f;
+   
 #   endif
 }
+
+#ifdef MANUX_FICHIER
+/**
+ * @brief Recherche du premier numéro de fichier ouvert disponible
+ *
+ * Attention : doit être protégé par un mutex !
+ */
+static int inline tacheNumFichierLibre(Tache * tache)
+{
+   int result = 0;
+
+   while ((result < MANUX_NB_MAX_FICHIERS) && (tache->fichiers[result])) {
+      result++;
+   }
+   return result;
+}
+
+/**
+ * @brief Ajout de n fichiers dans la table des descripteurs de
+ * fichier d'une tâche.
+ *
+ * On les affecte tous ou aucun. A priori, n = 1 la plupart du temps,
+ * et éventuellement 2 pour les tubes, ...
+ */
+int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
+{
+   int nbLibres;
+   int result = 0;
+   int fd;
+   
+   // WARNING à protéger par un mutex lock
+
+   // A-t-on la place ?
+   nbLibres = MANUX_NB_MAX_FICHIERS - tache->nbFichiersOuverts;
+   
+   // Si oui on affecte
+   if (nbLibres >= n) {
+      for (int i = 0; i < n; i++) {
+         fd = tacheNumFichierLibre(tache);
+	 assert(fd >= 0);
+	 assert(fd < MANUX_NB_MAX_FICHIERS);
+	 fds[i] = fd;
+	 tache->fichiers[fd] = fichiers[i];
+	 tache->nbFichiersOuverts ++;
+	 result++;
+      }
+   }
+
+   return result;
+}
+#endif
+
 #endif

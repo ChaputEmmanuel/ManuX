@@ -1,0 +1,70 @@
+%===============================================================================
+%
+%===============================================================================
+\section{Les outils de synchronisation}
+
+Allez donc voir votre cours de système d'exploitation centralisé !
+
+%===============================================================================
+%      Les outils de synchronisation
+%===============================================================================
+\section{L'implantation dans ManuX}
+
+   Les moyens de synchronisation entre tâches actuellement disponibles
+sont 
+
+\begin{itemize}
+   \item les opérations atomiques ;
+   \item les exclusions mutuelles.
+\end{itemize}
+
+%-------------------------------------------------------------------------------
+%      Opérations atomiques
+%-------------------------------------------------------------------------------
+\subsection{Opérations atomiques}
+
+   Les opérations élémentaires de synchronisation sont définies dans
+le fichier {\tt atomique.h}. Elles se basent sur le type
+\lstinline!Atomique! et les opérations qui lui sont associées. A part
+l'initialisation et la consultation, l'opération importante est la
+suivante
+
+\begin{lstlisting}{}
+booleen atomiqueTestInit(volatile Atomique * atom, uint32 val, uint32 cond);
+\end{lstlisting}
+
+   Elle compare la valeur de l'\lstinline!Atomique! avec
+\lstinline!cond! et, en cas d'égalité, affecte l'\lstinline!Atomique!
+avec la valeur \lstinline!val! et renvoie \lstinline!TRUE!, sinon elle 
+ne fait rien et renvoie \lstinline!FALSE!. Ce qui est important, bien
+sur, c'est que la comparaison et l'éventuelle affectation soient
+réalisées de façon {\em atomique}.
+
+%-------------------------------------------------------------------------------
+%      Exclusions mutuelles
+%-------------------------------------------------------------------------------
+\subsection{Exclusions mutuelles}
+
+   Les variables d'exclusion mutuelle permettent d'assurer que l'accés
+à une ressource (typiquement une section de code critique) se fait de
+façon exclusive entre les tâches.
+
+   Le fichier {\tt atomique.h} définit le type et les fonctions
+suivants 
+
+\begin{lstlisting}{}
+typedef struct _ExclusionMutuelle {
+   Atomique   verrou;
+   ListeTache tachesEnAttente;
+} ExclusionMutuelle;
+
+void initialiserExclusionMutuelle(ExclusionMutuelle * em);
+void entrerExclusionMutuelle(ExclusionMutuelle * em);
+void sortirExclusionMutuelle(ExclusionMutuelle * em);
+\end{lstlisting}
+
+   Naturellement, comme leurs noms l'indiquent, les trois
+sous-programmes permettent respectivement d'initialiser une variable
+d'exclusion mutuelle, de prendre une exclusion mutuelle et de libérer
+une exclusion mutuelle.
+

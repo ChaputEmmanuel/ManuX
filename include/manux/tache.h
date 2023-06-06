@@ -88,7 +88,8 @@ typedef struct _Tache {
    struct _Console  * console;
 #endif
 #ifdef MANUX_FICHIER
-  Fichier             fichiers[MANUX_NB_MAX_FICHIERS]; // WARNING à généraliser
+   Fichier          * fichiers[MANUX_NB_MAX_FICHIERS];
+   int                nbFichiersOuverts; // Pour faciliter la gestiob
 #endif
    uint32_t           nbActivations;   // Décompte du nombre d'activations
    Temps              tempsExecution;  // Cumul du temps d'exécution
@@ -99,6 +100,7 @@ typedef struct _Tache {
  * variable
  */
 extern Tache * tacheCourante;
+
 /*
 #ifdef MANUX_TACHE_CONSOLE
 Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
@@ -131,5 +133,17 @@ TacheID sysFork();
 /*
  * Implantation de l'appel système fork
  */
+
+#ifdef MANUX_FICHIER
+
+/**
+ * @brief Ajout de n fichiers dans la table des descripteurs de
+ * fichier d'une tâche.
+ *
+ * On les affecte tous ou aucun. A priori, n = 1 la plupart du temps,
+ * et éventuellement 2 pour les tubes, ...
+ */
+int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds);
+#endif
 
 #endif

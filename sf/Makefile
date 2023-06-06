@@ -7,6 +7,9 @@ ASM         = nasm
 ASM_BIN_OPT = -f elf
 
 OBJETS      = fichier.o
+OBJETS     +=   $(if $(MANUX_INOEUDS), inoeud.o)
+OBJETS     +=   $(if $(MANUX_TUBES), tubes.o)
+
 
 include ../make.conf
 

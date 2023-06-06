@@ -46,8 +46,6 @@ void startManuX()
    // Initialisation du journal
    journalInitialiser(&iNoeudConsole);
 
-   initialiserPagination(infoSysteme.memoireEtendue);
-
    initialiserAppelsSysteme();
 
    initialiserClavier();

@@ -18,6 +18,9 @@
 #include <manux/string.h>       // memcpy
 #include <manux/debug.h>        // assert
 #include <manux/temps.h>
+#ifdef MANUX_KMALLOC
+# include <manux/kmalloc.h>
+#endif
 
 //#define MANUX_CONSOLE_AVEC_MUTEX
 
@@ -30,6 +33,11 @@
 static Console _consoleNoyau;
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
+
+/**
+ * @brief Pour les compter
+ */
+static int nombreDeConsoles = 0;
 
 /**
  * En cas de gestion de consoles virtuelles, à tout moment, il n'y a
@@ -303,13 +311,12 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
    consoleActive->suivante = cons;
    cons->precedente = consoleActive;
    cons->suivante->precedente = cons;
+   cons->numero = nombreDeConsoles++;
 #endif
 #ifdef MANUX_CLAVIER_CONSOLE
    consoleSetClavier(cons, NULL);
 #endif
 }
-
-
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
 /**
@@ -478,8 +485,8 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
  */
 int consoleOuvrir(INoeud * iNoeud, Fichier * f)
 {
-   f->methodes = &consoleMethodesFichier;
-   f->prive = &_consoleNoyau;
+   f->iNoeud = iNoeud; //methodes = &consoleMethodesFichier;
+   //  f->prive = &_consoleNoyau;   // WARNING il y a un soucis là non ?
 
    return ESUCCES;
 }
@@ -542,6 +549,15 @@ Console * consoleNoyau()
 }
 
 #ifdef MANUX_FICHIER
+
+void consoleInitialiserINoeud(INoeud * i, Console * c)
+{
+   i->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
+   i->typePeripherique.mineur = c->numero;
+   i->prive = c;
+   i->methodesFichier = &consoleMethodesFichier;
+}
+
 /**
  * Initialisation du système de console. 
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
@@ -552,14 +568,32 @@ int consoleInitialisation(INoeud * iNoeudConsole)
    initialiserConsoleNoyau();
 
    //! On initialise l'INoeud qui la décrit
-   iNoeudConsole->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
-   iNoeudConsole->typePeripherique.mineur = 0;
-   iNoeudConsole->prive = &_consoleNoyau;
-   iNoeudConsole->methodesFichier = &consoleMethodesFichier;
+   consoleInitialiserINoeud(iNoeudConsole,  &_consoleNoyau);
 
    return ESUCCES;
 }
 
+#   ifdef MANUX_KMALLOC
+/**
+ * @brief : Création d'un iNoeud permettant de manipuler une console
+ * @param : c (in) pointeur sur la console
+ * @return : pointeur sur un INoeud
+ */
+INoeud * consoleCreerINoeud(Console * c)
+{
+   INoeud * result;
+
+   result = kmalloc(sizeof(INoeud));
+
+   if (result) {
+      //! On initialise l'INoeud qui la décrit
+      consoleInitialiserINoeud(result, c);
+   }
+   
+   return result;
+}
+
+#   endif // MANUX_KMALLOC
 #else 
 /**
  * Initialisation du système de console. 

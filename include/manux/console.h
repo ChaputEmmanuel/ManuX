@@ -50,6 +50,7 @@ typedef struct _Console {
   
    struct _Console   * suivante;    //!< Les consoles virtuelles sont chaînées
    struct _Console   * precedente;  //!< doublement chaînées
+   int                 numero;      //!< Pour les identifier
 #endif
 
 #ifdef MANUX_CLAVIER_CONSOLE
@@ -69,10 +70,18 @@ extern MethodesFichier consoleMethodesFichier;
 
 /**
  * @brief Initialisation du système de console 
+ *
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
  * @return ESUCCES en cas de succès, autre chose sinon
  */
 int consoleInitialisation(INoeud * iNoeudConsole);
+
+/**
+ * @brief : Création d'un iNoeud permettant de manipuler une console
+ * @param : c (in) pointeur sur la console
+ * @return : pointeur sur un INoeud
+ */
+INoeud * consoleCreerINoeud(Console * c);
 
 #else
 /**
@@ -80,7 +89,16 @@ int consoleInitialisation(INoeud * iNoeudConsole);
  * @return ESUCCES en cas de succès, autre chose sinon
  */
 int consoleInitialisation();
-#endif
+
+#   ifdef MANUX_KMALLOC
+/**
+ * @brief : Création d'un iNoeud permettant de manipuler une console
+ * @param : c (in) pointeur sur la console
+ * @return : pointeur sur un INoeud
+ */
+INoeud * consoleCreerINOeud(Console * c);
+#   endif // MANUX_MALLOC
+#endif // MANUX_FICHIER
 
 /*
  * Choix des couleurs de texte et de fond (voir l'enum ci dessus)

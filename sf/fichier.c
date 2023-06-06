@@ -6,14 +6,29 @@
 #include <manux/fichier.h>
 #include <manux/debug.h>
 #include <manux/scheduler.h>    // tacheEnCours
+#include <manux/errno.h>
+#ifdef MANUX_KMALLOC
+#   include <manux/kmalloc.h>
+#endif
 
 #define MANUX_DEBUG_FS_BASE
+
+int fichierLire(Fichier * f, void * buffer, int nbOctets)
+{
+   int result;
+
+   // On invoque la méthode associée
+   result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
+
+   return result;
+}
 
 int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
-   result = f->methodes->ecrire(f, buffer, nbOctets);
+   // On invoque la méthode associée
+   result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
 
    return result;
 }
@@ -26,11 +41,11 @@ int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
-   f = &tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
+   f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
    
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : fd=%d, file=%x\n", fd, f);
 
-   result = f->methodes->ecrire(f, buffer, nbOctets);
+   result = fichierEcrire(f, buffer, nbOctets);
    
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : res = %d\n", result);
    
@@ -44,11 +59,11 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
-   f = &tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
+   f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
    
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire : fd=%d, file=%x\n", fd, f);
 
-   result = f->methodes->lire(f, buffer, nbOctets);
+   result = fichierLire(f, buffer, nbOctets);
    
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire : res = %d\n", result);
    
@@ -76,6 +91,25 @@ int ouvrirFichier(INoeud * iNoeud, Fichier * f)
    printk_debug(DBG_KERNEL_SYSFI, "IN");
 
    // WARNING, plein de précautions à prendre !
+
+   f->iNoeud = iNoeud;
    
    return iNoeud->methodesFichier->ouvrir(iNoeud, f);
 }
+
+#ifdef MANUX_KMALLOC
+/**
+ * @brief : création et ouverture d'un fichier
+ */
+Fichier * fichierCreer(INoeud * iNoeud)
+{
+   Fichier * result = kmalloc(sizeof(Fichier));
+
+   if (ouvrirFichier(iNoeud, result) == ESUCCES) {
+      return result;
+   } else {
+      kfree(result);
+      return NULL;
+   }
+}
+#endif // MANUX_KMALLOC

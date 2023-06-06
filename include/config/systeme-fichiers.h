@@ -13,6 +13,16 @@
 #   define MANUX_NB_MAX_FICHIERS  4
 #endif
 
+/**
+ * @brief Définition des noeuds d'information
+ */
+#define MANUX_INOEUDS
+
+/** 
+ * @brief : implantation des tubes
+ */
+#define MANUX_TUBES
+
 /*----------------------------------------------------------------------------*/
 /* Définition de périphérique caractère. En pause, je n'en vois pas la        */
 /* nécessité pour le moment                                                   */
