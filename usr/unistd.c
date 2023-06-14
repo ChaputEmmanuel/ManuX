@@ -16,3 +16,4 @@ typedef void (CorpsTache());
 
 appelSysteme2(NBAS_CREER_TACHE, int, creerNouvelleTache, CorpsTache, booleen);
 
+appelSysteme1(NBAS_TUBE, int, tube, int *);

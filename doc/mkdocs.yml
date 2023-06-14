@@ -10,6 +10,8 @@ nav:
        - "Affichage" : affichage-part.md
        - "Interruptions" : inter-part.md
        - "La mémoire" : memoire-part.md
+       - "Les appels système" : appel-systeme-part.md
+       - "La gestion des fichiers" : systeme-fichiers-part.md
        
     - Le code :
        - "Doxygen" : doxy/html/index.html

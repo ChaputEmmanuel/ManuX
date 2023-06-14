@@ -26,6 +26,8 @@ int appelSystemeInutile();
 /*
  * Tout est dit !
  */
+
+int tube(int * fd);
 /*
 int numeroTache();
 int obtenirPages(int n);

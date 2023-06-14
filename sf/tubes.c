@@ -4,13 +4,10 @@
  */
 #include <manux/tubes.h>
 #include <manux/tache.h>    // tacheAjouterFichiers
+#include <manux/scheduler.h>// tacheEnCours
 #include <manux/fichier.h>
 #include <manux/errno.h>    // ESUCCES
 #include <manux/memoire.h>  // NULL
-
-#ifdef MANUX_APPELS_SYSTEME
-#   include <manux/appelsysteme.h>
-#endif
 
 MethodesFichier tubeMethodesFichier;
 
@@ -59,6 +56,8 @@ int sys_tube(ParametreAS as, int * fds)
    Fichier * fichiers[2];
    void    * buffer;       // Le buffer qui contient les données
 
+   printk("Coucou les tele tubes !\n");
+   /*
    // Alocation de la mémoire tampon du tube
    if ((buffer = allouerPage()) == NULL) {
       return ENOMEM;
@@ -74,11 +73,12 @@ int sys_tube(ParametreAS as, int * fds)
    fichiers[1] = fichierCreer(iNoeud);
 
    // On ajoute les fichiers à la tâche
-   if (tacheAjouterFichiers(tacheCourante, 2, fichiers, fds) != 2 ) {
+   if (tacheAjouterFichiers(tacheEnCours, 2, fichiers, fds) != 2 ) {
       return ENOMEM;
-   } else {
-      return ESUCCES;
    }
+   */
+   // Si on est encore là, c'est que tout s'est déroulé comme prévu !
+   return ESUCCES;
 }
 #endif
 

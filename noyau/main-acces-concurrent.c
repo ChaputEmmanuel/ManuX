@@ -50,9 +50,10 @@ void startManuX()
 
    initialiserClavier();
 
-   /* Initialisation de la gestion des processus */
+   // Initialisation de la gestion des processus
    initialiserScheduler();
 
+   // On a besoin de l'horloge pour l'ordonnanceur
    initialiserHorloge();
 
    // Un petit message

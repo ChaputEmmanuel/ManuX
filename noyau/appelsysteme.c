@@ -8,12 +8,16 @@
 #include <manux/errno.h>
 #include <manux/printk.h>
 #include <manux/debug.h>
-#include <manux/scheduler.h>   // sys_basculerTache
-#include <manux/memoire.h>     // AS_obtenirPages, à virer aprés dispatch  
-#include <manux/console.h>     // Console
+#include <manux/scheduler.h>      // sys_basculerTache
+#include <manux/memoire.h>        // AS_obtenirPages, à virer aprés dispatch  
+#include <manux/console.h>        // Console
 #ifdef MANUX_TACHES
 #   include <manux/tache.h>       // sysFork
 #endif
+#ifdef MANUX_TUBES
+#   include <manux/tubes.h>       // sys_tube
+#endif
+
 
 void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
@@ -47,11 +51,16 @@ void initialiserAppelsSysteme()
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);
 
 #ifdef MANUX_TACHES
-   /* Création d'une nouvelle tâche */
+   // Création d'une nouvelle tâche
    definirAppelSysteme(NBAS_CREER_TACHE, sys_creerTache);   
 
-   /* Invocation explicite de l'ordonnanceur */
+   // Invocation explicite de l'ordonnanceur
    definirAppelSysteme(NBAS_BASCULER_TACHE, sys_basculerTache);
+#endif
+
+#ifdef MANUX_TUBES
+   // Création d'un tube de communiations entre tâches
+   definirAppelSysteme(NBAS_TUBE, sys_tube);
 #endif
    
    /* Les 4 suivants sont à vérifier */

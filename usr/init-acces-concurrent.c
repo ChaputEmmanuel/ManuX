@@ -23,9 +23,13 @@ void ecrivain()
 void init()
 {
    int r;
+   int fd[2];  // Le tube
 
    printf("Sympa le mode utilisateur !\n");
 
+   if (tube(fd) != 0) {
+      printf("A casse la pipe !?\n");
+   }
    r = creerNouvelleTache(ecrivain, FALSE);
    r = creerNouvelleTache(lecteur, FALSE);
    

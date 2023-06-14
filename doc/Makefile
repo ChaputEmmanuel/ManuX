@@ -20,6 +20,7 @@ DOCS_PDF = \
            affichage-part.pdf \
            inter-part.pdf \
            appel-systeme-part.pdf \
+           systeme-fichiers-part.pdf \
            memoire-part.pdf 
 
 DOCS_HT = $(DOCS_PDF:.pdf=.ht)

@@ -13,9 +13,11 @@ Feuille de route
    . dormir/réveiller      <- est-ce vraiment utile sous cette forme ?
    . verrou tournant       <- quasiment fait dans atomique
    . mutex                 <- idem
+
+   (J EN SUIS LA)
    . pipe
-      . appel système de création (en profiter pour documenter les AS
-   ?)
+      . appel système tube créé mais fait planter le noyau alors qu'il
+   ne fait rien ! A déboguer et en profiter pour documenter les AS ...
    
 
 
