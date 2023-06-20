@@ -17,6 +17,7 @@ int fichierLire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
+   //   printk("C'est parti mon kiki  !\n");
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
 
@@ -27,6 +28,7 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
+   //   printk("C'est parti les aminches !\n");
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
 
@@ -39,6 +41,7 @@ int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
    Fichier * f;
    int result;
 
+   printk("ec\n");
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
    f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
@@ -56,6 +59,7 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
    int result;
+   printk("le\n");
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 

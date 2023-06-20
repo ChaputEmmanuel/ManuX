@@ -310,7 +310,7 @@ handlerAppelSysteme :
         push ecx
 	
         shl eax, 02h
-        push eax
+        push eax      ; WARNING : pas utilisé dans entrerAppelSysteme
 	
         ; On verouille le noyau WARNING : non réentrance
         call entrerAppelSysteme
@@ -319,11 +319,12 @@ handlerAppelSysteme :
         sti
 	
         ; On invoque l'AS
-	pop eax
         call [vecteurAppelsSysteme+eax] ; Le numéro est dans EAX (cf appelsysteme.h)
 
         ; On déverouille le noyau WARNING : non réentrance
         call sortirAppelSysteme
+
+        pop eax
 
         pop ecx
         pop edx

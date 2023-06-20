@@ -21,8 +21,8 @@
 
 void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
-/*
- * Implantation de l'appel système inutile
+/**
+ * @brief : Implantation de l'appel système inutile (pour tests)
  */
 int sys_dumbAS(ParametreAS as)
 {
@@ -30,8 +30,24 @@ int sys_dumbAS(ParametreAS as)
    return 0;
 }
 
+/**
+ * @brief : Implantation de l'appel système par défaut
+ */
+int sys_erreurAS(ParametreAS as)
+{
+   paniqueNoyau("Appel systeme %d non implante !\n", as.eax);
+   return 0;
+}
+
 int definirAppelSysteme(int num, void * appel)
 {
+   // C'est plus prudent
+   assert(num < NB_MAX_APPELS_SYSTEME) ;
+
+   // Attention, il faut tenir compte de la valeur de retour !!
+   // Pour le moment, je ne suis pas très clair là dessus (voir par
+   // exemple la fonction suivante) donc on maintient l'assert
+   // précédente. 
    if ((num < 0) || (num >= NB_MAX_APPELS_SYSTEME)) {
       return EINVAL;
    } else {
@@ -45,6 +61,10 @@ void initialiserAppelsSysteme()
 {
    printk_debug(DBG_KERNEL_AS, "vecteur des AS = 0x%x\n", vecteurAppelsSysteme);
 
+   for (int a = 0; a < NB_MAX_APPELS_SYSTEME; a++) {
+      definirAppelSysteme(a, sys_erreurAS);
+   }
+   
    definirAppelSysteme(NBAS_DUMB, sys_dumbAS);
    
    /* Envoyer une chaîne de caractères sur la console */

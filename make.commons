@@ -157,7 +157,7 @@ RUN_MANUX_VBOX   = vboxmanage startvm ManuX
 #
 #--------------------------------------------------------------------------
 CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
-           -g -gdwarf  \
+           -g -ggdb -gdwarf  \
 	   -I$(ROOTDIR)/include  \
            -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
            -fno-toplevel-reorder \

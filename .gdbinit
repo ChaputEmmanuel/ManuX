@@ -2,4 +2,6 @@ target remote :1234
 dir noyau
 dir lib
 dir boot
+dir usr
+dir sf
 file noyau/noyaumb.elf

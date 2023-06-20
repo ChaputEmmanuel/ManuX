@@ -15,7 +15,7 @@
  * Définition du nombre maximal d'appels système
  */
 #ifndef NB_MAX_APPELS_SYSTEME
-#   define NB_MAX_APPELS_SYSTEME 10
+#   define NB_MAX_APPELS_SYSTEME 16
 #endif
 
 /*
@@ -28,6 +28,7 @@ extern void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
  * séquencement des appels). WARNING a expliquer.
  */
 typedef struct _ParametreAS {
+   uint32_t eax;
    uint32_t ecx;
    uint32_t edx;
    uint32_t ebx;

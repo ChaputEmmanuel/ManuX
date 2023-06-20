@@ -32,7 +32,7 @@
   __attribute__ ((noinline))   typeRetour nom(typeArgument argument)                     \
    {                                                         \
       typeRetour resultat;                                   \
-      __asm__ __volatile__ ("int %2"                                       \
+      __asm__ __volatile__ ("int %2"                         \
               : "=a"(resultat)                               \
               : "0" (numero),                                \
                 "N" (MANUX_AS_INT));                         \

@@ -24,11 +24,13 @@ int tubeOuvrir(INoeud * iNoeud, Fichier * f)
 
 size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
+   printk("Coucou les poto !\n");
    return -EINVAL;  
 }
 
 size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
 {
+   printk("salut les amis !\n");
    return -EINVAL;  
 }
 
@@ -57,7 +59,7 @@ int sys_tube(ParametreAS as, int * fds)
    void    * buffer;       // Le buffer qui contient les données
 
    printk("Coucou les tele tubes !\n");
-   /*
+
    // Alocation de la mémoire tampon du tube
    if ((buffer = allouerPage()) == NULL) {
       return ENOMEM;
@@ -76,12 +78,11 @@ int sys_tube(ParametreAS as, int * fds)
    if (tacheAjouterFichiers(tacheEnCours, 2, fichiers, fds) != 2 ) {
       return ENOMEM;
    }
-   */
+
    // Si on est encore là, c'est que tout s'est déroulé comme prévu !
    return ESUCCES;
 }
 #endif
-
 
 
 /**
