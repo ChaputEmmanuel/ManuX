@@ -16,11 +16,11 @@ void lecteur()
    char b[16];
    
    printf("Je suis le lecteur !\n");
-
+   /*
    r = lire(fd[0], b, 1);
 
    printf("Je lis %d !\n", r);
-
+   */
    while(1){};
 }
 
@@ -44,11 +44,13 @@ void init()
 
    printf("Sympa le mode utilisateur !\n");
 
-   if (tube(fd) != 0) {
+   if (tube(fd) != 0 /*ESUCCES*/) {
       printf("A casse la pipe !?\n");
    }
+   ecrivain();
+   /*
    r = creerNouvelleTache(ecrivain, FALSE);
    r = creerNouvelleTache(lecteur, FALSE);
-   
+   */
    while(1){};
 }

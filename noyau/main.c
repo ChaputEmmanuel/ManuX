@@ -153,17 +153,19 @@ void startManuX()
    initialiserIDT();   
 
    i8259aInit(MANUX_INT_BASE_IRQ);
+   printk_debug(DBG_KERNEL_START, "La tu me voies ...\n");
 
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
     journalInitialiser(&iNoeudConsole);
 #endif
+   printk_debug(DBG_KERNEL_START, "La tu me voies pas ...\n");
 
    /* Initialisation de la pagination */
 #ifdef MANUX_PAGINATION
    printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
    initialiserPagination(infoSysteme.memoireEtendue);
-   printk_debug(DBG_KERNEL_START, "Paginiation initialisee\n");
+   printk_debug(DBG_KERNEL_START, "Pagination initialisee\n");
 #endif
    
    /* Initialisation de la table des appels système*/
@@ -233,7 +235,7 @@ void startManuX()
    initialiserHorloge();
    printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
 
-#ifdef MANUX_VIRTIO_CONSOLE_NON
+#ifdef MANUX_VIRTIO_CONSOLE
    testerVirtioConsole();
 #endif
 

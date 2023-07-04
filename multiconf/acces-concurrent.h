@@ -22,7 +22,6 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/journal.h>
-#include <config/appels-systeme.h>  // pour le mode utilisateur
 #include <config/systeme-fichiers.h>
 #include <config/pc-i386.h>         // Pour la segmentation
 #include <config/plan-memoire.h>
@@ -35,7 +34,7 @@
 #include <config/systeme-fichiers.h>
 #include <config/ramdisk.h>
 #include <config/pc-i386.h>
-#include <config/appels-systeme.h>
+#include <config/appels-systeme.h>  // pour le mode utilisateur
 #include <config/consoles-virtuelles.h>
 #include <config/printk.h>
 #include <config/journal.h>
@@ -44,7 +43,7 @@
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>
 #include <config/clavier.h>
-#include <config/reseau.h>
+#include <config/virtio.h>
 #include <config/pci.h>
 #include <config/stdlib.h>
 #include <config/usr.h>

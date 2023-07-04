@@ -38,6 +38,7 @@
 #include <config/clavier.h>
 #include <config/reseau.h>
 #include <config/pci.h>
+#include <config/virtio.h>
 #include <config/stdlib.h>
 #include <config/usr.h>
 #include <config/verifications.h>

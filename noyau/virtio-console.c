@@ -210,7 +210,6 @@ size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
 
 int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f)
 {
-   f->methodes = &virtioConsoleMethodesFichier;
    f->prive = &virtioConsole; // WARNING, il peut y en avoir plusieurs 
 
    return ESUCCES;

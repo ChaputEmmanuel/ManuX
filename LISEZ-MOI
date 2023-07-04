@@ -15,8 +15,15 @@ Feuille de route
    . mutex                 <- idem
 
    (J EN SUIS LA)
+   . Faire un fichier de config de démo de virtio-console, parce que
+   là ça ne marche plus ! Probablement depuis que j'ai changé des
+   choses dans fichiers et inoeuds (à documenter !)
    . pipe
       . appel système tube créé !
+      . Là je suis un peu pommé dans mes outils d'entrée sortie !
+   Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
+   Pourquoi il n'y a rien sur la console virtio !?
+   A creuser et à documenter !
       . Les appels système lire et ecrire font planter, à voir où dans
    l'iaguillage (en fait, c'est pire : le résultat est farfelu, et
    c'est quand j'essaie de printk_debug que ça plante !!!

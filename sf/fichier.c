@@ -28,7 +28,7 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
-   //   printk("C'est parti les aminches !\n");
+   //printk("C'est parti les aminches !\n");
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
 

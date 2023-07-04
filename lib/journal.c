@@ -55,6 +55,7 @@ void journalInitialiser(INoeud * iNoeudConsole)
     //   initialiserExclusionMutuelle(&emj);
     //   entrerExclusionMutuelle(&emj);
 
+   iNoeudConsole->methodesFichier = &consoleMethodesFichier;
    consoleFichier = &_consoleFichier; // WARNING, en vrai, il faudra un kmalloc
    ouvrirFichier(iNoeudConsole, consoleFichier);
 
