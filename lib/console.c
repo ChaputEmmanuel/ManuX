@@ -465,7 +465,7 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
  */
 size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
-   Console * con = f->prive;
+   Console * con = f->iNoeud->prive;
 
    return consoleLire(con, buffer, nbOctets);
 }
@@ -482,12 +482,12 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 #ifdef MANUX_FICHIER
 /**
  * @brief Ouverture d'une Console en tant que Fichier 
+ *
+ * WARNING : si vraiment rien à faire, on peut supprimer (la méthode
+ * ouvrir peut ne pas être implantée)
  */
 int consoleOuvrir(INoeud * iNoeud, Fichier * f)
 {
-   f->iNoeud = iNoeud; //methodes = &consoleMethodesFichier;
-   //  f->prive = &_consoleNoyau;   // WARNING il y a un soucis là non ?
-
    return ESUCCES;
 }
 
@@ -496,7 +496,7 @@ int consoleOuvrir(INoeud * iNoeud, Fichier * f)
  */
 size_t consoleEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
-   Console * con = f->prive;
+   Console * con = f->iNoeud->prive;
 
    consoleAfficherN(con, buffer, nbOctets);
 
@@ -553,14 +553,22 @@ Console * consoleNoyau()
 void consoleInitialiserINoeud(INoeud * i, Console * c)
 {
    i->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
+#ifdef MANUX_CONSOLES_VIRTUELLES
    i->typePeripherique.mineur = c->numero;
+#else
+   i->typePeripherique.mineur = 0;
+#endif
+   
    i->prive = c;
    i->methodesFichier = &consoleMethodesFichier;
 }
 
 /**
- * Initialisation du système de console. 
- * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
+ * @brief :Initialisation du système de console. 
+ * @param : iNoeudConsole (out) un INoeud décrivant la console par
+ * défaut 
+ * WARNING : changer le nom plutôt que reprendre le même que sans
+ * fichiers ?
  */
 int consoleInitialisation(INoeud * iNoeudConsole)
 {

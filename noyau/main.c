@@ -239,7 +239,7 @@ void startManuX()
    testerVirtioConsole();
 #endif
 
-#ifdef MANUX_KMALLOC
+#ifdef MANUX_KMALLOC_NON
    printk(PRINTK_DEBUGAGE "************************ Test kmalloc *************************\n");
    kmallocInitialisation();
    testerKmalloc();

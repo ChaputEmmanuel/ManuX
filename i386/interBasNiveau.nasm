@@ -310,7 +310,7 @@ handlerAppelSysteme :
         push ecx
 	
         shl eax, 02h
-        push eax      ; WARNING : pas utilisé dans entrerAppelSysteme
+        push eax      ; On empile eax pour avoir le numéro d'AS dans la pile
 	
         ; On verouille le noyau WARNING : non réentrance
         call entrerAppelSysteme
@@ -324,8 +324,9 @@ handlerAppelSysteme :
         ; On déverouille le noyau WARNING : non réentrance
         call sortirAppelSysteme
 
-        pop eax
-
+        pop ecx ; On enlève eax de la pile, mais sans altérer eax car c'est
+	        ; la vaelur de retour de l'appel système
+		
         pop ecx
         pop edx
         pop ebx

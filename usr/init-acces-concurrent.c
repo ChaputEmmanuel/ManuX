@@ -7,35 +7,45 @@
 #include <manux/types.h>
 #include <stdio.h>
 #include <unistd.h>   // creerNouvelleTache
+#include <manux/string.h>
 
 int fd[2];  // Le tube
 
 void lecteur()
 {
-   int r;
+  int r, c=0;
    char b[16];
    
    printf("Je suis le lecteur !\n");
-   /*
-   r = lire(fd[0], b, 1);
 
-   printf("Je lis %d !\n", r);
-   */
-   while(1){};
+   do {
+      r = lire(fd[0], b, 15);
+      if (r > 0) {
+         b[r] = 0;
+         printf(b);
+      }
+      c += r;
+   } while (r > 0);
+
+   printf("J'ai lu %d !\n", c);
+
 }
 
 void ecrivain()
 {
-   int r;
-   char b[16];
+   int r, c  = 0;
+   
+   char * b = "Bonjour les jeunes ! ";
 
    printf("Je suis l'ecrivain !\n");
 
-   r = ecrire(fd[0], b, 1);
+   do {
+      r = ecrire(fd[0], b, strlen(b));
+      c += r;
+   } while (r > 0);
 
-   printf("J'ecris %d !\n", r);
+   printf("J'ai ecrit %d !\n", c);
 
-   while(1){};
 }
 
 void init()
@@ -44,13 +54,15 @@ void init()
 
    printf("Sympa le mode utilisateur !\n");
 
-   if (tube(fd) != 0 /*ESUCCES*/) {
-      printf("A casse la pipe !?\n");
+   r = tube(fd);
+   if ( r != 0 /*ESUCCES*/) {
+      printf("r = %d : casse la pipe !?\n", r);
    }
+   
    ecrivain();
+   lecteur();
    /*
    r = creerNouvelleTache(ecrivain, FALSE);
    r = creerNouvelleTache(lecteur, FALSE);
    */
-   while(1){};
 }

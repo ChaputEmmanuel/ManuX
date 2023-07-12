@@ -21,7 +21,9 @@ DOCS_PDF = \
            inter-part.pdf \
            appel-systeme-part.pdf \
            systeme-fichiers-part.pdf \
-           memoire-part.pdf 
+           memoire-part.pdf \
+           synchronisation-part.pdf \
+           userland-part.pdf
 
 DOCS_HT = $(DOCS_PDF:.pdf=.ht)
 DOCS_MD = $(DOCS_PDF:.pdf=.md)

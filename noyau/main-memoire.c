@@ -39,6 +39,6 @@ void startManuX()
       p = allouerPage();
       printk("0x%x ", p);
    }
-   while (1){};   // A remplacer par un halt() 
+   printk("\nThe end\n");
 }   /* _start */
 

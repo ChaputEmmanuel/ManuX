@@ -57,8 +57,8 @@ système.
    Cette interface est donc décrite côté applications, dans les
 fichiers de {\tt usr}.
    
-   Des macros ont été créées dans le fichier {\tt
-manux/appelsysteme.h} pour simplifier une telle définition. Ce
+   Des macros ont été créées dans le fichier \fichier{usr/include/manux}{appelsysteme}{h}
+pour simplifier une telle définition. Ce
 sont par exemple les ``fonctions'' \lstinline!appelSysteme0!,
 \lstinline!appelSysteme1!, \ldots 
 
@@ -96,7 +96,7 @@ l'appel système \lstinline!ecrireConsole!. Il se trouve dans le
 fichier {\tt lib/console.c} :
 
 \begin{lstlisting}
-/*
+/**
  * L'implantation de l'AS ecrireConsole
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n)

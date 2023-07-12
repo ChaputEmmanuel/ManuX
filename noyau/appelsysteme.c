@@ -27,7 +27,8 @@ void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 int sys_dumbAS(ParametreAS as)
 {
    printk("I am so useless, ...\n");
-   return 0;
+
+   return 4832;
 }
 
 /**
@@ -36,6 +37,7 @@ int sys_dumbAS(ParametreAS as)
 int sys_erreurAS(ParametreAS as)
 {
    paniqueNoyau("Appel systeme %d non implante !\n", as.eax);
+
    return 0;
 }
 

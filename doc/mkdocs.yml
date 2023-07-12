@@ -12,6 +12,8 @@ nav:
        - "La mémoire" : memoire-part.md
        - "Les appels système" : appel-systeme-part.md
        - "La gestion des fichiers" : systeme-fichiers-part.md
+       - "Les outils de synchronisation" : synchronisation-part.md
+       - "Le mode utilisateur" : userland-part.md
        
     - Le code :
        - "Doxygen" : doxy/html/index.html

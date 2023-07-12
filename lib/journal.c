@@ -48,16 +48,20 @@ static booleen journalInitialise = FALSE;
 Fichier * fichierJournal = NULL;
 
 /**
- * @brief Initialisation du journal en profitant de l'interface fichier
+ * @brief Initialisation du journal en profitant de l'interface
+ * fichier
+ * WARNING : ne pas utiliser le même nom que sans fichier
  */
 void journalInitialiser(INoeud * iNoeudConsole)
 {
     //   initialiserExclusionMutuelle(&emj);
     //   entrerExclusionMutuelle(&emj);
 
-   iNoeudConsole->methodesFichier = &consoleMethodesFichier;
-   consoleFichier = &_consoleFichier; // WARNING, en vrai, il faudra un kmalloc
+   consoleFichier = &_consoleFichier;
    ouvrirFichier(iNoeudConsole, consoleFichier);
+
+   // Affichons un petit message   
+   consoleNoyauAfficher("Journal+f de ManuX-32 \n");
 
    // A partir de maintenant, le journal est opérationnel
    journalInitialise = TRUE;
@@ -103,8 +107,11 @@ void journaliserNiveau(booleen console, booleen fichier,
    // Sur la console
    if ((console) && (niveau <= MANUX_JOURNAL_NIVEAU_DEFAUT)) {
 #ifdef MANUX_FICHIER
-      if (consoleFichier) {
+      // Si le fichier a été ouvert, on y écrit ...
+      if (consoleFichier) { 
          fichierEcrire(consoleFichier, message, strlen(message));
+      // ... mais s'il n'est pas encore ouvert (pas initialisé), on
+      // passe directement par la console
       } else {
          consoleNoyauAfficher(message);
       }
@@ -168,9 +175,9 @@ void aiguillerMessage(char ** message,
  */
 void journaliser(char * message)
 {
-   booleen console;
-   booleen fichier;
-   uint8_t niveau;
+   booleen console; // affiche-t-on le message sur la console ?
+   booleen fichier; // envoie-t-on le message sur un fichier de log ?
+   uint8_t niveau;  // quel est le niveau de criticité ?
 
    // On détermine où il doit être envoyé pour affichage
    aiguillerMessage(&message, &console, &fichier, &niveau);
@@ -182,6 +189,7 @@ void journaliser(char * message)
 
 /**
  * Pour que printk puisse savoir
+ * WARINING apparemment inutile
  */
 booleen journalOperationnel()
 {

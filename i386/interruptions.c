@@ -331,7 +331,15 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
    }
 
    __asm__ __volatile__("str %%eax" : "=a" (indice));  // WARNING WTF !?
-   
+
+   // Première ligne
+   afficherHexa(itNum, 2, 1, 9);
+   afficherBin(eFlags, 32, 1, 45);
+   afficherHexa(cs, 4, 3, 9);
+   afficherHexa(eip, 8, 3, 25);
+   afficherHexa(errCode, 8, 9, 45);
+
+#ifdef MANUX_GESTION_MEMOIRE
    Descripteur desc = gdtSysteme->descripteur[indice>>3];
    IntelTSS * tssDuFautif = (IntelTSS *)(
          (((uint32_t)desc.dt.baseFort) << 24)
@@ -339,26 +347,20 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
        + desc.dt.baseFaible
      );
 
-   // Première ligne
-   afficherHexa(itNum, 2, 1, 9);
    afficherHexa(tssDuFautif, 8, 1, 25);
    //afficherBin(tssDuFautif->EFLAGS, 32, 1, 45);
-   afficherBin(eFlags, 32, 1, 45);
    afficherHexa(tssDuFautif->CR3, 8, 3, 45);
 
    // Les descripteurs de segment
-   afficherHexa(cs, 4, 3, 9);
    afficherHexa(tssDuFautif->SS, 4, 5, 9);
    afficherHexa(tssDuFautif->DS, 4, 7, 9);
 
    // Les pointeurs
    //afficherHexa(tssDuFautif->EIP, 8, 3, 25);
-   afficherHexa(eip, 8, 3, 25);
    afficherHexa(tssDuFautif->ESP, 8, 5, 25);
    afficherHexa(tssDuFautif->ESI, 8, 7, 25);
    afficherHexa(tssDuFautif->EDI, 8, 9, 25);
-
-   afficherHexa(errCode, 8, 9, 45);
+#endif
 }
 
 /**

@@ -41,7 +41,6 @@ int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
    Fichier * f;
    int result;
 
-   printk("ec\n");
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
    f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
@@ -59,7 +58,6 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
    int result;
-   printk("le\n");
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
@@ -92,13 +90,19 @@ void sfInitialiser()
  */
 int ouvrirFichier(INoeud * iNoeud, Fichier * f)
 {
+   int result = ESUCCES;
+  
    printk_debug(DBG_KERNEL_SYSFI, "IN");
 
    // WARNING, plein de précautions à prendre !
 
    f->iNoeud = iNoeud;
-   
-   return iNoeud->methodesFichier->ouvrir(iNoeud, f);
+
+   if (iNoeud->methodesFichier->ouvrir) {
+      result = iNoeud->methodesFichier->ouvrir(iNoeud, f);
+   }
+
+   return result;
 }
 
 #ifdef MANUX_KMALLOC

@@ -23,11 +23,11 @@
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
 #endif
 */
-/*
-#if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_TACHES)
-#   error "MANUX_APPELS_SYSTEME nécessite MANUX_TACHES"
+
+#if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_LIBI386)
+#   error "MANUX_APPELS_SYSTEME nécessite MANUX_LIBI386 (pour les interruptions"
 #endif
-*/
+
 #if defined(MANUX_OUTILS_SYNCHRO) && !defined(MANUX_TACHES)
 #   error "MANUX_OUTILS_SYNCHRO nécessite MANUX_TACHES"
 #endif
