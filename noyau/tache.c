@@ -111,7 +111,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    
 #ifdef MANUX_TACHE_CONSOLE   
    // Pas de console pour le moment
-   tache->console = NULL;
+   tache->console = consoleNoyau(); //NULL;
 #endif
    
    /* Elle n'a pas encore été activée */
@@ -176,7 +176,7 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
 {
    tache->console = cons;
 
-#   ifdef MANUX_FICHIER   // et sinon !?
+#ifdef MANUX_FICHIER   // et sinon !?
    Fichier * f;
    INoeud * i;
    
@@ -184,8 +184,7 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
    f = fichierCreer(i);
    
    tache->fichiers[0] =  f;
-   
-#   endif
+#endif
 }
 
 #ifdef MANUX_FICHIER

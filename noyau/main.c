@@ -157,7 +157,7 @@ void startManuX()
 
    /* Initialisation du journal */
 #ifdef MANUX_JOURNAL
-    journalInitialiser(&iNoeudConsole);
+   journalInitialiser(&iNoeudConsole);
 #endif
    printk_debug(DBG_KERNEL_START, "La tu me voies pas ...\n");
 

@@ -14,11 +14,6 @@
 #include <manux/appelsysteme.h>
 
 /*
- * Pour paramétrer le scheduler
- */
-//#define KHZ * 1000
-
-/*
  * Pour permettre la gestion des consoles virtuelles. WARNING n'a rien
  * à faire là
  */
@@ -42,8 +37,15 @@ void initialiserScheduler();
  * Déclencher le scheduler avant toute création de tache
  */
 
-TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
+/**
+ * @brief Ajout d'une tâche dans l'ordonnanceur
+ *
+ * On se contente de l'insérer dans la liste des tâches de l'ordonnanceur. 
+ */
+void ordonnanceurAddTache(Tache * tache);
+
 /*
+TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
  * Création d'une nouvelle tâche et mise de celle-ci dans
  * la liste du scheduler. Si nouvelleConsole est vrai, on crée une
  * nouvelle console pour cette tâche. Sinon elle hérite de celle de

@@ -15,22 +15,27 @@ Feuille de route
    . mutex                 <- idem
 
    (J EN SUIS LA)
+   . Attention, une tâche a une console, mais printk écrit dans la
+   console noyau. Ne faudrait-il pas, au moins de façon optionnelle,
+   avoir un printk qui écrive dans la console de la tâche ? printf
+   écrit bien sur la console, ...
+   
    . Faire un fichier de config de démo de virtio-console, parce que
    là ça ne marche plus ! Probablement depuis que j'ai changé des
    choses dans fichiers et inoeuds (à documenter !)
-   . pipe
-      . appel système tube créé !
-      . Là je suis un peu pommé dans mes outils d'entrée sortie !
    Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
    Pourquoi il n'y a rien sur la console virtio !?
    A creuser et à documenter !
-      . Les appels système lire et ecrire font planter, à voir où dans
-   l'iaguillage (en fait, c'est pire : le résultat est farfelu, et
-   c'est quand j'essaie de printk_debug que ça plante !!!
-      . A déboguer et en profiter pour documenter les AS ...
+
+
+   . A faire :
+      . pourquoi tache necessite console ?
+      . pourquoi tâhce nécessite interuption ?
+      . différence entre MANUX_CLAVIER et MANUX_CLAVIER_CONSOLE ?
+      . difference entre memoire et plan-memoire dans config ?
+
+   . Vérifier que printf fonctionne sans fichier (via l'appel système ecrireConsole)
    
-
-
    . [FAIT] Un malloc, parce qu'il y en a marre de tout déclarer en statique !
       . [FAIT] Un buddy area dans un premier temps
       . Pourquoi pas un slab allocator plus tard
@@ -38,7 +43,7 @@ Feuille de route
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
    . Modes usager/noyau
-   . Bus PCI                     <- Un minimum opérationnel est fait
+   . [FAIT] Bus PCI                     <- Un minimum opérationnel est fait
    . Ethernet                    <- La base y est !
    . Block device
    . SGF

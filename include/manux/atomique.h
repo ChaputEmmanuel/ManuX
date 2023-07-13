@@ -65,20 +65,11 @@ typedef struct _ExclusionMutuelle {
    atomiqueInit(&(em)->verrou, 0);                             \
    if ((ta = extraireTache(&(em)->tachesEnAttente)) != NULL) { \
       ta->etat = Tache_Prete;                                  \
-}
-
-/*
-#define sortirExclusionMutuelle(em)                            \
-{                                                              \
-   Tache * ta;                                                 \
-   atomiqueInit(&(em)->verrou, 0);                             \
-   if ((ta = extraireTache(&(em)->tachesEnAttente)) != NULL) { \
-      ta->etat = Tache_Prete;                                  \
       insererCelluleTache(tachesPretes,                        \
                           tacheEnCours,                        \
                           (CelluleTache*)ta+sizeof(Tache));    \
    }                                                           \
 }
-*/
+
   
 #endif

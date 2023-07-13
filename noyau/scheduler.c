@@ -189,6 +189,7 @@ void interruptionAfficher()
    printk("\n");
 }
 
+#ifdef MANUX_CLAVIER_CONSOLE
 /**
  * @brief Gestion du clavier pour la dummy
  */
@@ -228,6 +229,7 @@ void dummyTraiterClavier()
       }
    }
 }
+#endif // MANUX_CLAVIER_CONSOLE
 
 /**
  * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
@@ -237,7 +239,9 @@ void aDummyKernelTask()
    printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
    while(1) {
+#ifdef MANUX_CLAVIER_CONSOLE
       dummyTraiterClavier();
+#endif
 #ifdef MANUX_VIRTIO_NET
       virtioReseauPoll(); // WARNING à virer !!!
 #endif
