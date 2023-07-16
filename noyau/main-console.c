@@ -1,8 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*      Un exemple pitoyable de début de noyau.                               */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file : main-console.c
+ * @brief : utilisation minimaliste de la console
+ *                                                     (C) Manu Chaput 2000-2023
+ */
 #include <manux/config.h>
 #include <manux/console.h>
 
@@ -14,6 +14,5 @@ void startManuX()
    // Affichage d'un message
    consoleNoyauAfficher("La console vous salue ...\n");
 
-   while (1){asm( "hlt" );};   // A remplacer par un halt() 
-}   /* _startManuX */
+}   /* startManuX */
 

@@ -13,6 +13,9 @@
 #
 
 # Le fichier de configuration général
+ifdef CFG
+MANUX_FICHIER_CONFIG = $(ROOTDIR)/multiconf/$(CFG).h
+endif
 ifndef MANUX_FICHIER_CONFIG
 MANUX_FICHIER_CONFIG = $(ROOTDIR)/include/manux/config.h
 endif

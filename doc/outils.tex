@@ -1,7 +1,7 @@
 %===============================================================================
 %
 %===============================================================================
-\section{Les outils de développement}
+\section{Les principaux outils}
 
    Le but de cette section est de décrire brièvement les outils
 utilisés pour compiler et exécuter \manux.
@@ -22,22 +22,6 @@ de développer un noyau. Nous évoquerons des outils dans les
 sous-sections \ref{subsection:debugage_interne} et
 \ref{subsection:debugage_externe}.
 
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{La compilation}
-\label{subsection:compilation}
-
-   Observons les principaux éléments du {\tt Makefile}.
-
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{L'assembleur}
-
-   J'utilise \nasm \autocite{nasm-website}  pour les quelques fichiers
-écrits en assembleur.
- 
 %...............................................................................
 %
 %...............................................................................
@@ -47,6 +31,154 @@ sous-sections \ref{subsection:debugage_interne} et
 \lstinline!x86_64-linux-gnu! fonctionne parfaitement. Je n'ai jamais
 eu de problème avec aucune version de GCC jusqu'à présent.
 
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{L'assembleur}
+
+   J'utilise \nasm \autocite{nasm-website}  pour les quelques fichiers
+écrits en assembleur, dans sa version 2.14.
+ 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La compilation}
+
+   La commpilation générale du noyau est fondée sur l'outil {\tt
+make}, et j'utilise la version 4.2.1 de \gnu {\tt make}.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Les scripts}
+
+   Quelques outils de scripts tels que {\tt awk} sont utilisés, rien
+de très original, et tout système Linux correctement installé devrait
+fournir ce qui est nécessaire.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La gestion des fichiers {\sc iso}}
+
+   Les fichiers {\sc iso} son générés par la commande {\tt
+     grub-mkrescue} qui utilise {\tt xorriso}.
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{L'exécution dans un émulateur}
+
+   Bien sûr, l'idée n'est pas de faire fonctionner ManuX sur du
+matériel réel, même si c'est tout à fait possible, mais plutôt dans un
+émulateur.
+
+   J'utilise pour cela \qemu dans sa version 3.1.0. On peut
+également utiliser {\tt bochs} ainsi que VirtualBox.
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La documentation}
+
+   La maigre documentation (que vous êtes  en train de lide) est
+écrite essentiellement en LaTeX. N'importe quelle version convient
+parfaitement.
+
+   J'utilise également DoxyGen et mkdocs pour générer ensuite une
+version navigable en ligne.
+
+%===============================================================================
+%
+%===============================================================================
+\section{Compilation de ManuX}
+
+   Le {\tt Makefile} principal défini un certain nombre de cibles
+utilisables pour compiler et exécuter ManuX.
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La création du noyau}
+
+   Sans grande surprise, on compile avec la commande
+
+\begin{lstlisting}
+  make
+\end{lstlisting}
+
+  Différentes cibles peuvent être créées
+
+\begin{itemize}
+   \item {\tt manux} permet de compiler une image du noyau ;
+   \item {\tt run} permet de lancer un émulateur (par défaut pour le moment c'est \qemu) ;
+   \item {\tt clean} permet d'effacer tous les fichiers issus de compilation ;
+   \item {\tt iso} permet de créer une image \iso.
+\end{itemize}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Gestion de configurations multiples}
+
+   L'essentiel de la configuration de ManuX se fait dans le fichier
+\fichier{include/manux}{config}{h}. Il est cependant possible de
+demander à \make d'utiliser un fichier différent.
+
+   Le répertoire {\tt multiconf} contient différents fichiers de
+configuration. Chacun de ces fichiers permet alors de générer une
+version différente de ManuX.
+
+   Ainsi, le fichier \fichier{multiconf}{printk}{h} définit la
+configuration permettant de compiler un noyau ManuX montrant
+l'utilsation de {\tt printk}. On le compile de la façon suivante
+
+\begin{lstlisting}
+  make CFG=printk
+\end{lstlisting}
+
+   Il peut alors être exécuté par exemple avec
+
+\begin{lstlisting}
+  make run
+\end{lstlisting}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Création d'un fichier \iso}
+
+   Il est également possible de créer un fichier \iso contenant une ou
+plusieurs configuration de ManuX.
+
+   Pour créer un fichier \iso contenant la version actuellement
+définie dans le fichier \fichier{include/manux}{config}{h} on
+utilisera simplement
+
+\begin{lstlisting}
+  make iso
+\end{lstlisting}
+
+   L'exécution pourra alors se faire via la commande
+
+\begin{lstlisting}
+  make runiso
+\end{lstlisting}
+
+   Il est également possible de générer un fichier \iso contenant
+toutes les versions de ManuX décrites par les fichiers du répertoire
+\lstinline!multiconf! de la façon suivante
+
+\begin{lstlisting}
+  make multiso
+\end{lstlisting}
+
+On l'exécutera de la même façon :
+
+\begin{lstlisting}
+  make runiso
+\end{lstlisting}
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
@@ -88,7 +220,7 @@ SECTIONS {
 }
 \end{lstlisting}
 
-Dans ce script, nous avous défini le nom du point d'entrée (ici {\tt
+   Dans ce script, nous avous défini le nom du point d'entrée (ici {\tt
   start}), et nous avons décrit un certain nombre de sections avec
 leur ordre d'apparition dans le fichier de sortie et leur
 contenu. Vous remarquerez également que l'on utilise la notation
@@ -99,31 +231,12 @@ ligne {\tt adresseDebutManuX = .} stipule que l'on enregistre dans la
 variable {\tt adresseDebutManuX} la valeur de l'adresse courante
 (celle du début de la section {\tt . text} donc).
 
-%...............................................................................
+
+%===============================================================================
 %
-%...............................................................................
-\subsubsection{La création du noyau}
-
-   Sans grande surprise, on compile avec la commande
-
-\begin{lstlisting}
-  make
-\end{lstlisting}
-
-  Différentes cibles peuvent être créées
-
-\begin{itemize}
-   \item {\tt manux} permet de compiler une image du noyau ;
-   \item {\tt run} permet de lancer un émulateur (par défaut pour le moment c'est \qemu) ;
-   \item {\tt clean} permet d'effacer tous les fichiers issus de compilation ;
-   \item {\tt iso} permet de créer une image \iso.
-\end{itemize}
-
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{L'exécution}
-\label{subsection:execution}
+%===============================================================================
+\section{Exécution de ManuX}
+\label{section:execution}
 
    Le but n'est évidemment pas de faire tourner cette merveille sur du
 vrai matériel, mais plutôt dans un émulateur.
@@ -131,16 +244,7 @@ vrai matériel, mais plutôt dans un émulateur.
 %...............................................................................
 %
 %...............................................................................
-\subsubsection{L'émulateur Bochs}
-
-   J'utilisais initialement cet outil, mais les fichiers de
-configuration ne semblent plus convenir aux dernières versions de
-Bochs {} \cite{bochs-website} il faudrait les mettre à jour !
-
-%...............................................................................
-%
-%...............................................................................
-\subsubsection{L'émulateur Qemu}
+\subsection{L'émulateur Qemu}
 
    C'est maintenant \qemu \cite{qemu-website}  que j'utilise, par exemple de la façon
 suivante
@@ -181,7 +285,21 @@ suivante
 
    De nombreuses options sont disponibles, mais ce n'est pas le moment
 d'en parler !
-   
+
+%...............................................................................
+%
+%...............................................................................
+\subsection{L'émulateur Bochs}
+
+   J'utilisais initialement cet outil, mais les fichiers de
+configuration ne semblent plus convenir aux dernières versions de
+Bochs {} \cite{bochs-website} il faudrait les mettre à jour !
+
+%===============================================================================
+%
+%===============================================================================
+\section{Le débugage de ManuX}
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------

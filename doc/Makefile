@@ -13,7 +13,7 @@ PANDOC_CSL = csl/mla-notes.csl
 PDFLATEX = pdflatex
 DOXYGEN = doxygen
 PANDOC = pandoc
-DOCS_PDF = \
+DOCS_PDF = index.pdf \
            presentation-part.pdf \
            outils-part.pdf \
            boot-part.pdf \

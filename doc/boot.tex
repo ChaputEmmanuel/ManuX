@@ -22,14 +22,14 @@ dans une zone mémoire non volatile, sur une machine distante, \ldots
 
      Dans cette situation, nous devrons donc (presque) tout faire
      puisqu'il va falloir aller charger le noyau depuis la disquette
-     vers la mémoire. Heureusement le BIOS nous fourni des fonctions
+     vers la mémoire. Heureusement le \bios nous fourni des fonctions
      pour cela.
 
    \item Nous observerons ensuite des outils un peu plus modernes
      permettant de démarrer de façon un peu plus simple et plus
      indépendante du matériel sous-jacent.
 
-     Dans cette situation, nous utiliserons par exemple GRUB qui fera
+     Dans cette situation, nous utiliserons par exemple {\tt grub} qui fera
      le travail de charger le noyau depuis le support (disque dur,
      \ldots) vers la mémoire. Nous aurons juste quelques informations
      à lui fournir.
@@ -63,14 +63,14 @@ et d'autre part charger en mémoire le noyau lui-même.
 trois parties :
 
 \begin{itemize}
-     \item un {\em secteur de boot} sera un code de moins de 512
-       octets qui va s'occuper de charger le noyau ;
+     \item un {\em secteur de boot} (ou {\em bootsector}) sera un code
+       de moins de 512 octets qui va s'occuper de charger le noyau ;
      \item un code d'initiaisation qui va préparer le terrain pour le
        noyau avant de démarrer celui-ci ;
      \item le noyau lui-même.
 \end{itemize}
 
-   Observons la structure de ce fichier puis regardons comment en
+   Observons la structure de ce fichier pour ManuX puis regardons comment en
 construire chaque partie.
 
 %-------------------------------------------------------------------------------
@@ -81,6 +81,10 @@ construire chaque partie.
    Afin de permettre un démarrage ``à l'ancienne'' par un boot sur
 disquette du \textsc{ pc}, nous allons donc construire une image de disquette
 dont la structure est décrite par la figure suivante.
+
+   Le code d'initialiation est ici nommé {\tt initmanux}. Je fais figurer
+à la fin du noyau un fichier appelé {\tt ramdisk} qui peut être
+présent et comporté un premier système de fichiers élémentaire.
 
 \includegraphics{images/image-disquette.png}
 
@@ -96,7 +100,7 @@ temps. D'abord le secteur de boot est chargé en mémoire par le
    Le secteur de boot  s'occupe alors de charger en mémoire le code
 d'initialisation ainsi que le code du noyau. Il donne alors à son tour
 la main à l'initialisation. Ce second élément réalise quelques
-opération puis démarre enfin le noyau.
+opérations puis démarre enfin le noyau.
 
    Si le secteur de boot et le code d'initialisation sont deux
 éléments distincts, c'est pour deux raisons principales
