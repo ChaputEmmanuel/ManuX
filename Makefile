@@ -11,7 +11,7 @@ include make.commons
 include make.rules
 
 DEMARAGE    = outils boot
-BOURRAGE    = ./boot/bourrage ./boot/ramdisk.ram
+RAMDISK     = ./boot/ramdisk.ram
 OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 
 # Les includes de usr/include/manux qui sont des copies de include/manux
@@ -82,9 +82,13 @@ $(NOYAU_ELF) : configuration  composants
 
 #-------------------------------------------------------------------------------
 #    Troisième phase : le code d'initialisation (dépend de l'image)
+# bootfloppyelf est une nouvelle tentative d'avoir une image utilisable avec qemu !
 #-------------------------------------------------------------------------------
 bootfloppy : outillage $(NOYAU_ELF)
 	(cd boot ; make floppyboot)
+
+bootfloppyelf : outillage $(NOYAU_ELF)
+	(cd boot ; make floppybootelf)
 
 # L'image bootgrub nécessite un code d'initialisation spécifique
 grubinit :
@@ -105,12 +109,24 @@ manux : $(NOYAU_ELF)
 #...............................................................................
 floppy : $(FLOPPY_IMG)
 
-$(FLOPPY_IMG) : bootfloppy $(NOYAU_ELF)
+$(FLOPPYELF_IMG) : bootfloppyelf $(NOYAU_ELF)
 	objcopy  -O binary $(NOYAU_ELF) $(NOYAU_BIN)
-	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN) $(BOURRAGE) > floppy.bin
+	ld -Ttext=0x7c00 -melf_i386 $(BSEC_ELF) -o bsec.elf
+	objcopy  -O binary bsec.elf bsec.img
+	ld -Ttext=0x7e00 -melf_i386 $(INIT_ELF) -o init.elf
+	objcopy  -O binary init.elf init.img
+	cat bsec.img  init.img $(NOYAU_BIN)  > floppy.bin
 	dd if=/dev/zero of=$@ bs=1024 count=1440
 	dd if=floppy.bin of=$@ bs=512 conv=notrunc
-	rm -f floppy.bin
+
+$(FLOPPY_IMG) : bootfloppy $(NOYAU_ELF)
+	objcopy  -O binary $(NOYAU_ELF) $(NOYAU_BIN)
+	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN)  > floppy.bin
+	dd if=/dev/zero of=$@ bs=1024 count=1440
+	dd if=floppy.bin of=$@ bs=512 conv=notrunc
+#	rm -f floppy.bin
+
+
 
 #...............................................................................
 #  L'image bootgrub est en fait un noyau linké avec le code pour

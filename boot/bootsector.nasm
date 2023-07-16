@@ -36,6 +36,7 @@ ChargeInit :
 
         jc InitDisquette           ; En cas d'erreur, on réinitialise
 
+%ifdef VIRE_DANS_INI
         ; Chargement du noyau depuis le disque. On va la convertir
         ; sous la forme es:bx 
         ;---------------------------------------------------------
@@ -50,7 +51,7 @@ ChargeInit :
         int 13h                         ; On place ça en ES:BX
 
         jc InitDisquette            ; 0x7c34
-
+%endif
         ; Arret du lecteur de disquette WARNING violent et pas beau
         ;----------------------------------------------------------
         mov dx, 03f2h
@@ -75,5 +76,5 @@ InitDisquette :
 
 ; On complète par des 0 pour faire 512 octets
 
-times 512-($-$$)-2 db 0
+times 510-($-$$) db 0
         dw 0AA55h

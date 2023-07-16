@@ -15,11 +15,12 @@ all : floppyboot grubinit
 floppyboot : $(TAILLE_CONF)
 	(make floppyboot2)
 
-floppyboot2 : bourrage $(BSEC_BIN) $(INIT_BIN) 
+floppybootelf : $(TAILLE_CONF)
+	(make floppybootelf2)
 
-# L'image sur disquette nécessite éventuellement du bourrage
-bourrage :
-	dd if=/dev/zero of=bourrage bs=1 count=$(MANUX_TAILLE_BOURRAGE)
+floppyboot2 : $(BSEC_BIN) $(INIT_BIN) 
+
+floppybootelf2 : $(BSEC_ELF) $(INIT_ELF) 
 
 # Calcul de la taille du noyau et du bourrage nécessaire
 $(TAILLE_CONF) :  $(OUTILS) $(NOYAU_ELF)

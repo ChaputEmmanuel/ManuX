@@ -46,7 +46,7 @@ LD_SCRIPT     = manux.lds
 ASM_EXT     = nasm
 ASM         = nasm
 ASM_BIN_OPT = -f bin
-ASM_ELF_OPT = -f elf32 #-g3 -F dwarf
+ASM_ELF_OPT = -f elf32 -g3 -F dwarf
 
 ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
               -D MANUX_INIT_START_ADDRESS=$(MANUX_INIT_START_ADDRESS) \
@@ -82,6 +82,8 @@ FLOPPY_IMG = manux.img
 TAILLE_CONF = $(ROOTDIR)/boot/taille.conf
 BSEC_BIN = $(ROOTDIR)/boot/bootsector.bin
 INIT_BIN = $(ROOTDIR)/boot/init-manux.bin
+BSEC_ELF = $(ROOTDIR)/boot/bootsector.elf
+INIT_ELF = $(ROOTDIR)/boot/init-manux.elf
 
 COMPRESS = gzip
 

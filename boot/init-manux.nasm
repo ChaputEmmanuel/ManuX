@@ -1,18 +1,30 @@
-;-------------------------------------------------------------------------------
+;===============================================================================
 ;      Initialisation de ManuX
 ;                                                      (C) Manu Chaput 2000-2023
-;-------------------------------------------------------------------------------
+;===============================================================================
 %define portCmdClavier  0x64
 %define portDonneesClavier  0x60
 
 org  MANUX_INIT_START_ADDRESS
 global InitManuX
+[bits 16]
+
 
 InitManuX :
-        mov ax, 0 ; MANUX_INIT_START_ADDRESS   ; C'est à cette adresse qu'est chargé l'init
+        ; C'est à cette adresse qu'est chargé l'init
+        mov ax, 0 ; MANUX_INIT_START_ADDRESS
         mov ds, ax
         mov es, ax
-        mov si, MsgChargement       ; AfficheBIOS le message de chargement
+
+        ; Chargement du noyau depuis la disquette
+	;----------------------------------------
+        mov si, MsgChargement     ; AfficheBIOS le message de chargement
+        call AfficheBIOS
+
+        call chargerManuX
+        call arretDisquette
+	
+        mov si, MsgFinChargement  ; AfficheBIOS le message de fin de chargement
         call AfficheBIOS
 
         ; Détection du matériel
@@ -86,10 +98,18 @@ ModeReelOK :
 
         jmp IndSegCode32:Mode32       ; Pour vider le pipe
 
+;-------------------------------------------------------------------------------
+;
+;-------------------------------------------------------------------------------
+%include "gestion-manux.nasm"
+
 %ifdef MANUX_RAMDISK
 %include "gestion-ramdisk.nasm"
 %endif
 
+;-------------------------------------------------------------------------------
+;
+;-------------------------------------------------------------------------------
 [bits 32]
 
 Mode32:
@@ -205,6 +225,7 @@ InfoSysteme :
 ; Les messages
 ;-------------
 MsgChargement     db      'ManuX loading ...',13,10,0
+MsgFinChargement  db      'ManuX en memoire ...',13,10,0
 MsgDetection      db      'La, je devrais detecter le matos !', 13, 10, 0
 MsgBlocage        db      '(Blocage de debug)', 13, 10, 0
 MsgPassageProtege db      'Allez zou, on passe en mode protege ...', 13, 10, 0
