@@ -20,11 +20,11 @@ floppybootelf : $(TAILLE_CONF)
 
 floppyboot2 : $(BSEC_BIN) $(INIT_BIN) 
 
-floppybootelf2 : $(BSEC_ELF) $(INIT_ELF) 
+floppybootelf2 : $(BSEC_BIN) $(INIT_ELF) 
 
 # Calcul de la taille du noyau et du bourrage nécessaire
-$(TAILLE_CONF) :  $(OUTILS) $(NOYAU_ELF)
-	../outils/taillenoyau $(NOYAU_ELF) > $@
+$(TAILLE_CONF) :  $(OUTILS) $(NOYAU_BIN)
+	../outils/taillenoyau $(NOYAU_BIN) > $@
 
 grubinit :  $(MB_MANUX_ELF)
 

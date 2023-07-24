@@ -133,10 +133,6 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 
    printk_debug(DBG_KERNEL_MEMOIRE, "Page  0x0         pour les gestionnaires\n");
    
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la gestion memoire\n",
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
-
    // La table d'allocation de la mémoire
    for (i=0 ; i < tailleProprietaire; i++){
      reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);

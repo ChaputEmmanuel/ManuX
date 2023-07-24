@@ -79,6 +79,7 @@ ISO_FICHIER=manux.iso
 
 # Pour le boot sur disquette
 FLOPPY_IMG = manux.img
+FLOPPYELF_IMG = manuxelf.img
 TAILLE_CONF = $(ROOTDIR)/boot/taille.conf
 BSEC_BIN = $(ROOTDIR)/boot/bootsector.bin
 INIT_BIN = $(ROOTDIR)/boot/init-manux.bin

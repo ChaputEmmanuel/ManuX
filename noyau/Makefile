@@ -24,7 +24,7 @@ OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o)
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)
 
-all : binaries noyau.elf symbols_elf noyaumb.elf # noyau.bin symbols_bin
+all : binaries noyau.elf noyaumb.elf 
 
 #----------------------------------------------------------------------------------
 # Une fois qu'on a tout compilé, il est temps de construire les noyaux
@@ -32,23 +32,16 @@ all : binaries noyau.elf symbols_elf noyaumb.elf # noyau.bin symbols_bin
 # Création d'un noyau "elf"
 noyau.elf  : $(LD_SCRIPT) $(OBJETS) $(LIBRAIRIES_MANUX)
 	ld -m elf_i386 --section-start=.text=$(MANUX_KERNEL_START_ADDRESS) -nmagic -T $(LD_SCRIPT) $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
-	nm noyau.elf | sort > symbols_elf
+	nm noyau.elf | sort > symbols
+	objcopy  -O binary $(NOYAU_ELF) $(NOYAU_BIN)
 
 # Le même avec un entête multiboot (pas top !)
 noyaumb.elf  : $(LD_SCRIPT) $(MB_MANUX_ELF) $(OBJETS) $(LIBRAIRIES_MANUX)
 	ld -m elf_i386 -nmagic -T $(LD_SCRIPT) $(MB_MANUX_ELF) $(OBJETS) $(LIBRAIRIES_MANUX) -o $@
-	nm noyau.elf | sort > symbolsmb_elf
+	nm noyaumb.elf | sort > symbolsmb
 
-# Création des symboles, WARNING : à revoir
-symbols_bin : $(OBJETS) $(LIBRAIRIES_MANUX)
-	ld -m elf_i386 -N --section-start=.text=$(MANUX_KERNEL_START_ADDRESS) $(OBJETS) $(LIBRAIRIES_MANUX) -o noyau.sym
-	nm noyau.sym | sort > symbols_bin
-	rm noyau.sym
-
-symbols_elf : noyau.elf
-	nm noyau.elf | sort > symbols_elf
 
 #----------------------------------------------------------------------------------
 
 clean :
-	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols_bin symbols_elf symbolsmb_elf $(LD_SCRIPT)
+	rm -f bochs.out *.bin *.obj *.o *.elf *.a symbols* $(LD_SCRIPT)

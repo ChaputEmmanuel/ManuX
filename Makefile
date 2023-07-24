@@ -107,20 +107,16 @@ manux : $(NOYAU_ELF)
 # L'image sur disquette est obtenue en concaténant les fichiers de boot, d'init,
 # et le noyau, puis en plaçant le tout en début d'un fichier de 1.44 Mo
 #...............................................................................
-floppy : $(FLOPPY_IMG)
+floppy : $(FLOPPYELF_IMG)
 
 $(FLOPPYELF_IMG) : bootfloppyelf $(NOYAU_ELF)
-	objcopy  -O binary $(NOYAU_ELF) $(NOYAU_BIN)
-	ld -Ttext=0x7c00 -melf_i386 $(BSEC_ELF) -o bsec.elf
-	objcopy  -O binary bsec.elf bsec.img
 	ld -Ttext=0x7e00 -melf_i386 $(INIT_ELF) -o init.elf
-	objcopy  -O binary init.elf init.img
-	cat bsec.img  init.img $(NOYAU_BIN)  > floppy.bin
+	objcopy  -O binary init.elf $(INIT_BIN)
+	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN)  > floppy.bin
 	dd if=/dev/zero of=$@ bs=1024 count=1440
 	dd if=floppy.bin of=$@ bs=512 conv=notrunc
 
 $(FLOPPY_IMG) : bootfloppy $(NOYAU_ELF)
-	objcopy  -O binary $(NOYAU_ELF) $(NOYAU_BIN)
 	cat $(BSEC_BIN) $(INIT_BIN) $(NOYAU_BIN)  > floppy.bin
 	dd if=/dev/zero of=$@ bs=1024 count=1440
 	dd if=floppy.bin of=$@ bs=512 conv=notrunc
@@ -157,7 +153,7 @@ run : $(NOYAUMB_ELF)
 	$(RUN_MANUXMB_ELF)
 
 rundbg : $(NOYAUMB_ELF)
-	$(RUN_MANUXMB_ELF_DBG) #-gdb tcp::1234 -S 
+	$(RUN_MANUXMB_ELF_DBG)
 
 runfloppy : manux.img
 	$(RUN_MANUX_FLOPPY)

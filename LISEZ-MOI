@@ -15,6 +15,19 @@ Feuille de route
    . mutex                 <- idem
 
    (J EN SUIS LA)
+
+   Je n'arrive toujours pas à booter sur floppy. Je suspecte la pile,
+   mai sans conviction. A tester :
+   make clean ; make CFG=bootparam floppy
+   qui ne marche pas (portable) avec bochs, mais qui a l'air d'arriver
+   jusqu'aux premières instructions dans qemu
+   J'ai l'impression que ça marche, mais qu'à la fin ça reboote, genre
+   watchdog. On va commencer par vérifier que le load de gros noyau
+   (+de 63 secteurs ?) fontionne, ... puis mettre en place les
+   handlers, voir si c'est ça.
+
+   
+   A réfléchir
    . Attention, une tâche a une console, mais printk écrit dans la
    console noyau. Ne faudrait-il pas, au moins de façon optionnelle,
    avoir un printk qui écrive dans la console de la tâche ? printf
@@ -30,7 +43,7 @@ Feuille de route
 
    . A faire :
       . pourquoi tache necessite console ?
-      . pourquoi tâhce nécessite interuption ?
+      . pourquoi tâche nécessite interuption ?
       . différence entre MANUX_CLAVIER et MANUX_CLAVIER_CONSOLE ?
       . difference entre memoire et plan-memoire dans config ?
 
@@ -43,7 +56,7 @@ Feuille de route
    . Bottom halves
    . Clavier (utilisateur) à peu près utilisable
    . Modes usager/noyau
-   . [FAIT] Bus PCI                     <- Un minimum opérationnel est fait
+   . [FAIT] Bus PCI              <- Un minimum opérationnel est fait
    . Ethernet                    <- La base y est !
    . Block device
    . SGF

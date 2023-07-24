@@ -5,7 +5,7 @@
 %define portCmdClavier  0x64
 %define portDonneesClavier  0x60
 
-org  MANUX_INIT_START_ADDRESS
+;org  MANUX_INIT_START_ADDRESS
 global InitManuX
 [bits 16]
 
@@ -18,19 +18,19 @@ InitManuX :
 
         ; Chargement du noyau depuis la disquette
 	;----------------------------------------
-        mov si, MsgChargement     ; AfficheBIOS le message de chargement
-        call AfficheBIOS
+        mov si, msgChargement     ; afficheBIOS le message de chargement
+        call afficheBIOS
 
         call chargerManuX
-        call arretDisquette
+;        call arretDisquette ; WARNING !? WTF
 	
-        mov si, MsgFinChargement  ; AfficheBIOS le message de fin de chargement
-        call AfficheBIOS
+        mov si, msgFinChargement  ; afficheBIOS le message de fin de chargement
+        call afficheBIOS
 
         ; Détection du matériel
         ;----------------------
-        mov si, MsgDetection
-        call AfficheBIOS
+        mov si, msgDetection
+        call afficheBIOS
 
         ; Lecture de la mémoire conventionnelle
         int 12h
@@ -53,8 +53,8 @@ InitManuX :
         and al, 1         ; On vérifie le bit de poids faible
         jz ModeReelOK     ; Il doit être nul ...
 
-        mov si, MsgPasEnModeReel
-        call AfficheBIOS
+        mov si, msgPasEnModeReel
+        call afficheBIOS
 
         mov ah, 9
         int 21h
@@ -63,13 +63,13 @@ InitManuX :
         jmp BlocageDebug
 
 ModeReelOK :
-        mov si, MsgModeReel
-        call AfficheBIOS        ; @ 0x10048
+        mov si, msgModeReel
+        call afficheBIOS        ; @ 0x10048
 
         ; Activation de la ligne A20
         ;---------------------------
-        mov si, MsgValideA20
-        call AfficheBIOS
+        mov si, msgValideA20
+        call afficheBIOS
 
         cli
         call ValideA20
@@ -81,8 +81,9 @@ ModeReelOK :
 
         ; Passage en mode protégé
         ;------------------------
-        mov si, MsgPassageProtege
-        call AfficheBIOS
+        mov si, msgPassageProtege
+        call afficheBIOS
+
 
         ; Chargement de la GDT
         ;---------------------
@@ -126,7 +127,11 @@ Mode32:
         ; La pile ...
         mov bx, IndSegStack32
         mov ss, bx
-        mov eax, 90000h - 4
+;        mov eax, 90000h - 4     ; WARNING !! Reprendre _adresseLimitePileManuX
+	                        ; comme dans mb-manux ? sauf qu'on n'est pas linké
+				; avec ici, donc comment la connaître ?
+
+        mov eax, 27000h
         mov esp, eax
 
 	sti
@@ -142,7 +147,12 @@ Mode32:
 
         ; Et c'est parti, on saute sur le noyau !
         ;----------------------------------------
-        jmp MANUX_KERNEL_START_ADDRESS  
+        call MANUX_KERNEL_START_ADDRESS
+        cli
+soLongAndThankYouForTheFish :
+        hlt
+        jmp soLongAndThankYouForTheFish
+
 [bits 16]
 
 ;-------------------------------------------------------------------------------
@@ -177,24 +187,25 @@ AttenteClavierBcle :
 
 ;      Affichage par le BIOS de la chaine pointée par SI
 ;-------------------------------------------------------
-AfficheBIOS:
+afficheBIOS:
         lodsb
         or al,al
-        jz short FinAfficheBIOS
+        jz short afficheBIOSFin
         mov ah,0x0E
         mov bx,0x0007
         int 0x10
-        jmp AfficheBIOS
-FinAfficheBIOS:
+        jmp afficheBIOS
+afficheBIOSFin :
         retn
 
 ;      Blocage de la machine pour débugger
 ;-----------------------------------------
 BlocageDebug :
-        mov si, MsgBlocage
-        call AfficheBIOS
+        mov si, msgBlocage
+        call afficheBIOS
 
 BoucleFolle :
+        hlt
         jmp BoucleFolle
 
 ;-------------------------------------------------------------------------------
@@ -224,20 +235,24 @@ InfoSysteme :
 
 ; Les messages
 ;-------------
-MsgChargement     db      'ManuX loading ...',13,10,0
-MsgFinChargement  db      'ManuX en memoire ...',13,10,0
-MsgDetection      db      'La, je devrais detecter le matos !', 13, 10, 0
-MsgBlocage        db      '(Blocage de debug)', 13, 10, 0
-MsgPassageProtege db      'Allez zou, on passe en mode protege ...', 13, 10, 0
-MsgModeReel       db      'OK, on est en mode reel !', 13, 10, 0
-MsgPasEnModeReel  db      'ERREUR, on n est pas en mode reel ...', 13, 10, 0
-MsgValideA20      db      'Validation de la ligne A20 ...', 13, 10, 0
+;msgChargement     db      'ManuX loading ...',13,10,0
+msgChargement     db      '123456789012345678901234567890123456789012345678901234567890',13,10,0
+msgFinChargement  db      'ManuX en memoire ...',13,10,0
+msgDetection      db      'La, je devrais detecter le matos !', 13, 10, 0
+msgBlocage        db      '(Blocage de debug)', 13, 10, 0
+msgPassageProtege db      'Allez zou, on passe en mode protege ...', 13, 10, 0
+msgModeReel       db      'OK, on est en mode reel !', 13, 10, 0
+msgPasEnModeReel  db      'ERREUR, on n est pas en mode reel ...', 13, 10, 0
+msgValideA20      db      'Validation de la ligne A20 ...', 13, 10, 0
 %ifdef MANUX_RAMDISK
-MsgLoadRamDisk    db      'Chargement du RamDisk ...', 13, 10, 0
-MsgNoRamDisk      db      'Pas de RamDisk ...', 13, 10, 0
-MsgErreurRamDisk  db      'Erreur de chargement RamDisk ...', 13, 10, 0
+msgLoadRamDisk    db      'Chargement du RamDisk ...', 13, 10, 0
+msgNoRamDisk      db      'Pas de RamDisk ...', 13, 10, 0
+msgErreurRamDisk  db      'Erreur de chargement RamDisk ...', 13, 10, 0
 %endif
-MsgRunningManux   db      'On lance ManuX, ...', 13, 10, 0
+msgRunningManux   db      'On lance ManuX, ...', 13, 10, 0
+msgDisquetteErr   db      13, 10, 'Erreur disquette !', 13, 10, 0
+msgChargementSec  db      '#', 0
+msgChargementFin  db      '!', 13, 10, 0
 
 ; Le bourrage (pour faire 2 blocs)
 ;---------------------------------
