@@ -16,17 +16,21 @@ Feuille de route
 
    (J EN SUIS LA)
 
-   Je n'arrive toujours pas à booter sur floppy. Je suspecte la pile,
-   mai sans conviction. A tester :
-   make clean ; make CFG=bootparam floppy
-   qui ne marche pas (portable) avec bochs, mais qui a l'air d'arriver
-   jusqu'aux premières instructions dans qemu
-   J'ai l'impression que ça marche, mais qu'à la fin ça reboote, genre
-   watchdog. On va commencer par vérifier que le load de gros noyau
-   (+de 63 secteurs ?) fontionne, ... puis mettre en place les
-   handlers, voir si c'est ça.
 
+Boot floppy
+-----------
+   Ca avance un peu : certaines config fonctionnent (eg console,
+   printk, journal, journal+fichier) d'autre non (eg memoire, taches,
+   ...)
+   Il faut refaire un poil mes makefile pour que make runfloppy fasse
+   ce qu'il faut ! 
+
+Userland
+--------
+   errno.h n'est pas transféré
    
+------------------------------------------------
+
    A réfléchir
    . Attention, une tâche a une console, mais printk écrit dans la
    console noyau. Ne faudrait-il pas, au moins de façon optionnelle,

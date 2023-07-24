@@ -75,9 +75,9 @@ void startManuX()
 
    ordonnanceurAddTache(t0);
    ordonnanceurAddTache(t1);
-   while (1) {
-     //     printk(".");
-   }
+
+   // Attention, à la fin de ManuX, c'est un arrêt de la machine !
+   while (1) {}
    
-}   /* _startManuX */
+}   /* startManuX */
 

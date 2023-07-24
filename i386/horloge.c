@@ -8,7 +8,9 @@
 #include <manux/horloge.h>
 #include <manux/io.h>           // outb
 #include <manux/memoire.h>      // NULL
-#include <manux/scheduler.h>    // ordonnanceur
+#ifdef MANUX_TACHES
+#   include <manux/scheduler.h>    // ordonnanceur
+#endif
 #include <manux/printk.h>
 /*
  * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
@@ -27,7 +29,7 @@ void handlerHorloge(void * inutile)
 {
    nbTopHorloge++;
 
-#ifdef MANUX_PREEMPTIF
+#if defined(MANUX_TACHES) && defined(MANUX_PREEMPTIF) 
    ordonnanceur();
 #endif
 }
