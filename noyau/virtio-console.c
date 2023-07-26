@@ -137,7 +137,7 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
    // On ajoute des buffers sur la file d'entrée
    fr = &(virtioConsole.virtioPeripherique.filesVirtuelles[VIRTIO_CONSOLE_PORT0_IN]);
 
-   // Pas de malloc, ...
+   // Pas de malloc, ... WARNING : faire version avec malloc
    pointeur = allouerPages(NB_PAGES(fr->taille*(1024)));
 
    for (int i = 0 ; i < fr->taille ; i++) {
@@ -151,6 +151,8 @@ int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
                            1,
 		           VRING_DESC_F_WRITE);
    }
+
+   printk_debug(DBG_KERNEL_VIRTIO, "OUT\n");
 
    return ESUCCES;
 }

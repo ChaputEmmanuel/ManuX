@@ -16,6 +16,7 @@
 #define MANUX_FICHIER_MAIN main-virtio-journal
 
 #include <config/base.h>
+#include <config/bootloader.h>
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>
 #include <config/console.h>

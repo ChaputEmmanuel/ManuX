@@ -46,10 +46,8 @@
 //  ;
 
 #define masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_START     \
 			       )
 #define masqueDebugageFichier (0x00000000\
- | DBG_KERNEL_START     \
 			       )
 
 /*

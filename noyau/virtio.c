@@ -118,7 +118,7 @@ int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
 
    // Combien faut-il de pages avec les contraintes d'alignement ?
    nbTotalPages = NB_PAGES(taillePartie1) + NB_PAGES(taillePartie2);
-   
+
    // Allocation des pages nécessaires
    pointeur = allouerPages(nbTotalPages);
 
@@ -176,6 +176,8 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
    uint8_t  etat;       // Etat du périphérique   
    int      numFile;    // Pour boucler sur les files
    
+   printk_debug(DBG_KERNEL_VIRTIO, "IN\n");
+
    // On va chercher un pointeur vers la description PCI
    vp->pciEquipement = PCIEquipementNumero(PCINum);
 
@@ -226,26 +228,32 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
       printk(PRINTK_ERREUR, "Le device virtio net refuse les caract. !\n");
       return EINVAL;
    }
+   printk_debug(DBG_KERNEL_VIRTIO, "Les files\n");
 
    // Construction des files (7) comme décrit dans [3] section 2.3
    for (numFile = 0 ; numFile < MANUX_VIRTIO_NB_MAX_FILES; numFile++) {
+      printk_debug(DBG_KERNEL_VIRTIO, "Creation file %d : \n", numFile);
+
       // Lecture de la taille (1)(2)
       outw((uint16_t)(adresseES + VIRTIO_HIST_FILE_SEL), numFile);
       inw((uint16_t)(adresseES + VIRTIO_HIST_TAILLE_FILE), tailleFile);
+      printk_debug(DBG_KERNEL_VIRTIO, "   . Taille : %d\n", tailleFile);
 
       if (tailleFile) {
          // Création des fameuses files (3)
          virtioCreerFileVirtuelle(&(vp->filesVirtuelles[numFile]),   
 	                          tailleFile);
+         printk_debug(DBG_KERNEL_VIRTIO, "   . Creation ok\n");
 
          // On donne l'adresse à l'équipement (3)
          outw((uint16_t)(adresseES + VIRTIO_HIST_FILE_SEL), numFile);
          outl((uint16_t)(adresseES + VIRTIO_HIST_ADDRESS_FILE),
          ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
-         printk_debug(DBG_KERNEL_VIRTIO, "File %d @ %d\n", numFile,
+         printk_debug(DBG_KERNEL_VIRTIO, "   . @     %d\n",
 		      ((uint32_t)vp->filesVirtuelles[numFile].tableDescripteurs)/MANUX_TAILLE_PAGE);
       }     
    }
+   printk_debug(DBG_KERNEL_VIRTIO, "voila\n");
    
    // On dit au périphérique qu'on est bon, ...
    outb((uint16_t)(adresseES + VIRTIO_HIST_ETAT),
@@ -253,6 +261,8 @@ int virtioInitPeripheriquePCI(VirtioPeripherique * vp,
 	| VIRTIO_DRIVER
 	| VIRTIO_FEATURES_OK
 	| VIRTIO_DRIVER_OK);
+
+   printk_debug(DBG_KERNEL_VIRTIO, "OUT\n");
 
    return ESUCCES;
 }

@@ -5,6 +5,8 @@
  */
 #include <manux/config.h>
 #include <manux/debug.h>
+#include <manux/bootloader.h>      // infoSysteme
+#include <manux/memoire.h>         // initialiserMemoire
 #include <manux/console.h>
 #include <manux/printk.h>
 #include <manux/fichier.h>
@@ -18,27 +20,29 @@ void startManuX()
 
    INoeud iNoeudVirtioConsole; 
    Fichier fichierVirtioConsole;
-  
+   
+   // Récupération des informations depuis le bootloader
+   bootloaderLireInfo();
+
    // Initialisation de la console noyau
    consoleInitialisation(&iNoeudConsole);
 
-   printk("Bonjour !!!\n");
-   
+   //bootloaderInitialiser();
+
+   initialiserMemoire(infoSysteme.memoireDeBase,
+                      infoSysteme.memoireEtendue);
+
    // Initialisation du journal
    journalInitialiser(&iNoeudConsole);
 
    // Initialisation du bus PCI
-   printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
    PCIEnumerationDesEquipements();
-   printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
 
    // Initialisation de la console virtio
-   printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == 0/*ESUCCES*/) {
       ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
       journalAffecterFichier(&fichierVirtioConsole);
    }
-   printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
    
    // Un petit message
    printk("Printk dit bonjour via le journal !\n");

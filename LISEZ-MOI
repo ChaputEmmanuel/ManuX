@@ -9,6 +9,13 @@ doc (ok, ça c'est la théorie !).
 Feuille de route
 ----------------
 
+   . Faire un fichier de config de démo de virtio-console, parce que
+   là ça ne marche plus ! Probablement depuis que j'ai changé des
+   choses dans fichiers et inoeuds (à documenter !)
+   Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
+   Pourquoi il n'y a rien sur la console virtio !?
+   A creuser et à documenter !
+
    (pour les cours)
    . dormir/réveiller      <- est-ce vraiment utile sous cette forme ?
    . verrou tournant       <- quasiment fait dans atomique
@@ -17,18 +24,41 @@ Feuille de route
    (J EN SUIS LA)
 
 
-Boot floppy
------------
-   Ca avance un peu : certaines config fonctionnent (eg console,
+Boot
+----
+   . floppy avance un peu : certaines config fonctionnent (eg console,
    printk, journal, journal+fichier) d'autre non (eg memoire, taches,
    ...)
-   Il faut refaire un poil mes makefile pour que make runfloppy fasse
-   ce qu'il faut ! 
-
+   . Il faut refaire un poil mes makefile pour que make runfloppy fasse
+   ce qu'il faut !
+   . Documenter bootloader !
+   . Faire un framework de passage de paramètres ! En particulier pour
+   les flags d'affichage. (on peut utiliser https://github.com/tusharjois/bscanf)
+   
 Userland
 --------
-   errno.h n'est pas transféré
-   
+   . errno.h n'est pas transféré
+   . Vérifier que printf fonctionne sans fichier (via l'appel système ecrireConsole)
+
+
+Gestion des config
+------------------
+   . est-ce que memoire nécessite bootloader (pour info sur taille) ?
+   . pourquoi tache necessite console ?
+   . pourquoi tâche nécessite interuption ?
+   . différence entre MANUX_CLAVIER et MANUX_CLAVIER_CONSOLE ?
+   . difference entre memoire et plan-memoire dans config ?
+   . Il va falloir faire quelque chose pour aider à construire un
+   noyau. Par exemple, dès qu'on ajoute la mémoire, il faut penser à
+   l'initialiser au début du main.
+      . Évidemment on peut mettre un test au début de allouerPage,
+      mais c'est pas génial, ...
+      . Construire une macro d'initialisation ? A réfléchir, ...
+      . Générer un canevas à partir de main.c et d'un coup de
+      "gcc $(CFLAGS) -E -P -x c" (voir la règle pour ld dans
+      make.conf) eg "make CFG=uneconf canevas" qui va générer un
+      fichier canevas/main-uneconf.c
+
 ------------------------------------------------
 
    A réfléchir
@@ -37,21 +67,7 @@ Userland
    avoir un printk qui écrive dans la console de la tâche ? printf
    écrit bien sur la console, ...
    
-   . Faire un fichier de config de démo de virtio-console, parce que
-   là ça ne marche plus ! Probablement depuis que j'ai changé des
-   choses dans fichiers et inoeuds (à documenter !)
-   Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
-   Pourquoi il n'y a rien sur la console virtio !?
-   A creuser et à documenter !
 
-
-   . A faire :
-      . pourquoi tache necessite console ?
-      . pourquoi tâche nécessite interuption ?
-      . différence entre MANUX_CLAVIER et MANUX_CLAVIER_CONSOLE ?
-      . difference entre memoire et plan-memoire dans config ?
-
-   . Vérifier que printf fonctionne sans fichier (via l'appel système ecrireConsole)
    
    . [FAIT] Un malloc, parce qu'il y en a marre de tout déclarer en statique !
       . [FAIT] Un buddy area dans un premier temps
