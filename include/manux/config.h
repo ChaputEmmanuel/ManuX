@@ -10,12 +10,7 @@
 /*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 
-/*
- * On peut définir un autre fichier de configuration générale
- * WARNING, vus les résultats, ça fonctione !!! Pourquoi ???
- */
 #ifdef MANUX_FICHIER_CONFIG
-#   error "Cette chose ne devrait pas se produire !"
 #   include MANUX_FICHIER_CONFIG
 #else
 #ifndef MANUX_CONFIG

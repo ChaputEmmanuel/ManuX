@@ -55,17 +55,17 @@ void bootloaderInitialiser()
          printk_debug(DBG_KERNEL_BOOTLOADER, "C'est init-manux qui nous a lance.\n");
       break;
       default :
-	paniqueNoyau("Bootloader inconnue : 0x%x\n", magic);
+         paniqueNoyau("Bootloader inconnue : 0x%x\n", magic);
    }
 
    // Alignement des modules à la page ? (Pas important pour nous)
    if ((infoSysteme.flags &  MULTIBOOT_PAGE_ALGIN) ==  MULTIBOOT_PAGE_ALGIN) {
-     printk_debug(DBG_KERNEL_BOOTLOADER, "Alignement a la page\n");
+      printk_debug(DBG_KERNEL_BOOTLOADER, "Alignement a la page\n");
    }
 
    // A-t-on des infos sur la mémoire ?
    if ((infoSysteme.flags & MULTIBOOT_MEMORY_INFO) == MULTIBOOT_MEMORY_INFO) {
-     printk_debug(DBG_KERNEL_BOOTLOADER, "Base = %d, etendue = %d\n",
+      printk_debug(DBG_KERNEL_BOOTLOADER, "Base = %d, etendue = %d\n",
 	  infoSysteme.memoireDeBase,
 	  infoSysteme.memoireEtendue);
    } else {

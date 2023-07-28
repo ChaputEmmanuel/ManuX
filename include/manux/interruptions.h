@@ -57,10 +57,10 @@ typedef IDTGate * IDT;
  */
 typedef void (Handler());
 
-void initialiserIDT();
-/*
- * Initialiser l'IDT (Interrupt Description Table)
+/**
+ * @brief ! Initialiser l'IDT (Interrupt Description Table)
  */
+void initialiserIDT();
 
 /**
  * Le type d'une fonction de gestion d'exception

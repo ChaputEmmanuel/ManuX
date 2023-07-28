@@ -1,6 +1,6 @@
 /**
- * @file multiconf/interruptions.h
- * @brief Exemple de configuration permettant d'observer des interruptions.
+ * @file multiconf/virtio-cons.h
+ * @brief Exemple de configuration pour l'utilisation des consoles virtio.
  *
  *                                                     (C) Manu Chaput 2000-2023
  */
@@ -12,13 +12,19 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-#define MANUX_FICHIER_MAIN main-interruptions
+#define MANUX_FICHIER_MAIN main-virtio-cons
 
 #include <config/base.h>
-#include <config/gestion-memoire.h>
+#include <config/bootloader.h>
 #include <config/plan-memoire.h>
+#include <config/gestion-memoire.h>
 #include <config/console.h>
 #include <config/printk.h>
+#include <config/systeme-fichiers.h>
+#undef MANUX_TUBES
+#include <config/pc-i386.h>
+#include <config/pci.h>
+#include <config/virtio.h>
 
 #include <config/verifications.h>
 

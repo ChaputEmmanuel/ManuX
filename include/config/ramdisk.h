@@ -5,7 +5,7 @@
 /*
  * Utilisation d'un RAMdisk ou non
  */
-//#define MANUX_RAMDISK
+#define MANUX_RAMDISK
 
 /*
  * Sa taille. WARNING : à calculer par un outils comme la taille du noyau

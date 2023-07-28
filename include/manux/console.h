@@ -62,6 +62,12 @@ typedef struct _Console {
   
 } Console;
 
+/**
+ * @brief Initialisation du système de console sans notion de fichier
+ * @return ESUCCES en cas de succès, autre chose sinon
+ */
+int consoleInitialisation();
+
 #ifdef MANUX_FICHIER
 /**
  * Les méthodes permettant de traiter une console comme un fichier
@@ -74,7 +80,7 @@ extern MethodesFichier consoleMethodesFichier;
  * @param iNoeudConsole (out) un INoeud décrivant la console par défaut 
  * @return ESUCCES en cas de succès, autre chose sinon
  */
-int consoleInitialisation(INoeud * iNoeudConsole);
+int consoleInitialisationINoeud(INoeud * iNoeudConsole);
 
 /**
  * @brief : Création d'un iNoeud permettant de manipuler une console
@@ -83,14 +89,7 @@ int consoleInitialisation(INoeud * iNoeudConsole);
  */
 INoeud * consoleCreerINoeud(Console * c);
 
-#else
-/**
- * @brief Initialisation du système de console sans notion de fichier
- * @return ESUCCES en cas de succès, autre chose sinon
- */
-int consoleInitialisation();
-
-#   ifdef MANUX_KMALLOC
+#ifdef MANUX_KMALLOC
 /**
  * @brief : Création d'un iNoeud permettant de manipuler une console
  * @param : c (in) pointeur sur la console

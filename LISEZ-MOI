@@ -9,13 +9,6 @@ doc (ok, ça c'est la théorie !).
 Feuille de route
 ----------------
 
-   . Faire un fichier de config de démo de virtio-console, parce que
-   là ça ne marche plus ! Probablement depuis que j'ai changé des
-   choses dans fichiers et inoeuds (à documenter !)
-   Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
-   Pourquoi il n'y a rien sur la console virtio !?
-   A creuser et à documenter !
-
    (pour les cours)
    . dormir/réveiller      <- est-ce vraiment utile sous cette forme ?
    . verrou tournant       <- quasiment fait dans atomique
@@ -23,7 +16,10 @@ Feuille de route
 
    (J EN SUIS LA)
 
-
+Fichiers
+--------
+   . Changer INoeud en NoeudI
+   
 Boot
 ----
    . floppy avance un peu : certaines config fonctionnent (eg console,
@@ -37,6 +33,7 @@ Boot
    
 Userland
 --------
+   . faire un config/userland.h qui définit INIT=init-toto.o
    . errno.h n'est pas transféré
    . Vérifier que printf fonctionne sans fichier (via l'appel système ecrireConsole)
 
@@ -48,6 +45,7 @@ Gestion des config
    . pourquoi tâche nécessite interuption ?
    . différence entre MANUX_CLAVIER et MANUX_CLAVIER_CONSOLE ?
    . difference entre memoire et plan-memoire dans config ?
+   . Créer un config/interruptions.h décorrélé de pc-i386.h
    . Il va falloir faire quelque chose pour aider à construire un
    noyau. Par exemple, dès qu'on ajoute la mémoire, il faut penser à
    l'initialiser au début du main.
@@ -99,7 +97,7 @@ En cours
    Tranquile sur les interruptions :
    
    . Remplacer i8259a* par pic* et initialiser une structure
-   picFonctions. (COMMENCE mas en STAND BY : pas urgent !)
+   picFonctions. (COMMENCE mais en STAND BY : pas urgent !)
    . Le PIC ne devrait pas être visible hors de interruptions ! Pas
    besoin d'include de i8259a ailleurs que dans interruptions.h
    . Séparer exception et soft ints ?
@@ -513,4 +511,11 @@ make qui copie de include/manux vers usr/include/manux.
 
    Horloge.c :  un délai en millisecondes
    A FAIRE immédiatement : séparer iNoeud et fichier
+
+   . Faire un fichier de config de démo de virtio-console, parce que
+   là ça ne marche plus ! Probablement depuis que j'ai changé des
+   choses dans fichiers et inoeuds (à documenter !)
+   Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
+   Pourquoi il n'y a rien sur la console virtio !?
+   A creuser et à documenter !
 

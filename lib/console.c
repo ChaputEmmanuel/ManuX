@@ -570,7 +570,7 @@ void consoleInitialiserINoeud(INoeud * i, Console * c)
  * WARNING : changer le nom plutôt que reprendre le même que sans
  * fichiers ?
  */
-int consoleInitialisation(INoeud * iNoeudConsole)
+int consoleInitialisationINoeud(INoeud * iNoeudConsole)
 {
    //! On initialise la console
    initialiserConsoleNoyau();
@@ -602,7 +602,7 @@ INoeud * consoleCreerINoeud(Console * c)
 }
 
 #   endif // MANUX_KMALLOC
-#else 
+#endif
 /**
  * Initialisation du système de console. 
  */
@@ -612,7 +612,6 @@ int consoleInitialisation()
    
    return ESUCCES;
 }
-#endif
 
 #ifdef MANUX_APPELS_SYSTEME
 /*

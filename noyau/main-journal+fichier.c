@@ -14,7 +14,7 @@ void startManuX()
    INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
   
    // Initialisation de la console noyau
-   consoleInitialisation(&iNoeudConsole);
+   consoleInitialisationINoeud(&iNoeudConsole);
 
    printk("Pouet pouet !!!\n");
    

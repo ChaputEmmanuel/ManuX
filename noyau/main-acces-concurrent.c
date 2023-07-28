@@ -38,7 +38,7 @@ void startManuX()
    bootloaderLireInfo();
 
    // Initialisation de la console noyau
-   consoleInitialisation(&iNoeudConsole);
+   consoleInitialisationINoeud(&iNoeudConsole);
 
    bootloaderInitialiser();
 

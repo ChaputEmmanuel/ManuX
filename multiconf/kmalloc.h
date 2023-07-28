@@ -1,6 +1,6 @@
 /**
- * @file multiconf/interruptions.h
- * @brief Exemple de configuration permettant d'observer des interruptions.
+ * @file multiconf/kmalloc.h
+ * @brief Exemple de configuration pour l'utilisation de kmalloc
  *
  *                                                     (C) Manu Chaput 2000-2023
  */
@@ -12,13 +12,16 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-#define MANUX_FICHIER_MAIN main-interruptions
+#define MANUX_FICHIER_MAIN main-kmalloc
 
 #include <config/base.h>
-#include <config/gestion-memoire.h>
+#include <config/bootloader.h>
 #include <config/plan-memoire.h>
+#include <config/gestion-memoire.h>
+#include <config/kmalloc.h>
 #include <config/console.h>
 #include <config/printk.h>
+#include <config/stdlib.h>  // rand
 
 #include <config/verifications.h>
 

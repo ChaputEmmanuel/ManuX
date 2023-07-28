@@ -7,7 +7,6 @@
 #include <manux/console.h>
 #include <manux/printk.h>
 #include <manux/interruptions.h>
-#include <manux/intel-8259a.h>
 
 void startManuX()
 {
@@ -22,11 +21,6 @@ void startManuX()
    // Initialisation de la table des interruptions
    initialiserIDT();   
 
-   // Initialisation de la table des interruptions
-   initialiserIDT();   
-
-   i8259aInit(MANUX_INT_BASE_IRQ);
-   
    // Un petit message
    printk("ManuX et les interruptions ...\n");
 

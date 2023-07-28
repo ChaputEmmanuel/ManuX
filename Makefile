@@ -60,6 +60,7 @@ usrinc : $(USR_INC) usrconf
 make.conf :  $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
 	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
 
+
 FORCE:
 
 #-------------------------------------------------------------------------------
@@ -143,7 +144,7 @@ $(ISO_FICHIER) : iso
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/* ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) ; done )
+	(for c in $(ROOTDIR)/multiconf/*.h ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) ; done )
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------
@@ -171,6 +172,16 @@ vbrun : iso
 	$(RUN_MANUX_VBOX)
 
 #-------------------------------------------------------------------------------
+#
+#-------------------------------------------------------------------------------
+unifdef.conf :
+	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(ROOTDIR)/include/manux/config.h  | awk '/^#define MANUX_/ {print "#undef "$$2;}' > unifdef.conf
+	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print "#define " $$2"="val}' >> unifdef.conf
+
+canevas : unifdef.conf 
+	/usr/bin/unifdef -x 2 -f unifdef.conf noyau/main.c -o multiconf/main-$(CFG).c
+
+#-------------------------------------------------------------------------------
 #    Quelques cibles complémentaires en vrac
 #-------------------------------------------------------------------------------
 dump : $(NOYAU_ELF)
@@ -178,7 +189,7 @@ dump : $(NOYAU_ELF)
 
 clean :
 	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
-	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf *.img
+	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf *.img unifdef.conf
 
 distclean :
 	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)

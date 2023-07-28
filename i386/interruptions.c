@@ -406,23 +406,3 @@ void gestionExceptionPanique(TousRegistres registres,
    halt();
 }
 
-
-
-
-/**
- * @brief : Fonction de base de gestion d'un interruption.
- *
- * Elle va se charger de rediriger sur la bonne fonction de gestion
- * de l'interruption s'il en existe une, et sur la fonction de panique
- * sinon.
-
-void gestionGeneraleInterruption(TousRegistres registres,
-                                 uint32_t eip, uint32_t cs, uint32_t eFlags,
-				 uint32_t numIt)
-{
-   int idx = numIt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
-   printk(" Patatras %d -> %d\n", numIt, idx);
-
-   fonctionDeGestionInterruption[numIt](registres, eip, cs, eFlags, 19);
-}
- */

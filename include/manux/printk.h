@@ -9,6 +9,15 @@
 
 #include <manux/config.h>
 #include <manux/stdarg.h>
+#ifdef MANUX_FICHIER
+#include <manux/fichier.h>
+#endif
+
+/**
+ * Longueur maximale d'une chaîne affichable (à supprimer dès qu'on
+ * aura de la mémoire dynamique)
+ */
+#define MAX_PRINTK_LENGTH 128
 
 /**
  * @brief Les différentes préfixes pour les niveaux de criticité
@@ -36,4 +45,17 @@ void printk(char * format, ...);
  *    %[n][l[l]]{dxo} %s \n
  */
 
+/**
+ * @brief : Écriture formattée dans une chaîne de caractères
+ */
+int sprintk(char * str, char * format, ...);
+
+
+#ifdef MANUX_FICHIER
+#define fprintk(f, format, ...) \
+  {	   \
+   char chaine[MAX_PRINTK_LENGTH]; \
+   fichierEcrire(f, chaine, sprintk(chaine, format, __VA_ARGS__));\
+}
+#endif // MANUX_FICHIER
 #endif
