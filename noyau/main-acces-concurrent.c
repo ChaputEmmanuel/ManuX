@@ -14,11 +14,7 @@
 #include <manux/fichier.h>
 #include <manux/bootloader.h>
 #include <manux/clavier.h>
-#include <manux/intel-8259a.h>
 #include <manux/pagination.h>
-#ifdef MANUX_VIRTIO_CONSOLE
-#   include <manux/virtio-console.h>
-#endif
 
 /**
  * Configuration de la console
@@ -49,9 +45,10 @@ void startManuX()
    initialiserGDT();
 
    /* Initialisation de la table des interruptions */
-   initialiserIDT();   
+   initialiserIDT();
 
-   i8259aInit(MANUX_INT_BASE_IRQ);
+   // Le clavier nous permettra de basculer entre consoles
+   initialiserClavier();
 
    // Initialisation du journal
    journalInitialiser(&iNoeudConsole);
@@ -59,20 +56,11 @@ void startManuX()
    // On va utiliser des appels systèmes
    initialiserAppelsSysteme();
 
+   // Le clavier va nous servir à basculer entre consoles
    initialiserClavier();
 
    // On va utiliser des tubes, donc le système de fichiers
    sfInitialiser();
-
-   // On utilise une console virtio pour afficher la console
-#ifdef MANUX_VIRTIO_CONSOLE
-   printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
-   if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
-      ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
-      journalAffecterFichier(&fichierVirtioConsole);
-   }
-   printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
-#endif
 
    // Initialisation de la gestion des processus
    initialiserScheduler();

@@ -3,6 +3,7 @@
  * @brief Une implantation des tubes de communication
  */
 #include <manux/tubes.h>
+#include <manux/debug.h>
 #include <manux/tache.h>    // tacheAjouterFichiers
 #include <manux/scheduler.h>// tacheEnCours
 #include <manux/fichier.h>
@@ -10,6 +11,7 @@
 #include <manux/memoire.h>  // NULL
 #include <manux/kmalloc.h>  // NULL
 #include <manux/string.h>   // memcpy
+#include <manux/atomique.h> // exclusions mutuelles
 
 MethodesFichier tubeMethodesFichier;
 
@@ -22,10 +24,14 @@ MethodesFichier tubeMethodesFichier;
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
+/**
+ * @brief : Définition d'un tube
+ */
 typedef struct _tube {
-   uint8_t * donnees;
-   int taille; //< Nombre d'octets présents dans le tube
+   uint8_t * donnees;   //< Pointeur sur la zone de données
+   int taille;          //< Nombre d'octets présents dans le tube
    int indiceProchain ; //< Position de la prochaine insertion
+   ExclusionMutuelle exclusionMutuelle;
 } Tube;
 
 /**
@@ -47,10 +53,11 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
    Tube * tube;
    int n = 0;
    int nbOctetsEcrits = 0; // Le nombre d'octets écrits
-   
 
+   printk_debug(DBG_KERNEL_TUBE, "in\n");
+   
+   // Peut-on décemment écrire dans le tube ?
    if ((f == NULL) || (f->iNoeud == NULL) || (f->iNoeud->prive == NULL)) {
-      printk("Dans le cul lulu !\n");
       return -EINVAL;
    }
    tube = f->iNoeud->prive;
@@ -75,6 +82,8 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
       nbOctetsEcrits += n;
    } while (n > 0);
    
+   printk_debug(DBG_KERNEL_TUBE, "out\n");
+
    return nbOctetsEcrits;  
 }
 
@@ -85,8 +94,10 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
    int nbOctetsLus = 0;
    int indicePremier;
    
+   printk_debug(DBG_KERNEL_TUBE, "in\n");
+
+   // Peut-on décemment lire dans le tube ?
    if ((f == NULL) || (f->iNoeud == NULL) || (f->iNoeud->prive == NULL)) {
-      printk("Dans le cul lulu !\n");
       return -EINVAL;
    }
    tube = f->iNoeud->prive;
@@ -112,7 +123,9 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
 
       nbOctetsLus += n;
    } while (n > 0);
-   
+
+   printk_debug(DBG_KERNEL_TUBE, "out\n");
+
    return nbOctetsLus;  
 }
 
@@ -140,7 +153,7 @@ int sys_tube(ParametreAS as, int * fds)
    Fichier * fichiers[2];
    Tube    * tube;
 
-   printk("Coucou les tele tubes !\n");
+   printk_debug(DBG_KERNEL_TUBE, "Creation d'un tube ...\n");
 
    // Création de la structure
    tube = kmalloc(sizeof(Tube));
@@ -153,8 +166,12 @@ int sys_tube(ParametreAS as, int * fds)
       return ENOMEM;
    }
 
+   // Initialisation des compteurs
    tube->taille = 0;
    tube->indiceProchain = 0;
+
+   // L'exclusion mutuelle qui le protègera
+   initialiserExclusionMutuelle((&(tube->exclusionMutuelle)));
    
    // Création de l'iNoeud qui décrit le tube dans le système
    iNoeud = iNoeudCreer(tube, &tubeMethodesFichier);
@@ -170,17 +187,10 @@ int sys_tube(ParametreAS as, int * fds)
       return ENOMEM;
    }
 
-   printk("On va faire un tube entre %d et %d!\n", fds[0], fds[1]);
+   printk_debug(DBG_KERNEL_TUBE, "Tube cree entre %d et %d\n", fds[0], fds[1]);
 
    // Si on est encore là, c'est que tout s'est déroulé comme prévu !
    return ESUCCES;
 }
 #endif
 
-
-/**
- * @brief
- */
-void tubesInitialisation()
-{
-}

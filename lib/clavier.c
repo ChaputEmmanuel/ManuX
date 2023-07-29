@@ -1,7 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantation des sous-programmes de manipulation du clavier.          */
+/**---------------------------------------------------------------------------*/
+/* @file : clavier.c                                                          */
+/* @brief: Implantation des sous-programmes de manipulation du clavier.       */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #include <manux/clavier.h>
 

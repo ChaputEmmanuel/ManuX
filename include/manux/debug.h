@@ -29,6 +29,7 @@
 #define DBG_KERNEL_VIRTIO     0x00000400
 #define DBG_KERNEL_A_FAIRE    0x00000800
 #define DBG_KERNEL_BOOTLOADER 0x00001000
+#define DBG_KERNEL_TUBE       0x00002000
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
 // WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
@@ -46,6 +47,8 @@
 //  ;
 
 #define masqueDebugageConsole (0x00000000 \
+ | DBG_KERNEL_START      \
+ | DBG_KERNEL_TUBE       \
 			       )
 #define masqueDebugageFichier (0x00000000\
 			       )
@@ -61,6 +64,7 @@
  | DBG_KERNEL_AS         \
  | DBG_KERNEL_SYSFI      \
  | DBG_KERNEL_FILES      \
+ | DBG_KERNEL_TUBE       \
 */
 
 /**

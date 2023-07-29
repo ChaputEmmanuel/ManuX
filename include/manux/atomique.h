@@ -38,18 +38,28 @@ static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32
    return resultat;
 }
 
-/*
- * Gestion des exclusions mutuelles
+/**
+ * @brief Définition des exclusions mutuelles
  */
 typedef struct _ExclusionMutuelle {
    Atomique   verrou;
    ListeTache tachesEnAttente;
 } ExclusionMutuelle;
 
+/**
+ * @brief Initialisation d'une exclusion mutuelle
+ */
 #define initialiserExclusionMutuelle(em)                  \
    atomiqueInit(&(em)->verrou, 0);                        \
    initialiserListeTache(&(em)->tachesEnAttente);
 
+/**
+ * @brief Entrée en exclusion mutuelle.
+ * 
+ * La tâche appelante est éventuellement mise en attente dans une
+ * file spécifique. Elle n'en sera extraite que par la sortie d'une
+ * tâche qui est dans la zone d'exclusion.
+ */
 #define entrerExclusionMutuelle(em)                                  \
    while (!atomiqueTestInit(&((em)->verrou), 1, 0)) {                \
       tacheEnCours->etat = Tache_Bloquee;                            \

@@ -4,13 +4,17 @@
  *                                                                            
  *                                                     (C) Manu Chaput 2000-2023
  **/
+#undef MANUX_RAMDISK
+
 #include <manux/config.h>
 #ifdef MANUX_BOOTLOADER
 #include <manux/bootloader.h>
 #endif
 #include <manux/errno.h>
 #include <manux/console.h>
+#ifdef MANUX_CLAVIER
 #include <manux/clavier.h>
+#endif
 #include <manux/tache.h>
 #include <manux/horloge.h>        // initialiserHorloge
 #include <manux/scheduler.h>
@@ -68,16 +72,6 @@ Fichier fichierVirtioConsole;
  * Configuration de la console
  */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
-
-#ifdef MANUX_VIRTIO_CONSOLE
-#define NB_LIGNES 12800
-void testerVirtioConsole()
-{
-   for (int n = 0; n < NB_LIGNES; n++) {
-     printk("(7)" "(%3d) Une ligne de texte ...\n", n);
-   }
-}
-#endif // MANUX_VIRTIO_CONSOLE
 
 void startManuX()
 {
@@ -209,13 +203,11 @@ void startManuX()
    initialiserHorloge();
    printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
 
-#ifdef MANUX_VIRTIO_CONSOLE
-   testerVirtioConsole();
-#endif
-
-#ifdef MANUX_KMALLOC_NON
+#ifdef MANUX_KMALLOC
    // Initilisation du système kmalloc
+   printk_debug(DBG_KERNEL_START, "Initialisation de kmalloc ...\n");
    kmallocInitialisation();
+   printk_debug(DBG_KERNEL_START, "kmalloc initialise\n");
 #endif
 
 #ifdef MANUX_CONSOLES_VIRTUELLES

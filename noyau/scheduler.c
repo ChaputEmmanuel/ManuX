@@ -200,6 +200,7 @@ void dummyTraiterClavier()
    int i;
    
    while (cons->nbCarAttente) {
+      c[0] = 0;
       consoleLire(cons, c, 1);
       switch (c[0]) {
          case 'c' :
@@ -245,8 +246,8 @@ void aDummyKernelTask()
 #ifdef MANUX_VIRTIO_NET
       virtioReseauPoll(); // WARNING à virer !!!
 #endif
-      for (int i = 0; i<100000000; i+=1){asm("");};
-   //      ordonnanceur();
+      //   for (int i = 0; i<100000000; i+=1){asm("");};
+      ordonnanceur();
 
    }
 }

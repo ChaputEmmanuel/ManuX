@@ -6,6 +6,7 @@
  */
 #include <manux/types.h>
 #include <stdio.h>
+#include <manux/errno.h>
 #include <unistd.h>   // creerNouvelleTache
 #include <manux/string.h>
 
@@ -19,6 +20,7 @@ void lecteur()
    printf("Je suis le lecteur !\n");
 
    do {
+      printf("Je vais lire ...\n");
       r = lire(fd[0], b, 15);
       if (r > 0) {
          b[r] = 0;
@@ -27,7 +29,7 @@ void lecteur()
       c += r;
    } while (r > 0);
 
-   printf("J'ai lu %d !\n", c);
+   printf("En tout, j'ai lu %d !\n", c);
 
 }
 
@@ -40,11 +42,13 @@ void ecrivain()
    printf("Je suis l'ecrivain !\n");
 
    do {
+      printf("Je vais ecrire ...\n");
       r = ecrire(fd[0], b, strlen(b));
+      printf("J'ai ecrit %d !\n", r);
       c += r;
    } while (r > 0);
 
-   printf("J'ai ecrit %d !\n", c);
+   printf("En tout, j'ai ecrit %d !\n", c);
 
 }
 
@@ -55,14 +59,15 @@ void init()
    printf("Sympa le mode utilisateur !\n");
 
    r = tube(fd);
-   if ( r != 0 /*ESUCCES*/) {
+   if ( r != ESUCCES) {
       printf("r = %d : casse la pipe !?\n", r);
    }
-   
+
    ecrivain();
    lecteur();
    /*
    r = creerNouvelleTache(ecrivain, FALSE);
    r = creerNouvelleTache(lecteur, FALSE);
    */
+   while(1){};
 }
