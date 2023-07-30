@@ -36,7 +36,6 @@ Console
 Tache
 -----
    . [URG] Terminer une tâche !!
-   . [URG] faire une liste de *toutes* les tâches de sorte à pouvoir les lister !
    
 Boot
 ----
@@ -541,4 +540,7 @@ Appel système
    . [BUG] make CFG=appel-systeme ne donne pas le bon résultat ! Non
    c'est ok attention aux appels de fonction (entrerAppelSysteme
    dépile en finissant !!)
-
+   
+Tache
+-----
+   . [URG] faire une liste de *toutes* les tâches de sorte à pouvoir les lister !

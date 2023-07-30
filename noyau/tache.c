@@ -19,11 +19,6 @@
 #include <manux/string.h>     // memcpy
 #include <manux/printk.h>
 #include <manux/debug.h>
-#include <manux/listetaches.h>
-/**
- * @brief : La liste de toutes les tâches existant sur le système.
- */
-ListeTache listeToutesLesTaches;
 
 /*
  * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
@@ -183,6 +178,10 @@ Tache * tacheCreer(CorpsTache corpsTache)
 #else
    printk_debug(DBG_KERNEL_TACHE, "tss=0x%x, ldt=0x%x\n", tache->tss, tache->ldt);
 #endif
+
+   insererCelluleTache(&listeToutesLesTaches,
+		       tache,
+		       (CelluleTache*)tache+sizeof(Tache)+sizeof(CelluleTache));
 
    return tache;
 }

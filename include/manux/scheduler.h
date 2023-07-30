@@ -21,10 +21,16 @@ extern booleen basculeConsoleDemandee;
 extern booleen afficheEtatSystemeDemande;
 extern booleen basculerTacheDemande;
 
-/*
- * L'identification de la tâche en cours
+/**
+ * @brief : L'identification de la tâche en cours
  */
 extern Tache * tacheEnCours;
+
+
+/**
+ * @brief : La liste de toutes les tâches existant sur le système.
+ */
+extern ListeTache listeToutesLesTaches;
 
 /*
  * Le verrou suivant nous permet de garantir qu'un seul processus

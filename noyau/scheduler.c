@@ -64,7 +64,12 @@ Atomique verrouScheduler;
 ListeTache listeTachesPretes;
 
 /**
- * La tche en cours
+ * @brief : La liste de toutes les tâches existant sur le système.
+ */
+ListeTache listeToutesLesTaches;
+
+/**
+ * @brief : La tâche en cours
  */
 Tache * tacheEnCours = NULL;
 
@@ -145,17 +150,7 @@ void appelsSystemeAfficher()
 
    printk("\nTache  | Appels Systeme (num:in/out)\n");
    printk("-------+----------------------------------------\n");
-   printk("%3d    | ", tacheEnCours->numero);
-   for (int i = 0; i < NB_MAX_APPELS_SYSTEME; i++) {
-      if (tacheEnCours->nbAppelsSystemeIn[i]) {
-         printk("%d:%d/%d ", i,
-		tacheEnCours->nbAppelsSystemeIn[i],
-		tacheEnCours->nbAppelsSystemeOut[i]);
-      }
-   }
-   printk("\n");
- 
-   for (celluleTache = listeTachesPretes.tete;
+   for (celluleTache = listeToutesLesTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
       printk("%3d    | ", celluleTache->tache->numero);
@@ -186,8 +181,7 @@ void afficherEtatTaches()
 
    printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
    printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
-   afficherEtatUneTache(tacheEnCours);
-   for (celluleTache = listeTachesPretes.tete;
+   for (celluleTache = listeToutesLesTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
         afficherEtatUneTache(celluleTache->tache);
@@ -319,6 +313,9 @@ void initialiserScheduler()
 
    // Initialisation de la liste (vide) des tâches en cours
    initialiserListeTache(&listeTachesPretes);
+
+   // Initialisation de la liste (vide) de toutes les tâches
+   initialiserListeTache(&listeToutesLesTaches);
 
    // Création d'une tâche pour le fil actuel (numéro 0)
    t0 = tacheCreer(NULL);
