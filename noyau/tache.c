@@ -19,6 +19,11 @@
 #include <manux/string.h>     // memcpy
 #include <manux/printk.h>
 #include <manux/debug.h>
+#include <manux/listetaches.h>
+/**
+ * @brief : La liste de toutes les tâches existant sur le système.
+ */
+ListeTache listeToutesLesTaches;
 
 /*
  * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
@@ -38,12 +43,6 @@ void basculerVersTache(Tache * tache)
 
 }
 
-/*#ifdef MANUX_TACHE_CONSOLE
-Tache * creerTache(CorpsTache corpsTache, struct _Console * cons)
-#else
-Tache * creerTache(CorpsTache corpsTache)
-#endif
-*/
 Tache * tacheCreer(CorpsTache corpsTache)
 {
    void  * unePage;
@@ -98,7 +97,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    /* On recharge la GDT (nécessaire suite changement de taille ?) */
    chargerGDT(gdtSysteme);
 
-   /* On lui affecte son numero */
+   // On lui affecte son numero
    tache->numero = numeroProchaineTache++;
 
 #ifdef MANUX_FICHIER
@@ -107,11 +106,30 @@ Tache * tacheCreer(CorpsTache corpsTache)
      tache->fichiers[i] = NULL;
    }
    tache->nbFichiersOuverts = 0;
+
+#   ifdef MANUX_HERITER_FICHIERS
+   if (tache->numero) {
+      // On hérite les fichiers de la tâche mère
+      for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
+         tache->fichiers[i] = tacheEnCours->fichiers[i];
+      }
+      printk("Tache %d herite %d fichiers de tache %d\n",   
+             tache->numero, tacheEnCours->nbFichiersOuverts, tacheEnCours->numero);
+      tache->nbFichiersOuverts = tacheEnCours->nbFichiersOuverts;
+   }
+#   endif
 #endif
    
 #ifdef MANUX_TACHE_CONSOLE   
-   // Pas de console pour le moment
-   tache->console = consoleNoyau(); //NULL;
+   // Pas de console spécifique pour le moment
+   tache->console = consoleNoyau();
+#endif
+
+#if defined(MANUX_APPEL_SYSTEME) && defined(MANUX_AS_AUDIT)
+   for (int i = 0; i < NB_MAX_APPELS_SYSTEME; i++) {
+     nbAppelsSystemeIn[i] = 0;
+     nbAppelsSystemeOut[i] = 0;
+   }
 #endif
    
    /* Elle n'a pas encore été activée */
@@ -165,6 +183,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
 #else
    printk_debug(DBG_KERNEL_TACHE, "tss=0x%x, ldt=0x%x\n", tache->tss, tache->ldt);
 #endif
+
    return tache;
 }
 
@@ -217,7 +236,9 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
    int fd;
    
    // WARNING à protéger par un mutex lock
-
+   printk("Tache %d, %d fichiers ouverts, on en veut %d\n",
+	  tache->numero, tache->nbFichiersOuverts, n);
+   
    // A-t-on la place ?
    nbLibres = MANUX_NB_MAX_FICHIERS - tache->nbFichiersOuverts;
    

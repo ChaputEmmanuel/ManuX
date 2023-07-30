@@ -124,10 +124,13 @@ void startManuX()
    initialiserIDT();   
 
 #ifdef MANUX_JOURNAL
-   /* Initialisation du journal */
-   journalInitialiser(&iNoeudConsole);
+   // Initialisation du journal
+   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
+   journalInitialiser();
+   //journalInitialiserINoeud(&iNoeudConsole);
+   printk_debug(DBG_KERNEL_START, "Journal initialise ...\n");
 #endif
-   printk_debug(DBG_KERNEL_START, "La tu me voies pas ...\n");
+
 
 #ifdef MANUX_PAGINATION
    /* Initialisation de la pagination */
@@ -160,7 +163,7 @@ void startManuX()
 #endif
 
 #ifdef MANUX_RESEAU
-   /* Initialisation du réseau */
+   // Initialisation du réseau
    printk_debug(DBG_KERNEL_START, "Initialisation du reseau ...\n");
 #   ifdef MANUX_VIRTIO_NET
    virtioNetInit();

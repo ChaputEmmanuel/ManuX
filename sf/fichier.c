@@ -17,9 +17,12 @@ int fichierLire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
-   //   printk("C'est parti mon kiki  !\n");
+   printk_debug(DBG_KERNEL_SYSFI, "on invoque 0x%x\n", f->iNoeud->methodesFichier->lire);
+   
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
+
+   printk_debug(DBG_KERNEL_SYSFI, "on renvoie %d\n", result);
 
    return result;
 }
@@ -28,7 +31,6 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 {
    int result;
 
-   //printk("C'est parti les aminches !\n");
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
 
@@ -43,13 +45,18 @@ int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
-   f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
-   
-   printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : fd=%d, file=%x\n", fd, f);
-
-   result = fichierEcrire(f, buffer, nbOctets);
-   
-   printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : res = %d\n", result);
+   if (tacheEnCours == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de tache en cours !\n");
+      result = -EINVAL;
+   } else if (tacheEnCours->fichiers[fd] == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de fichier %d !\n", fd);
+      result = -EPASDEF;
+   } else {
+      f = tacheEnCours->fichiers[fd]; 
+      printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : fd=%d, file=%x\n", fd, f);
+      result = fichierEcrire(f, buffer, nbOctets);
+      printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire : res = %d\n", result);
+   }
    
    return result;
 }
@@ -61,13 +68,18 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
-   f = tacheEnCours->fichiers[fd];  // WARNING !!! Gestion erreur
-   
-   printk_debug(DBG_KERNEL_SYSFI, "sys_lire : fd=%d, file=%x\n", fd, f);
-
-   result = fichierLire(f, buffer, nbOctets);
-   
-   printk_debug(DBG_KERNEL_SYSFI, "sys_lire : res = %d\n", result);
+   if (tacheEnCours == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de tache en cours !\n");
+      result = -EINVAL;
+   } else if (tacheEnCours->fichiers[fd] == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de fichier %d !\n", fd);
+      result = -EPASDEF;
+   } else {
+      f = tacheEnCours->fichiers[fd]; 
+      printk_debug(DBG_KERNEL_SYSFI, "sys_lire : fd=%d, file=%x\n", fd, f);
+      result = fichierLire(f, buffer, nbOctets);
+      printk_debug(DBG_KERNEL_SYSFI, "sys_lire : res = %d\n", result);
+   }
    
    return result;
 }
@@ -92,7 +104,7 @@ int ouvrirFichier(INoeud * iNoeud, Fichier * f)
 {
    int result = ESUCCES;
   
-   printk_debug(DBG_KERNEL_SYSFI, "IN");
+   //   printk_debug(DBG_KERNEL_SYSFI, "IN");
 
    // WARNING, plein de précautions à prendre !
 
@@ -102,6 +114,7 @@ int ouvrirFichier(INoeud * iNoeud, Fichier * f)
       result = iNoeud->methodesFichier->ouvrir(iNoeud, f);
    }
 
+   //printk_debug(DBG_KERNEL_SYSFI, "OUT");
    return result;
 }
 
@@ -113,6 +126,7 @@ Fichier * fichierCreer(INoeud * iNoeud)
 {
    Fichier * result = kmalloc(sizeof(Fichier));
 
+   //   printk_debug(DBG_KERNEL_SYSFI, "IN");
    if (ouvrirFichier(iNoeud, result) == ESUCCES) {
       return result;
    } else {

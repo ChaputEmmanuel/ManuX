@@ -20,6 +20,8 @@
 #include <config/plan-memoire.h>
 #include <config/pc-i386.h>         // Besoin des interuptions pour les AS
 #include <config/appels-systeme.h>
+#include <config/gestion-memoire.h>
+#include <config/taches.h>
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/usr.h>

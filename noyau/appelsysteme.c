@@ -13,6 +13,9 @@
 #include <manux/console.h>        // Console
 #ifdef MANUX_TACHES
 #   include <manux/tache.h>       // sysFork
+#   ifdef MANUX_AS_AUDIT
+#      include <manux/scheduler.h>  // tacheEnCours
+#   endif
 #endif
 #ifdef MANUX_TUBES
 #   include <manux/tubes.h>       // sys_tube
@@ -93,21 +96,20 @@ void initialiserAppelsSysteme()
 
 }
 
-void entrerAppelSysteme()
+void entrerAppelSysteme(uint32_t num)
 {
-  printk_debug(DBG_KERNEL_AS, "Appel sys IN\n");
+  printk_debug(DBG_KERNEL_AS, "Appel sys %d IN\n", num);
+#ifdef MANUX_AS_AUDIT
+   tacheEnCours->nbAppelsSystemeIn[num]++;
+#endif   
 }
 
-void sortirAppelSysteme()
+void sortirAppelSysteme(uint32_t num)
 {
-  printk_debug(DBG_KERNEL_AS, "Appel sys OUT\n");
+  printk_debug(DBG_KERNEL_AS, "Appel sys %d OUT\n", num);
+#ifdef MANUX_AS_AUDIT
+   tacheEnCours->nbAppelsSystemeOut[num]++;
+#endif   
 }
 
-/*
- * Déclaration des appels système. WARNING à dispatcher dans usr ...
- */
-/*
-appelSysteme0(NBAS_NUMERO_TACHE,  int,       numeroTache);
-appelSysteme0(NBAS_CONSOLE,       Console *, getConsole);
-appelSysteme1(NBAS_OBTENIR_PAGES, int,       obtenirPages, int);
-*/
+

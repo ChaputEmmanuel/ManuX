@@ -42,6 +42,7 @@ void startManuX()
 		      infoSysteme.memoireEtendue);
    
    /* Initilisation des descripteurs de segments */
+   printk_debug(DBG_KERNEL_START, "Initialisation de la GDT ...\n");
    initialiserGDT();
 
    /* Initialisation de la table des interruptions */
@@ -51,9 +52,11 @@ void startManuX()
    initialiserClavier();
 
    // Initialisation du journal
-   journalInitialiser(&iNoeudConsole);
+   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
+   journalInitialiser();
 
    // On va utiliser des appels systèmes
+   printk_debug(DBG_KERNEL_START, "Initialisation des AS ...\n");
    initialiserAppelsSysteme();
 
    // Le clavier va nous servir à basculer entre consoles
@@ -70,6 +73,8 @@ void startManuX()
 
    // Un petit message
    printk("Tests d'acces concurrents, ...\n");
+
+   printk_debug(DBG_KERNEL_START, "On passe en usr ...\n");
 
    init();
 }   /* _startManuX */

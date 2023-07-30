@@ -23,6 +23,11 @@
  */
 #define MANUX_TUBES
 
+/**
+ * @brief : lorsqu'on crée une tâche, hérite-t-elle des fichiers ouverts ?
+ */
+#define MANUX_HERITER_FICHIERS
+
 /*----------------------------------------------------------------------------*/
 /* Définition de périphérique caractère. En pause, je n'en vois pas la        */
 /* nécessité pour le moment                                                   */

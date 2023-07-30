@@ -19,10 +19,24 @@ Feuille de route
 Organisation générale
 ---------------------
    . Faire un  'pilotes' avec clavier, virtio, ...
-   
+
+Appel système
+-------------
+   . 
+
 Fichiers
 --------
-   . Changer INoeud en NoeudI
+   . [STL] Changer INoeud en NoeudI
+   . [ADD] Copier les fichiers du père lors d'un fork
+
+Console
+-------
+   . [DOC] Différence entre CONSOLES_VIRTUELLES et CONSOLE_TACHE pas claire
+   
+Tache
+-----
+   . [URG] Terminer une tâche !!
+   . [URG] faire une liste de *toutes* les tâches de sorte à pouvoir les lister !
    
 Boot
 ----
@@ -38,7 +52,6 @@ Boot
 Userland
 --------
    . faire un config/userland.h qui définit INIT=init-toto.o
-   . errno.h n'est pas transféré
    . Vérifier que printf fonctionne sans fichier (via l'appel système ecrireConsole)
 
 
@@ -522,4 +535,10 @@ make qui copie de include/manux vers usr/include/manux.
    Pourquoi les  printk du main n'ont pas l'air de s'afficher ?
    Pourquoi il n'y a rien sur la console virtio !?
    A creuser et à documenter !
+
+Appel système
+-------------
+   . [BUG] make CFG=appel-systeme ne donne pas le bon résultat ! Non
+   c'est ok attention aux appels de fonction (entrerAppelSysteme
+   dépile en finissant !!)
 

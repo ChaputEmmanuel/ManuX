@@ -28,10 +28,9 @@
 /**
  * @brief Initialisation du système de journalisation.
  */
-#ifdef MANUX_FICHIER
-void journalInitialiser(INoeud * iNoeudConsole);
-#else
 void journalInitialiser();
+#ifdef MANUX_FICHIER
+void journalInitialiserINoeud(INoeud * iNoeudConsole);
 #endif
 
 /**

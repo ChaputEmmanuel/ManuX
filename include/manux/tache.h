@@ -13,6 +13,10 @@
 #include <manux/segment.h>        /* Pour la descriptor table */
 #include <manux/fichier.h>
 
+#ifdef MANUX_APPELS_SYSTEME
+#   include  <manux/appelsysteme.h>
+#endif
+
 /*
  * Taille de la Local Descriptor Table de chaque tâche
  */
@@ -72,8 +76,8 @@ typedef struct _IntelTSS {
    uint16_t IOMBA;
 } IntelTSS;
 
-/*
- * Définition du type décrivant une tache.
+/**
+ * @brief : Définition du type décrivant une tache.
  */
 typedef struct _Tache {
    IntelTSS           tss;
@@ -89,10 +93,17 @@ typedef struct _Tache {
 #endif
 #ifdef MANUX_FICHIER
    Fichier          * fichiers[MANUX_NB_MAX_FICHIERS];
-   int                nbFichiersOuverts; // Pour faciliter la gestiob
+   int                nbFichiersOuverts; // Pour faciliter la gestion
 #endif
-   uint32_t           nbActivations;   // Décompte du nombre d'activations
-   Temps              tempsExecution;  // Cumul du temps d'exécution
+   uint32_t           nbActivations;     // Décompte du nombre d'activations
+   Temps              tempsExecution;    // Cumul du temps d'exécution
+
+#if defined(MANUX_APPELS_SYSTEME) && defined(MANUX_AS_AUDIT)
+   uint32_t           nbAppelsSystemeIn[NB_MAX_APPELS_SYSTEME]; //< Décompte du nombre d'AS
+   uint32_t           nbAppelsSystemeOut[NB_MAX_APPELS_SYSTEME]; //< Décompte du nombre d'AS
+#endif
+
+  
 } Tache;
 
 /**
@@ -101,13 +112,6 @@ typedef struct _Tache {
  */
 extern Tache * tacheCourante;
 
-/*
-#ifdef MANUX_TACHE_CONSOLE
-Tache * creerTache(CorpsTache corpsTache, struct _Console * cons);
-#else
-Tache * creerTache(CorpsTache corpsTache);
-#endif
-*/
 /**
  * @brief Création d'une nouvelle tâche.
  * @param corpsTache pointeur vers la fonction à exécuter par la tâche

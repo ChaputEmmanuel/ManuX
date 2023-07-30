@@ -11,5 +11,5 @@
 #define ENOENT           2      /* Fichier ou répertoire inexistant  */
 #define ENOMEM          12      /* Plus de mémoire          */
 #define EINVAL          22      /* Argument non valide      */
-
+#define EPASDEF          1      /* Pas de fichier ouvert */
 #endif

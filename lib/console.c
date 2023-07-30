@@ -22,9 +22,6 @@
 # include <manux/kmalloc.h>
 #endif
 
-//#define MANUX_CONSOLE_AVEC_MUTEX
-
-
 /*
  * La console du noyau est celle "par défaut", sur laquelle seront
  * envoyés en particulier les messages du noyau (ceux affichés par
@@ -567,8 +564,6 @@ void consoleInitialiserINoeud(INoeud * i, Console * c)
  * @brief :Initialisation du système de console. 
  * @param : iNoeudConsole (out) un INoeud décrivant la console par
  * défaut 
- * WARNING : changer le nom plutôt que reprendre le même que sans
- * fichiers ?
  */
 int consoleInitialisationINoeud(INoeud * iNoeudConsole)
 {

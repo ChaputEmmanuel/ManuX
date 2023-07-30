@@ -233,7 +233,7 @@ affent :          switch (prefixe) {
    
    chaine[indice] = 0;
 
-   /* On affiche  */
+   // On affiche 
 #ifdef MANUX_JOURNAL
    journaliser(chaine);
 #else

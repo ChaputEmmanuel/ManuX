@@ -308,25 +308,33 @@ handlerAppelSysteme :
         push ebx
         push edx
         push ecx
-	
-        shl eax, 02h
-        push eax      ; On empile eax pour avoir le numéro d'AS dans la pile
-	
-        ; On verouille le noyau WARNING : non réentrance
+
+        ; On appelle la fonctin d'entrée en AS
+        push eax
         call entrerAppelSysteme
-	
+	pop eax
+
+        push eax      ; On empile eax pour avoir le numéro d'AS dans la pile
+        shl eax, 02h  ; On multiplie par 4 our aller taper dans le tableau
+
         ; On autorise les IT WARNING, est-ce bien raisonable ?
         sti
 	
         ; On invoque l'AS
         call [vecteurAppelsSysteme+eax] ; Le numéro est dans EAX (cf appelsysteme.h)
+        push eax  ; On sauvegarde la valeur de retour
 
-        ; On déverouille le noyau WARNING : non réentrance
+        ; On va récupérer (sans la dépiler) la valeur dans la pile et on la passe
+	; à la fonction de sortie
+        mov eax, [esp + 4]
+        push eax
         call sortirAppelSysteme
-
+	pop eax
+	
+	pop eax   ; On récupère la valeur de retour de l'AS
+	
         pop ecx ; On enlève eax de la pile, mais sans altérer eax car c'est
-	        ; la vaelur de retour de l'appel système
-		
+	        ; la valeur de retour de l'appel système
         pop ecx
         pop edx
         pop ebx

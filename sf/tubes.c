@@ -103,7 +103,9 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
    tube = f->iNoeud->prive;
 
    do {
-      indicePremier = (tube->indiceProchain + MANUX_TUBE_CAPACITE - tube->taille)%MANUX_TUBE_CAPACITE;
+      // A partir de quel octet peut-on lire ?
+      indicePremier = (tube->indiceProchain + MANUX_TUBE_CAPACITE - tube->taille)
+	%MANUX_TUBE_CAPACITE;
 
       // On ne lit ni plus que ce qui est demandé, ni plus que ce
       // qu'on a
@@ -153,7 +155,7 @@ int sys_tube(ParametreAS as, int * fds)
    Fichier * fichiers[2];
    Tube    * tube;
 
-   printk_debug(DBG_KERNEL_TUBE, "Creation d'un tube ...\n");
+   printk_debug(DBG_KERNEL_TUBE, "Creation d'un tube (lire = 0x%x) ...\n", tubeLire);
 
    // Création de la structure
    tube = kmalloc(sizeof(Tube));

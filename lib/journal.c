@@ -52,7 +52,7 @@ Fichier * fichierJournal = NULL;
  * fichier
  * WARNING : ne pas utiliser le même nom que sans fichier
  */
-void journalInitialiser(INoeud * iNoeudConsole)
+void journalInitialiserInoeud(INoeud * iNoeudConsole)
 {
     //   initialiserExclusionMutuelle(&emj);
     //   entrerExclusionMutuelle(&emj);
@@ -74,7 +74,8 @@ void journalAffecterFichier(Fichier * pc)
    fichierJournal = pc;
 }
 
-#else
+#endif
+
 /**
  * @brief Initialisation du journal sans interface fichier
  */
@@ -93,7 +94,6 @@ void journalInitialiser()
    
    //   sortirExclusionMutuelle(&emj);
 }
-#endif
 
 /**
  * @brief Journalisation d'un message avec un niveau d'urgence
@@ -175,9 +175,9 @@ void aiguillerMessage(char ** message,
  */
 void journaliser(char * message)
 {
-   booleen console; // affiche-t-on le message sur la console ?
-   booleen fichier; // envoie-t-on le message sur un fichier de log ?
-   uint8_t niveau;  // quel est le niveau de criticité ?
+   booleen console; //< affiche-t-on le message sur la console ?
+   booleen fichier; //< envoie-t-on le message sur un fichier de log ?
+   uint8_t niveau;  //< quel est le niveau de criticité ?
 
    // On détermine où il doit être envoyé pour affichage
    aiguillerMessage(&message, &console, &fichier, &niveau);

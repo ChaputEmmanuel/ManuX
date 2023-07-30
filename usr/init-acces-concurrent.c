@@ -25,12 +25,15 @@ void lecteur()
       if (r > 0) {
          b[r] = 0;
          printf(b);
+         c += r;
+      } else {
+	printf("Erreur lecture\n");
       }
-      c += r;
    } while (r > 0);
 
    printf("En tout, j'ai lu %d !\n", c);
 
+   while(1){};
 }
 
 void ecrivain()
@@ -44,8 +47,12 @@ void ecrivain()
    do {
       printf("Je vais ecrire ...\n");
       r = ecrire(fd[0], b, strlen(b));
-      printf("J'ai ecrit %d !\n", r);
-      c += r;
+      if (r > 0) {
+	 printf("J'ai ecrit %d !\n", r);
+         c += r;
+      } else {
+         printf("Erreur ecriture\n");
+      }
    } while (r > 0);
 
    printf("En tout, j'ai ecrit %d !\n", c);
@@ -59,15 +66,19 @@ void init()
    printf("Sympa le mode utilisateur !\n");
 
    r = tube(fd);
+   //   while(1){};
+
    if ( r != ESUCCES) {
       printf("r = %d : casse la pipe !?\n", r);
    }
 
+   /*
    ecrivain();
    lecteur();
-   /*
-   r = creerNouvelleTache(ecrivain, FALSE);
-   r = creerNouvelleTache(lecteur, FALSE);
    */
+   //   r = creerNouvelleTache(ecrivain, FALSE);
+   r = creerNouvelleTache(lecteur, FALSE);
+
+   
    while(1){};
 }

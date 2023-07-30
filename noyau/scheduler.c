@@ -54,10 +54,14 @@ booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
  */
 Atomique verrouScheduler;
 
-/*
- * La liste des tâches en attente sur le système
+/**
+ * @brief : La liste des tâches prêtes sur le système
+ *
+ * Ce sont les tâches prêtes à être exécutées. N'y figurent donc pas
+ * la tâche en cours d'exécution ni les tâches en attente sur un outil
+ * de synchronisation.
  */
-ListeTache listeTaches;
+ListeTache listeTachesPretes;
 
 /**
  * La tche en cours
@@ -82,7 +86,7 @@ void ordonnanceur()
 
    /* (1) On suspend la tâche en cours */
    assert(tacheEnCours != NULL);
-   insererCelluleTache(&listeTaches,
+   insererCelluleTache(&listeTachesPretes,
                        tacheEnCours,
                        (CelluleTache*)tacheEnCours+sizeof(Tache));
 
@@ -95,7 +99,7 @@ void ordonnanceur()
    /* (2) on cherche la tâche suivante */
    /* On prend la première tâche prête, il y en a au moins une : la dummy */
    do {
-      tacheEnCours = extraireTache(&listeTaches);
+      tacheEnCours = extraireTache(&listeTachesPretes);
    } while (tacheEnCours->etat != Tache_Prete); 
 
    tacheEnCours->etat = Tache_En_Cours;
@@ -131,6 +135,43 @@ void afficherEtatUneTache(Tache * tache)
           tache->ldt);
 }
 
+#ifdef MANUX_AS_AUDIT
+/**
+ * @brief Affichage sur la console des AS de chaque tâche
+ */
+void appelsSystemeAfficher()
+{
+   CelluleTache * celluleTache;
+
+   printk("\nTache  | Appels Systeme (num:in/out)\n");
+   printk("-------+----------------------------------------\n");
+   printk("%3d    | ", tacheEnCours->numero);
+   for (int i = 0; i < NB_MAX_APPELS_SYSTEME; i++) {
+      if (tacheEnCours->nbAppelsSystemeIn[i]) {
+         printk("%d:%d/%d ", i,
+		tacheEnCours->nbAppelsSystemeIn[i],
+		tacheEnCours->nbAppelsSystemeOut[i]);
+      }
+   }
+   printk("\n");
+ 
+   for (celluleTache = listeTachesPretes.tete;
+      celluleTache != NULL;
+      celluleTache = celluleTache->suivant){
+      printk("%3d    | ", celluleTache->tache->numero);
+
+      for (int i=0; i < NB_MAX_APPELS_SYSTEME; i++) {
+         if (celluleTache->tache->nbAppelsSystemeIn[i]) {
+	    printk("%d:%d/%d ", i,
+		   celluleTache->tache->nbAppelsSystemeIn[i],
+		   celluleTache->tache->nbAppelsSystemeOut[i]);
+         }
+      }
+      printk("\n");
+   }
+}
+#endif
+
 /**
  * @brief Affichage des tâches
  */
@@ -146,7 +187,7 @@ void afficherEtatTaches()
    printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
    printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
    afficherEtatUneTache(tacheEnCours);
-   for (celluleTache = listeTaches.tete;
+   for (celluleTache = listeTachesPretes.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
         afficherEtatUneTache(celluleTache->tache);
@@ -203,10 +244,13 @@ void dummyTraiterClavier()
       c[0] = 0;
       consoleLire(cons, c, 1);
       switch (c[0]) {
+         case 'a' :
+            appelsSystemeAfficher();
+         break;
          case 'c' :
-	   for (i = 0; i < 24; i++)
+	    for (i = 0; i < 24; i++)
 	       printk("\n");
-	 break;
+         break;
          case 'h' :
 	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\n");
 	 break;
@@ -259,7 +303,7 @@ void aDummyKernelTask()
  */
 void ordonnanceurAddTache(Tache * tache)
 {
-   insererCelluleTache(&listeTaches,
+   insererCelluleTache(&listeTachesPretes,
 		       tache,
 		       (CelluleTache*)tache+sizeof(Tache));
 }
@@ -274,14 +318,16 @@ void initialiserScheduler()
    dateDernierOrdonnancement = nbTopHorloge;
 
    // Initialisation de la liste (vide) des tâches en cours
-   initialiserListeTache(&listeTaches);
+   initialiserListeTache(&listeTachesPretes);
 
    // Création d'une tâche pour le fil actuel (numéro 0)
    t0 = tacheCreer(NULL);
    if (t0 == NULL) {
       paniqueNoyau("impossible de creer la premiere tache !\n");
    }
+#ifdef MANUX_TACHE_CONSOLE   
    tacheSetConsole(t0, consoleNoyau());
+#endif
    /* Cas particulier de la première tâche : */
    /*   . on charge son task register ;      */
    ltr(t0->indiceTSSDescriptor);
@@ -294,7 +340,9 @@ void initialiserScheduler()
    if (t1 == NULL) {
       paniqueNoyau("impossible de creer la seconde tache !\n");
    }
+#ifdef MANUX_TACHE_CONSOLE   
    tacheSetConsole(t1, consoleNoyau());
+#endif
    ordonnanceurAddTache(t1);
 }
 
@@ -335,7 +383,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, console * cons)
 
    /* On insère la nouvelle tâche à la fin de la liste */
    if (corpsTache) {
-      insererCelluleTache(&listeTaches,
+      insererCelluleTache(&listeTachesPretes,
                           tache,
                           (CelluleTache*)tache+sizeof(Tache));
       printk_debug(DBG_KERNEL_TACHE, "Tache inseree\n");
@@ -398,7 +446,7 @@ int sys_basculerTache(ParametreAS as)
 /**
  * @brief Implantation de l'appel système de création d'une nouvelle
  * tâche
- * @param as le numéro de l'appel système
+ * @param as les paramètrers d'un appel système
  * @param corpsTache un pointeur vers la fonction a exécuter
  * @param shareConsole pour partager la console de la tâche en cours
  * (ou en crééer une nouvelle sinon)
@@ -422,7 +470,7 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
 
 #ifdef MANUX_TACHE_CONSOLE
    // Affectation de la console
-#   ifdef MANUX_CONSOLES_VIRTUELLES
+#   ifdef MANUX_CONSOLES_VIRTUELLES    // WARNING : MANUX_TACHE_CONSOLE plutôt ?
    if (shareConsole) {
       console = tacheEnCours->console;
    } else {
