@@ -69,6 +69,11 @@ ListeTache listeTachesPretes;
 ListeTache listeToutesLesTaches;
 
 /**
+ * @brief : La liste des tâches achevées.
+ */
+ListeTache listeTachesTerminees;
+
+/**
  * @brief : La tâche en cours
  */
 Tache * tacheEnCours = NULL;
@@ -81,28 +86,38 @@ void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
+   //   printk_debug(DBG_KERNEL_ORDON, "in (de tache %d)\n", tachePrecedente->numero);
+   
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   /* Basculement entre les consoles virtuelles */
+   // Basculement entre les consoles virtuelles WARNING pourquoi ici
+   // !? A faire faire par dummyTask
    if (basculeConsoleDemandee) {
       basculeConsoleDemandee = FALSE;
       basculerVersConsoleSuivante();
    }
 #endif
 
-   /* (1) On suspend la tâche en cours */
+   // (1) On s'occupe de la tâche en cours
    assert(tacheEnCours != NULL);
-   insererCelluleTache(&listeTachesPretes,
-                       tacheEnCours,
-                       (CelluleTache*)tacheEnCours+sizeof(Tache));
 
-   /* On cumule le temps d'écution dont elle vient de profiter */
+   // On cumule le temps d'écution dont elle vient de profiter
    tacheEnCours->tempsExecution += (nbTopHorloge - dateDernierOrdonnancement);
 
-   tacheEnCours->etat = Tache_Prete;    // On n'est pas là volontairement
-                                        // WARNING : il faudra faire gaffe en cas de pause
+   // Si on n'est pas là spontanément, on se considère en cours, mais
+   // c'est fini pour le moment !
+   if (tacheEnCours->etat == Tache_En_Cours) {
+      tacheEnCours->etat = Tache_Prete;
+   
+      insererCelluleTache(&listeTachesPretes,
+                          tacheEnCours,
+                          (CelluleTache*)tacheEnCours+sizeof(Tache));
+   }
 
-   /* (2) on cherche la tâche suivante */
-   /* On prend la première tâche prête, il y en a au moins une : la dummy */
+   // Dans les autres cas, la tâche est sensée être dans une file
+   // correspondant à son état
+   
+   // (2) on cherche la tâche suivante
+   // On prend la première tâche prête, il y en a au moins une : la dummy 
    do {
       tacheEnCours = extraireTache(&listeTachesPretes);
    } while (tacheEnCours->etat != Tache_Prete); 
@@ -119,15 +134,17 @@ void ordonnanceur()
 
       /* On note la date pour pouvoir mesurer le temps dont elle va profiter */
       dateDernierOrdonnancement = nbTopHorloge;
+      printk_debug(DBG_KERNEL_ORDON, "out (vers tache %d)\n", tacheEnCours->numero);
       basculerVersTache(tacheEnCours);
    }
+   //printk_debug(DBG_KERNEL_ORDON, "back (vers tache %d)\n", tacheEnCours->numero);
 }
 
 void afficherEtatUneTache(Tache * tache)
 {
   printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
        tache->numero,
-         (tache->etat == Tache_En_Cours)?"c":((tache->etat == Tache_Prete)?"p":"b"),
+         (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
           tache->nbActivations,
 	  totalMinutesDansTemps(tache->tempsExecution),
 	  secondesDansTemps(tache->tempsExecution),
@@ -238,9 +255,11 @@ void dummyTraiterClavier()
       c[0] = 0;
       consoleLire(cons, c, 1);
       switch (c[0]) {
+#ifdef MANUX_AS_AUDIT
          case 'a' :
             appelsSystemeAfficher();
          break;
+#endif
          case 'c' :
 	    for (i = 0; i < 24; i++)
 	       printk("\n");
@@ -285,8 +304,8 @@ void aDummyKernelTask()
       virtioReseauPoll(); // WARNING à virer !!!
 #endif
       //   for (int i = 0; i<100000000; i+=1){asm("");};
-      ordonnanceur();
-
+      //     ordonnanceur();
+      //      printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask is up\n");
    }
 }
 
@@ -317,6 +336,9 @@ void initialiserScheduler()
    // Initialisation de la liste (vide) de toutes les tâches
    initialiserListeTache(&listeToutesLesTaches);
 
+   // Initialisation de la liste (vide) des tâches terminées
+   initialiserListeTache(&listeTachesTerminees);
+
    // Création d'une tâche pour le fil actuel (numéro 0)
    t0 = tacheCreer(NULL);
    if (t0 == NULL) {
@@ -341,6 +363,8 @@ void initialiserScheduler()
    tacheSetConsole(t1, consoleNoyau());
 #endif
    ordonnanceurAddTache(t1);
+
+   printk_debug(DBG_KERNEL_ORDON, "scheduler is done\n");
 }
 
 #ifdef SUPPRIME

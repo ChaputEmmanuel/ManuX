@@ -35,14 +35,54 @@ void basculerVersTache(Tache * tache)
    volatile uint32_t selecteur[2] = {0 , tache->indiceTSSDescriptor};
 
    __asm__ __volatile__ ("ljmp %0"::"m" (*selecteur));
-
 }
 
+/**
+ * @brief la fonction principale d'exécution d'une tâche.
+ *
+ * C'est cette fonction qui va invoquer la fonction associée à la
+ * tâche et qui devra nettoyer à la fin.
+ */
+void tacheExecuter()
+{
+   Tache * moi = tacheEnCours;
+     
+   printk_debug(DBG_KERNEL_TACHE, "Demarage de la tache %d (exec 0x%x) ...\n",
+		moi->numero,
+		moi->fonctionPrincipale);
+
+   moi->fonctionPrincipale();
+
+   printk_debug(DBG_KERNEL_TACHE, "Fin de la tache %d, ...\n", moi->numero);
+
+   // On bascule dans les taches terminées
+   moi->etat = Tache_Terminee;
+   insererCelluleTache(&listeTachesTerminees,
+                       moi,
+                       (CelluleTache*)moi+sizeof(Tache));
+
+   // On peut maintenant détruire les structures qui lui étaient
+   // allouées
+
+   // WARNING : à faire !
+
+   // On rend la main
+   ordonnanceur();
+}
+
+/**
+ * @brief : Création d'une tâche. 
+ *
+ * Attention, elle n'est pas insérée dans la liste des tâches prêtes,
+ * elle ne sera donc pas exécutée tant que ce ne sera pas fait.
+ */
 Tache * tacheCreer(CorpsTache corpsTache)
 {
    void  * unePage;
    Tache * tache;
    void  * pile;      // Elle a sa propre pile
+
+   printk_debug(DBG_KERNEL_TACHE, "in\n");
 
    /* On stoque les infos en zone système */
    unePage = allouerPage();
@@ -81,15 +121,20 @@ Tache * tacheCreer(CorpsTache corpsTache)
    tache->tss.GS = 0x10;  /* WARNING, hardcodé pas beau ! */
    tache->tss.SS = 0x18;  /* WARNING, hardcodé pas beau ! */
    tache->tss.ESP = (uint32_t)pile + 4092;  /* WARNING !! */
-   tache->tss.EIP = (uint32_t)corpsTache;
+   if (corpsTache) {
+      tache->fonctionPrincipale = corpsTache;
+      tache->tss.EIP = (uint32_t)tacheExecuter;
+   } else {
+      tache->tss.EIP = NULL;
+   }
    tache->tss.EFLAGS = (uint32_t)0x200;
 
-   /* Ajout de la tâche dans la GDT */
+   // Ajout de la tâche dans la GDT 
    tache->indiceTSSDescriptor = ajouterDescTSS(gdtSysteme,
 					       &tache->tss,
 					       0x67, FALSE);
 
-   /* On recharge la GDT (nécessaire suite changement de taille ?) */
+   // On recharge la GDT (nécessaire suite changement de taille ?) 
    chargerGDT(gdtSysteme);
 
    // On lui affecte son numero
@@ -127,11 +172,11 @@ Tache * tacheCreer(CorpsTache corpsTache)
    }
 #endif
    
-   /* Elle n'a pas encore été activée */
+   // Elle n'a pas encore été activée
    tache->nbActivations = 0;
    tache->tempsExecution = (Temps)0;
    
-   /* Zone mémoire utilisable */
+   // Zone mémoire utilisable 
    tache->tailleMemoire = (void *)(nombrePagesSysteme * MANUX_TAILLE_PAGE);
 
 #ifdef MANUX_PAGINATION
@@ -183,6 +228,11 @@ Tache * tacheCreer(CorpsTache corpsTache)
 		       tache,
 		       (CelluleTache*)tache+sizeof(Tache)+sizeof(CelluleTache));
 
+   printk_debug(DBG_KERNEL_TACHE, "Tache %d creee, main = 0x%d ...\n",
+		tache->numero,
+		tache->fonctionPrincipale);
+
+   printk_debug(DBG_KERNEL_TACHE, "in\n");
    return tache;
 }
 

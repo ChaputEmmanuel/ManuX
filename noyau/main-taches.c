@@ -17,21 +17,21 @@
 
 void albert()
 {
-  while (1) {
-    printk("O");
+  for (int n = 0; n < 10; n++) {
+    //    printk("O");
   }
 }
 
 void barnabe()
 {
-  while (1) {
-    printk("X");
+  for (int n = 0; n < 10; n++) {
+    //    printk("X");
   }
 }
 
 void startManuX()
 {
-   Tache * t0, *t1;
+  Tache * t0, *t1;
 
    // Récupération des informations depuis le bootloader
    bootloaderLireInfo();
@@ -57,13 +57,11 @@ void startManuX()
    /* Initialisation de la table des interruptions */
    initialiserIDT();   
 
-   i8259aInit(MANUX_INT_BASE_IRQ);
-
    initialiserClavier();
 
-   initialiserScheduler();
-
    initialiserHorloge();
+
+   initialiserScheduler();
 
    // Affichage d'un message
    consoleNoyauAfficher("Creation de deux taches ...\n");
@@ -76,8 +74,11 @@ void startManuX()
    ordonnanceurAddTache(t0);
    ordonnanceurAddTache(t1);
 
-   // Attention, à la fin de ManuX, c'est un arrêt de la machine !
-   while (1) {}
-   
+   for (int i = 0; i < 20; i++) {
+      printk("{%d} -> ", i);
+      ordonnanceurAddTache(tacheCreer(barnabe));
+      printk("}%d{ <- ", i);
+   }
+      printk("FINI ! ");
 }   /* startManuX */
 

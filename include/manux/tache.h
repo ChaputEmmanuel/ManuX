@@ -28,7 +28,8 @@
 typedef enum _EtatTache {
    Tache_En_Cours   = 1,    // la tâche courante
    Tache_Prete      = 2,    // les tâches en attente du processeur
-   Tache_Bloquee    = 3     // sur un sémaphore par ex
+   Tache_Bloquee    = 3,    // sur un sémaphore par ex
+   Tache_Terminee   = 4
 } EtatTache;
 
 /*
@@ -87,10 +88,13 @@ typedef struct _Tache {
    TacheID            numero;
    EtatTache          etat;
    void             * tailleMemoire;             /* en octets */
+
+  CorpsTache        * fonctionPrincipale;
   
 #ifdef MANUX_TACHE_CONSOLE
    struct _Console  * console;
 #endif
+  
 #ifdef MANUX_FICHIER
    Fichier          * fichiers[MANUX_NB_MAX_FICHIERS];
    int                nbFichiersOuverts; // Pour faciliter la gestion

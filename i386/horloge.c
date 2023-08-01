@@ -4,6 +4,7 @@
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
 #include <manux/config.h>
+#include <manux/debug.h>
 #include <manux/intel-8259a.h>
 #include <manux/horloge.h>
 #include <manux/io.h>           // outb
@@ -82,6 +83,7 @@ void attenteCalibrer()
  */
 void initialiserHorloge()
 {
+
    // Initialisation de la fréquence de l'horloge matérielle
    setFrequenceHorloge(MANUX_FREQUENCE_HORLOGE);
 
@@ -92,7 +94,7 @@ void initialiserHorloge()
    i8259aAutoriserIRQ(IRQ_HORLOGE);
 
    // Calibrage du système d'attente active
-   attenteCalibrer();
+   //   attenteCalibrer();
 }
 
 /**

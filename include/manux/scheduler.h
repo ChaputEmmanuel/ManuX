@@ -26,11 +26,15 @@ extern booleen basculerTacheDemande;
  */
 extern Tache * tacheEnCours;
 
-
 /**
  * @brief : La liste de toutes les tâches existant sur le système.
  */
 extern ListeTache listeToutesLesTaches;
+
+/**
+ * @brief : La liste des tâches achevées
+ */
+extern ListeTache listeTachesTerminees;
 
 /*
  * Le verrou suivant nous permet de garantir qu'un seul processus

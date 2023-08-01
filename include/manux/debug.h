@@ -48,6 +48,7 @@
 
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_START      \
+ | DBG_KERNEL_TACHE      \
 			       )
 #define masqueDebugageFichier (0x00000000\
 			       )

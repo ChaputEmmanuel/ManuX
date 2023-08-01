@@ -16,14 +16,22 @@ Feuille de route
 
    (J EN SUIS LA)
 
+Synchronisation
+---------------
+   . S'assurer qu'un processus en mode noyau ne soit pas préempter.
+   
 Organisation générale
 ---------------------
    . Faire un  'pilotes' avec clavier, virtio, ...
 
 Appel système
 -------------
-   . 
-
+   .
+   
+Interruptions
+-------------
+   . Bug avec attenteCalibrer !? Cf horloge.c
+    
 Fichiers
 --------
    . [STL] Changer INoeud en NoeudI
@@ -35,7 +43,13 @@ Console
    
 Tache
 -----
-   . [URG] Terminer une tâche !!
+   . [BUG] pas plus de 10 tâches !?
+   . [URG] Terminer une tâche : libérer les structures (eg dans dummyTask)
+
+Ordonnanceur
+------------
+   . faire faire le basculement entre consoles par dummyTask
+   (attention à l'accès !)
    
 Boot
 ----
