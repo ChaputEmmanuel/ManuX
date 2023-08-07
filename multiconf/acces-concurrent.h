@@ -1,5 +1,5 @@
 /**
- * @file multiconf/printk.h
+ * @file multiconf/acces-concurrent.h
  * @brief Exemple de configuration pour un test d'accès concurrents
  *
  *                                                     (C) Manu Chaput 2000-2023
@@ -13,21 +13,8 @@
 #define MANUX_CONFIG
 
 #define MANUX_FICHIER_MAIN main-acces-concurrent
-
 #define MANUX_USR_INIT init-acces-concurrent.o
-/*
-#include <config/usr.h>
 
-#include <config/base.h>
-#include <config/console.h>
-#include <config/printk.h>
-#include <config/journal.h>
-#include <config/systeme-fichiers.h>
-#include <config/pc-i386.h>         // Pour la segmentation
-#include <config/plan-memoire.h>
-#include <config/gestion-memoire.h> // Nécessaire pour les tâches
-#include <config/taches.h>          // Concurrence entre tâches
-*/
 #include <config/base.h>
 #include <config/plan-memoire.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader

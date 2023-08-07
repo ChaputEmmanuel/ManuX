@@ -10,7 +10,6 @@
 #include <manux/tache.h>
 #include <manux/listetaches.h>
 #include <manux/atomique.h>
-
 #include <manux/appelsysteme.h>
 
 /*
@@ -27,6 +26,15 @@ extern booleen basculerTacheDemande;
 extern Tache * tacheEnCours;
 
 /**
+ * @brief : La liste des tâches prêtes sur le système
+ *
+ * Ce sont les tâches prêtes à être exécutées. N'y figurent donc pas
+ * la tâche en cours d'exécution ni les tâches en attente sur un outil
+ * de synchronisation.
+ */
+extern ListeTache listeTachesPretes;
+
+/**
  * @brief : La liste de toutes les tâches existant sur le système.
  */
 extern ListeTache listeToutesLesTaches;
@@ -36,11 +44,17 @@ extern ListeTache listeToutesLesTaches;
  */
 extern ListeTache listeTachesTerminees;
 
-/*
- * Le verrou suivant nous permet de garantir qu'un seul processus
- * est en mode noyau à un instant donné.
+/**
+ * @brief Identifiant de la tâche actuellement en cours d'exécution
+ * dans le noyau (0 si aucune)
+ *
+ * C'est une façon d'assurer le fonctionnement d'un noyau non
+ * réentrant.
  */
-//ExclusionMutuelle verrouNoyau;
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+extern struct _ExclusionMutuelle verrouGeneralDuNoyau;
+extern TacheID tacheDansLeNoyau;
+#endif
 
 void initialiserScheduler();
 /*

@@ -13,14 +13,15 @@
 #include <manux/console.h>        // Console
 #ifdef MANUX_TACHES
 #   include <manux/tache.h>       // sysFork
-#   ifdef MANUX_AS_AUDIT
-#      include <manux/scheduler.h>  // tacheEnCours
-#   endif
 #endif
 #ifdef MANUX_TUBES
 #   include <manux/tubes.h>       // sys_tube
 #endif
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#   include <manux/atomique.h>    // Mutex
+#endif
 
+#include <manux/horloge.h>
 
 void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 
@@ -31,6 +32,8 @@ int sys_dumbAS(ParametreAS as)
 {
    printk("I am so useless, ...\n");
 
+   attenteMilliSecondes(500);
+   
    return 4832;
 }
 
@@ -94,11 +97,22 @@ void initialiserAppelsSysteme()
    //definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
    //   definirAppelSysteme(NBAS_FORK,           sysFork);
 
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   tacheDansLeNoyau= 0;
+   initialiserExclusionMutuelle(&verrouGeneralDuNoyau);
+#endif   
 }
 
 void entrerAppelSysteme(uint32_t num)
 {
-  printk_debug(DBG_KERNEL_AS, "Appel sys %d IN\n", num);
+   printk_debug(DBG_KERNEL_AS, "Appel sys %d IN\n", num);
+
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   assert(tacheDansLeNoyau == 0);
+   tacheDansLeNoyau = tacheEnCours->numero;
+#endif
+
 #ifdef MANUX_AS_AUDIT
    tacheEnCours->nbAppelsSystemeIn[num]++;
 #endif   
@@ -106,7 +120,14 @@ void entrerAppelSysteme(uint32_t num)
 
 void sortirAppelSysteme(uint32_t num)
 {
-  printk_debug(DBG_KERNEL_AS, "Appel sys %d OUT\n", num);
+   
+   printk_debug(DBG_KERNEL_AS, "Appel sys %d OUT\n", num);
+
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   tacheDansLeNoyau = 0;
+   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+#endif
+
 #ifdef MANUX_AS_AUDIT
    tacheEnCours->nbAppelsSystemeOut[num]++;
 #endif   

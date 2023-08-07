@@ -115,8 +115,8 @@ void inline chargerGDT(DescriptorTable * gdt)
    asm volatile (
       "movl %0, %%eax \n\t"
       "lgdt (%%eax) \n\t"
-      "ljmp $0x08,$vidageCache \n\t"
-      "vidageCache : \n\t"
+      "ljmp $0x08,$vidageDuCache_%= \n\t"
+      "vidageDuCache_%= : \n\t"
       "movw $0x10, %%ax \n\t"
       "movw %%ax, %%ds \n\t"
       "movw %%ax, %%es \n\t"

@@ -13,6 +13,7 @@
 #   include <manux/scheduler.h>    // ordonnanceur
 #endif
 #include <manux/printk.h>
+
 /*
  * Nous allons décompter avec cette variable le nombre d'interruptions d'horloge
  */
@@ -31,7 +32,9 @@ void handlerHorloge(void * inutile)
    nbTopHorloge++;
 
 #if defined(MANUX_TACHES) && defined(MANUX_PREEMPTIF) 
-   ordonnanceur();
+   if (tacheEnCours) {
+      ordonnanceur();
+   }
 #endif
 }
 
@@ -59,7 +62,7 @@ void attenteCalibrer()
    uint32_t n = 0;
 
    t = nbTopHorloge;
-
+   
    // On attend le prochain top
    do {
    } while (t == nbTopHorloge);
@@ -94,7 +97,7 @@ void initialiserHorloge()
    i8259aAutoriserIRQ(IRQ_HORLOGE);
 
    // Calibrage du système d'attente active
-   //   attenteCalibrer();
+   attenteCalibrer();
 }
 
 /**

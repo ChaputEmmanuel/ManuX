@@ -17,21 +17,21 @@
 
 void albert()
 {
-  for (int n = 0; n < 10; n++) {
-    //    printk("O");
-  }
+   for (int n = 0; n < 10; n++) {
+      printk("O");
+   }
 }
 
 void barnabe()
 {
-  for (int n = 0; n < 10; n++) {
-    //    printk("X");
-  }
+   for (int n = 0; n < 10; n++) {
+      printk("X");
+   }
 }
 
 void startManuX()
 {
-  Tache * t0, *t1;
+   Tache * t0, *t1;
 
    // Récupération des informations depuis le bootloader
    bootloaderLireInfo();
@@ -74,11 +74,12 @@ void startManuX()
    ordonnanceurAddTache(t0);
    ordonnanceurAddTache(t1);
 
-   for (int i = 0; i < 20; i++) {
+   for (int i = 0; i < 8; i++) {
       printk("{%d} -> ", i);
       ordonnanceurAddTache(tacheCreer(barnabe));
       printk("}%d{ <- ", i);
    }
-      printk("FINI ! ");
+   printk("FINI ! ");
+   while(1){};
 }   /* startManuX */
 

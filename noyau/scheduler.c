@@ -55,6 +55,18 @@ booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
 Atomique verrouScheduler;
 
 /**
+ * @brief Identifiant de la tâche actuellement en cours d'exécution
+ * dans le noyau (0 si aucune)
+ *
+ * C'est une façon d'assurer le fonctionnement d'un noyau non
+ * réentrant.
+ */
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+ExclusionMutuelle verrouGeneralDuNoyau;
+TacheID tacheDansLeNoyau = 0;
+#endif
+
+/**
  * @brief : La liste des tâches prêtes sur le système
  *
  * Ce sont les tâches prêtes à être exécutées. N'y figurent donc pas
@@ -86,7 +98,7 @@ void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
 
-   //   printk_debug(DBG_KERNEL_ORDON, "in (de tache %d)\n", tachePrecedente->numero);
+   printk_debug(DBG_KERNEL_ORDON, "in (de tache %d)\n", tachePrecedente->numero);
    
 #ifdef MANUX_CONSOLES_VIRTUELLES
    // Basculement entre les consoles virtuelles WARNING pourquoi ici
@@ -124,6 +136,9 @@ void ordonnanceur()
 
    tacheEnCours->etat = Tache_En_Cours;
  
+   /* On note la date pour pouvoir mesurer le temps dont elle va profiter */
+   dateDernierOrdonnancement = nbTopHorloge;
+
    if (tacheEnCours != tachePrecedente){
       printk_debug(DBG_KERNEL_ORDON, "On passe a la tache %d de TSS 0x%x \n",
 	     tacheEnCours->numero,
@@ -132,12 +147,10 @@ void ordonnanceur()
       /* Une activation de plus pour elle */
       tacheEnCours->nbActivations++;
 
-      /* On note la date pour pouvoir mesurer le temps dont elle va profiter */
-      dateDernierOrdonnancement = nbTopHorloge;
       printk_debug(DBG_KERNEL_ORDON, "out (vers tache %d)\n", tacheEnCours->numero);
       basculerVersTache(tacheEnCours);
    }
-   //printk_debug(DBG_KERNEL_ORDON, "back (vers tache %d)\n", tacheEnCours->numero);
+   printk_debug(DBG_KERNEL_ORDON, "back (vers tache %d)\n", tacheEnCours->numero);
 }
 
 void afficherEtatUneTache(Tache * tache)
@@ -183,6 +196,19 @@ void appelsSystemeAfficher()
    }
 }
 #endif
+
+/**
+ */
+void afficherEtatMutex()
+{
+   printk("\n-- Tache dans le noyau : %d \n-- Taches en attente : ", tacheDansLeNoyau);
+   for (CelluleTache * celluleTache = verrouGeneralDuNoyau.tachesEnAttente.tete;
+        celluleTache != NULL;
+	celluleTache = celluleTache->suivant){
+      printk("%d ", celluleTache->tache->numero);
+   }
+   printk("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
+}
 
 /**
  * @brief Affichage des tâches
@@ -273,6 +299,9 @@ void dummyTraiterClavier()
          case 'p' :
             afficherEtatTaches();
 	 break;
+         case 'x' :
+            afficherEtatMutex();
+	 break;
          case 'm' :
 #ifdef MANUX_KMALLOC_STAT
             kmallocAfficherStatistiques("");
@@ -294,18 +323,30 @@ void dummyTraiterClavier()
  */
 void aDummyKernelTask()
 {
-   printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
-
    while(1) {
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+      // Cette tâche passe sa vie dans le noyau, elle doit donc
+      // acquérir le verrou si le noyau n'est pas réentrant.
+      entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+      assert(tacheDansLeNoyau == 0);
+      tacheDansLeNoyau = tacheEnCours->numero;
+#endif
+
+      printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
+
 #ifdef MANUX_CLAVIER_CONSOLE
       dummyTraiterClavier();
 #endif
 #ifdef MANUX_VIRTIO_NET
       virtioReseauPoll(); // WARNING à virer !!!
 #endif
-      //   for (int i = 0; i<100000000; i+=1){asm("");};
-      //     ordonnanceur();
-      //      printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask is up\n");
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+      // Cette tâche passe sa vie dans le noyau, elle doit donc
+      // rendre le verrou si le noyau n'est pas réentrant.
+      tacheDansLeNoyau = 0;
+      sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+      ordonnanceur();
+#endif
    }
 }
 
@@ -339,7 +380,7 @@ void initialiserScheduler()
    // Initialisation de la liste (vide) des tâches terminées
    initialiserListeTache(&listeTachesTerminees);
 
-   // Création d'une tâche pour le fil actuel (numéro 0)
+   // Création d'une tâche pour le fil actuel (premier numéro)
    t0 = tacheCreer(NULL);
    if (t0 == NULL) {
       paniqueNoyau("impossible de creer la premiere tache !\n");
@@ -348,10 +389,12 @@ void initialiserScheduler()
    tacheSetConsole(t0, consoleNoyau());
 #endif
    /* Cas particulier de la première tâche : */
-   /*   . on charge son task register ;      */
-   ltr(t0->indiceTSSDescriptor);
    /*   . et on la déclare comme en cours.   */
    tacheEnCours = t0;
+   t0->etat = Tache_En_Cours;
+   
+   /*   . on charge son task register ;      */
+   ltr(t0->indiceTSSDescriptor);
 			
    // Initialisation de la tache "aDummyKernelTask" (numéro 1)
    t1 = tacheCreer(aDummyKernelTask);

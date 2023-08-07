@@ -22,6 +22,56 @@ typedef uint32_t Atomique;
 #define atomiqueLire(atom) \
    (atom)
 
+
+/*
+   Désassemblage d'une compilation sans optimisation de cette version
+
+static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint32_t val)
+{
+   uint32_t resultat;
+   __asm__ volatile("cmpxchg %2, %1 \n\t"
+		    : "=a"(resultat), "+m"(ptr)
+                    : "r"(val), "0"(cond)
+		    : "memory");
+   return resultat;
+}
+
+   État de la pile après la première instr :
+
+10(%esp)   val
+0c(%esp)   cond
+08(%esp)   ptr
+04(%esp)   @retour
+00(%esp)   ebp
+
+   0x00020044 <+0>:     push   %ebp             On sauve epb
+   0x00020045 <+1>:     mov    %esp,%ebp        On l'utilise comme copie de esp
+   0x00020047 <+3>:     sub    $0x4,%esp        esp qu'on aligne (ici à 2²)
+   0x0002004a <+6>:     mov    0x10(%ebp),%edx  edx <- val
+   0x0002004d <+9>:     mov    0xc(%ebp),%eax   eax <- cond
+   0x00020050 <+12>:    cmpxchg %edx,0x8(%ebp)  cmpxchg %edx, ptr
+   0x00020054 <+16>:    mov    %eax,-0x4(%ebp)  result <- %eax
+   0x00020057 <+19>:    mov    -0x4(%ebp),%eax  Pas d'optimisation
+   0x0002005a <+22>:    mov    %ebp,%esp        On remet %esp en place
+   0x0002005c <+24>:    pop    %ebp             On restaure %ebp
+   0x0002005d <+25>:    ret
+
+ */
+
+static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint32_t val)
+{
+  /**
+   Clobbers : "memory" car on va lire/écrire en mémoire, donc il faut
+   une barrièe mémoire
+   */
+   uint32_t resultat;
+   __asm__ volatile("cmpxchg %2, %1 \n\t"
+		    : "=a"(resultat), "+m"(ptr)
+                    : "r"(val), "0"(cond)
+		    : "memory");
+   return resultat;
+}
+
 static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32_t cond)
 /*
  * La valeur de l'Atomique est comparée à la valeur cond ; en cas d'égalité,
@@ -44,12 +94,15 @@ static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32
 typedef struct _ExclusionMutuelle {
    Atomique   verrou;
    ListeTache tachesEnAttente;
+   int        nbEntrees;
+   int        nbSorties;
 } ExclusionMutuelle;
 
 /**
  * @brief Initialisation d'une exclusion mutuelle
  */
 #define initialiserExclusionMutuelle(em)                  \
+   (em)->nbEntrees = 0; (em)->nbSorties = 0;		  \
    atomiqueInit(&(em)->verrou, 0);                        \
    initialiserListeTache(&(em)->tachesEnAttente);
 
@@ -61,24 +114,25 @@ typedef struct _ExclusionMutuelle {
  * tâche qui est dans la zone d'exclusion.
  */
 #define entrerExclusionMutuelle(em)                                  \
-   while (!atomiqueTestInit(&((em)->verrou), 1, 0)) {                \
+   while (!compareEtEchange(&((em)->verrou), 0, 1)) {                \
+      printk("[[%d/%d]] ", tacheEnCours->numero, tacheDansLeNoyau);  \
       tacheEnCours->etat = Tache_Bloquee;                            \
       insererCelluleTache(&(em)->tachesEnAttente,                    \
                           tacheEnCours,                              \
                           (CelluleTache*)tacheEnCours+sizeof(Tache));\
-      basculerTache();                                               \
-   }
+      ordonnanceur();                                                \
+   }; (em)->nbEntrees++;
 
 #define sortirExclusionMutuelle(em)                            \
 {                                                              \
    Tache * ta;                                                 \
-   atomiqueInit(&(em)->verrou, 0);                             \
    if ((ta = extraireTache(&(em)->tachesEnAttente)) != NULL) { \
       ta->etat = Tache_Prete;                                  \
-      insererCelluleTache(tachesPretes,                        \
-                          tacheEnCours,                        \
+      insererCelluleTache(&listeTachesPretes,                  \
+                          ta,                                  \
                           (CelluleTache*)ta+sizeof(Tache));    \
    }                                                           \
+   (em)->nbSorties++ ; atomiqueInit(&(em)->verrou, 0);	       \
 }
 
   

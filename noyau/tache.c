@@ -20,10 +20,11 @@
 #include <manux/printk.h>
 #include <manux/debug.h>
 
-/*
- * Le numero de la prochaine tache (WARNING : et si on cycle ?) 
+/**
+ * @brief :Le numero de la prochaine tache
+ * (WARNING : et si on cycle ?) 
  */
-TacheID numeroProchaineTache = 0;
+TacheID numeroProchaineTache = 1;
 
 unsigned int nbActivations = 0; //  Nombre d'appels à activerTache
 
@@ -45,13 +46,32 @@ void basculerVersTache(Tache * tache)
  */
 void tacheExecuter()
 {
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   // On commmence en mode noyau, ...
+   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   assert(tacheDansLeNoyau == 0);
+   tacheDansLeNoyau = tacheEnCours->numero;
+#endif
    Tache * moi = tacheEnCours;
      
    printk_debug(DBG_KERNEL_TACHE, "Demarage de la tache %d (exec 0x%x) ...\n",
 		moi->numero,
 		moi->fonctionPrincipale);
 
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   // On commmence en mode noyau, ...
+   tacheDansLeNoyau = 0;
+   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+#endif
+
    moi->fonctionPrincipale();
+
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+      // On commmence en mode noyau, ...
+      entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+      assert(tacheDansLeNoyau == 0);
+      tacheDansLeNoyau = tacheEnCours->numero;
+#endif
 
    printk_debug(DBG_KERNEL_TACHE, "Fin de la tache %d, ...\n", moi->numero);
 
@@ -65,6 +85,12 @@ void tacheExecuter()
    // allouées
 
    // WARNING : à faire !
+
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   // On commmence en mode noyau, ...
+   tacheDansLeNoyau = 0;
+   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+#endif
 
    // On rend la main
    ordonnanceur();
@@ -82,7 +108,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    Tache * tache;
    void  * pile;      // Elle a sa propre pile
 
-   printk_debug(DBG_KERNEL_TACHE, "in\n");
+   printk_debug(DBG_KERNEL_TACHE, "(%d)in\n", numeroProchaineTache);
 
    /* On stoque les infos en zone système */
    unePage = allouerPage();
@@ -148,7 +174,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    tache->nbFichiersOuverts = 0;
 
 #   ifdef MANUX_HERITER_FICHIERS
-   if (tache->numero) {
+   if (tache->numero > 1) {
       // On hérite les fichiers de la tâche mère
       for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
          tache->fichiers[i] = tacheEnCours->fichiers[i];
@@ -201,7 +227,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    */
    tache->ldt = NULL;
    tache->tss.LDT = NULL;
-   //   printk("iiiii\n");
+   printk("iiiii\n");
    
    /* On recharge la GDT */
    //   chargerGDT(gdtSysteme);
@@ -214,7 +240,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
 
    /* Elle est prète à être exécutée */
    tache->etat = Tache_Prete;
-   //  printk("lllll\n");
+   //printk("lllll\n");
 
    /* On affiche quelques infos */
    printk_debug(DBG_KERNEL_TACHE, "Tache[%d] = 0x%x\n", tache->numero, tache);
@@ -232,7 +258,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
 		tache->numero,
 		tache->fonctionPrincipale);
 
-   printk_debug(DBG_KERNEL_TACHE, "in\n");
+   printk_debug(DBG_KERNEL_TACHE, "out\n");
    return tache;
 }
 
