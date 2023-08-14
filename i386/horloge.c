@@ -56,7 +56,7 @@ void setFrequenceHorloge(uint16_t freqHz)
 /**
  * @brief Calibrage de la fonction mdelay()
  */
-void attenteCalibrer()
+void __attribute__((optimize("O0"))) attenteCalibrer()
 {
    Temps    t;
    uint32_t n = 0;
@@ -103,7 +103,7 @@ void initialiserHorloge()
 /**
  * @brief Attente active de n millisecondes
  */
-void attenteMilliSecondes(int n)
+void __attribute__((optimize("O0"))) attenteMilliSecondes(int n)
 {
    uint32_t m = n * attenteCalibre;
    uint32_t c = 0;

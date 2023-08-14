@@ -14,7 +14,7 @@ int fd[2];  // Le tube
 
 void lecteur()
 {
-  int r, c=0;
+   int r, c=0;
    char b[16];
    
    printf("Je suis le lecteur !\n");
@@ -66,19 +66,17 @@ void init()
    printf("Sympa le mode utilisateur !\n");
 
    r = tube(fd);
-   //   while(1){};
+
+   printf("Tube ok !\n");
 
    if ( r != ESUCCES) {
       printf("r = %d : casse la pipe !?\n", r);
    }
 
-   /*
-   ecrivain();
-   lecteur();
-   */
-   //   r = creerNouvelleTache(ecrivain, FALSE);
-   r = creerNouvelleTache(lecteur, FALSE);
+   printf("Je lance les taches.\n");
 
+   r = creerNouvelleTache(ecrivain, TRUE);
+   r = creerNouvelleTache(lecteur, TRUE);
    
    while(1){};
 }

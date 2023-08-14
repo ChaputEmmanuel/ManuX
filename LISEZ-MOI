@@ -18,7 +18,12 @@ Feuille de route
 
 Synchronisation
 ---------------
-   . S'assurer qu'un processus en mode noyau ne soit pas préempter.
+   . S'assurer qu'un processus en mode noyau ne soit pas préempté via
+   un "Big Kernel Lock" (verrouGeneralDuNoyau)
+   . Attetion, il faut urgemment faire une fonction d'appel à init,
+   qui va en particulier relâcher le verrou en question, ca le premier
+   fil d'exécution en est propriétaire jusque là (cf main-acces-concurrent)
+   
    
 Organisation générale
 ---------------------

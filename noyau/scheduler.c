@@ -396,8 +396,12 @@ void initialiserScheduler()
    /*   . on charge son task register ;      */
    ltr(t0->indiceTSSDescriptor);
 			
+   printk_debug(DBG_KERNEL_ORDON, "creons la dummy\n");
+
    // Initialisation de la tache "aDummyKernelTask" (numéro 1)
    t1 = tacheCreer(aDummyKernelTask);
+
+   printk_debug(DBG_KERNEL_ORDON, "la dummy est la ...\n");
    
    if (t1 == NULL) {
       paniqueNoyau("impossible de creer la seconde tache !\n");
@@ -405,6 +409,20 @@ void initialiserScheduler()
 #ifdef MANUX_TACHE_CONSOLE   
    tacheSetConsole(t1, consoleNoyau());
 #endif
+
+   // Avant de permettre à une deuxième tâche d'entrer en concurrence,
+   // il faut s'assurer qu'on a la main sur le noyau.
+#if !defined(MANUX_REENTRANT)
+   printk_debug(DBG_KERNEL_ORDON, "on verouille le verrou\n");
+   
+   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   assert(tacheDansLeNoyau == 0);
+   tacheDansLeNoyau = tacheEnCours->numero;
+#endif
+
+   printk_debug(DBG_KERNEL_ORDON, "on ajoute la t1 dans l'ordo\n");
+   
+   // A partir de maintenant, nous ne sommes plus seuls
    ordonnanceurAddTache(t1);
 
    printk_debug(DBG_KERNEL_ORDON, "scheduler is done\n");

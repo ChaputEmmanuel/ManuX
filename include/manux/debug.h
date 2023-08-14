@@ -49,7 +49,6 @@
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_START      \
  | DBG_KERNEL_TACHE      \
- | DBG_KERNEL_AS         \
 			       )
 #define masqueDebugageFichier (0x00000000\
 			       )
@@ -96,7 +95,7 @@
  */
 #ifdef MANUX_TACHES
 #define paniqueNoyau(fmt, args...)	                                  \
-{\
+  { 								\
    printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero); \
    printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
    printk("" fmt, ## args);                                               \

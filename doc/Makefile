@@ -22,6 +22,7 @@ DOCS_PDF = index.pdf \
            appel-systeme-part.pdf \
            systeme-fichiers-part.pdf \
            memoire-part.pdf \
+	   taches-part.pdf \
            synchronisation-part.pdf \
            userland-part.pdf
 

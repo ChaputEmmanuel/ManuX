@@ -74,10 +74,8 @@ void startManuX()
    ordonnanceurAddTache(t0);
    ordonnanceurAddTache(t1);
 
-   for (int i = 0; i < 8; i++) {
-      printk("{%d} -> ", i);
+   for (int i = 0; i < 2; i++) {
       ordonnanceurAddTache(tacheCreer(barnabe));
-      printk("}%d{ <- ", i);
    }
    printk("FINI ! ");
    while(1){};

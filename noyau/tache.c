@@ -179,7 +179,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
       for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
          tache->fichiers[i] = tacheEnCours->fichiers[i];
       }
-      printk("Tache %d herite %d fichiers de tache %d\n",   
+      printk_debug(DBG_KERNEL_SYSFI, "Tache %d herite %d fichiers de tache %d\n",   
              tache->numero, tacheEnCours->nbFichiersOuverts, tacheEnCours->numero);
       tache->nbFichiersOuverts = tacheEnCours->nbFichiersOuverts;
    }
@@ -227,20 +227,16 @@ Tache * tacheCreer(CorpsTache corpsTache)
    */
    tache->ldt = NULL;
    tache->tss.LDT = NULL;
-   printk("iiiii\n");
    
    /* On recharge la GDT */
    //   chargerGDT(gdtSysteme);
-   //  printk("jjjjj\n");
 
    /* Copie de la LDT, maintenant qu'elle est complète */
    //memcpy(tache->ldt, gdtSysteme, tailleGDTSysteme);
 
-   //  printk("kkkkk\n");
 
    /* Elle est prète à être exécutée */
    tache->etat = Tache_Prete;
-   //printk("lllll\n");
 
    /* On affiche quelques infos */
    printk_debug(DBG_KERNEL_TACHE, "Tache[%d] = 0x%x\n", tache->numero, tache);

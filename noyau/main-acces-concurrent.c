@@ -60,21 +60,34 @@ void startManuX()
    initialiserAppelsSysteme();
 
    // Le clavier va nous servir à basculer entre consoles
+   printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
 
    // On va utiliser des tubes, donc le système de fichiers
+   printk_debug(DBG_KERNEL_START, "Initialisation des fichiers ...\n");
    sfInitialiser();
 
    // Initialisation de la gestion des processus
+   printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
 
    // On a besoin de l'horloge pour l'ordonnanceur
+   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge...\n");
    initialiserHorloge();
 
    // Un petit message
    printk("Tests d'acces concurrents, ...\n");
 
    printk_debug(DBG_KERNEL_START, "On passe en usr ...\n");
+
+   // Avant de passer la main à init, on relâche le verrou global. On
+   // n'a donc plus accès au noyau, il faudra passer par des appels
+   // systèmes
+   
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+   tacheDansLeNoyau = 0;
+   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+#endif
 
    init();
 }   /* _startManuX */

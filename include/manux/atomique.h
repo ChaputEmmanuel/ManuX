@@ -66,10 +66,20 @@ static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint3
    */
    uint32_t resultat;
    __asm__ volatile("cmpxchg %2, %1 \n\t"
-		    : "=a"(resultat), "+m"(ptr)
+		    : "=a"(resultat), "+m"(*ptr)
                     : "r"(val), "0"(cond)
 		    : "memory");
    return resultat;
+}
+
+#define _compareEtEchange(ptr, cond, val)                \
+  {					                 \
+   uint32_t _cmpxchg_resultat;                           \
+   __asm__ volatile("cmpxchg %2, %1 \n\t"                \
+		    : "=a"(_cmpxchg_resultat), "+m"(ptr) \
+                    : "r"(val), "0"(cond)                \
+		    : "memory");                         \
+   _cmpxchg_resultat;                                    \
 }
 
 static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32_t cond)
@@ -114,8 +124,7 @@ typedef struct _ExclusionMutuelle {
  * tâche qui est dans la zone d'exclusion.
  */
 #define entrerExclusionMutuelle(em)                                  \
-   while (!compareEtEchange(&((em)->verrou), 0, 1)) {                \
-      printk("[[%d/%d]] ", tacheEnCours->numero, tacheDansLeNoyau);  \
+   while (compareEtEchange(&((em)->verrou), 0, tacheEnCours->numero)) {                \
       tacheEnCours->etat = Tache_Bloquee;                            \
       insererCelluleTache(&(em)->tachesEnAttente,                    \
                           tacheEnCours,                              \
