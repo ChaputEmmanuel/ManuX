@@ -377,6 +377,41 @@ void * allouerPage();
 une page mémoire application.
 
 %...............................................................................
+%
+%...............................................................................
+\subsection{Gestion fine de la mémoire dans le noyau}
+
+   L'allocation de la mémoire physique page par page et importante,
+mais il est également très utile de pouvoir allouer la mémoire avec
+une granularité bien plus fine. Tous les sous-systèmes du noyau qui
+ont besoin d'allocation dynamique manipulent des objets qui sont pour
+la plupart bien plus petits qu'une page !
+
+   On peut alors envisager deux grandes familles de techniques : un
+allocateur ``généraliste''  (qui va fournir un service tel que le
+malloc classique de la librairie C) ou un allocateur plus spécialisé
+(qui permettra une gestion bien plus efficace d'un type d'objets
+unique avec éventuellement un système d'initialisation, etc ...)
+
+%...............................................................................
+%  
+%...............................................................................
+\subsubsection{Un allocateur généraliste}
+
+   Dans ManuX, un système d'allocation fine est implanté dans les
+fichiers kmallc-zs.h et .c. Il utilise la technique des ``zones
+siamoises'' ou buddy memory allocation system.
+
+   Il fournit essentiellement les trois fonctions suivantes
+
+void kmallocInitialisation();
+
+void * kmalloc(size_t n);
+
+void kfree(void * p);
+
+
+%...............................................................................
 %      Organisation de la mémoire virtuelle
 %...............................................................................
 \subsubsection{Organisation de la mémoire virtuelle}
