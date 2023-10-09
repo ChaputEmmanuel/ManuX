@@ -197,7 +197,9 @@ void appelsSystemeAfficher()
 }
 #endif
 
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
 /**
+ * @brief Etat du verrou général
  */
 void afficherEtatMutex()
 {
@@ -209,6 +211,7 @@ void afficherEtatMutex()
    }
    printk("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
 }
+#endif
 
 /**
  * @brief Affichage des tâches
@@ -299,9 +302,11 @@ void dummyTraiterClavier()
          case 'p' :
             afficherEtatTaches();
 	 break;
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
          case 'x' :
             afficherEtatMutex();
 	 break;
+#endif
          case 'm' :
 #ifdef MANUX_KMALLOC_STAT
             kmallocAfficherStatistiques("");

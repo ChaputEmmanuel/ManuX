@@ -48,5 +48,5 @@
  *
  * Si un élément ne l'est pas, cette macro ne doit pas être définie
  */
-//#define MANUX_REENTRANT
-#undef MANUX_REENTRANT
+#define MANUX_REENTRANT
+//#undef MANUX_REENTRANT

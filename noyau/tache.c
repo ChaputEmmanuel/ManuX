@@ -307,8 +307,6 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
    int fd;
    
    // WARNING à protéger par un mutex lock
-   printk("Tache %d, %d fichiers ouverts, on en veut %d\n",
-	  tache->numero, tache->nbFichiersOuverts, n);
    
    // A-t-on la place ?
    nbLibres = MANUX_NB_MAX_FICHIERS - tache->nbFichiersOuverts;

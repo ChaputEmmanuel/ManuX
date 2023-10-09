@@ -10,28 +10,32 @@
 #include <unistd.h>   // creerNouvelleTache
 #include <manux/string.h>
 
+/**
+ * Taille du buffer utilisé en lecture
+ */ 
+#define TAILLE_BUFFER 16
+
 int fd[2];  // Le tube
 
 void lecteur()
 {
    int r, c=0;
-   char b[16];
+   char b[TAILLE_BUFFER];
    
    printf("Je suis le lecteur !\n");
 
    do {
-      printf("Je vais lire ...\n");
-      r = lire(fd[0], b, 15);
+      r = lire(fd[0], b, TAILLE_BUFFER - 1);
       if (r > 0) {
          b[r] = 0;
          printf(b);
          c += r;
-      } else {
+      } else if (r < 0){
 	printf("Erreur lecture\n");
       }
    } while (r > 0);
 
-   printf("En tout, j'ai lu %d !\n", c);
+   printf("\nFini ... En tout, j'ai lu %d !\n", c);
 
    while(1){};
 }
@@ -45,10 +49,8 @@ void ecrivain()
    printf("Je suis l'ecrivain !\n");
 
    do {
-      printf("Je vais ecrire ...\n");
       r = ecrire(fd[0], b, strlen(b));
-      if (r > 0) {
-	 printf("J'ai ecrit %d !\n", r);
+      if (r >= 0) {
          c += r;
       } else {
          printf("Erreur ecriture\n");
@@ -56,7 +58,6 @@ void ecrivain()
    } while (r > 0);
 
    printf("En tout, j'ai ecrit %d !\n", c);
-
 }
 
 void init()
@@ -67,16 +68,13 @@ void init()
 
    r = tube(fd);
 
-   printf("Tube ok !\n");
-
    if ( r != ESUCCES) {
       printf("r = %d : casse la pipe !?\n", r);
+   } else {
+      printf("Tube ok !\n");
+      printf("Je lance les taches.\n");
+      r = creerNouvelleTache(ecrivain, TRUE);
+      r = creerNouvelleTache(lecteur, FALSE);
    }
-
-   printf("Je lance les taches.\n");
-
-   r = creerNouvelleTache(ecrivain, TRUE);
-   r = creerNouvelleTache(lecteur, TRUE);
-   
    while(1){};
 }

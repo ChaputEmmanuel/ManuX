@@ -32,27 +32,11 @@
 #define DBG_KERNEL_TUBE       0x00002000
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
-// WARNING ! A voir pourquoi la définition suivante ne fonctionne pas
-// Pour être plus précis, sa valeur ne change rien ... sauf lorsque
-// j'essaie de l'afficher avec printk_debug !!!! Ca sent le gros bug,
-// mais je ne le trouve évidemment pas, ...
-//    Après, ce n'est pas hyper important en soi, mais ça agace !
-//
-//static unsigned long masqueDebugage __attribute__ ((unused)) = 0x00000000
-  // | DBG_KERNEL_START
-  // | DBG_KERNEL_PAGIN
-  // | DBG_KERNEL_SYSFI
-  // | DBG_KERNEL_ALL
-  // | DBG_KERNEL_VIRTIO
-//  ;
-
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_TACHE      \
 			       )
 #define masqueDebugageFichier (0x00000000\
 			       )
-
 /*
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \

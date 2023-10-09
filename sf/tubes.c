@@ -1,6 +1,13 @@
 /**
  * @file sf/tube.c
  * @brief Une implantation des tubes de communication
+ *
+ * Un tube va être mis en oeuvre par un buffer mémoire dans lequel
+ * seront écrites/lues les données.
+ *
+ * Attention, pour le moment, aucune distinction n'est faite entre les
+ * extrémités du tube : ce qui est écrit (sur t[0] ou t[1]) est lu
+ * (sur t[0] ou t[1]).
  */
 #include <manux/tubes.h>
 #include <manux/debug.h>
@@ -16,7 +23,7 @@
 MethodesFichier tubeMethodesFichier;
 
 /**
- * @brief Capacité mémoire d'un tube, en nombde pages
+ * @brief Capacité mémoire d'un tube, en nombre de pages
  */
 #define MANUX_TUBE_NB_PAGES 1
 
@@ -52,7 +59,7 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Tube * tube;
    int n = 0;
-   int nbOctetsEcrits = 0; // Le nombre d'octets écrits
+   int nbOctetsEcrits = 0; // Le nombre d'octets déja écrits
 
    printk_debug(DBG_KERNEL_TUBE, "in\n");
    
@@ -62,6 +69,9 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
    }
    tube = f->iNoeud->prive;
 
+   // On fait une boucle, car il est possible que l'on doive écrire en
+   // deux fois si on est proche de la fin du tableau qui contient les
+   // données.
    do {
       // On n'écrit ni plus que ce qui est demandé, ni plus que ce
       // qu'on peut
@@ -74,6 +84,8 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
       // position courante, sans risque de déborder
       memcpy(tube->donnees + tube->indiceProchain, buffer, n);
 
+      ordonnanceur(); // Pour forcer
+      
       tube->indiceProchain = (tube->indiceProchain + n) % MANUX_TUBE_CAPACITE;
       tube->taille += n;
       
@@ -118,6 +130,8 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
       // position courante, sans risque de déborder
       memcpy(buffer, tube->donnees + indicePremier, n);
 
+      ordonnanceur(); // Pour forcer
+      
       indicePremier = (indicePremier + n) % MANUX_TUBE_CAPACITE;
       tube->taille -= n;
       
