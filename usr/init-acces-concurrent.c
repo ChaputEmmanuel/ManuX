@@ -64,7 +64,7 @@ void init()
 {
    int r;
 
-   printf("Sympa le mode utilisateur !\n");
+   printf("Bonjour le mode utilisateur !\n");
 
    r = tube(fd);
 
