@@ -156,7 +156,7 @@ void startManuX()
 #ifdef MANUX_VIRTIO_CONSOLE
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
-      ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
+     ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
       journalAffecterFichier(&fichierVirtioConsole);
    }
    printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");

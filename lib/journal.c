@@ -58,7 +58,7 @@ void journalInitialiserInoeud(INoeud * iNoeudConsole)
     //   entrerExclusionMutuelle(&emj);
 
    consoleFichier = &_consoleFichier;
-   ouvrirFichier(iNoeudConsole, consoleFichier);
+   fichierOuvrir(iNoeudConsole, consoleFichier, O_WRONLY, 0);
 
    // Affichons un petit message   
    consoleNoyauAfficher("Journal+f de ManuX-32 \n");

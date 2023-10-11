@@ -13,9 +13,17 @@
 
 #define MANUX_DEBUG_FS_BASE
 
+/**
+ * @brief Lecture dans un fichier
+ * @param f le fichier doit être != NULL
+ */
 int fichierLire(Fichier * f, void * buffer, int nbOctets)
 {
-   int result;
+   int result = -EBADF;
+
+   if (f->fanions & O_RDONLY) {
+      return result;
+   }
 
    printk_debug(DBG_KERNEL_SYSFI, "on invoque 0x%x\n", f->iNoeud->methodesFichier->lire);
    
@@ -29,7 +37,11 @@ int fichierLire(Fichier * f, void * buffer, int nbOctets)
 
 int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 {
-   int result;
+   int result = -EBADF;
+
+   if (f->fanions & O_WRONLY) {
+      return result;
+   }
 
    // On invoque la méthode associée
    result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
@@ -38,6 +50,31 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
 }
 
 #ifdef MANUX_APPELS_SYSTEME
+/**
+ * @brief L'appel système permettant de fermer un fichier ouvert
+ */
+int sys_fermer(ParametreAS as, int fd)
+{
+   Fichier * f;
+   int result = EBADF;
+
+   if (tacheEnCours == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de tache en cours !\n");
+      result = EINVAL;
+   } else if (tacheEnCours->fichiers[fd] == NULL) {
+      printk_debug(DBG_KERNEL_SYSFI, "pas de fichier %d !\n", fd);
+      result = EPASDEF;
+   } else {
+      f = tacheEnCours->fichiers[fd]; 
+      result = fichierFermer(f);
+
+      // WARNING : libérer l'emplacement dans les fichiers de la tâche
+   }
+   
+   return result;
+   
+}
+
 int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
@@ -88,6 +125,7 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 void sfInitialiser()
 {
 #ifdef MANUX_APPELS_SYSTEME
+   definirAppelSysteme(NBAS_FERMER, sys_fermer);
    definirAppelSysteme(NBAS_ECRIRE, sys_ecrire);
    definirAppelSysteme(NBAS_LIRE, sys_lire);
 #endif
@@ -100,18 +138,37 @@ void sfInitialiser()
  *
  * On utilise la fonction d'ouverture du type de périphérique correspondant
  */
-int ouvrirFichier(INoeud * iNoeud, Fichier * f)
+int fichierOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    int result = ESUCCES;
   
-   //   printk_debug(DBG_KERNEL_SYSFI, "IN");
+   printk_debug(DBG_KERNEL_SYSFI, "IN");
 
    // WARNING, plein de précautions à prendre !
 
    f->iNoeud = iNoeud;
+   f->fanions = fanions;
+   f->mode = mode;
 
    if (iNoeud->methodesFichier->ouvrir) {
-      result = iNoeud->methodesFichier->ouvrir(iNoeud, f);
+      result = iNoeud->methodesFichier->ouvrir(iNoeud, f, fanions, mode);
+   }
+
+   //printk_debug(DBG_KERNEL_SYSFI, "OUT");
+   return result;
+}
+
+/**
+ * @brief Fermeture d'un fichier
+ */
+int fichierFermer(Fichier * f)
+{
+   int result = EBADF;
+  
+   printk_debug(DBG_KERNEL_SYSFI, "IN");
+
+   if (f->iNoeud->methodesFichier->fermer) {
+      result = f->iNoeud->methodesFichier->fermer(f);
    }
 
    //printk_debug(DBG_KERNEL_SYSFI, "OUT");
@@ -122,12 +179,12 @@ int ouvrirFichier(INoeud * iNoeud, Fichier * f)
 /**
  * @brief : création et ouverture d'un fichier
  */
-Fichier * fichierCreer(INoeud * iNoeud)
+Fichier * fichierCreer(INoeud * iNoeud, uint16_t fanions, uint16_t mode)
 {
    Fichier * result = kmalloc(sizeof(Fichier));
 
    //   printk_debug(DBG_KERNEL_SYSFI, "IN");
-   if (ouvrirFichier(iNoeud, result) == ESUCCES) {
+   if (fichierOuvrir(iNoeud, result, fanions, mode) == ESUCCES) {
       return result;
    } else {
       kfree(result);

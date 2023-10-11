@@ -90,13 +90,16 @@ ListeTache listeTachesTerminees;
  */
 Tache * tacheEnCours = NULL;
 
-/*
- * Le coeur de l'ordonnanceur. C'est cette fonction qui détermine la
- * prochaine tâche à exécuter.
+/**
+ * @brief Le coeur de l'ordonnanceur.
+ *
+ * C'est cette fonction qui détermine la prochaine tâche à exécuter.
  */
 void ordonnanceur()
 {
    Tache * tachePrecedente = tacheEnCours;
+
+   assert(tacheEnCours != NULL);
 
    printk_debug(DBG_KERNEL_ORDON, "in (de tache %d)\n", tachePrecedente->numero);
    
@@ -109,9 +112,13 @@ void ordonnanceur()
    }
 #endif
 
+   // Attention, si la tâche en cours n'est pas préemptible
+   if (tacheEnCours->nonPreemptible) {
+      return;
+   }
+   
    // (1) On s'occupe de la tâche en cours
-   assert(tacheEnCours != NULL);
-
+  
    // On cumule le temps d'écution dont elle vient de profiter
    tacheEnCours->tempsExecution += (nbTopHorloge - dateDernierOrdonnancement);
 

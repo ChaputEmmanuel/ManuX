@@ -8,6 +8,7 @@
 #define ERRNO_H
 
 #define ESUCCES          0      /* Succés, donc "non erreur */
+#define EBADF            9
 #define ENOENT           2      /* Fichier ou répertoire inexistant  */
 #define ENOMEM          12      /* Plus de mémoire          */
 #define EINVAL          22      /* Argument non valide      */

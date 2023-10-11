@@ -137,7 +137,7 @@ void consoleAfficherN(Console * cons, char * msg, int nbOctets)
   assert(nbOctets > 0);
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   entrerExclusionMutuelle(&cons->scAcces);
+   exclusionMutuelleEntrer(&cons->scAcces);
 #endif
 
   assert(cons->nbColonnes != 0);
@@ -207,7 +207,7 @@ void consoleAfficherN(Console * cons, char * msg, int nbOctets)
       msg++;nbOctets--;
    }
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   sortirExclusionMutuelle(&cons->scAcces);
+   exclusionMutuelleSortir(&cons->scAcces);
 #endif
 }
 
@@ -267,7 +267,7 @@ void consoleSetClavier(Console * cons, void * buffer)
    cons->bufferClavier = buffer;
    cons->nbCarAttente = 0;
    cons->indiceProchainCar = 0;
-   initialiserExclusionMutuelle(&(cons->accesBufferClavier));
+   exclusionMutuelleInitialiser(&(cons->accesBufferClavier));
 }
 #endif
 
@@ -296,7 +296,7 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
 
    /* Initialisation du verrou */
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   initialiserExclusionMutuelle(&cons->scAcces);
+   exclusionMutuelleInitialiser(&cons->scAcces);
 #endif
 
    // Un peu de ménage
@@ -375,7 +375,7 @@ void basculerVersConsole(Console * suivante)
    consoleActive = suivante;
 
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   entrerExclusionMutuelle(&consolesVirtuelles[consoleCourante]->scAcces);
+   exclusionMutuelleEntrer(&consolesVirtuelles[consoleCourante]->scAcces);
 #endif
 
    // On l'active (à partir de maintenant, ce qui y est écrit apparaît
@@ -408,7 +408,7 @@ void basculerVersConsole(Console * suivante)
    consoleActive->attribut = a;
    
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
-   sortirExclusionMutuelle(&consoleActive->scAcces);
+   exclusionMutuelleSortir(&consoleActive->scAcces);
 #endif
 }
 
@@ -483,7 +483,7 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
  * WARNING : si vraiment rien à faire, on peut supprimer (la méthode
  * ouvrir peut ne pas être implantée)
  */
-int consoleOuvrir(INoeud * iNoeud, Fichier * f)
+int consoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    return ESUCCES;
 }

@@ -22,8 +22,9 @@ void lecteur()
    int r, c=0;
    char b[TAILLE_BUFFER];
    
-   printf("Je suis le lecteur !\n");
-
+   printf("Je suis un lecteur !\n");
+   fermer(fd[1]);
+   
    do {
       r = lire(fd[0], b, TAILLE_BUFFER - 1);
       if (r > 0) {
@@ -46,10 +47,11 @@ void ecrivain()
    
    char * b = "Bonjour les jeunes ! ";
 
-   printf("Je suis l'ecrivain !\n");
+   printf("Je suis un ecrivain !\n");
+   fermer(fd[0]);
 
    do {
-      r = ecrire(fd[0], b, strlen(b));
+      r = ecrire(fd[1], b, strlen(b));
       if (r >= 0) {
          c += r;
       } else {

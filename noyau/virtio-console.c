@@ -210,7 +210,7 @@ size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
    return 0;
 }
 
-int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f)
+int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    f->prive = &virtioConsole; // WARNING, il peut y en avoir plusieurs 
 

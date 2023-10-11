@@ -33,5 +33,6 @@
 #ifdef MANUX_TUBES
 #   define NBAS_TUBE          10
 #endif
+#define NBAS_FERMER           11
 
 #endif // APPEL_SYSTEME_NUM_DEF

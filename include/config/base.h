@@ -50,3 +50,8 @@
  */
 #define MANUX_REENTRANT
 //#undef MANUX_REENTRANT
+
+/**
+ * @brief Utilisation d'outils de synchronisation ?
+ */
+#define MANUX_ATOMIQUE

@@ -197,6 +197,8 @@ Tache * tacheCreer(CorpsTache corpsTache)
      nbAppelsSystemeOut[i] = 0;
    }
 #endif
+   // A priori elle est préemptible
+   tache->nonPreemptible = 0;
    
    // Elle n'a pas encore été activée
    tache->nbActivations = 0;
@@ -271,7 +273,7 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
    INoeud * i;
    
    i = consoleCreerINoeud(cons);
-   f = fichierCreer(i);
+   f = fichierCreer(i, O_WRONLY, 0);
    
    tache->fichiers[0] =  f;
 #endif

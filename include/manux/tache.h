@@ -89,7 +89,9 @@ typedef struct _Tache {
    EtatTache          etat;
    void             * tailleMemoire;             /* en octets */
 
-  CorpsTache        * fonctionPrincipale;
+   CorpsTache        * fonctionPrincipale;
+
+   uint8_t            nonPreemptible;      //< Permet de la synchronisation
   
 #ifdef MANUX_TACHE_CONSOLE
    struct _Console  * console;

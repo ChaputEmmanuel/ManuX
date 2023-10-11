@@ -21,4 +21,6 @@ int lire(int fd, void * buffer, int nb);
 
 int ecrire(int fd, void * buffer, int nb);
 
+int fermer(int fd);
+
 #endif

@@ -61,6 +61,7 @@
 #define MANUX_USR_INIT init-acces-concurrent.o
 #define MANUX_BASCULER_NOUVELLE_CONSOLE 
 #define MANUX_TUBES 
+#define MANUX_ATOMIQUE 
 #define MANUX_ASSERT_ACTIVES 
 #define MANUX_STDLIB 
 #define MANUX_NOMBRE_PAGES_SYSTEME 0x800

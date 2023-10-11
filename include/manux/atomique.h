@@ -1,7 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des opérations atomiques de ManuX.                         */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*      A faire : déplacer des choses dans atomique.c, voire répartir dans    */
+/* plusieurs fichiers thématiques.                                            */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef ATOMIQUE_DEF
 #define ATOMIQUE_DEF
@@ -21,42 +23,6 @@ typedef uint32_t Atomique;
 
 #define atomiqueLire(atom) \
    (atom)
-
-
-/*
-   Désassemblage d'une compilation sans optimisation de cette version
-
-static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint32_t val)
-{
-   uint32_t resultat;
-   __asm__ volatile("cmpxchg %2, %1 \n\t"
-		    : "=a"(resultat), "+m"(ptr)
-                    : "r"(val), "0"(cond)
-		    : "memory");
-   return resultat;
-}
-
-   État de la pile après la première instr :
-
-10(%esp)   val
-0c(%esp)   cond
-08(%esp)   ptr
-04(%esp)   @retour
-00(%esp)   ebp
-
-   0x00020044 <+0>:     push   %ebp             On sauve epb
-   0x00020045 <+1>:     mov    %esp,%ebp        On l'utilise comme copie de esp
-   0x00020047 <+3>:     sub    $0x4,%esp        esp qu'on aligne (ici à 2²)
-   0x0002004a <+6>:     mov    0x10(%ebp),%edx  edx <- val
-   0x0002004d <+9>:     mov    0xc(%ebp),%eax   eax <- cond
-   0x00020050 <+12>:    cmpxchg %edx,0x8(%ebp)  cmpxchg %edx, ptr
-   0x00020054 <+16>:    mov    %eax,-0x4(%ebp)  result <- %eax
-   0x00020057 <+19>:    mov    -0x4(%ebp),%eax  Pas d'optimisation
-   0x0002005a <+22>:    mov    %ebp,%esp        On remet %esp en place
-   0x0002005c <+24>:    pop    %ebp             On restaure %ebp
-   0x0002005d <+25>:    ret
-
- */
 
 static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint32_t val)
 {
@@ -111,7 +77,7 @@ typedef struct _ExclusionMutuelle {
 /**
  * @brief Initialisation d'une exclusion mutuelle
  */
-#define initialiserExclusionMutuelle(em)                  \
+#define exclusionMutuelleInitialiser(em)                  \
    (em)->nbEntrees = 0; (em)->nbSorties = 0;		  \
    atomiqueInit(&(em)->verrou, 0);                        \
    initialiserListeTache(&(em)->tachesEnAttente);
@@ -123,26 +89,101 @@ typedef struct _ExclusionMutuelle {
  * file spécifique. Elle n'en sera extraite que par la sortie d'une
  * tâche qui est dans la zone d'exclusion.
  */
-#define entrerExclusionMutuelle(em)                                  \
-   while (compareEtEchange(&((em)->verrou), 0, tacheEnCours->numero)) {                \
-      tacheEnCours->etat = Tache_Bloquee;                            \
-      insererCelluleTache(&(em)->tachesEnAttente,                    \
-                          tacheEnCours,                              \
-                          (CelluleTache*)tacheEnCours+sizeof(Tache));\
-      ordonnanceur();                                                \
-   }; (em)->nbEntrees++;
+void exclusionMutuelleEntrer(ExclusionMutuelle * em);
 
-#define sortirExclusionMutuelle(em)                            \
-{                                                              \
-   Tache * ta;                                                 \
-   if ((ta = extraireTache(&(em)->tachesEnAttente)) != NULL) { \
-      ta->etat = Tache_Prete;                                  \
-      insererCelluleTache(&listeTachesPretes,                  \
-                          ta,                                  \
-                          (CelluleTache*)ta+sizeof(Tache));    \
-   }                                                           \
-   (em)->nbSorties++ ; atomiqueInit(&(em)->verrou, 0);	       \
+void exclusionMutuelleSortir(ExclusionMutuelle * em);
+
+/**
+ * @brief Empêcher la préemption pour la tâche en cours
+ *
+ * A utiliser de façon très limitée !
+ */
+#define tacheEnCoursInterdirePreemption()      \
+   tacheEnCours->nonPreemptible++;
+
+/**
+ * @brief Autoriser la préemption pour la tâche en cours
+ */
+#define tacheEnCoursAutoriserPreemption()      \
+   tacheEnCours->nonPreemptible--;
+
+/**                                                                                                                                          * @brief Définition des conditions
+ */
+typedef struct _condition {
+   ListeTache tachesEnAttente;
+} Condition;
+
+/**
+ * @brief Initialisation d'une condition
+ */
+void conditionInitialiser(Condition * cond);
+
+/**
+ * @brief Attente de la prochaine occurence d'une condition
+ *
+ * La tâche appelante doit être dans l'exclusion mutuelle
+ * (qui sera automatiquement libérée le temps de l'attente puis
+ * reprise avant que cette fonction ne rende la main)
+ */
+void conditionAttendre(Condition * cond, ExclusionMutuelle * em);
+
+/**
+ * @brief Signaler une occurence d'une condition à une tâche en
+ * attente 
+ *
+ * Attention, doit être utilisée sous la protection de l'exclusion
+ * mutuelle détenue par les tâches en attente.
+ * Ell est donc inutilisable dans un handler d'interruption.
+ */
+void conditionSignaler(Condition * cond);
+
+/**
+ * @brief Signaler une occurence d'une condition à toutes les tâches
+ * en attente
+ *
+ * Attention, doit être utilisée sous la protection de l'exclusion
+ * mutuelle détenue par les tâches en attente.
+ * Ell est donc inutilisable dans un handler d'interruption.
+ */
+void conditionDiffuser(Condition * cond);
+ 
+#endif
+
+
+
+
+/*
+   Désassemblage d'une compilation sans optimisation de cette version
+
+static __inline__ uint32_t compareEtEchange(uint32_t * ptr, uint32_t cond, uint32_t val)
+{
+   uint32_t resultat;
+   __asm__ volatile("cmpxchg %2, %1 \n\t"
+		    : "=a"(resultat), "+m"(ptr)
+                    : "r"(val), "0"(cond)
+		    : "memory");
+   return resultat;
 }
 
-  
-#endif
+   État de la pile après la première instr :
+
+10(%esp)   val
+0c(%esp)   cond
+08(%esp)   ptr
+04(%esp)   @retour
+00(%esp)   ebp
+
+   0x00020044 <+0>:     push   %ebp             On sauve epb
+   0x00020045 <+1>:     mov    %esp,%ebp        On l'utilise comme copie de esp
+   0x00020047 <+3>:     sub    $0x4,%esp        esp qu'on aligne (ici à 2²)
+   0x0002004a <+6>:     mov    0x10(%ebp),%edx  edx <- val
+   0x0002004d <+9>:     mov    0xc(%ebp),%eax   eax <- cond
+   0x00020050 <+12>:    cmpxchg %edx,0x8(%ebp)  cmpxchg %edx, ptr
+   0x00020054 <+16>:    mov    %eax,-0x4(%ebp)  result <- %eax
+   0x00020057 <+19>:    mov    -0x4(%ebp),%eax  Pas d'optimisation
+   0x0002005a <+22>:    mov    %ebp,%esp        On remet %esp en place
+   0x0002005c <+24>:    pop    %ebp             On restaure %ebp
+   0x0002005d <+25>:    ret
+
+ */
+

@@ -55,7 +55,7 @@ void startManuX()
 
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
-      ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole);
+     ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
    }
    printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
 

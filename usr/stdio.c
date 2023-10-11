@@ -14,6 +14,8 @@ appelSysteme3(NBAS_ECRIRE, int, ecrire, int, void *, int);
 
 appelSysteme3(NBAS_LIRE, int, lire, int, void *, int);
 
+appelSysteme1(NBAS_LIRE, int, fermer, int);
+
 /*
  * ecrireConsole est un appel système. Son "implantation" côté
  * utilisateur passe donc par une macro.

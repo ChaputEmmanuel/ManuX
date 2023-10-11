@@ -38,16 +38,57 @@ typedef struct _tube {
    uint8_t * donnees;   //< Pointeur sur la zone de données
    int taille;          //< Nombre d'octets présents dans le tube
    int indiceProchain ; //< Position de la prochaine insertion
+
+   int nbEcrivains;
+   int nbLecteurs;
+  
    ExclusionMutuelle exclusionMutuelle;
+   Condition         nouvellesDonnees;
 } Tube;
 
 /**
- * @brief Ouverture d'un tube en tant que Fichier 
- * Ca existe ?
+  * @brief Ouverture d'un tube en tant que Fichier 
   */
-int tubeOuvrir(INoeud * iNoeud, Fichier * f)
+int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
+   Tube * tube = (Tube *) f->iNoeud->prive;
+   
+   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+
+   if (fanions | O_RDONLY) {
+      tube->nbLecteurs++;
+   }
+   if (fanions | O_WRONLY) {
+      tube->nbEcrivains++;
+   }
+
+   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
+
    f->prive = NULL;
+
+   return ESUCCES;
+}
+
+/**
+  * @brief Fermeture d'un tube en tant que Fichier 
+  */
+int tubeFermer(Fichier * f)
+{
+   Tube * tube = (Tube *) f->iNoeud->prive;
+
+   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+   
+   if (f->fanions | O_RDONLY) {
+      tube->nbLecteurs--;
+   }
+   if (f->fanions | O_WRONLY) {
+      tube->nbEcrivains--;
+      if (tube->nbEcrivains == 0) {
+         conditionDiffuser(&(tube->nouvellesDonnees));
+      }
+   }
+
+   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
 
    return ESUCCES;
 }
@@ -69,6 +110,8 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
    }
    tube = f->iNoeud->prive;
 
+   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+   
    // On fait une boucle, car il est possible que l'on doive écrire en
    // deux fois si on est proche de la fin du tableau qui contient les
    // données.
@@ -93,7 +136,13 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
 
       nbOctetsEcrits += n;
    } while (n > 0);
+
+   if (nbOctetsEcrits > 0) {
+      conditionSignaler(&(tube->nouvellesDonnees));
+   }
    
+   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
+
    printk_debug(DBG_KERNEL_TUBE, "out\n");
 
    return nbOctetsEcrits;  
@@ -108,12 +157,26 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
    
    printk_debug(DBG_KERNEL_TUBE, "in\n");
 
-   // Peut-on décemment lire dans le tube ?
+   // Peut-on décemment lire dans le tube ? (note : les deux premières
+   // conditions sont assurées par l'appelant (fichierLire) a priori
    if ((f == NULL) || (f->iNoeud == NULL) || (f->iNoeud->prive == NULL)) {
       return -EINVAL;
    }
    tube = f->iNoeud->prive;
 
+   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+
+   // En cas de lecture bloquante, j'attends la dispo des données ou
+   // la disparition du dernier écrivain
+   if ((f->fanions & O_NONBLOCK) == 0) {
+      while ((tube->taille == 0) && (tube->nbEcrivains > 0)) {
+        conditionAttendre(&(tube->nouvellesDonnees), &(tube->exclusionMutuelle));
+      }
+   }
+   // Je sais maintenant qu'il y a des données, ou alors qu'il n'y en
+   // aura plus jamais, ou alors je suis en non bloquant, bref, je
+   // peux y aller et faire comme si, ...
+   
    do {
       // A partir de quel octet peut-on lire ?
       indicePremier = (tube->indiceProchain + MANUX_TUBE_CAPACITE - tube->taille)
@@ -140,6 +203,8 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
       nbOctetsLus += n;
    } while (n > 0);
 
+   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
+
    printk_debug(DBG_KERNEL_TUBE, "out\n");
 
    return nbOctetsLus;  
@@ -151,6 +216,7 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
  */
 MethodesFichier tubeMethodesFichier = {
    .ouvrir = tubeOuvrir,
+   .fermer = tubeFermer,
    .ecrire = tubeEcrire,
    .lire = tubeLire
 };
@@ -187,16 +253,17 @@ int sys_tube(ParametreAS as, int * fds)
    tube->indiceProchain = 0;
 
    // L'exclusion mutuelle qui le protègera
-   initialiserExclusionMutuelle((&(tube->exclusionMutuelle)));
+   exclusionMutuelleInitialiser((&(tube->exclusionMutuelle)));
+   conditionInitialiser((&(tube->nouvellesDonnees)));
    
    // Création de l'iNoeud qui décrit le tube dans le système
    iNoeud = iNoeudCreer(tube, &tubeMethodesFichier);
 
    // Création du fichier d'entrée du tube (celui où on va écrire)
-   fichiers[0] = fichierCreer(iNoeud);
+   fichiers[0] = fichierCreer(iNoeud, O_WRONLY, 0);
 
    // Création du fichier de sortie du tube (celui où on va lire)
-   fichiers[1] = fichierCreer(iNoeud);
+   fichiers[1] = fichierCreer(iNoeud, O_RDONLY, 0);
 
    // On ajoute les fichiers à la tâche
    if (tacheAjouterFichiers(tacheEnCours, 2, fichiers, fds) != 2 ) {
