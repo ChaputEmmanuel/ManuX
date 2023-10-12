@@ -74,9 +74,13 @@ int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
   */
 int tubeFermer(Fichier * f)
 {
-   Tube * tube = (Tube *) f->iNoeud->prive;
 
+   printk_debug(DBG_KERNEL_TUBE, "in\n");
+   Tube * tube = (Tube *) f->iNoeud->prive;
+   
    exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+
+   printk_debug(DBG_KERNEL_TUBE, "mutex locked\n");
    
    if (f->fanions | O_RDONLY) {
       tube->nbLecteurs--;
@@ -165,11 +169,13 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
    tube = f->iNoeud->prive;
 
    exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+   printk_debug(DBG_KERNEL_TUBE, "mutex locked\n");
 
    // En cas de lecture bloquante, j'attends la dispo des données ou
    // la disparition du dernier écrivain
    if ((f->fanions & O_NONBLOCK) == 0) {
       while ((tube->taille == 0) && (tube->nbEcrivains > 0)) {
+        printk_debug(DBG_KERNEL_TUBE, "attente condition\n");
         conditionAttendre(&(tube->nouvellesDonnees), &(tube->exclusionMutuelle));
       }
    }
@@ -189,6 +195,8 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
       // On ne doit pas aller lire au delà du buffer
       n = MIN(n, (MANUX_TUBE_CAPACITE - indicePremier));
 
+      printk_debug(DBG_KERNEL_TUBE,"Je vais lire %d\n", n);
+      
       // On peut donc copier n octets dans le buffer à partir de la
       // position courante, sans risque de déborder
       memcpy(buffer, tube->donnees + indicePremier, n);

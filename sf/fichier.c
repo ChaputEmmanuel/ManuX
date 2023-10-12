@@ -5,6 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/fichier.h>
 #include <manux/debug.h>
+#include <manux/string.h>       // bcopy
 #include <manux/scheduler.h>    // tacheEnCours
 #include <manux/errno.h>
 #ifdef MANUX_KMALLOC
@@ -58,6 +59,8 @@ int sys_fermer(ParametreAS as, int fd)
    Fichier * f;
    int result = EBADF;
 
+   printk_debug(DBG_KERNEL_SYSFI, "in\n");
+   
    if (tacheEnCours == NULL) {
       printk_debug(DBG_KERNEL_SYSFI, "pas de tache en cours !\n");
       result = EINVAL;
@@ -176,6 +179,39 @@ int fichierFermer(Fichier * f)
 }
 
 #ifdef MANUX_KMALLOC
+/**
+ * @brief Copie d'un fichier ouvert
+ * 
+ * Par exemple pour faire hériter un processus fils, ou pour un appel
+ * de type dup 
+ */
+Fichier * fichierDipliquer(Fichier * f)
+{
+   int res;
+   Fichier * result;
+
+   result = kmalloc(sizeof(Fichier));
+
+   if (result == NULL) {
+      paniqueNoyau("Plus de memoire !\n");
+   } else {
+      // On fait une coie simple, ...
+      bcopy(f, result, sizeof(Fichier));
+
+      // ... et on invoque la méthdode d'ouverture, si elle a des
+      // décomptes à faire, par exemple
+      if (f->iNoeud->methodesFichier->ouvrir != NULL) {
+ 	 res = f->iNoeud->methodesFichier->ouvrir(f->iNoeud, result, f->fanions, f->mode);
+	 if (res != ESUCCES) {
+            kfree(result);
+ 	    result = NULL;
+	 }
+      }
+   }
+   
+   return result;
+}
+
 /**
  * @brief : création et ouverture d'un fichier
  */

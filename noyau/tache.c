@@ -176,12 +176,17 @@ Tache * tacheCreer(CorpsTache corpsTache)
 #   ifdef MANUX_HERITER_FICHIERS
    if (tache->numero > 1) {
       // On hérite les fichiers de la tâche mère
-      for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
-         tache->fichiers[i] = tacheEnCours->fichiers[i];
-      }
       printk_debug(DBG_KERNEL_SYSFI, "Tache %d herite %d fichiers de tache %d\n",   
              tache->numero, tacheEnCours->nbFichiersOuverts, tacheEnCours->numero);
+      for (int i = 0; i < MANUX_NB_MAX_FICHIERS; i++){
+	 //tache->fichiers[i] = tacheEnCours->fichiers[i];
+	 if (tacheEnCours->fichiers[i] != NULL) {
+	    tache->fichiers[i] = fichierDupliquer(tacheEnCours->fichiers[i]);
+	 }
+      }
       tache->nbFichiersOuverts = tacheEnCours->nbFichiersOuverts;
+      printk_debug(DBG_KERNEL_SYSFI, "Tache %d herite %d fichiers de tache %d OK\n",   
+             tache->numero, tacheEnCours->nbFichiersOuverts, tacheEnCours->numero);
    }
 #   endif
 #endif

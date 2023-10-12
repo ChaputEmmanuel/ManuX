@@ -14,7 +14,7 @@ appelSysteme3(NBAS_ECRIRE, int, ecrire, int, void *, int);
 
 appelSysteme3(NBAS_LIRE, int, lire, int, void *, int);
 
-appelSysteme1(NBAS_LIRE, int, fermer, int);
+appelSysteme1(NBAS_FERMER, int, fermer, int);
 
 /*
  * ecrireConsole est un appel système. Son "implantation" côté

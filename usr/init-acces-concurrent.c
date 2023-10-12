@@ -27,6 +27,7 @@ void lecteur()
    
    do {
       r = lire(fd[0], b, TAILLE_BUFFER - 1);
+      printf(" lecture %d\n", r);
       if (r > 0) {
          b[r] = 0;
          printf(b);
@@ -49,9 +50,13 @@ void ecrivain()
 
    printf("Je suis un ecrivain !\n");
    fermer(fd[0]);
+   printf("Je suis un ecrivain encore en vie!\n");
+   
 
    do {
+     printf("Je vais ecrire %d\n", strlen(b));
       r = ecrire(fd[1], b, strlen(b));
+      printf("Voila j'ai ecri %d\n", r);
       if (r >= 0) {
          c += r;
       } else {
@@ -75,8 +80,9 @@ void init()
    } else {
       printf("Tube ok !\n");
       printf("Je lance les taches.\n");
-      r = creerNouvelleTache(ecrivain, TRUE);
+      r = creerNouvelleTache(ecrivain, FALSE);
       r = creerNouvelleTache(lecteur, FALSE);
    }
+   printf("Voila voila !\n");
    while(1){};
 }

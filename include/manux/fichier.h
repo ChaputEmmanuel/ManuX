@@ -89,9 +89,18 @@ int fichierFermer(Fichier * f);
 
 #ifdef MANUX_KMALLOC
 /**
+ * @brief Copie d'un fichier ouvert
+ * 
+ * Par exemple pour faire hériter un processus fils, ou pour un appel
+ * de type dup 
+ */
+Fichier * fichierDupliquer(Fichier * f);
+
+/**
  * @brief : création et ouverture d'un fichier
  */
 Fichier * fichierCreer(INoeud * iNoeud, uint16_t fanions, uint16_t mode);
+
 #endif // MANUX_KMALLOC
 
 #endif
