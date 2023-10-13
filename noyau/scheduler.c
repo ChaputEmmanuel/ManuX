@@ -309,6 +309,11 @@ void dummyTraiterClavier()
          case 'p' :
             afficherEtatTaches();
 	 break;
+#if defined(MANUX_ATOMIQUE_AUDIT)
+         case 's' :
+            condtionsAfficherEtat();
+         break;
+#endif
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
          case 'x' :
             afficherEtatMutex();

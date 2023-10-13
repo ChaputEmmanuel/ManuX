@@ -185,7 +185,7 @@ int fichierFermer(Fichier * f)
  * Par exemple pour faire hériter un processus fils, ou pour un appel
  * de type dup 
  */
-Fichier * fichierDipliquer(Fichier * f)
+Fichier * fichierDupliquer(Fichier * f)
 {
    int res;
    Fichier * result;

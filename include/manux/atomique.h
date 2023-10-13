@@ -1,8 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Définition des opérations atomiques de ManuX.                         */
 /*                                                                            */
-/*      A faire : déplacer des choses dans atomique.c, voire répartir dans    */
-/* plusieurs fichiers thématiques.                                            */
+/*      A faire : déplacer des choses dans plusieurs fichiers thématiques.    */
 /*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef ATOMIQUE_DEF
@@ -107,10 +106,14 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em);
 #define tacheEnCoursAutoriserPreemption()      \
    tacheEnCours->nonPreemptible--;
 
-/**                                                                                                                                          * @brief Définition des conditions
+/**                                                                                                                        * @brief Définition des conditions
  */
 typedef struct _condition {
    ListeTache tachesEnAttente;
+#if defined(MANUX_ATOMIQUE_AUDIT)
+   int nbSignaler;
+   int nbDiffuser;
+#endif
 } Condition;
 
 /**
@@ -147,6 +150,13 @@ void conditionSignaler(Condition * cond);
  */
 void conditionDiffuser(Condition * cond);
  
+#if defined(MANUX_ATOMIQUE_AUDIT)
+/**
+ * @brief Affichage de l'état des variables condition
+ */
+void condtionsAfficherEtat();
+
+#endif
 #endif
 
 

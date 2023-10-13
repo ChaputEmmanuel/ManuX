@@ -63,3 +63,7 @@
 #if defined(MANUX_TUBES) && !defined(MANUX_KMALLOC)
 #   error "MANUX_TUBES nécessite MANUX_KMALLOC"
 #endif
+
+#if defined(MANUX_ATOMIQUE_AUDIT) && !defined(MANUX_KMALLOC)
+#   error "MANUX_ATOMIQUE_AUDIT nécessite MANUX_KMALLOC"
+#endif

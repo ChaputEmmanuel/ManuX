@@ -5,6 +5,65 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/atomique.h>
 #include <manux/memoire.h>   // NULL
+#include <manux/debug.h>     // assert
+#if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
+#   include <manux/kmalloc.h>
+#endif
+
+#if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
+
+typedef struct _CelluleCondition {
+   Condition                * condition;
+   struct _CelluleCondition * suivant;
+} CelluleCondition;
+  
+typedef struct _ListeConditions {
+   CelluleCondition * tete;
+   CelluleCondition * queue;
+} ListeConditions;
+
+ListeConditions * listeConditionsCreer()
+{
+   ListeConditions * result;
+
+   result = (ListeConditions *) kmalloc(sizeof(ListeConditions));
+
+   result->tete = NULL;
+   result->queue = NULL;
+
+   return result;
+}
+
+/**
+ * @brief Insertion d'une condition dans une liste (au début)
+ *
+ */
+void listeConditionsInserer(ListeConditions * l, Condition * c)
+{
+   CelluleCondition * cell = (CelluleCondition *) kmalloc(sizeof(CelluleCondition));
+   
+   assert(l != NULL);
+   assert(c != NULL);
+
+   if (cell != NULL) {
+      cell->condition = c;
+      cell->suivant = NULL;
+      if (l->queue != NULL) {
+         l->queue->suivant = cell;
+      }
+      l->queue = cell;
+      if (l->tete  == NULL) {
+	l->tete = cell;
+      }
+   }
+}
+
+/** 
+ * @brief  Liste des conditions définies sur le système
+ */
+static ListeConditions * listeConditions = NULL;
+
+#endif //  defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
 
 /**
  * @brief Entrée en exclusion mutuelle.
@@ -58,14 +117,24 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em)
    atomiqueInit(&(em)->verrou, 0);
 }
 
-
-
 /**
  * @brief Initialisation d'une condition
  */
 void conditionInitialiser(Condition * cond)
 {
    initialiserListeTache((&cond->tachesEnAttente));
+
+#if defined(MANUX_ATOMIQUE_AUDIT)
+   cond->nbSignaler = 0;
+   cond->nbDiffuser = 0;
+
+   if (listeConditions == NULL) {
+      listeConditions = listeConditionsCreer();
+   }
+   if (listeConditions != NULL) {
+      listeConditionsInserer(listeConditions, cond);
+   }
+#endif
 }
 
 /**
@@ -121,6 +190,9 @@ void conditionSignaler(Condition * cond)
                           ta,
                           (CelluleTache*)ta+sizeof(Tache));
    }
+#if defined(MANUX_ATOMIQUE_AUDIT)
+   cond->nbSignaler++;
+#endif
 }
 
 /**
@@ -143,6 +215,26 @@ void conditionDiffuser(Condition * cond)
                           ta,
                           (CelluleTache*)ta+sizeof(Tache));
    }
+#if defined(MANUX_ATOMIQUE_AUDIT)
+   cond->nbDiffuser++;
+#endif
 }
+
+#if defined(MANUX_ATOMIQUE_AUDIT)
+/**
+ * @brief Affichage de l'état des variables condition
+ */
+void condtionsAfficherEtat()
+{
+   CelluleCondition * cell;
+
+   printk("Cond  s  d\n");
+   for (cell = listeConditions->tete; cell != NULL; cell = cell->suivant){
+     printk("0x%x  %d %d\n", cell->condition, cell->condition->nbSignaler, cell->condition->nbDiffuser);
+   }
+}
+
+#endif
+
 
 
