@@ -69,17 +69,16 @@ static __inline__ booleen atomiqueTestInit(Atomique * atom, uint32_t val, uint32
 typedef struct _ExclusionMutuelle {
    Atomique   verrou;
    ListeTache tachesEnAttente;
+#if defined(MANUX_ATOMIQUE_AUDIT)
    int        nbEntrees;
    int        nbSorties;
+#endif
 } ExclusionMutuelle;
 
 /**
  * @brief Initialisation d'une exclusion mutuelle
  */
-#define exclusionMutuelleInitialiser(em)                  \
-   (em)->nbEntrees = 0; (em)->nbSorties = 0;		  \
-   atomiqueInit(&(em)->verrou, 0);                        \
-   initialiserListeTache(&(em)->tachesEnAttente);
+void exclusionMutuelleInitialiser(ExclusionMutuelle * em);
 
 /**
  * @brief Entrée en exclusion mutuelle.
@@ -151,6 +150,12 @@ void conditionSignaler(Condition * cond);
 void conditionDiffuser(Condition * cond);
  
 #if defined(MANUX_ATOMIQUE_AUDIT)
+/**
+ * @brief Affichage de l'état des variables d'exclusion mutuelle
+ */
+
+void exclusionsMutuellesAfficherEtat();
+
 /**
  * @brief Affichage de l'état des variables condition
  */

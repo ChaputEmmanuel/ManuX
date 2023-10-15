@@ -311,6 +311,7 @@ void dummyTraiterClavier()
 	 break;
 #if defined(MANUX_ATOMIQUE_AUDIT)
          case 's' :
+            exclusionsMutuellesAfficherEtat();
             condtionsAfficherEtat();
          break;
 #endif

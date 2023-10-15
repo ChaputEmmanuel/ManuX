@@ -12,6 +12,60 @@
 
 #if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
 
+typedef struct _CelluleExclusionMutuelle {
+   ExclusionMutuelle                * exclusionMutuelle;
+   struct _CelluleExclusionMutuelle * suivant;
+} CelluleExclusionMutuelle;
+  
+typedef struct _ListeExclusionsMutuelles {
+   CelluleExclusionMutuelle * tete;
+   CelluleExclusionMutuelle * queue;
+} ListeExclusionsMutuelles;
+
+ListeExclusionsMutuelles * listeExclusionsMutuellesCreer()
+{
+   ListeExclusionsMutuelles * result;
+
+   result = (ListeExclusionsMutuelles *) kmalloc(sizeof(ListeExclusionsMutuelles));
+
+   if (result == NULL) {
+      paniqueNoyau("retour de malloc NULL\n");
+   }
+   result->tete = NULL;
+   result->queue = NULL;
+
+   return result;
+}
+
+/**
+ * @brief Insertion d'une exclusionMutuelle dans une liste (au début)
+ *
+ */
+void listeExclusionsMutuellesInserer(ListeExclusionsMutuelles * l, ExclusionMutuelle * c)
+{
+   CelluleExclusionMutuelle * cell = (CelluleExclusionMutuelle *) kmalloc(sizeof(CelluleExclusionMutuelle));
+   
+   assert(l != NULL);
+   assert(c != NULL);
+
+   if (cell != NULL) {
+      cell->exclusionMutuelle = c;
+      cell->suivant = NULL;
+      if (l->queue != NULL) {
+         l->queue->suivant = cell;
+      }
+      l->queue = cell;
+      if (l->tete  == NULL) {
+	l->tete = cell;
+      }
+   }
+}
+
+/** 
+ * @brief  Liste des exclusionMutuelles définies sur le système
+ */
+static ListeExclusionsMutuelles * listeExclusionsMutuelles = NULL;
+
 typedef struct _CelluleCondition {
    Condition                * condition;
    struct _CelluleCondition * suivant;
@@ -66,6 +120,27 @@ static ListeConditions * listeConditions = NULL;
 #endif //  defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
 
 /**
+ * @brief Initialisation d'une exclusion mutuelle
+ */
+void exclusionMutuelleInitialiser(ExclusionMutuelle * em)
+{
+   atomiqueInit(&(em->verrou), 0);
+   initialiserListeTache(&(em->tachesEnAttente));
+
+#if defined(MANUX_ATOMIQUE_AUDIT)
+   em->nbEntrees = 0;
+   em->nbSorties = 0;
+
+   if (listeExclusionsMutuelles == NULL) {
+      listeExclusionsMutuelles = listeExclusionsMutuellesCreer();
+   }
+   if (listeExclusionsMutuelles != NULL) {
+      listeExclusionsMutuellesInserer(listeExclusionsMutuelles, em);
+   }
+#endif
+};
+
+/**
  * @brief Entrée en exclusion mutuelle.
  * 
  * La tâche appelante est éventuellement mise en attente dans une
@@ -94,7 +169,9 @@ void exclusionMutuelleEntrer(ExclusionMutuelle * em)
    };
 
    // Je peux tranquilement modifier le compteur !  
+#if defined(MANUX_ATOMIQUE_AUDIT)
    em->nbEntrees++;
+#endif
 }
 
 void exclusionMutuelleSortir(ExclusionMutuelle * em)
@@ -111,8 +188,9 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em)
    }
    // Le verrou est encore à nous, on peut modifier les compteurs sans
    // crainte 
+#if defined(MANUX_ATOMIQUE_AUDIT)
    (em)->nbSorties++ ;
-
+#endif
    // On déverouille
    atomiqueInit(&(em)->verrou, 0);
 }
@@ -222,6 +300,19 @@ void conditionDiffuser(Condition * cond)
 
 #if defined(MANUX_ATOMIQUE_AUDIT)
 /**
+ * @brief Affichage de l'état des variables d'exclusion mutuelle
+ */
+void exclusionsMutuellesAfficherEtat()
+{
+   CelluleExclusionMutuelle * cell;
+
+   printk("Excl M  en  so\n");
+   for (cell = listeExclusionsMutuelles->tete; cell != NULL; cell = cell->suivant){
+     printk("0x%x  %d %d\n", cell->exclusionMutuelle, cell->exclusionMutuelle->nbEntrees, cell->exclusionMutuelle->nbSorties);
+   }
+}
+
+/**
  * @brief Affichage de l'état des variables condition
  */
 void condtionsAfficherEtat()
@@ -233,7 +324,6 @@ void condtionsAfficherEtat()
      printk("0x%x  %d %d\n", cell->condition, cell->condition->nbSignaler, cell->condition->nbDiffuser);
    }
 }
-
 #endif
 
 
