@@ -55,10 +55,10 @@ int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
    
    exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
 
-   if (fanions | O_RDONLY) {
+   if (fanions & O_RDONLY) {
       tube->nbLecteurs++;
    }
-   if (fanions | O_WRONLY) {
+   if (fanions & O_WRONLY) {
       tube->nbEcrivains++;
    }
 
@@ -82,10 +82,10 @@ int tubeFermer(Fichier * f)
 
    printk_debug(DBG_KERNEL_TUBE, "mutex locked\n");
    
-   if (f->fanions | O_RDONLY) {
+   if (f->fanions & O_RDONLY) {
       tube->nbLecteurs--;
    }
-   if (f->fanions | O_WRONLY) {
+   if (f->fanions & O_WRONLY) {
       tube->nbEcrivains--;
       if (tube->nbEcrivains == 0) {
          conditionDiffuser(&(tube->nouvellesDonnees));
@@ -267,11 +267,11 @@ int sys_tube(ParametreAS as, int * fds)
    // Création de l'iNoeud qui décrit le tube dans le système
    iNoeud = iNoeudCreer(tube, &tubeMethodesFichier);
 
-   // Création du fichier d'entrée du tube (celui où on va écrire)
-   fichiers[0] = fichierCreer(iNoeud, O_WRONLY, 0);
-
    // Création du fichier de sortie du tube (celui où on va lire)
-   fichiers[1] = fichierCreer(iNoeud, O_RDONLY, 0);
+   fichiers[0] = fichierCreer(iNoeud, O_RDONLY, 0);
+
+   // Création du fichier d'entrée du tube (celui où on va écrire)
+   fichiers[1] = fichierCreer(iNoeud, O_WRONLY, 0);
 
    // On ajoute les fichiers à la tâche
    if (tacheAjouterFichiers(tacheEnCours, 2, fichiers, fds) != 2 ) {

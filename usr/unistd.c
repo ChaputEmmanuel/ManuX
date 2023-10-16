@@ -10,6 +10,8 @@
 
 appelSysteme0(NBAS_BASCULER_TACHE, int, basculerTache);
 
+appelSysteme0(NBAS_IDENTIFIANT_TACHE, int, identifiantTache);
+
 appelSysteme0(NBAS_DUMB, int, appelSystemeInutile);
 
 typedef void (CorpsTache());

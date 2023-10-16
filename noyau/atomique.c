@@ -8,6 +8,7 @@
 #include <manux/debug.h>     // assert
 #if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
 #   include <manux/kmalloc.h>
+#   include <manux/listetaches.h>
 #endif
 
 #if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
@@ -29,7 +30,7 @@ ListeExclusionsMutuelles * listeExclusionsMutuellesCreer()
    result = (ListeExclusionsMutuelles *) kmalloc(sizeof(ListeExclusionsMutuelles));
 
    if (result == NULL) {
-      paniqueNoyau("retour de malloc NULL\n");
+      paniqueNoyau("retour de kmalloc NULL\n");
    }
    result->tete = NULL;
    result->queue = NULL;
@@ -305,24 +306,43 @@ void conditionDiffuser(Condition * cond)
 void exclusionsMutuellesAfficherEtat()
 {
    CelluleExclusionMutuelle * cell;
+   CelluleTache * cellT;
 
-   printk("Excl M  en  so\n");
+   printk("\nEtat des variables d'exclusion mutuelle sur le systeme :\n\n");
+   printk("Excl M  |   en |   so | Attente\n");
+   printk("--------+------+------+--------\n");
    for (cell = listeExclusionsMutuelles->tete; cell != NULL; cell = cell->suivant){
-     printk("0x%x  %d %d\n", cell->exclusionMutuelle, cell->exclusionMutuelle->nbEntrees, cell->exclusionMutuelle->nbSorties);
+     printk("0x%x | %4d | %4d | ",
+	    cell->exclusionMutuelle,
+	    cell->exclusionMutuelle->nbEntrees,
+	    cell->exclusionMutuelle->nbSorties);
+     for (cellT = cell->exclusionMutuelle->tachesEnAttente.tete ; cellT != NULL; cellT = cellT->suivant){
+        printk("%d ", cellT->tache->numero);
+     }
+     printk("\n");
    }
+   printk("--------+------+------+--------\n");
 }
 
 /**
  * @brief Affichage de l'état des variables condition
  */
-void condtionsAfficherEtat()
+void conditionsAfficherEtat()
 {
    CelluleCondition * cell;
+   CelluleTache * cellT;
 
-   printk("Cond  s  d\n");
+   printk("\nEtat des variables de condition sur le systeme :\n\n");
+   printk("Cond    |    s |    d | Attente\n");
+   printk("--------+------+------+--------\n");
    for (cell = listeConditions->tete; cell != NULL; cell = cell->suivant){
-     printk("0x%x  %d %d\n", cell->condition, cell->condition->nbSignaler, cell->condition->nbDiffuser);
+     printk("0x%x | %4d | %4d | ", cell->condition, cell->condition->nbSignaler, cell->condition->nbDiffuser);
+     for (cellT = cell->condition->tachesEnAttente.tete ; cellT != NULL; cellT = cellT->suivant){
+        printk("%d ", cellT->tache->numero);
+     }
+     printk("\n");
    }
+   printk("--------+------+------+--------\n");
 }
 #endif
 

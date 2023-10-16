@@ -8,9 +8,10 @@
 #include <manux/errno.h>
 #include <manux/debug.h>      // A virer j'espère !
 #include <manux/console.h>
+#include <manux/kmalloc.h>    // Pour l'initialisation
 #include <manux/printk.h>
 #include <manux/memoire.h>
-#include <manux/journal.h>       /* initialiserJournal() */
+#include <manux/journal.h>    // initialiserJournal()
 #include <manux/fichier.h>
 #include <manux/bootloader.h>
 #include <manux/clavier.h>
@@ -33,14 +34,14 @@ void startManuX()
    // Récupération des informations depuis le bootloader
    bootloaderLireInfo();
 
-   // Initialisation de la console noyau
-   consoleInitialisationINoeud(&iNoeudConsole);
-
    bootloaderInitialiser();
 
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
    
+   // Initialisation de la console noyau
+   consoleInitialisationINoeud(&iNoeudConsole);
+
    /* Initilisation des descripteurs de segments */
    printk_debug(DBG_KERNEL_START, "Initialisation de la GDT ...\n");
    initialiserGDT();
@@ -48,6 +49,9 @@ void startManuX()
    /* Initialisation de la table des interruptions */
    initialiserIDT();
 
+   // Initialisation de l'allocateur généraliste
+   kmallocInitialisation();
+   
    // Le clavier nous permettra de basculer entre consoles
    initialiserClavier();
 
@@ -74,9 +78,6 @@ void startManuX()
    // On a besoin de l'horloge pour l'ordonnanceur
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge...\n");
    initialiserHorloge();
-
-   // Un petit message
-   printk("Tests d'acces concurrents, ...\n");
 
    printk_debug(DBG_KERNEL_START, "On passe en usr ...\n");
 

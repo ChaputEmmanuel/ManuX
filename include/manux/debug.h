@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*      Ma version des assertions et autres outils de debug.                  */
 /*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef MANUX_DEBUG_DEF
 #define MANUX_DEBUG_DEF
@@ -34,8 +34,6 @@
 
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_SYSFI      \
- | DBG_KERNEL_TUBE       \
 			       )
 #define masqueDebugageFichier (0x00000000\
 			       )

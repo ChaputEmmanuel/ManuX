@@ -66,7 +66,8 @@ void handlerClavier(void * toto)
    uint8_t etat;
 
    inb(0x64, etat);
-   if (etat && 0x01) {
+
+   if (etat & 0x01) {
       inb(0x60, codeClavier);
       codeClavier &= 0xFF;
 
@@ -79,7 +80,7 @@ void handlerClavier(void * toto)
          shiftActif--;
 	 return;
       }
-      //printk("[KBD-0x%x / %d]", codeClavier, shiftActif);
+      // printk("[KBD-0x%x / %d]\n", codeClavier, shiftActif);
       
 #ifdef MANUX_CONSOLES_VIRTUELLES
       if (codeClavier == KEYCODE_ESC) {
@@ -101,19 +102,16 @@ void handlerClavier(void * toto)
 #   else
       cons = consoleNoyau();
 #   endif
-      //      printk("[KBD-cons 0x%x : %d]\n", cons, cons->nbCarAttente);
 
       if (codeClavier & 0x80) {
+	printk("(up)\n");
       } else {
          if (cons->bufferClavier){ 
             if (cons->nbCarAttente < 4096) {
                cons->bufferClavier[(cons->indiceProchainCar + cons->nbCarAttente)%4096] =
 		 shiftActif ?keymapShift[codeClavier]:keymap[codeClavier];
 	       cons->nbCarAttente++;
-	       //               printk("[KBD-cons 0x%x : %d]\n", cons, cons->nbCarAttente);
 	    }
-	    /* 	 } else {
-		 printk("[KBD-cons 0x%x : NO BUF]\n", cons);*/
 	 }
       }
 #endif

@@ -114,7 +114,7 @@ void i8259aInit(uint8_t intBase)
 }
 
 /**
- * Ajout d'un handler
+ * @brief Ajout d'un handler
  */
 int i8259aAjouterHandler(int numIRQ, void (*handler)(void *), void * private)
 {

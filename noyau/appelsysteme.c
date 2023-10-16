@@ -90,12 +90,13 @@ void initialiserAppelsSysteme()
    // Création d'un tube de communiations entre tâches
    definirAppelSysteme(NBAS_TUBE, sys_tube);
 #endif
-   
-   /* Les 4 suivants sont à vérifier */
-   //definirAppelSysteme(NBAS_NUMERO_TACHE,   AS_numeroTache);
+
+   definirAppelSysteme(NBAS_IDENTIFIANT_TACHE, sys_identifiantTache);
+
+   /* Les suivants sont à revoir */
    //definirAppelSysteme(NBAS_CONSOLE,        AS_console);
    //definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
-   //   definirAppelSysteme(NBAS_FORK,           sysFork);
+   //definirAppelSysteme(NBAS_FORK,           sysFork);
 
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
    tacheDansLeNoyau= 0;

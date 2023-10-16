@@ -23,14 +23,12 @@ int fichierLire(Fichier * f, void * buffer, int nbOctets)
    int result = -EBADF;
 
    if (f->fanions & O_RDONLY) {
-      return result;
-   }
-
-   printk_debug(DBG_KERNEL_SYSFI, "on invoque 0x%x\n", f->iNoeud->methodesFichier->lire);
+      printk_debug(DBG_KERNEL_SYSFI, "on invoque 0x%x\n", f->iNoeud->methodesFichier->lire);
    
-   // On invoque la méthode associée
-   result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
-
+      // On invoque la méthode associée
+      result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
+   }
+   
    printk_debug(DBG_KERNEL_SYSFI, "on renvoie %d\n", result);
 
    return result;
@@ -41,12 +39,13 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
    int result = -EBADF;
 
    if (f->fanions & O_WRONLY) {
-      return result;
+      printk_debug(DBG_KERNEL_SYSFI, "on invoque 0x%x\n", f->iNoeud->methodesFichier->ecrire);
+
+      // On invoque la méthode associée
+      result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
    }
-
-   // On invoque la méthode associée
-   result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
-
+   printk_debug(DBG_KERNEL_SYSFI, "on renvoie %d\n", result);
+   
    return result;
 }
 

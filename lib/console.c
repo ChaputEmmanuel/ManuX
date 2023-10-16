@@ -267,7 +267,6 @@ void consoleSetClavier(Console * cons, void * buffer)
    cons->bufferClavier = buffer;
    cons->nbCarAttente = 0;
    cons->indiceProchainCar = 0;
-   exclusionMutuelleInitialiser(&(cons->accesBufferClavier));
 }
 #endif
 

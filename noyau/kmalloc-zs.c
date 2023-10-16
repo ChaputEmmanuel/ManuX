@@ -80,11 +80,11 @@ void kmallocAfficherStatistiques(char *prefixe)
 void kmallocInitialisation()
 {
    // Pour le moment, on commence à vide !
-  /*
-   printk(PRINTK_DEBUGAGE "Initialisation de kmalloc\n");
-   printk(PRINTK_DEBUGAGE " nb : 0x%x, last : 0x%x\n", &nbPagesAllouees, &(blocsLibres[MANUX_KMALLOC_ORDRE_MAX]));
-   kmallocAfficherStatistiques(PRINTK_DEBUGAGE);
-  */
+
+   // Attention, on ne peut rien afficher car il faut que cette
+   // fonction soit invoquée (le jour où elle fera quelque chose !)
+   // avant l'initialisation de la console, au cas où la macro
+   // MANUX_ATOMIQUE_AUDIT soit initialisée, ...
 }
 
 /**
@@ -123,18 +123,12 @@ void decouperUnBloc(uint16_t o)
    // Le suivant est à une distance d'un ordre inférieur
    part1 = origine;
    part2 = (enteteBlocMemoire *)((void *)origine + (1<<o));
-   //   printk(PRINTK_DEBUGAGE"On obtient  ordre %d d'adresse 0x%x = %d\n", o, part1, part1);
-   //printk(PRINTK_DEBUGAGE"      et un ordre %d d'adresse 0x%x = %d\n", o, part2, part2);
-   //   printk(PRINTK_DEBUGAGE"On casse un ordre %d d'adresse 0x%x en \n   0x%x\n   0x%x\n", o, origine, part1, part2);
 
    // On les insère en tête de liste
    part1->e.suivant = part2;
    part2->e.suivant = blocsLibres[o];
    blocsLibres[o] = part1;
 
-   //   printk(PRINTK_DEBUGAGE "Etat apres decoupe :\n");
-   //kmallocAfficherStatistiques(PRINTK_DEBUGAGE);
-   
 }
 
 /** 
@@ -155,8 +149,6 @@ void * kmalloc(size_t n)
    assert(ordre <= MANUX_KMALLOC_ORDRE_MAX);
    assert(ordre >= MANUX_KMALLOC_ORDRE_MIN);
    
-   //printk(PRINTK_DEBUGAGE "Allocation de %d d'ordre %d\n", n, ordre);
-   
    // On recherche un bloc assez gros pour la demande
    o = ordre;
    while (( o <= MANUX_KMALLOC_ORDRE_MAX) && (blocsLibres[o] == NULL)) {
@@ -175,7 +167,6 @@ void * kmalloc(size_t n)
          return NULL;
       } else {
 #ifdef MANUX_KMALLOC_STAT
-	//printk(PRINTK_DEBUGAGE "            -> Need a %d page : 0x%x\n", nbPagesAllouees, blocsLibres[MANUX_KMALLOC_ORDRE_MAX]);
          nbPagesAllouees++;
 #endif
          o = MANUX_KMALLOC_ORDRE_MAX;
@@ -202,8 +193,6 @@ void * kmalloc(size_t n)
 #ifdef MANUX_KMALLOC_STAT
       nbAlloc[ordre]++;
 #endif
-      //printk(PRINTK_DEBUGAGE "Fin de kmalloc (0x%x) \n", enteteBlocAlloue);
-      //      kmallocAfficherStatistiques(PRINTK_DEBUGAGE);
 
       return enteteBlocAlloue + 1;
    }
@@ -222,22 +211,19 @@ void reintegrerBloc(enteteBlocMemoire * bloc)
    uint16_t ordre = bloc->e.alloue.ordre; //< Ordre du bloc à intégrer
    enteteBlocMemoire * siamois, *prec = NULL;
 
-   //printk(PRINTK_DEBUGAGE "Reint 0x%x ordre %d\n", bloc, ordre);
    do {
       assert(ordre <= MANUX_KMALLOC_ORDRE_MAX);
       assert(ordre >= MANUX_KMALLOC_ORDRE_MIN);
-      //printk(PRINTK_DEBUGAGE "   reint 0x%x ordre %d\n", bloc, ordre);
+
       // On cherche le siamois, dont l'adresse ne diffère que par le
       // bit de l'ordre
       prec = NULL;
       siamois = blocsLibres[ordre];
       while ((siamois != NULL) && (((uint32_t)siamois ^ (1<<ordre)) != (uint32_t)bloc)) {
-	//printk(PRINTK_DEBUGAGE "   nope (0x%x)\n", siamois);
          prec = siamois;
 	 siamois = siamois->e.suivant;
-         //printk(PRINTK_DEBUGAGE "   next (0x%x)\n", siamois);
       }
-      //printk(PRINTK_DEBUGAGE "   reint 0x%x siamois 0x%x\n", bloc, siamois);
+
       // Si le siamois était dans les libres, on l'enlève et  on procède
       // à la fusion
       if (siamois != NULL) {
@@ -246,7 +232,6 @@ void reintegrerBloc(enteteBlocMemoire * bloc)
             blocsLibres[ordre] = siamois->e.suivant;
          } else {           // Sinon
 	    prec->e.suivant =  siamois->e.suivant;
-	    //printk(PRINTK_DEBUGAGE "   suivant de (0x%x) = 0x%x\n", prec, siamois->e.suivant); 
          }
  
          // On recrée le bloc constitué de la fusion. L'adresse est celle
@@ -259,8 +244,6 @@ void reintegrerBloc(enteteBlocMemoire * bloc)
    } while ((siamois != NULL) // Si la fusion a pu être faite, on
           &&(ordre < MANUX_KMALLOC_ORDRE_MAX)); // essaye de fusionner un ordre au dessus
 
-   //printk(PRINTK_DEBUGAGE "Fin de reint 0x%x ordre %d\n", bloc, ordre);
-   
    // A ce stade, on a effectué toutes les fusions possibles
    // concernant ce bloc. L'état final du bloc intègre ces
    // éventuellles fusions et l'ordre a donc été incrémenté à chaque
@@ -287,7 +270,6 @@ void kfree(void * p)
      paniqueNoyau("Tentative de libérer un bloc 0x%x inconnu (m=0x%x, o=%d)\n",
 		  p, bloc->e.alloue.magique, bloc->e.alloue.ordre);
    }
-   //printk(PRINTK_DEBUGAGE "free (0x%x) ordre %d\n", bloc, bloc->e.alloue.ordre);
 
 #ifdef MANUX_KMALLOC_STAT
    nbFree[bloc->e.alloue.ordre]++;
@@ -296,6 +278,5 @@ void kfree(void * p)
    if (bloc->e.alloue.ordre < MANUX_KMALLOC_ORDRE_MAX) {
       reintegrerBloc(bloc);
    }
-   //   kmallocAfficherStatistiques(PRINTK_DEBUGAGE);   
 }
 

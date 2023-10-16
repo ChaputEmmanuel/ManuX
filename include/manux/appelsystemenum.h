@@ -3,7 +3,7 @@
 /*                                                                            */
 /*      Il s'agit ici de définir les éléments communs à la partie noyau et la */
 /* partie user.                                                               */
-/*                                                  (C) Manu Chaput 2000-2021 */
+/*                                                  (C) Manu Chaput 2000-2023 */
 /*----------------------------------------------------------------------------*/
 #ifndef APPEL_SYSTEME_NUM_DEF
 #define APPEL_SYSTEME_NUM_DEF
@@ -18,7 +18,7 @@
 /*
  * Liste des appels système prédéfinis
  */
-#define NBAS_NUMERO_TACHE      0
+#define NBAS_IDENTIFIANT_TACHE 0
 #define NBAS_ECRIRE_CONS       1
 #ifdef MANUX_PAGINATION
 #   define NBAS_OBTENIR_PAGES  2

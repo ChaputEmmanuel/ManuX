@@ -11,9 +11,15 @@
 #include <manux/string.h>
 
 /**
- * Taille du buffer utilisé en lecture
+ * @brief Taille du buffer utilisé en lecture
  */ 
 #define TAILLE_BUFFER 16
+
+/**
+ * @brief Nombres de lecteurs et écrivains
+ */ 
+#define NB_LECTEURS  2
+#define NB_ECRIVAINS 2
 
 int fd[2];  // Le tube
 
@@ -22,24 +28,22 @@ void lecteur()
    int r, c=0;
    char b[TAILLE_BUFFER];
    
-   printf("Je suis un lecteur !\n");
+   printf("[%d] Je suis un lecteur !\n", identifiantTache());
    fermer(fd[1]);
    
    do {
       r = lire(fd[0], b, TAILLE_BUFFER - 1);
-      printf(" lecture %d\n", r);
+      printf("[%d] lecture %d\n", identifiantTache(), r);
       if (r > 0) {
          b[r] = 0;
          printf(b);
          c += r;
       } else if (r < 0){
-	printf("Erreur lecture\n");
+	printf("[%d] Erreur lecture\n", identifiantTache());
       }
    } while (r > 0);
 
-   printf("\nFini ... En tout, j'ai lu %d !\n", c);
-
-   while(1){};
+   printf("\n[%d] Fini ... En tout, j'ai lu %d !\n", identifiantTache(), c);
 }
 
 void ecrivain()
@@ -48,28 +52,28 @@ void ecrivain()
    
    char * b = "Bonjour les jeunes ! ";
 
-   printf("Je suis un ecrivain !\n");
+   printf("[%d] Je suis un ecrivain !\n", identifiantTache());
    fermer(fd[0]);
-   printf("Je suis un ecrivain encore en vie!\n");
-   
 
    do {
-     printf("Je vais ecrire %d\n", strlen(b));
+     printf("[%d] Je vais ecrire %d\n", identifiantTache(), strlen(b));
       r = ecrire(fd[1], b, strlen(b));
-      printf("Voila j'ai ecri %d\n", r);
+      printf("[%d] Voila j'ai ecrit %d\n", identifiantTache(), r);
       if (r >= 0) {
          c += r;
       } else {
-         printf("Erreur ecriture\n");
+         printf("[%d] Erreur ecriture\n", identifiantTache());
       }
    } while (r > 0);
 
-   printf("En tout, j'ai ecrit %d !\n", c);
+   printf("[%d] En tout, j'ai ecrit %d !\n", identifiantTache(), c);
+
+   fermer(fd[1]);
 }
 
 void init()
 {
-   int r;
+  int r, l, e;
 
    printf("Bonjour le mode utilisateur !\n");
 
@@ -78,11 +82,15 @@ void init()
    if ( r != ESUCCES) {
       printf("r = %d : casse la pipe !?\n", r);
    } else {
-      printf("Tube ok !\n");
-      printf("Je lance les taches.\n");
-      r = creerNouvelleTache(ecrivain, FALSE);
-      r = creerNouvelleTache(lecteur, FALSE);
+      for (e = 0; e < NB_ECRIVAINS; e++) {
+         r = creerNouvelleTache(ecrivain, FALSE);
+      }
+      for (l = 0; l < NB_LECTEURS; l++) {
+         r = creerNouvelleTache(lecteur, FALSE);
+      }
    }
+   fermer(fd[0]);
+   fermer(fd[1]);
    printf("Voila voila !\n");
    while(1){};
 }

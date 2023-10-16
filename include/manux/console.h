@@ -57,7 +57,6 @@ typedef struct _Console {
    unsigned char     * bufferClavier;     // Pour les données du clavier
    uint16_t            nbCarAttente;
    uint16_t            indiceProchainCar; // Le prochain caractère à lire
-   ExclusionMutuelle   accesBufferClavier;
 #endif
   
 } Console;

@@ -8,29 +8,34 @@
 
 #include <manux/types.h>
 
+/**
+ * @brief Création d"une nouvelle tâche 
+ * @param  corps : fonction à exécuter
+ * @param  shareCons : partage-t-on la console de la tâche actuelle ?
+ * @return le numéro de la tâche créée.
+ */
 int creerNouvelleTache(void (corps()), booleen shareCons);
-/*
- * Création d"une nouvelle tâche 
- *   corps : fonction à exécuter
- *   shareCons : partage-t-on la console de la tâche actuelle ?
- *   retour : le numéro de la tâche créée.
- */
 
+/**
+ * @brief Basculer vers une autre tâche.
+ * On rend simplement la main, c'est du collaboratif.
+ */
 int basculerTache();
-/*
- * Basculer vers une autre tâche. On rend simplement la main, c'est du
- * collaboratif.
- */
 
+/**
+ * @brief Un appel système sans intérêt, pour l'exemple
+ */
 int appelSystemeInutile();
-/*
- * Tout est dit !
- */
 
+/**
+ * @brief Création d'un tube de communication
+ */
 int tube(int * fd);
-/*
-int numeroTache();
-int obtenirPages(int n);
-*/
+
+/**
+ * @brief Obtention de l'identifiant de la tâche en cours
+ */
+int identifiantTache();
+
 
 #endif

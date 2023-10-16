@@ -159,7 +159,7 @@ void exclusionsMutuellesAfficherEtat();
 /**
  * @brief Affichage de l'état des variables condition
  */
-void condtionsAfficherEtat();
+void conditionsAfficherEtat();
 
 #endif
 #endif

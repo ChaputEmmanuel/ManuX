@@ -301,7 +301,7 @@ void dummyTraiterClavier()
 	       printk("\n");
          break;
          case 'h' :
-	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\n");
+	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\ns(ynchronisation)\n");
 	 break;
          case 'i' :
             interruptionAfficher();
@@ -312,7 +312,7 @@ void dummyTraiterClavier()
 #if defined(MANUX_ATOMIQUE_AUDIT)
          case 's' :
             exclusionsMutuellesAfficherEtat();
-            condtionsAfficherEtat();
+            conditionsAfficherEtat();
          break;
 #endif
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
@@ -329,7 +329,7 @@ void dummyTraiterClavier()
 #endif
 	 break;
          default :
-            printk("Unkown [0x%x] pressed\n", c[0]);
+	   //            printk("Unknown [0x%x] pressed\n", c[0]);
          break;
       }
    }
@@ -508,7 +508,7 @@ TacheID ordonnancerTache(CorpsTache corpsTache, console * cons)
 /**
  * @brief Implantation de l'AS d'obtention de l'identifiant
  */
-int AS_numeroTache()
+int sys_identifiantTache()
 {
    return (int)tacheEnCours->numero;
 }
@@ -517,8 +517,7 @@ int AS_numeroTache()
 /**
  * @brief l'AS permettant d'obtenir la Console de la tâche
  *
- * Le nom de cette fonction est probablement à changer, comme celui
- * de la précédente d'ailleurs.
+ * Le nom de cette fonction est à changer
  */
 uint32_t AS_console()
 {

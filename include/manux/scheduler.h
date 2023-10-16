@@ -81,7 +81,7 @@ void ordonnanceur();
  * Basculer vers la prochaine tache à exécuter
  */
 
-int AS_numeroTache();
+int sys_identifiantTache();
 /*
  * Obtention du numero de la tache en cours. WARNING ça n'a rien
  * à faire là ...
