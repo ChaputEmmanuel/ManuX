@@ -17,7 +17,7 @@
  * Longueur maximale d'une chaîne affichable (à supprimer dès qu'on
  * aura de la mémoire dynamique)
  */
-#define MAX_PRINTK_LENGTH 128
+#define MAX_PRINTK_LENGTH 512
 
 /**
  * @brief Les différentes préfixes pour les niveaux de criticité
@@ -31,7 +31,6 @@
 #define PRINTK_INFORMATION  "{6}"
 #define PRINTK_DEBUGAGE     "{7}"
 
-void printk(char * format, ...);
 /**
  * @brief Fonction principale d'affichage dans le noyau
  *
@@ -44,12 +43,17 @@ void printk(char * format, ...);
  *
  *    %[n][l[l]]{dxo} %s \n
  */
+void printk(char * format, ...);
 
 /**
  * @brief : Écriture formattée dans une chaîne de caractères
  */
 int sprintk(char * str, char * format, ...);
 
+/**
+ * @brief : Écriture formattée dans une chaîne de caractères
+ */
+int vsprintk(char * str, char * format, va_list argList);
 
 #ifdef MANUX_FICHIER
 #define fprintk(f, format, ...) \
