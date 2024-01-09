@@ -358,8 +358,7 @@ est généré à la compilation du noyau.
 {\tt gdb}. Pour cela, je lance par exemple {\tt qemu} de la façon suivante
 
 \begin{lstlisting}
-   qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc
-base=localtime -m 64M -gdb tcp::1234  -S 
+   qemu-system-i386 -drive format=raw,file=manux,index=0,if=floppy  -rtc base\=localtime -m 64M -gdb tcp::1234  -S 
 \end{lstlisting}
 
    Je lance ensuite {\tt gdb} dans un autre terminal avec un
