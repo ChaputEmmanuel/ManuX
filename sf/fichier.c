@@ -197,7 +197,7 @@ Fichier * fichierDupliquer(Fichier * f)
       // On fait une coie simple, ...
       bcopy(f, result, sizeof(Fichier));
 
-      // ... et on invoque la méthdode d'ouverture, si elle a des
+      // ... et on invoque la méthode d'ouverture, si elle a des
       // décomptes à faire, par exemple
       if (f->iNoeud->methodesFichier->ouvrir != NULL) {
  	 res = f->iNoeud->methodesFichier->ouvrir(f->iNoeud, result, f->fanions, f->mode);

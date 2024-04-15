@@ -64,6 +64,18 @@
 #   error "MANUX_TUBES nécessite MANUX_KMALLOC"
 #endif
 
+#if defined(MANUX_ATOMIQUE) && !defined(MANUX_TACHES)
+#   error "MANUX_ATOMIQUE nécessite MANUX_TACHES"
+#endif
+
 #if defined(MANUX_ATOMIQUE_AUDIT) && !defined(MANUX_KMALLOC)
 #   error "MANUX_ATOMIQUE_AUDIT nécessite MANUX_KMALLOC"
+#endif
+
+#if defined(MANUX_HERITER_FICHIERS) && !defined(MANUX_KMALLOC)
+#   error "MANUX_HERITER_FICHIERS nécessite MANUX_KMALLOC"
+#endif
+
+#if defined(MANUX_FICHIER) && !defined(MANUX_PRINTK)
+#   error "MANUX_FICHIER nécessite MANUX_PRINTK"
 #endif

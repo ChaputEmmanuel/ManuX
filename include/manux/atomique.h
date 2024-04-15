@@ -7,9 +7,6 @@
 #ifndef ATOMIQUE_DEF
 #define ATOMIQUE_DEF
 
-
-mlkfnqkljhfklqjhg
-
 #include <manux/types.h>
 #include <manux/tache.h>
 #include <manux/listetaches.h>  /* Pour les listes de tâches en attente */
