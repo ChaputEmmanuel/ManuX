@@ -59,7 +59,7 @@ int vsprintk(char * str, char * format, va_list argList);
 #define fprintk(f, format, ...) \
   {	   \
    char chaine[MAX_PRINTK_LENGTH]; \
-   fichierEcrire(f, chaine, sprintk(chaine, format, __VA_ARGS__));\
+   fichierEcrire(f, chaine, snprintk(chaine, MAX_PRINTK_LENGTH, format, __VA_ARGS__));	\
 }
 #endif // MANUX_FICHIER
 #endif

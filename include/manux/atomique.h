@@ -161,7 +161,7 @@ void exclusionsMutuellesAfficherEtat();
  */
 void conditionsAfficherEtat();
 
-#endif
+#endif // MANUX_ATOMIQUE_AUDIT
 #endif
 
 
