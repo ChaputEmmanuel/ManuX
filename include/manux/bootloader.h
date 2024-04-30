@@ -24,7 +24,7 @@
 /**
  * @brief les diverses informations que peut fournir le bootloader
  */
-#define MULTIBOOT_PAGE_ALGIN   0x00000001
+#define MULTIBOOT_PAGE_ALIGN   0x00000001
 #define MULTIBOOT_MEMORY_INFO  0x00000002
 #define MULTIBOOT_INFO_CMDLINE 0x00000004
 

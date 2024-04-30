@@ -39,7 +39,7 @@ void startManuX()
       break;
    }
 
-   if ((infoSysteme->flags &  MULTIBOOT_PAGE_ALGIN) ==  MULTIBOOT_PAGE_ALGIN) {
+   if ((infoSysteme->flags &  MULTIBOOT_PAGE_ALIGN) ==  MULTIBOOT_PAGE_ALIGN) {
      printk("Alignement a la page\n");
    }
 

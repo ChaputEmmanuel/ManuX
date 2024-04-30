@@ -59,7 +59,7 @@ void bootloaderInitialiser()
    }
 
    // Alignement des modules à la page ? (Pas important pour nous)
-   if ((infoSysteme.flags &  MULTIBOOT_PAGE_ALGIN) ==  MULTIBOOT_PAGE_ALGIN) {
+   if ((infoSysteme.flags &  MULTIBOOT_PAGE_ALIGN) ==  MULTIBOOT_PAGE_ALIGN) {
       printk_debug(DBG_KERNEL_BOOTLOADER, "Alignement a la page\n");
    }
 
