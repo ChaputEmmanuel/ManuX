@@ -24,6 +24,7 @@
 #include <config/journal.h>
 #include <config/systeme-fichiers.h>
 #undef MANUX_TUBES
+#include <config/kmalloc.h>
 #include <config/pc-i386.h>
 #include <config/intel-8259a.h>
 #include <config/pci.h>

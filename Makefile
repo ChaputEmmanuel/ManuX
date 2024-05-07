@@ -58,7 +58,7 @@ usrinc : $(USR_INC) usrconf
 #    Le fichier de configuration (une des premières choses à faire !)
 #...............................................................................
 make.conf :  $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
-	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
+	@cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
 
 
 FORCE:
@@ -144,7 +144,7 @@ $(ISO_FICHIER) : iso
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/*.h ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) ; done )
+	(for c in $(ROOTDIR)/multiconf/*.h ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; ( make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) || true ) ; done )
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------
@@ -182,18 +182,29 @@ canevas : unifdef.conf
 	/usr/bin/unifdef -x 2 -f unifdef.conf noyau/main.c -o multiconf/main-$(CFG).c
 
 #-------------------------------------------------------------------------------
+#    Tentative d'affichage des configurations disponibles
+#-------------------------------------------------------------------------------
+CFG_LIST :
+	@(for f in multiconf/*.h ; do c=`basename -s .h  $$f` ; make CFG=$$c clean make.conf >/dev/null 2>&1; make CFG=$$c affiche_config ; done)
+
+# Attention, la rêgle suivante doit être invoquée avec un CFG cohérent
+# avec le fichier de config
+affiche_config :
+	@echo " * \033[0;34m$(CFG)\033[0m"; echo -n "   " ; grep "@brief" $(MANUX_FICHIER_CONFIG) | cut -d' ' -f 4- ; echo "   MANUX_FICHIER_MAIN=$(MANUX_FICHIER_MAIN)"
+
+#-------------------------------------------------------------------------------
 #    Quelques cibles complémentaires en vrac
 #-------------------------------------------------------------------------------
 dump : $(NOYAU_ELF)
 	ndisasm $(NOYAU_ELF) -u > dump
 
 clean :
-	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
+	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)
 	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf *.img unifdef.conf
 
 distclean :
-	(for r in $(SOUS_REP) ; do (cd $$r ; make clean) ; done)
-	rm -f bochs.out *.bin *.obj *.o dump $(TAILLE_CONF) *~
+	(for r in $(SOUS_REP) doc ; do (cd $$r ; make clean) ; done)
+	rm -f bochs.out *.bin manux *.obj *.o dump $(TAILLE_CONF) *~ __bfe.log__ $(ISO_FICHIER) dump.dat make.conf *.img unifdef.conf
 
 tar : clean
 	(cd .. ; tar cvf -  ManuX-32 | $(COMPRESS) > manux-32-`date +"%Y-%m-%d"`.tgz ; echo Archive dans manux-32-`date +"%Y-%m-%d"`.tgz )

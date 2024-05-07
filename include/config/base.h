@@ -43,15 +43,3 @@
 #   define MANUX_NB_CYCLES_CALIBRAGE MANUX_FREQUENCE_HORLOGE
 #endif
 
-/**
- * @brief Le noyau est-il réentrant ?
- *
- * Si un élément ne l'est pas, cette macro ne doit pas être définie
- */
-#define MANUX_REENTRANT
-//#undef MANUX_REENTRANT
-
-/**
- * @brief Utilisation d'outils de synchronisation ?
- */
-#define MANUX_ATOMIQUE

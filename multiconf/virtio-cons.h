@@ -20,8 +20,9 @@
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>   // Parce que dans tache, on hérite des fichiers
 #include <config/taches.h>
-#include <config/atomique.h>
-#undef MANUX_ATOMIQUE_AUDIT
+#include <config/synchronisation.h>
+#undef MANUX_EXCLUSION_MUTUELLE_AUDIT
+#undef MANUX_CONDITION_AUDIT
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/systeme-fichiers.h>

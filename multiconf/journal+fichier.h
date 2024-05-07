@@ -21,8 +21,8 @@
 #include <config/printk.h>
 #include <config/journal.h>
 #include <config/systeme-fichiers.h>
-
 #undef MANUX_TUBES
+#include <config/kmalloc.h>
 
 #include <config/verifications.h>
 

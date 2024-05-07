@@ -419,3 +419,13 @@ de base dont il aura besoin.
 %-------------------------------------------------------------------------------
 \subsection{Obtention des paramètres passés par le {\em bootloader}}
 
+   Grâce à Grub, qui implante {\em Multiboot}, nous pouvons passer des
+paramètres au noyau. La figure suivante montre un exemple de ligne de
+commande de Grub sur laquelle un paramètre a été ajouté.
+   
+\includegraphics{images/multiboot-param-1.png}
+
+   La figure suivante montre alors ManuX qui a démarré et qui a
+récupéré cette information sous forme de chaîne de caractères.
+   
+\includegraphics{images/multiboot-param-2.png}

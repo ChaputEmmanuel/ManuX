@@ -14,7 +14,15 @@
 #include <manux/console.h>
 #include <manux/io.h>
 #include <manux/memoire.h>       /* NULL, allouerPage */
-#include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
+#if defined(MANUX_SYNCHRONISATION)
+#   include <manux/atomique.h>      /* Pour le verrou sur le scheduler */
+#   if defined(MANUX_EXCLUSION_MUTUELLE)
+#      include <manux/exclusion-mutuelle.h>
+#   endif
+#   if defined(MANUX_CONDITION)
+#      include <manux/condition.h>
+#   endif
+#endif
 #include <manux/printk.h>        /* printk() */
 #include <manux/debug.h>         /* debug() paniqueNoyau() */
 #include <manux/interruptions.h> /* nbTopHorloge */
@@ -49,11 +57,6 @@ booleen basculeConsoleDemandee = FALSE;
 booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
 				     // faire du "pas à pas"
 
-/*
- * Le scheduler est-il en cours d'exécution ?
- */
-Atomique verrouScheduler;
-
 /**
  * @brief Identifiant de la tâche actuellement en cours d'exécution
  * dans le noyau (0 si aucune)
@@ -61,7 +64,7 @@ Atomique verrouScheduler;
  * C'est une façon d'assurer le fonctionnement d'un noyau non
  * réentrant.
  */
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
 ExclusionMutuelle verrouGeneralDuNoyau;
 TacheID tacheDansLeNoyau = 0;
 #endif
@@ -204,7 +207,10 @@ void appelsSystemeAfficher()
 }
 #endif
 
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if  defined(MANUX_TACHES) \
+ &&  defined(MANUX_SYNCHRONISATION) \
+ &&  defined(MANUX_EXCLUSION_MUTUELLE) \
+ && !defined(MANUX_REENTRANT)
 /**
  * @brief Etat du verrou général
  */
@@ -309,13 +315,17 @@ void dummyTraiterClavier()
          case 'p' :
             afficherEtatTaches();
 	 break;
-#if defined(MANUX_ATOMIQUE_AUDIT)
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT) || defined(MANUX_CONDITION_AUDIT)
          case 's' :
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
             exclusionsMutuellesAfficherEtat();
-            conditionsAfficherEtat();
-         break;
 #endif
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_CONDITION_AUDIT)
+            conditionsAfficherEtat();
+#endif
+	    break;
+#endif
+#if defined(MANUX_TACHES) && defined(MANUX_REENTRANT) && !defined(MANUX_REENTRANT)
          case 'x' :
             afficherEtatMutex();
 	 break;
@@ -336,16 +346,19 @@ void dummyTraiterClavier()
 }
 #endif // MANUX_CLAVIER_CONSOLE
 
+#if defined(MANUX_TACHES)  // A virer non ? Scheduler sans tache, ...
 /**
  * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
  */
 void aDummyKernelTask()
 {
    while(1) {
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // acquérir le verrou si le noyau n'est pas réentrant.
-      entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+#   if defined(MANUX_EXCLUSION_MUTUELLE)
+      exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
+#   endif
       assert(tacheDansLeNoyau == 0);
       tacheDansLeNoyau = tacheEnCours->numero;
 #endif
@@ -358,16 +371,18 @@ void aDummyKernelTask()
 #ifdef MANUX_VIRTIO_NET
       virtioReseauPoll(); // WARNING à virer !!!
 #endif
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // rendre le verrou si le noyau n'est pas réentrant.
       tacheDansLeNoyau = 0;
-      sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+#   if defined(MANUX_EXCLUSION_MUTUELLE)
+      exclusionMutuelleSortir(&verrouGeneralDuNoyau);
+#endif
       ordonnanceur();
 #endif
    }
 }
-
+#endif // MANUX_TACHES
 /**
  * @brief Ajout d'une tâche dans l'ordonnanceur
  *
@@ -430,10 +445,10 @@ void initialiserScheduler()
 
    // Avant de permettre à une deuxième tâche d'entrer en concurrence,
    // il faut s'assurer qu'on a la main sur le noyau.
-#if !defined(MANUX_REENTRANT)
+#if !defined(MANUX_REENTRANT) && defined(MANUX_EXCLUSION_MUTUELLE)
    printk_debug(DBG_KERNEL_ORDON, "on verouille le verrou\n");
    
-   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
    assert(tacheDansLeNoyau == 0);
    tacheDansLeNoyau = tacheEnCours->numero;
 #endif

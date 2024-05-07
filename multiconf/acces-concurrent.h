@@ -27,7 +27,7 @@
 #include <config/journal.h>
 #include <config/noyau.h>
 #include <config/taches.h>
-#include <config/atomique.h>
+#include <config/synchronisation.h>
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>
 #include <config/clavier.h>

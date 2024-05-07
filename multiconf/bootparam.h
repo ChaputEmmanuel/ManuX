@@ -1,9 +1,8 @@
 /**
  * @file multiconf/bootparam.h
- * @brief Exemple de configuration pour le passage de paramètres par le
- * bootloader.
+ * @brief Passage de paramètres par le bootloader.
  *
- *                                                     (C) Manu Chaput 2000-2023
+ *                                                     (C) Manu Chaput 2000-2024
  */
 
 #ifdef MANUX_FICHIER_CONFIG

@@ -1,8 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantation des sous-programmes de gestion des taches.               */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file tache.c
+ * @brief Implantation des sous-programmes de gestion des tâches.
+ *
+ *                                                     (C) Manu Chaput 2000-2024
+ */
 #include <manux/tache.h>
 #include <manux/scheduler.h>  /* tacheEnCours */
 #include <manux/memoire.h>
@@ -46,9 +47,9 @@ void basculerVersTache(Tache * tache)
  */
 void tacheExecuter()
 {
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
    // On commmence en mode noyau, ...
-   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
    assert(tacheDansLeNoyau == 0);
    tacheDansLeNoyau = tacheEnCours->numero;
 #endif
@@ -58,17 +59,17 @@ void tacheExecuter()
 		moi->numero,
 		moi->fonctionPrincipale);
 
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
    // On commmence en mode noyau, ...
    tacheDansLeNoyau = 0;
-   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleSortir(&verrouGeneralDuNoyau);
 #endif
 
    moi->fonctionPrincipale();
 
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // On commmence en mode noyau, ...
-      entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+      exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
       assert(tacheDansLeNoyau == 0);
       tacheDansLeNoyau = tacheEnCours->numero;
 #endif
@@ -86,10 +87,10 @@ void tacheExecuter()
 
    // WARNING : à faire !
 
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
    // On commmence en mode noyau, ...
    tacheDansLeNoyau = 0;
-   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleSortir(&verrouGeneralDuNoyau);
 #endif
 
    // On rend la main
