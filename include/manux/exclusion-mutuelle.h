@@ -9,6 +9,7 @@
 #define EXCLUSION_MUTUELLE_DEF
 
 #include <manux/types.h>
+#include <manux/atomique.h>     // Atomique
 #include <manux/listetaches.h>  // Pour les listes de tâches en attente
 
 /**

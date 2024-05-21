@@ -18,7 +18,8 @@
 #include <manux/memoire.h>  // NULL
 #include <manux/kmalloc.h>  // NULL
 #include <manux/string.h>   // memcpy
-#include <manux/atomique.h> // exclusions mutuelles
+#include <manux/exclusion-mutuelle.h> 
+#include <manux/condition.h> 
 
 MethodesFichier tubeMethodesFichier;
 

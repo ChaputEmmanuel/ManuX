@@ -9,6 +9,7 @@
 
 #include <manux/config.h>
 #include <manux/stdarg.h>
+#include <manux/stddef.h>   // size_t
 #ifdef MANUX_FICHIER
 #include <manux/fichier.h>
 #endif
@@ -54,6 +55,14 @@ int sprintk(char * str, char * format, ...);
  * @brief : Écriture formattée dans une chaîne de caractères
  */
 int vsprintk(char * str, char * format, va_list argList);
+
+/**
+ * @brief : Écriture formattée dans une chaîne de caractères
+ *
+ * C'est cette fonction qui doit être utilisée pour écrire dans une
+ * chaîne de caractères
+ */
+int snprintk(char * str, size_t l, char * format, ...);
 
 #ifdef MANUX_FICHIER
 #define fprintk(f, format, ...) \

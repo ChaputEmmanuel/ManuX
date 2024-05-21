@@ -8,13 +8,10 @@
 #define MEMOIRE_DEF
 
 #include <manux/types.h>
+#include <manux/stddef.h>    // NULL
 
 #ifdef MANUX_AS
 #   include <manux/appelsysteme.h> /* ParametreAS */
-#endif
-
-#ifndef NULL
-#   define NULL 0
 #endif
 
 #define MANUX_DEBUT_MEMOIRE_ETENDUE 0x100000

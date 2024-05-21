@@ -18,7 +18,7 @@
 #   include <manux/tubes.h>       // sys_tube
 #endif
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
-#   include <manux/atomique.h>    // Mutex
+#   include <manux/exclusion-mutuelle.h>    // Mutex
 #endif
 
 #include <manux/horloge.h>
@@ -100,7 +100,7 @@ void initialiserAppelsSysteme()
 
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
    tacheDansLeNoyau= 0;
-   initialiserExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleInitialiser(&verrouGeneralDuNoyau);
 #endif   
 }
 
@@ -116,7 +116,7 @@ void entrerAppelSysteme(uint32_t num)
 #   ifdef MANUX_TUBE_REENTRANT
    if (num != NBAS_TUBE) {
 #   endif
-   entrerExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
    assert(tacheDansLeNoyau == 0);
    tacheDansLeNoyau = tacheEnCours->numero;
 #   ifdef MANUX_TUBE_REENTRANT
@@ -143,7 +143,7 @@ void sortirAppelSysteme(uint32_t num)
    if (num != NBAS_TUBE) {
 #   endif
    tacheDansLeNoyau = 0;
-   sortirExclusionMutuelle(&verrouGeneralDuNoyau);
+   exclusionMutuelleSortir(&verrouGeneralDuNoyau);
 #   ifdef MANUX_TUBE_REENTRANT
    }
 #   endif

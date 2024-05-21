@@ -17,12 +17,14 @@
 
 #include <config/base.h>
 #include <config/plan-memoire.h>
+#include <config/pc-i386.h>
+#include <config/gestion-memoire.h>
+#include <config/kmalloc.h>
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/journal.h>
 #include <config/systeme-fichiers.h>
 #undef MANUX_TUBES
-#include <config/kmalloc.h>
 
 #include <config/verifications.h>
 

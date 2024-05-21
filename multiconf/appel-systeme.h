@@ -25,7 +25,10 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/usr.h>
-
+#include <config/synchronisation.h>
+#undef MANUX_ATOMIQUE_AUDIT
+#undef MANUX_CONDITION_AUDIT
+#undef MANUX_EXCLUSION_MUTUELLE_AUDIT
 #include <config/verifications.h>
 
 #endif  // MANUX_CONFIG

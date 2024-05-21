@@ -24,6 +24,10 @@
 #include <config/printk.h>
 #include <config/gestion-memoire.h>
 #include <config/pc-i386.h>    // Besoin des inter pour les tâches
+#include <config/synchronisation.h>
+#undef MANUX_ATOMIQUE_AUDIT
+#undef MANUX_EXCLUSION_MUTUELLE_AUDIT
+#undef MANUX_CONDITION_AUDIT
 #include <config/taches.h>
 #include <config/appels-systeme.h>
 #include <config/usr.h>

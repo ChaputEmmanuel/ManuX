@@ -16,6 +16,7 @@
 
 #include <config/base.h>
 #include <config/bootloader.h>
+#include <config/pc-i386.h>
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>

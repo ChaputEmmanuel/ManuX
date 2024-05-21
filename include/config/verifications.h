@@ -72,10 +72,18 @@
 #   error "MANUX_ATOMIQUE_AUDIT nécessite MANUX_KMALLOC"
 #endif
 
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT) && !defined(MANUX_KMALLOC)
+#   error "MANUX_EXCLUSION_MUTUELLE_AUDIT nécessite MANUX_KMALLOC"
+#endif
+
 #if defined(MANUX_HERITER_FICHIERS) && !defined(MANUX_KMALLOC)
 #   error "MANUX_HERITER_FICHIERS nécessite MANUX_KMALLOC"
 #endif
 
 #if defined(MANUX_FICHIER) && !defined(MANUX_PRINTK)
 #   error "MANUX_FICHIER nécessite MANUX_PRINTK"
+#endif
+
+#if defined(MANUX_GESTION_MEMOIRE) && !defined(MANUX_LIBI386)
+#   error "MANUX_GESTION_MEMOIRE nécessite MANUX_LIBI386"
 #endif

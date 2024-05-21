@@ -40,7 +40,7 @@ void startManuX()
 
    // Initialisation de la console virtio
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == 0/*ESUCCES*/) {
-     ouvrirFichier(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
+      fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
       journalAffecterFichier(&fichierVirtioConsole);
    }
    

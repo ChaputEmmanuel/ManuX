@@ -5,8 +5,11 @@
  *                                                    (C) Manu Chaput 2000-2024
  */
 #include <manux/exclusion-mutuelle.h>
+#include <manux/stddef.h>   // NULL
+#include <manux/debug.h>    // assert, ...
+#include <manux/kmalloc.h>    // kmalloc, ...
 
-#if defined(MANUX_CONDITION_MUTUELLE_AUDIT)
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
 
 /**
  * @brief Définition des listes d'exclusions mutuelles pour pouvoir
@@ -70,27 +73,6 @@ void listeExclusionsMutuellesInserer(ListeExclusionsMutuelles * l, ExclusionMutu
 static ListeExclusionsMutuelles * listeExclusionsMutuelles = NULL;
 
 /**
- * @brief Initialisation d'une exclusion mutuelle
- */
-void exclusionMutuelleInitialiser(ExclusionMutuelle * em)
-{
-   atomiqueInit(&(em->verrou), 0);
-   initialiserListeTache(&(em->tachesEnAttente));
-
-#if defined(MANUX_CONDITION_MUTUELLE_AUDIT)
-   em->nbEntrees = 0;
-   em->nbSorties = 0;
-
-   if (listeExclusionsMutuelles == NULL) {
-      listeExclusionsMutuelles = listeExclusionsMutuellesCreer();
-   }
-   if (listeExclusionsMutuelles != NULL) {
-      listeExclusionsMutuellesInserer(listeExclusionsMutuelles, em);
-   }
-#endif
-};
-
-/**
  * @brief Affichage de l'état des variables d'exclusion mutuelle
  */
 void exclusionsMutuellesAfficherEtat()
@@ -117,7 +99,28 @@ void exclusionsMutuellesAfficherEtat()
    printk("--------+------+------+--------\n");
 }
 
-#endif // defined(MANUX_CONDITION_MUTUELLE_AUDIT)
+#endif // defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
+
+/**
+ * @brief Initialisation d'une exclusion mutuelle
+ */
+void exclusionMutuelleInitialiser(ExclusionMutuelle * em)
+{
+   atomiqueInit(&(em->verrou), 0);
+   initialiserListeTache(&(em->tachesEnAttente));
+
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
+   em->nbEntrees = 0;
+   em->nbSorties = 0;
+
+   if (listeExclusionsMutuelles == NULL) {
+      listeExclusionsMutuelles = listeExclusionsMutuellesCreer();
+   }
+   if (listeExclusionsMutuelles != NULL) {
+      listeExclusionsMutuellesInserer(listeExclusionsMutuelles, em);
+   }
+#endif
+};
 
 /**
  * @brief Entrée en exclusion mutuelle.
@@ -148,7 +151,7 @@ void exclusionMutuelleEntrer(ExclusionMutuelle * em)
    };
 
    // Je peux tranquilement modifier le compteur !  
-#if defined(MANUX_CONDITION_MUTUELLE_AUDIT)
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
    em->nbEntrees++;
 #endif
 }
@@ -167,7 +170,7 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em)
    }
    // Le verrou est encore à nous, on peut modifier les compteurs sans
    // crainte 
-#if defined(MANUX_CONDITION_MUTUELLE_AUDIT)
+#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
    (em)->nbSorties++ ;
 #endif
    // On déverouille

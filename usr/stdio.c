@@ -15,7 +15,6 @@ int vsnprintk(char * str, const size_t l, char * format, va_list argList);
 
 #define MAX_PRINTF_LENGTH 64
 
-#define NULL ((void *)0)
 #define chiffre "0123456789abcdef"
 
 appelSysteme3(NBAS_ECRIRE, int, ecrire, int, void *, int);

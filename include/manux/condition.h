@@ -10,6 +10,7 @@
 
 #include <manux/types.h>
 #include <manux/listetaches.h>  // Pour les listes de tâches en attente 
+#include <manux/exclusion-mutuelle.h>
 
 /**
  * @brief Définition des conditions

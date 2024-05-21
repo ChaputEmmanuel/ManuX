@@ -18,7 +18,7 @@ OUTILS      = ./outils/taillenoyau ./outils/makeconfig
 # ils sont édités dans l'arborescence du noyau et doivent donc être
 # mis à jour dans la partie usr
 USR_INC_D   = usr/include/manux
-USR_INC_F   = appelsystemenum.h types.h string.h i386.h errno.h
+USR_INC_F   = appelsystemenum.h types.h string.h i386.h errno.h stddef.h
 USR_INC     = $(USR_INC_F:%.h=$(USR_INC_D)/%.h)
 
 # Quels sont les composants d'un noyau fonctionnel (hors processus de boot)
@@ -144,7 +144,7 @@ $(ISO_FICHIER) : iso
 #...............................................................................
 multiso :
 	(rm -rf noyaux/* $(ISO_REP_BASE)/* | true)
-	(for c in $(ROOTDIR)/multiconf/*.h ; do (echo "\033[0;34m*****" ; echo "*****  Construction de $$c *****" ;echo "*****\033[0m" ;  make clean ; ( make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) ; cp noyau/noyaumb.elf noyaux/`basename $$c .h` ) || true ) ; done )
+	for c in $(ROOTDIR)/multiconf/*.h ; do n=`basename $$c .h` ; echo -n "\033[0;34m* Construction de $$n ... " ;  make clean > /dev/null 2>&1 ;  if make MANUX_FICHIER_CONFIG="$$c" $(NOYAUMB_ELF) > /dev/null 2>&1 ; then  cp noyau/noyaumb.elf noyaux/`basename $$c .h` ;  echo "\033[0;32m Oui" ; else echo "\033[1;31m Non"; fi ; echo -n "\033[1;37m" ; done  ; echo
 	$(CREER_ISO) $(ISO_REP_BASE) $(ISO_FICHIER) noyaux/*
 
 #-------------------------------------------------------------------------------

@@ -12,7 +12,7 @@
 #   include <manux/listetaches.h>
 #endif
 
-#if defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
+#if defined(MANUX_CONDITION_AUDIT) && defined(MANUX_KMALLOC)
 
 /**
  * @brief Définition des listes de conditions
@@ -99,7 +99,7 @@ void conditionsAfficherEtat()
    printk("--------+------+------+--------\n");
 }
 
-#endif //  defined(MANUX_ATOMIQUE_AUDIT) && defined(MANUX_KMALLOC)
+#endif //  defined(MANUX_CONDITION_AUDIT) && defined(MANUX_KMALLOC)
 
 
 /**
@@ -109,7 +109,7 @@ void conditionInitialiser(Condition * cond)
 {
    initialiserListeTache((&cond->tachesEnAttente));
 
-#if defined(MANUX_ATOMIQUE_AUDIT)
+#if defined(MANUX_CONDITION_AUDIT)
    cond->nbSignaler = 0;
    cond->nbDiffuser = 0;
 
@@ -175,7 +175,7 @@ void conditionSignaler(Condition * cond)
                           ta,
                           (CelluleTache*)ta+sizeof(Tache));
    }
-#if defined(MANUX_ATOMIQUE_AUDIT)
+#if defined(MANUX_CONDITION_AUDIT)
    cond->nbSignaler++;
 #endif
 }
@@ -200,7 +200,7 @@ void conditionDiffuser(Condition * cond)
                           ta,
                           (CelluleTache*)ta+sizeof(Tache));
    }
-#if defined(MANUX_ATOMIQUE_AUDIT)
+#if defined(MANUX_CONDITION_AUDIT)
    cond->nbDiffuser++;
 #endif
 }
