@@ -71,7 +71,7 @@ void gestionExceptionDiv0(TousRegistres registres,
 			  uint32_t numEx, uint32_t errCode,
 			  uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-   printk("Vers l'infini et au dela, ...\n");
+   printk("Panique division par 0, ...\n");
    gestionExceptionPanique(registres, numEx, errCode, eip, cs, eFlags);
 }
 

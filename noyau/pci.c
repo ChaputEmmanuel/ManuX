@@ -128,6 +128,11 @@ void PCIEnumerationDesEquipements()
       // Lecture des numéros de vendeur et d'équipement
       idVendeur = PCILireMot(0, numEquipement, 0, PCI_ID_VENDEUR);
       if (idVendeur != PCI_AUCUN_VENDEUR) {
+	 if (PCINombreEquipements >= MANUX_NB_MAX_EQUIPEMENTS_PCI) {
+	    printk(PRINTK_CRITIQUE"Trop d'equipements PCI pour moi (%d vs %d)!\n",
+		   PCINombreEquipements, MANUX_NB_MAX_EQUIPEMENTS_PCI);
+            return;
+	 }
          idEquipement = PCILireMot(0, numEquipement, 0, PCI_ID_EQUIPEMENT);
 
 	 // Les identifiants
@@ -160,12 +165,7 @@ void PCIEnumerationDesEquipements()
 	 
          printk_debug(DBG_KERNEL_PCI, "[%d] Vendeur/Id 0x%x/0x%x\n",
 		      PCINombreEquipements, idVendeur, idEquipement);
-
 	 PCINombreEquipements++;
-	 if (PCINombreEquipements >= MANUX_NB_MAX_EQUIPEMENTS_PCI) {
-            printk(PRINTK_CRITIQUE"Trop d'equipements PCI pour moi !\n");
-            return;
-	 }
       }
    }
    printk_debug(DBG_KERNEL_PCI, "%d equipements PCI\n", PCINombreEquipements);

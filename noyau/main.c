@@ -177,7 +177,7 @@ void startManuX()
    sfInitialiser();
    printk_debug(DBG_KERNEL_START, "Systeme de fichiers initialise\n");
 #endif
-   
+
 #ifdef MANUX_RAMDISK
    // Initialisation du ramdisk 
    if (infoSysteme.tailleRamdisk > 0) {
@@ -201,6 +201,7 @@ void startManuX()
    initialiserScheduler();
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
+   while(1){};   
 
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();

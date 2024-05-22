@@ -6,7 +6,7 @@
 /*
  * Du réseau
  */
-//#define MANUX_VIRTIO_NET
+#define MANUX_VIRTIO_NET
 
 /*
  * Une console
