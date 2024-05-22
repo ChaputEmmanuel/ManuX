@@ -2,7 +2,7 @@
  * @file :
  * @brief : Un exemple de début de noyau.
  *                                                                            
- *                                                     (C) Manu Chaput 2000-2023
+ *                                                     (C) Manu Chaput 2000-2024
  **/
 #undef MANUX_RAMDISK
 

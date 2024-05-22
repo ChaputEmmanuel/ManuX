@@ -1,8 +1,8 @@
 /**
  * @file multiconf/virtio-cons.h
- * @brief Exemple de configuration pour l'utilisation des consoles virtio.
+ * @brief Affichage de messages sur une console virtuelle de type virtio.
  *
- *                                                     (C) Manu Chaput 2000-2023
+ *                                                     (C) Manu Chaput 2000-2024
  */
 
 #ifdef MANUX_FICHIER_CONFIG

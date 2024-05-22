@@ -185,7 +185,7 @@ canevas : unifdef.conf
 #    Tentative d'affichage des configurations disponibles
 #-------------------------------------------------------------------------------
 CFG_LIST :
-	@(for f in multiconf/*.h ; do c=`basename -s .h  $$f` ; make CFG=$$c clean make.conf >/dev/null 2>&1; make CFG=$$c affiche_config ; done)
+	@(for f in multiconf/*.h ; do c=`basename -s .h  $$f` ; make CFG=$$c clean make.conf >/dev/null 2>&1; make --no-print-directory CFG=$$c affiche_config ; done)
 
 # Attention, la rêgle suivante doit être invoquée avec un CFG cohérent
 # avec le fichier de config
