@@ -16,9 +16,6 @@ void startManuX()
 {
    void * p;
 
-   // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-   
    // Initialisation de la console noyau
    consoleInitialisation();
 

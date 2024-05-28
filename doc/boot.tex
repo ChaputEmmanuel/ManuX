@@ -321,7 +321,7 @@ nous fournir ces informations.
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
 par la {\em Free Software Foundation} qui va nous permettre d'utiliser
-les services d'outils tels que GRUB afin de grandement simplifier
+les services d'outils tels que \grub afin de grandement simplifier
 le chargement du noyau de ManuX.
 
    Cela nous permettra également d'utiliser des outils un peu plus
@@ -335,8 +335,8 @@ hors d'age !
 \subsection{Structure du fichier chargé par {\em Multiboot}}
 
    Nous devons construire un fichier qui sera fourni à {\em
-Multiboot}.  Nous allons utiliser ici la version 1 de {\em Multiboot} et
-non {\em Multiboot2}. On trouvera la spécification par exemple
+Multiboot}.  Nous allons utiliser ici la version 1 de {\em Multiboot} (et
+non {\em Multiboot2}). On trouvera la spécification par exemple
 \href{ici}{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html}.
 
    Un tel fichier contient essentiellement notre noyau, mais doit avoir
@@ -355,8 +355,25 @@ une structure particulière afin d'être pris en charge~:
      adresse physique en mémoire. 
 \end{itemize}
 
-   Le programme exécutable, c'est évidemment ManuX. Nous allons
-décrire maintenant la structure de l'entête.
+   Le programme exécutable, c'est évidemment le noyau. L'entête est un
+des éléments permettant l'interface entre le bootloader et le noyau.
+
+   En effet, le bootloader et le noyau doivent pouvoir se
+``reconnaître'' (c'est-à-dire savoir chacun que l'autre implante la
+même version de {\em Multiboot}) et, le cas échéant, ils doivent
+échanger des informations.
+
+   C'est d'abord le bootloader qui est exécuté, il doit donc se
+contenter d'informations statiques pour reconnaître le noyau et lire
+les informations qui le caractérisent. C'est à cela que sert l'entête
+: à décrire le noyau. Nous allons décrire la structure de l'entête
+dans la sous-section suivante.
+
+   Lorsque le noyau s'exécute ensuite, le bootloader a fini son
+travail, et il aura pu laisser en mémoire des informations construites
+dynamiquement pour que le noyau le reconnaisse et profite de ces
+informations. Nous décrirons donc ensuite ce passage d'information
+dans la sous-section \ref{subsection:bootparam}
      
 %-------------------------------------------------------------------------------
 %
@@ -364,21 +381,180 @@ décrire maintenant la structure de l'entête.
 \subsection{Structure de l'entête}
 
    Le système {\em Multiboot} nécessite donc un entête devant le noyau
-avec des caractéristiques bien définies.
+avec des caractéristiques bien définies. Cette interface est
+relativement légère et constituée d'une structure de quelques dizaines
+d'octets. Elle est décrite par exemple sur la  page
+https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Architecture
 
+   Le premier champ (intitulé \lstinline!magic!) doit avoir une valeur
+bien définie (\lstinline!0x1BADB002!), ce qui permet au bootloader de
+savoir qu'il a bien affaire à un noyau qui implante le protocole {\em
+  Multiboot}.
+
+   Le deuxième champ (intitulé \lstinline!flags!) permet de spécifier
+quelques contraintes dans la gestion du noyau (quant à la gestion de
+la mémoire ou de la vidéo).
+
+   Le  troisième champ (\lstinline!checksum!) est une somme de
+contrôle sur les deux champs précédents.
+
+   Les autre champs doivent être présents, mais leur utilité est
+conditionnée par le champ \lstinline!flags!, nous ne nous y
+intéresserons pas ici.   
+
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Passage d'informations depuis le bootloader}
+\label{subsection:bootparam}
+
+   À son tour le bootloader doit s'identifier auprès du noyau (afin
+que ce dernier sache comment il est arrivé là et quelles informations
+lui sont donc disponibles) et lui fournir des informations décrivant
+le système.
+
+   En ce qui concerne l'identification, elle va simplement consister
+en l'initialisation du registre \lstinline!eax! avec une valeur bien
+définie, en l'occurence \lstinline!0x2BADB002!.
+
+   Les paramètres passés par le bootloader seront quand à eux placés
+dans une zone mémoire dont l'adresse est fournie au travers du
+registre \lstinline!ebx!.
+
+   Le format de cette zone mémoire est décrit dans la spécification de
+ {\em Multiboot}, je ne vais donc pas la reprendre ici.
 
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{L'entête de ManuX}
+\subsection{L'implantation dans ManuX}
 
-   En ce qui concerne ManuX, il est
+   ManuX fait une utilisation minimaliste de {\em Multiboot} : un
+fichier d'entête va être ajouté au noyau de sorte à ce qu'il puisse
+être pris en charge par \grub. Quelques informations seront ensuite
+utilisées par le noyau : la taille de la mémoire disponible, et les
+paramètres de la ligne de commande.  
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Structure de l'entête}
+
+   En ce qui concerne ManuX, l'entête est
 implanté dans le fichier \fichier{boot}{mb-manux}{nasm}.
 
-   Ce fichier contient essentiellement quelques éléments permettant à
-{\em Multiboot} de le reconnaitre puis du code permettant de démarrer
-véritablement le noyau par un appel à la fonction \lstinline!_start()!
-qui sera implantée dans le fichier \fichier{noyau}{main}{c}.
+   Comme expliqué précédemment, ce fichier contient essentiellement
+quelques éléments permettant à {\em Multiboot} de comprendre que ManuX
+est compatible avec {\em Multiboot}.
+
+   Dans ManuX, nous allons simplement demander au bootloader de nous
+informer sur la mémoire disponible. Le champ \lstinline!flags! sera
+donc positionné avec un bit à un.
+
+   Le début de l'entête est donc simplement celui-ci :
+
+\begin{lstlistings}
+;-------------------------------------------------------------------------------
+; Quelques macros spécifiques à multiboot
+;-------------------------------------------------------------------------------
+MULTIBOOT_PAGE_ALIGN   equ 0x00000001 ; Alignement des modules sur des pages
+MULTIBOOT_MEMORY_INFO  equ 0x00000002 ; Pour que multiboot nous donne le plan
+
+;-------------------------------------------------------------------------------
+; Définition de notre entête
+;-------------------------------------------------------------------------------
+FLAGS    equ  MULTIBOOT_MEMORY_INFO 
+MAGIC    equ  0x1BADB002        
+CHECKSUM equ -(MAGIC + FLAGS)
+header_addr   dd 0
+load_addr     dd 0
+load_end_addr dd 0
+bss_end_addr  dd 0
+entry_addr    dd 0
+mode_type     dd 0
+width         dd 0
+height        dd 0
+depth         dd 0
+
+;-------------------------------------------------------------------------------
+; L'entête à proprement parler
+;-------------------------------------------------------------------------------
+section .multiboot
+align 4
+	dd MAGIC
+	dd FLAGS
+	dd CHECKSUM
+\end{lstlistings}  
+
+   Cependant, pour simplifier un peu le passage de paramètre depuis le
+bootloader vers le noyau, l'entête contient également un peu de
+code.
+
+   Ce code va copier la signature du bootloader (qui se trouve,
+d'après le protocole {\em Multiboot} dans le registre \lstinline!eax!)
+ainsi que le pointeur sur la structure de données fourni par le
+bootloader (pointeur passé dans le registre \lstinline!ebx!) vers deux
+variables déclarées dans le noyau. Elles pourront ainsi être
+manipulées plus confortablement par la suite (car le compilateur
+risque de très rapidement utiliser ces registres généraux).
+
+   Une fois cette copie faite, ce code va pouvoir démarrer
+ véritablement le noyau par un appel à la fonction
+\lstinline!startManuX()! qui sera implantée dans le fichier
+\fichier{noyau}{main}{c}.
+
+   La fin du fichier d'entête est donc finalement la suivante :
+
+\begin{lstlistings}
+;-------------------------------------------------------------------------------
+; Le code de démarrage. On se contente d'initialiser le pointeur de pile, car
+; ce n'est pas prévu par multiboot. Apparemment GRUB le fait, mais pas le
+; loader de qemu par exemple.
+;-------------------------------------------------------------------------------
+global _startManuX
+extern _adresseLimitePileManuX
+extern startManuX
+extern signatureBootloader
+extern _infoSysteme
+
+_startManuX : 
+	mov esp, _adresseLimitePileManuX ; Initialisation du pointeur de pile
+        mov [signatureBootloader], eax   ; On fournit la signature du bootloader
+        mov [_infoSysteme], ebx          ; Le pointeur sur les informations
+
+        call startManuX                  ; C'est parti
+ 
+	cli
+.FinDesTemps:	hlt
+	jmp .FinDesTemps
+\end{lstlistings}
+   
+%...............................................................................
+%
+%...............................................................................
+\subsubsection{Récupération des informations fournies par le bootloader}
+
+   Grâce à l'entête ainsi construit, ManuX va pouvoir avoir accès aux
+informations fournies par le bootloader au travers des deux variables
+\lstinline!signatureBootloader! et \lstinline!_infoSysteme!. Une
+difficulté provient du fait que la majorité de ces informations sont
+dans une zone mémoire qui risque d'être écrasée lors de
+l'initialisation du noyau.
+
+   Pour remédier à ce problème, quelques outils sont définis dans
+\fichier{manux}{bootloader}{h} et implantés dans
+\fichier{noyau}{bootloader}{c}.
+
+   La structure \lstinline!InfoSysteme! décrit le début des données
+fournies par le bootloader. Elle ne couvre que les éléments qui
+intéressent ManuX : la taille mémoire et la ligne de commande.
+
+   La fonction \lstinline!bootloaderInitialiser()! a pour rôle
+d'initialiser des variables de ManuX en fonction du contenu de cette
+structure (qui est appelée à disparaître).
+
+   Elle doit être invoquée très tôt lors du démarrage de ManuX, a
+minima avant l'initialisation de la mémoire.
 
 %-------------------------------------------------------------------------------
 %

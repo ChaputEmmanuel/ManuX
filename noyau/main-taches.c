@@ -33,9 +33,6 @@ void startManuX()
 {
    Tache * t0, *t1;
 
-   // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-   
    // Initialisation de la console noyau
    consoleInitialisation();
 

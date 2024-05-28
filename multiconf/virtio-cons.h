@@ -30,6 +30,7 @@
 #include <config/pc-i386.h>
 #include <config/pci.h>
 #include <config/virtio.h>
+#undef MANUX_VIRTIO_NET
 
 #include <config/verifications.h>
 

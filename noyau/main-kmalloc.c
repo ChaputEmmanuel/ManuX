@@ -45,8 +45,8 @@ void testerKmalloc()
 void startManuX()
 {
    // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-   
+   bootloaderInitialiser();
+
    // Initialisation de la console noyau
    consoleInitialisation();
 

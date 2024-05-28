@@ -24,16 +24,9 @@ INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
 extern void init(); // Faire un init.h
 
-#ifdef MANUX_VIRTIO_CONSOLE
-INoeud iNoeudVirtioConsole;
-Fichier fichierVirtioConsole;
-#endif
-
 void startManuX()
 {
    // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-
    bootloaderInitialiser();
 
    initialiserMemoire(infoSysteme.memoireDeBase,

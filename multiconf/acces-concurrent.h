@@ -31,8 +31,6 @@
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>
 #include <config/clavier.h>
-#include <config/virtio.h>
-#include <config/pci.h>
 #include <config/stdlib.h>
 #include <config/usr.h>
 

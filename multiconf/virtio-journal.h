@@ -29,7 +29,7 @@
 #include <config/intel-8259a.h>
 #include <config/pci.h>
 #include <config/virtio.h>
-
+#undef MANUX_VIRTIO_NET
 #include <config/verifications.h>
 
 #endif  // MANUX_CONFIG

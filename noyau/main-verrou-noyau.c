@@ -40,9 +40,6 @@ void startManuX()
       char     caracteres[13];
    } descriptionProc;
 
-   // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-   
    // Initialisation de la console noyau
    consoleInitialisation();
 

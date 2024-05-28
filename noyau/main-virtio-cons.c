@@ -30,9 +30,6 @@ void startManuX()
    INoeud iNoeudVirtioConsole;
    Fichier fichierVirtioConsole;
    
-   // Récupération des informations depuis le bootloader
-   bootloaderLireInfo();
-   
    // Initialisation de la console noyau
    consoleInitialisation();
 

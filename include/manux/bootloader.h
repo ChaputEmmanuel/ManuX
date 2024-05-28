@@ -2,23 +2,29 @@
  * @file bootloader.h
  * @brief Interfaçage avec les bootloader
  *                                                                          
- *                                                (C) Manu Chaput 2000 - 2023 
-                                                                              */
+ *                                                (C) Manu Chaput 2000 - 2024 
+ */
 #ifndef BOOTLOADER_CONFIG
 #define BOOTLOADER_CONFIG
 
 #include <manux/types.h>     // uint...
+#include <manux/string.h>    // memcpy
 
 /**
  * @brief la signature d'un chargement par multiboot (legacy)
  */
-#define MULTIBOOT_MAGIC 0x2BADB002
+#define MULTIBOOT_SIGNATURE 0x2BADB002
+
+/**
+ * @brief Valeur passée via %eax par le bootloader pour s'identifier
+ */ 
+extern uint32_t signatureBootloader;
 
 /**
  * @brief la signature d'un chargement par init-manux
  */
-#ifndef MANUX_INIT_MAGIC
-#   define MANUX_INIT_MAGIC 0x01c0ffee
+#ifndef MANUX_INIT_SIGNATURE
+#   define MANUX_INIT_SIGNATURE 0x01c0ffee
 #endif
 
 /**
@@ -40,19 +46,26 @@ typedef struct _InfoSysteme {
    char *   ligneCommande;
 } InfoSysteme;
 
+
+/**
+ * @brief Stockage des informations décrivant le système fournies par
+ * le bootloader.
+ */
 extern InfoSysteme infoSysteme;
+
+/**
+ * @brief Adresse de la zone mémoire dans laquelle le bootloader nous
+ * fournit les informations sur le système.
+ */
+extern InfoSysteme * _infoSysteme;
 
 /**
  * @brief Lecture des informations fournies par le bootloader
  *
- * Cette fonction doit être la toute première invoquée car le passage
- * de paramètres se fonde en particulier sur le contenu de certains
- * registres.
- */
-void bootloaderLireInfo();
-
-/**
- * @brief On prend le temps de construire les structures de données ici
+ * Cette fonction doit être invoquée relativement tôt, car elle a la
+ * charge de recopier des informations fournies par le bootloader. Ces
+ * informations sont dans une zole mémoire que l'on risque ensuite
+ * d'utiliser.
  */
 void bootloaderInitialiser();
 
