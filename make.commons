@@ -48,6 +48,8 @@ ASM         = nasm
 ASM_BIN_OPT = -f bin
 ASM_ELF_OPT = -f elf32 -g3 -F dwarf
 
+# Attention, tous les define ne sont pas passés à nasm par défaut
+
 ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
               -D MANUX_INIT_START_ADDRESS=$(MANUX_INIT_START_ADDRESS) \
 	      -D MANUX_INIT_MAGIC=$(MANUX_INIT_MAGIC) \
@@ -66,6 +68,8 @@ ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
 	      -D MANUX_NB_INTERRUPTIONS=$(MANUX_NB_INTERRUPTIONS) \
 	      -D MANUX_NB_EXCEPTIONS=$(MANUX_NB_EXCEPTIONS) \
               -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK)
+
+ASM_DEF += $(if $(MANUX_BOOTLOADER), -D MANUX_BOOTLOADER)
 
 #--------------------------------------------------------------------------
 #   Création des images

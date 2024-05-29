@@ -2,7 +2,7 @@
  * @file bootloader.c
  * @brief Gestion de l'interfaçage avec le bootloader
  *
- *                                                  (C) Manu Chaput 2000-2023 
+ *                                                     (C) Manu Chaput 2000-2024 
  */
 #include <manux/bootloader.h>
 #include <manux/debug.h>     // paniqueNoyau

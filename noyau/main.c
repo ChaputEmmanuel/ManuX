@@ -87,7 +87,9 @@ void startManuX()
    consoleInitialisation();
 #endif
 
+#ifdef MANUX_BOOTLOADER
    bootloaderInitialiser();
+#endif
    
 #ifdef MANUX_RAMDISK
    uint32_t adresseRamdisk = infoSysteme.adresseRamdiskHi * 65536

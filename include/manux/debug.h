@@ -33,8 +33,7 @@
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
 #define masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_START      \
- | DBG_KERNEL_PCI        \
+ | DBG_KERNEL_START         \
  			       )
 #define masqueDebugageFichier (0x00000000\
 			       )
