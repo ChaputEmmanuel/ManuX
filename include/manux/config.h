@@ -17,6 +17,7 @@
 #define MANUX_CONFIG
 
 #include <config/base.h>
+#include <config/debug.h>
 #include <config/plan-memoire.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
 #include <config/systeme-fichiers.h>
@@ -26,7 +27,6 @@
 #include <config/consoles-virtuelles.h>
 #include <config/printk.h>
 #include <config/journal.h>
-#include <config/noyau.h>
 #include <config/taches.h>
 #include <config/synchronisation.h>
 #include <config/gestion-memoire.h>

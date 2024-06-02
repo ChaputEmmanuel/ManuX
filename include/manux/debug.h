@@ -15,7 +15,9 @@
 #   include <manux/horloge.h>    // nbTopHorloge
 #endif
 
-
+/**
+ * @brief Définition des différents flags 
+ */
 #define DBG_KERNEL_ERREUR     0x00000001
 #define DBG_KERNEL_START      0x00000002
 #define DBG_KERNEL_PAGIN      0x00000004
@@ -32,11 +34,22 @@
 #define DBG_KERNEL_TUBE       0x00002000
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
+/**
+ * @brief Définition des masques de débugage
+ */
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_START         \
  			       )
-#define masqueDebugageFichier (0x00000000\
+# define masqueDebugageFichier (0x00000000\
 			       )
+
+#ifdef MANUX_DEBUGMASK_VAR
+   extern uint32_t _masqueDebugageConsole;
+   extern uint32_t _masqueDebugageFichier;
+#else
+#   define _masqueDebugageConsole masqueDebugageConsole 
+#   define _masqueDebugageFichier masqueDebugageFichier 
+#endif // MANUX_DEBUGMASK_VAR
 /*
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
@@ -56,20 +69,20 @@
  */
 #ifdef MANUX_LIBI386  // pour les tops horloge
 #define printk_debug(lvl, fmt, args...)	 \
-   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
+   if (((lvl)& _masqueDebugageConsole) && ((lvl)& _masqueDebugageFichier)) {     \
       printk("{7} [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& masqueDebugageFichier) {				\
+   } else if ((lvl)& _masqueDebugageFichier) {				\
       printk("(7) [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& masqueDebugageConsole) {				\
+   } else if ((lvl)& _masqueDebugageConsole) {				\
       printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
    }
 #else
 #define printk_debug(lvl, fmt, args...)	 \
-   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
+   if (((lvl)& _masqueDebugageConsole) && ((lvl)& _masqueDebugageFichier)) {     \
       printk("{7} %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& masqueDebugageFichier) {				\
+   } else if ((lvl)& _masqueDebugageFichier) {				\
       printk("(7) %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& masqueDebugageConsole) {				\
+   } else if ((lvl)& _masqueDebugageConsole) {				\
       printk("[7] %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
    }
 #endif

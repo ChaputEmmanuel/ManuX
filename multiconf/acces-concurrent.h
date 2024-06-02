@@ -26,7 +26,6 @@
 #include <config/synchronisation.h>
 #include <config/printk.h>
 #include <config/journal.h>
-#include <config/noyau.h>
 #include <config/taches.h>
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>

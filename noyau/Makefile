@@ -22,6 +22,7 @@ OBJETS     +=   $(if $(MANUX_VIRTIO), virtio.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_NET), virtio-net.o)
 OBJETS     +=   $(if $(MANUX_VIRTIO_CONSOLE), virtio-console.o)
 OBJETS     +=   $(if $(MANUX_KMALLOC), $(MANUX_KMALLOC).o)
+OBJETS     +=   $(if $(MANUX_DEBUGMASK_VAR), debug.o)
 
 # Une cible pour compiler les binaires, mais sans édition de liens
 binaries :  $(OBJETS)
