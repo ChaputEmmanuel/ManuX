@@ -38,7 +38,6 @@
  * @brief Définition des masques de débugage
  */
 #define masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_START         \
  			       )
 # define masqueDebugageFichier (0x00000000\
 			       )

@@ -80,6 +80,8 @@ void startManuX()
       char     caracteres[13];
    } descriptionProc;
 
+   printk_debug(DBG_KERNEL_START, "32 bit ManuX running\n");
+   
    // Initialisation de la console noyau
 #ifdef MANUX_FICHIER   
    consoleInitialisationINoeud(&iNoeudConsole);
