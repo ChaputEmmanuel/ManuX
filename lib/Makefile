@@ -14,6 +14,7 @@ OBJETS     += $(if $(MANUX_RAMDISK), ramdisk.o)
 OBJETS     += $(if $(MANUX_JOURNAL), journal.o)
 OBJETS     += $(if $(MANUX_CLAVIER), clavier.o)
 OBJETS     += $(if $(MANUX_STDLIB), stdlib.o)
+OBJETS     += $(if $(MANUX_PARAMETRES), base-de-parametres.o)
 #OBJETS     += $(if $(MANUX_GESTION_MEMOIRE), malloc.o)
 
 libmanux.a : $(MANUX_FICHIER_CONFIG) $(OBJETS)
