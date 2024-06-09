@@ -7,5 +7,5 @@
 /**
  * @brief Gère-t-on une base de paramètres de ManuX ?
  */
-#define MANUX_PARAMETRES
+#define MANUX_REGISTRE
 

@@ -52,3 +52,44 @@ int strlen(const char * s)
    
    return result;
 }
+
+int strncmp(const char *s1, const char *s2, size_t n)
+{
+   int i;
+
+   // On cherche la première différence
+   for (i = 0 ; (i < n) && (s1[i] == s2[i]) ; i++) { }
+
+   // Si on n'en a pas trouvé, c'est égalité, sinon on compare
+   if (i == n) {
+      return 0;
+   } else  if (s1[i] < s2[i]) {
+      return -1;
+   } else {
+     return +1;
+   }
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+   int l1 = strlen(s1);
+   int l2 = strlen(s2);
+   int l = l1;
+   int result;
+
+   if (l2 < l) {
+      l = l2;
+   }
+
+   result = strncmp(s1, s2, l);
+
+   // Si elles sont égales sur la longueur commune
+   if (result == 0) {
+      if (l1 < l2) {
+         return -1;
+      } else if (l2 < l1) {
+ 	return +1;
+      }
+   }
+   return result;
+}

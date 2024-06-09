@@ -1,6 +1,6 @@
 /**
- * @file multiconf/parametres.h
- * @brief Gestion dynamique des paramètres de ManuX
+ * @file multiconf/registre.h
+ * @brief Gestion dynamique des paramètres de ManuX dans un registre
  *
  *                                                     (C) Manu Chaput 2023-2024
  */
@@ -12,7 +12,7 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-#define MANUX_FICHIER_MAIN main-parametres
+#define MANUX_FICHIER_MAIN main-registre
 
 #include <config/base.h>
 #include <config/console.h>

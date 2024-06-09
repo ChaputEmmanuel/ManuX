@@ -14,9 +14,13 @@ void * memcpy(void *dest, const void *src, size_t n);
 
 void * memset(void *dest, int val, size_t n);
 
-  void bcopy (const void *src, void *dest, int n);
+void bcopy (const void *src, void *dest, int n);
 /*
  * Copie de n octets depuis src vers dest.
  */
+
+int strncmp(const char *s1, const char *s2, size_t n);
+
+int strcmp(const char *s1, const char *s2);
 
 #endif

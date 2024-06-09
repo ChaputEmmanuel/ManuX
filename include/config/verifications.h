@@ -87,3 +87,7 @@
 #if defined(MANUX_GESTION_MEMOIRE) && !defined(MANUX_LIBI386)
 #   error "MANUX_GESTION_MEMOIRE nécessite MANUX_LIBI386"
 #endif
+
+#if defined(MANUX_REGISTRE) && !defined(MANUX_KMALLOC)
+#   error "MANUX_REGISTRE nécessite MANUX_KMALLOC"
+#endif
