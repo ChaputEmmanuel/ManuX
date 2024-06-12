@@ -80,8 +80,6 @@ void startManuX()
       char     caracteres[13];
    } descriptionProc;
 
-   printk_debug(DBG_KERNEL_START, "32 bit ManuX running\n");
-   
    // Initialisation de la console noyau
 #ifdef MANUX_FICHIER   
    consoleInitialisationINoeud(&iNoeudConsole);
@@ -131,7 +129,6 @@ void startManuX()
    //journalInitialiserINoeud(&iNoeudConsole);
    printk_debug(DBG_KERNEL_START, "Journal initialise ...\n");
 #endif
-
 
 #ifdef MANUX_PAGINATION
    /* Initialisation de la pagination */

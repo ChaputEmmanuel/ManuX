@@ -38,8 +38,16 @@
  * @brief Définition des masques de débugage
  */
 #define masqueDebugageConsole (0x00000000 \
+ | DBG_KERNEL_ERREUR     \
+ | DBG_KERNEL_START      \
+ | DBG_KERNEL_PAGIN      \
+ | DBG_KERNEL_MEMOIRE    \
  			       )
 # define masqueDebugageFichier (0x00000000\
+ | DBG_KERNEL_ERREUR     \
+ | DBG_KERNEL_START      \
+ | DBG_KERNEL_PAGIN      \
+ | DBG_KERNEL_MEMOIRE    \
 			       )
 
 #ifdef MANUX_DEBUGMASK_VAR

@@ -12,7 +12,7 @@
  * débug affichés est stoqué dans une variable, sinon il est stoqué
  * dans une macro.
  */
-#define MANUX_DEBUGMASK_VAR
+//#define MANUX_DEBUGMASK_VAR
 
 /**
  * @brief Doit-on activer les "assert" ?

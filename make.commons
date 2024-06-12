@@ -106,7 +106,7 @@ COMPRESS = gzip
 #                   -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
 #                   -device virtio-net-pci,disable-legacy=off,tx_queue_size=256,rx_queue_size=256,indirect_desc=off,ctrl_vq=off,page-per-vq=on,mac=c0:ff:ee:de:ad:be,netdev=v1 \
 #--------------------------------------------------------------------------
-RUN_MANUX_RAMSIZE = 128M
+RUN_MANUX_RAMSIZE = 64M
 QEMU_RAMSIZE      = -m $(RUN_MANUX_RAMSIZE)
 QEMU_DEBUG        = -gdb tcp::1234 -S
 
