@@ -5,8 +5,9 @@
  *                                                     (C) Manu Chaput 2000-2024 
  */
 #include <manux/bootloader.h>
-#include <manux/debug.h>     // paniqueNoyau
-#include <manux/string.h>    // memcpy
+#include <manux/debug.h>     // paniqueNoyau, assert
+#include <manux/string.h>    // memcpy, prochainDelimiteur
+#include <manux/registre.h>  // registreSystemeAjouterC
 
 #define CMDLINE_MAX_LENGTH 512
 
@@ -34,7 +35,7 @@ InfoSysteme * _infoSysteme;
  *
  * Cette fonction doit être invoquée relativement tôt, car elle a la
  * charge de recopier des informations fournies par le bootloader. Ces
- * informations sont dans une zole mémoire que l'on risque ensuite
+ * informations sont dans une zone mémoire que l'on risque ensuite
  * d'utiliser.
  */
 void bootloaderInitialiser()
@@ -77,8 +78,51 @@ void bootloaderInitialiser()
    if ((infoSysteme.flags & MULTIBOOT_INFO_CMDLINE) == MULTIBOOT_INFO_CMDLINE) {
       printk_debug(DBG_KERNEL_BOOTLOADER, "Command line : \"%s\"\n", infoSysteme.ligneCommande);
       int l = strlen(infoSysteme.ligneCommande);
-      memcpy(cmdLine, infoSysteme.ligneCommande, ((l > 512)?512:l));
-      cmdLine[(l > 512)?512:l] = 0;
+      memcpy(cmdLine, infoSysteme.ligneCommande, ((l > CMDLINE_MAX_LENGTH)?CMDLINE_MAX_LENGTH:l));
+      cmdLine[(l > CMDLINE_MAX_LENGTH)?CMDLINE_MAX_LENGTH:l] = 0;
       printk_debug(DBG_KERNEL_BOOTLOADER, "Command line : \"%s\"\n", infoSysteme.ligneCommande);
    }
 }
+
+
+#ifdef MANUX_REGISTRE
+/**
+ * @brief Analyse de la ligne de commande et insertion de paramètres
+ * dans le registre
+ */
+#ifndef BOOTLOADER_CMD_SEPARATEUR
+#   define BOOTLOADER_CMD_SEPARATEUR ','
+#endif
+
+void bootloaderLireLigneCmd()
+{
+   char   param[512] ; // Une chaîne de caractères qui contient le
+		  // paramètre en cours d'analyse
+   char * debut, * fin ; // Pointeurs
+   int lgParam;
+   
+   // La ligne de commande est une liste d'éléments séparés par des
+   // BOOTLOADER_CMD_SEPARATEUR
+
+   debut = cmdLine;
+   
+   while (strlen(debut)) {
+      fin = prochainDelimiteur(debut, BOOTLOADER_CMD_SEPARATEUR);
+      assert(fin > debut);   // Puisque strlen(debut) != 0
+      lgParam = fin - debut;
+      memcpy(param, debut, lgParam);
+      param[lgParam] = 0;
+      printk("   -> '%s'\n", param);
+
+      registreSystemeAjouterC(param);
+      
+      // Si on a un séparateur, on avance, sinon, on est sur le 0 final
+      if (*fin == BOOTLOADER_CMD_SEPARATEUR) {
+         debut = fin + 1;
+      } else {
+         debut = fin;
+      }
+   }
+}
+
+#endif

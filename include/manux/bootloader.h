@@ -69,5 +69,14 @@ extern InfoSysteme * _infoSysteme;
  */
 void bootloaderInitialiser();
 
+#ifdef MANUX_REGISTRE
+/**
+ * @brief Analyse de la ligne de commande et insertion de paramètres
+ * dans le registre
+ */
+void bootloaderLireLigneCmd();
+
+#endif
+
 #endif
  

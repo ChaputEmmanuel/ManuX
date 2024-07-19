@@ -93,3 +93,19 @@ int strcmp(const char *s1, const char *s2)
    }
    return result;
 }
+
+/**
+ * @brief Recherche d'un délimiteur dans une chaîne
+ * 
+ * renvoie un pointeur dans la chaine sur le premier délimiteur ou un
+ * pointeur sur le 0 final.
+ */
+char * prochainDelimiteur(char * chaine, char delimiteur)
+{
+   char * result = chaine;
+
+   while ((*result != 0) && (*result != delimiteur)) {
+      result ++;
+   }
+   return result;
+}

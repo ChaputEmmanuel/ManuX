@@ -5,10 +5,11 @@
  *                                                            (C) E. Chaput 2024
  */
 #include <manux/registre.h>
-#include <manux/string.h>               // strlen, memcpy
+#include <manux/string.h>    // strlen, memcpy, prochainDelimiteur
 #include <manux/printk.h>
 #include <manux/kmalloc.h>
-#include <manux/errno.h>                // ENOENT
+#include <manux/errno.h>     // ENOENT
+#include <manux/debug.h>     // assert
 
 /**
  * @brief Un paramètre est simplement une valeur (qui peut être typée)
@@ -17,12 +18,17 @@
 typedef struct _parametre {
    char * nom;
    typeParametre type;
-   union {
+    union {
       char * chaine;
       struct _registre * registre;
       void * pointeur;
       uint32_t  u32;
    } v;
+   void ( (*mettreAJour) (struct _parametre *)); // Invoquée par le
+					    // registre lors d'une
+					    // modification du
+					    // paramètre
+   void * prive;    // Un pointeur à disposition de l'utilisateur
 } parametre;
 
 /**
@@ -70,6 +76,17 @@ parametre * parametreCreer(char * nom, typeParametre type, void * valeur)
    }
    
    return result;
+}
+
+/**
+ * @brief Définition de la fonction de mis à jour du paramètre
+ */
+void parametreDefinirMiseAJour(parametre * param,
+			       void ( (*mettreAJour) (parametre *)),
+			       void * prive)
+{
+   param->mettreAJour = mettreAJour;
+   param->prive = prive;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -198,7 +215,7 @@ registre * registreAjouterSousRegistre(registre * reg, char * nomSr)
 }
 
 /**
- * @brief Ajout dans un reistre d'un paramètre dont le nom est défini
+ * @brief Ajout dans un registre d'un paramètre dont le nom est défini
  * dans un tableau.
  */ 
 void registreAjouterT(registre * reg,
@@ -253,6 +270,81 @@ void registreAjouter(registre * reg,
    va_start(argList, valeur);
    registreAjouterT(reg, type, valeur, argList);
    va_end(argList);
+}
+
+/**
+ * @brief Ajouter dans un registre un paramètre décrit dans une chaîne
+ * de caractères.
+ *
+ * La chaîne doit être sous la forme "a.b.c=v"
+ * Attention, elle va être modifiée !
+ */
+#ifndef REGISTRE_NOM_SEPARATEUR
+#   define REGISTRE_NOM_SEPARATEUR '.'
+#endif
+#ifndef REGISTRE_AFFECTATION
+#   define REGISTRE_AFFECTATION '='
+#endif
+
+void registreAjouterC(registre * reg, char * chaine)
+{
+   char * debut;  // Pointeur sur le début du nom
+   char * fin;    // Pointeur sur la fin du nom courant
+   char   nom[512]; // Une chaine pour héberger temporairement le nom courant
+   int    lgNom;  // Longueur du nom courant
+   char * valeur;
+   registre * regSS = reg; // La base du sous-système dans lequel on
+			   // va introduire
+
+   // On fait pointer valeur sur la représentation ou une chaîne vide
+   valeur = prochainDelimiteur(chaine, REGISTRE_AFFECTATION);
+
+   // On s'assure que le nom (qui précède l'affectation) est terminé
+   // par un 0
+   if (*valeur == REGISTRE_AFFECTATION) {
+      *valeur = 0;
+      valeur ++;
+   }
+   
+   // Nous avons donc maintenant deux chaines de caractères (collées
+   // l'une derrière l'autre) l'une contient un nom, l'autre une
+   // valeur (cette dernière peut être une chaîne vide)
+   debut = chaine;
+   
+   // Il faut maintenant construire et/ou renseigner la structure sur
+   // la base du nom 
+   while (strlen(debut)) {
+      fin = prochainDelimiteur(debut, REGISTRE_NOM_SEPARATEUR);
+      assert(fin > debut);   // Puisque strlen(debut) != 0
+      lgNom = fin - debut;
+      memcpy(nom, debut, lgNom);
+      nom[lgNom] = 0;
+      printk("    + '%s'\n", nom);
+      // Si on a un séparateur, on descend dans l'arborescence, sinon,
+      // on est sur le 0 final
+      if (*fin == REGISTRE_NOM_SEPARATEUR) {
+
+         // On descend dans l'arborescence
+         regSS = registreChercherSousRegistre(reg, nom);
+	 if (regSS == NULL) {
+            regSS = registreAjouterSousRegistre(reg, nom);
+	 }
+	 // Eventuellement en la créant
+	 if (regSS != NULL) {
+	   reg = regSS; // On travaille maintenant dans le sous reg
+	 }
+         
+         // On passe au suivant
+         debut = fin + 1;
+      // Si on est à la dernière, on peut placer la donnée
+      } else {
+	 registreAjouterParametre(regSS, parametreCreer(nom, typeParametreChaine, valeur));
+	
+         //  On en arrive à la fin
+         debut = fin;
+      }
+   }
+
 }
 
 /**
@@ -336,6 +428,18 @@ void registreAfficher(registre * reg, int profondeur)
 void registreSystemeInitialiser()
 {
    registreSysteme = registreCreer("ManuX-Param");     
+}
+
+/**
+ * @brief Ajouter dans un registre système un paramètre décrit dans une chaîne
+ * de caractères.
+ *
+ * La chaîne doit être sous la forme "a.b.c=v"
+ * Attention, elle va être modifiée !
+ */
+void registreSystemeAjouterC(char * chaine)
+{
+  registreAjouterC(registreSysteme, chaine);
 }
 
 /**
