@@ -52,10 +52,12 @@ void startManuX()
 
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
-     fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
+      fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
+      printk_debug(DBG_KERNEL_START, "Virtio console initialise ...\n");
+   } else {
+      printk_debug(DBG_KERNEL_START, "Impossible d'initialiser la Virtio console !\n");
+      return ;
    }
-   printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
-
 
    // Initialisation de la gestion des systèmes de fichiers
    printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers ...\n");

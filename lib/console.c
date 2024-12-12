@@ -146,6 +146,7 @@ void consoleAfficherN(Console * cons, char * msg, int nbOctets)
       switch (*msg) {
          case '\n' :
             avancerLigne(cons);
+         case '\r' :
             cons->colonne = 0;
          break;
          case ASCII_ESC :

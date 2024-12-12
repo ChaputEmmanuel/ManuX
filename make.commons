@@ -109,41 +109,46 @@ COMPRESS = gzip
 RUN_MANUX_RAMSIZE = 64M
 QEMU_RAMSIZE      = -m $(RUN_MANUX_RAMSIZE)
 QEMU_DEBUG        = -gdb tcp::1234 -S
+QEMU_VERSION	  = qemu-system-x86_64 -monitor vc # qemu-system-i386
 
-QEMU_VIRTIO_CONSOLE = -chardev stdio,id=cons1 \
-                   -device virtio-serial-pci \
-                   -device virtconsole,chardev=cons1
-		   
+QEMU_VIRTIO_CONSOLE = -chardev stdio,id=charconsole0             \
+		      -device virtio-serial-pci                  \
+		      -device virtconsole,chardev=charconsole0
+
+#-device virtio-serial-pci,id=cons1 \
+#                   -device virtconsole,chardev=cons1 \
+#                   -chardev stdio,id=cons1
+
 QEMU_VIRTIO_NET     = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
                    -object filter-dump,id=f1,netdev=v1,file=dump.dat
 
-RUN_MANUX_FLOPPY = qemu-system-i386 \
+RUN_MANUX_FLOPPY = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
                    -drive format=raw,file=$(FLOPPY_IMG),index=0,if=floppy
 		   
-RUN_MANUXMB_ELF  = qemu-system-i386 \
+RUN_MANUXMB_ELF  = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
                    -kernel $(NOYAUMB_ELF)
 		   
-RUN_MANUXMB_ELF_DBG = qemu-system-i386 \
+RUN_MANUXMB_ELF_DBG = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
 		   $(QEMU_DEBUG) \
                    -kernel $(NOYAUMB_ELF)
 		   
-RUN_MANUX_ISO    = qemu-system-i386 \
+RUN_MANUX_ISO    = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
 		   -cdrom
 
-RUN_MANUX_ISO_DBG= qemu-system-i386 \
+RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \

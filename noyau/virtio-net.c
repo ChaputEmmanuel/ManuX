@@ -299,7 +299,7 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
    void                * buffers[2];
    int                   longueurs[2];
 
-   //   printk_debug(DBG_KERNEL_NET, "IN\n");
+   printk_debug(DBG_KERNEL_NET, "IN\n");
 
    // On ne délègue rien à l'interface
    virtioReseauEntete.flags = 0;
@@ -319,7 +319,7 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
                         2,
 		        0); // pour émettre
 
-   //   printk_debug(DBG_KERNEL_NET, "OUT\n");
+    printk_debug(DBG_KERNEL_NET, "OUT\n");
 } 
 
 /**
@@ -332,6 +332,8 @@ int virtioNetInit()
    printk_debug(DBG_KERNEL_NET, "IN\n");
 
    // On va chercher un peripherique virtio net
+   printk_debug(DBG_KERNEL_NET, "Je cherche un PCI vendeur/Id %d/%d\n",
+		PCI_VENDEUR_VIRTIO,PCI_PERIPHERIQUE_VIRTIO_NET);
    PCINumeroPeripherique = PCIObtenirProchainEquipement(PCI_VENDEUR_VIRTIO,
 							PCI_PERIPHERIQUE_VIRTIO_NET, -1);
    printk_debug(DBG_KERNEL_NET, "Peripherique PCI %d\n", PCINumeroPeripherique);

@@ -18,7 +18,7 @@
 #include <config/bootloader.h>
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>
-#include <config/kmalloc.h>   // Parce que dans tache, on hérite des fichiers
+#include <config/kmalloc.h>   // Parce que dans tâche, on hérite des fichiers
 #include <config/taches.h>
 #include <config/synchronisation.h>
 #undef MANUX_EXCLUSION_MUTUELLE_AUDIT
