@@ -40,10 +40,12 @@
 #define masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
+ | DBG_KERNEL_NET        \
  			       )
 # define masqueDebugageFichier (0x00000000\
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
+ | DBG_KERNEL_NET        \
 			       )
 
 #ifdef MANUX_DEBUGMASK_VAR
@@ -64,6 +66,7 @@
  | DBG_KERNEL_AS         \
  | DBG_KERNEL_SYSFI      \
  | DBG_KERNEL_TUBE       \
+ | DBG_KERNEL_NET        \
 */
 
 /**

@@ -61,7 +61,7 @@ void virtioConsoleTraiterBuffers(VirtioConsole * vc)
 	     bf, lg, NB_BUFF_TRAITES);
       //printk("[7] OK !\n");
 
-      // WARNING Pas top
+      // WARNING Pas top, est-ce qu'il faut vraiment des désallouer !?
       for (int n = 0; n < nbLu; n++) {
 	 libererPage(bf[n]);
          nbPageAlloueesIci --;

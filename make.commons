@@ -120,8 +120,10 @@ QEMU_VIRTIO_CONSOLE = -chardev stdio,id=charconsole0             \
 #                   -chardev stdio,id=cons1
 
 QEMU_VIRTIO_NET     = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
-                   -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
+                   -netdev tap,id=v1 \
                    -object filter-dump,id=f1,netdev=v1,file=dump.dat
+
+#                   -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
 
 RUN_MANUX_FLOPPY = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \

@@ -41,7 +41,7 @@ void startManuX()
       printk_debug(DBG_KERNEL_START, "Impossible d'initialiser periph reseau ...\n");
    }
 
-   
+   while(1){};   
 }   /* startManuX */
 
 

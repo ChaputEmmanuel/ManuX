@@ -103,8 +103,14 @@ uint8_t unBufferALaCon[4096] ={0};
 /**
  * @brief Affichage d'un paquet
  */
-void netDumpPacket(void * packet)
+void netDumpPacket(uint8_t * packet, int lg)
 {
+   int i;
+   for (i = 0; i < lg; i++) {
+      printk(" 0x%2x ", packet[i]);
+      if (i % 8 == 7) printk("\n");
+   }
+   if (i % 8 != 7) printk("\n");
 }
 
 void virtioNetTraiterEmissions(VirtioReseau * vr)
@@ -123,13 +129,6 @@ void virtioNetTraiterEmissions(VirtioReseau * vr)
    // On va chercher une trame, a priori dans une chaîne de buffers
    virtioFileRecupererBuffers(fv, (void*)buffers, longueurs, 2);
 
-   // WARNING Horreur de debogage 
-   /*printk("\n (E)Recu %d + %d :\n", longueurs[0], longueurs[1]);
-   for (int i = 0; i < longueurs[1]; i++) {
-     printk(" %x ", buffers[1][i]);
-   }
-   printk("\n");*/
-   
    // On peut reprendre une activité normale
    //   virtioFileAutoriserInterruption(fv);
 }
@@ -145,16 +144,6 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    int                   nbLu;
    VirtioFileVirtuelle * fv = &(vr->virtioPeripherique.filesVirtuelles[VR_FILE_RECEPTION]);
 
-   /*
-   printk_debug(DBG_KERNEL_NET, "reception (file %x)!!!\n", fv);
-
-   printk_debug(DBG_KERNEL_NET, "File emission :\n");
-   virtioAfficherFile(&(vr->virtioPeripherique.filesVirtuelles[VR_FILE_EMISSION]));
-   
-   printk_debug(DBG_KERNEL_NET, "File reception :\n");
-   virtioAfficherFile(&(vr->virtioPeripherique.filesVirtuelles[VR_FILE_RECEPTION]));
-   */
-   
    // On ne veut plus être embêté
    //   virtioFileInterdireInterruption(fv);
 
@@ -164,16 +153,10 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
 		vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
 
-   /*
    if (nbLu) {
-      // WARNING Horreur de debogage 
-      printk("\n (R)Recu %d + %d :\n", longueurs[0], longueurs[1]);
-      for (int i = 0; i < 42 ; i++) {
-        printk(" 0x%x ", buffers[1][i]);
-      }
-      printk("\n");
+      netDumpPacket(buffers[1], longueurs[1]);
    }
-   */
+
    // On peut reprendre une activité normale
    //   virtioFileAutoriserInterruption(fv);
 }
@@ -248,7 +231,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // d'où VIRTIO_TAILLE_TRAME_MAX qui remplace sizeof ...
    
    // Pas de malloc, ...
-   pointeur = allouerPages(NB_PAGES(fr->taille*(VIRTIO_TAILLE_TRAME_MAX/*sizeof(VirtioReseauEntete)*/
+   pointeur = allouerPages(NB_PAGES(fr->taille*(sizeof(VirtioReseauEntete)
 						+ VIRTIO_TAILLE_TRAME_MAX)/2));
 
    // Concrètement, puisque le réseau préfixe systématiquement par un
@@ -274,6 +257,12 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
       inb((uint16_t)(pciEquip->adresseES + 0x14 + i), addr);
       virtioReseau.adresseMAC[i] = addr;
    }
+
+   printk("MAC@ = ");
+   for (int i = 0 ; i < 5 ; i++) {
+      printk("%x:", virtioReseau.adresseMAC[i]);
+   }
+   printk("%x\n", virtioReseau.adresseMAC[5]);
 
    // On définit notre fonction de gestion des interuptions
    if (i8259aAjouterHandler(pciEquip->interruption,
@@ -344,7 +333,7 @@ int virtioNetInit()
    }
 
    // Test d'émission
-   virtioNetEmettre(&virtioReseau, requeteARP);
+   //   virtioNetEmettre(&virtioReseau, requeteARP);
 
    printk_debug(DBG_KERNEL_NET, "out\n");
    return ESUCCES;
