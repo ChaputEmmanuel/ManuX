@@ -1,8 +1,9 @@
 /**
  * @file lib/registre.c
- * @brief
+ * @brief Mise en oeuvre de la notion de registre permettant de gérer
+ * des paramètres de façon structurée.
  *
- *                                                            (C) E. Chaput 2024
+ *                                                       (C) E. Chaput 2024-2025
  */
 #include <manux/registre.h>
 #include <manux/string.h>    // strlen, memcpy, prochainDelimiteur
@@ -12,23 +13,20 @@
 #include <manux/debug.h>     // assert
 
 /**
- * @brief Un paramètre est simplement une valeur (qui peut être typée)
- * associée à un nom
+ * @brief Un paramètre est simplement une valeur sous forme de chaîne
+ * de caractères associée à un nom.
  */
 typedef struct _parametre {
    char * nom;
-   typeParametre type;
-    union {
-      char * chaine;
-      struct _registre * registre;
-      void * pointeur;
-      uint32_t  u32;
-   } v;
-   void ( (*mettreAJour) (struct _parametre *)); // Invoquée par le
-					    // registre lors d'une
-					    // modification du
-					    // paramètre
+   int    estUnRegistre; // Sous-registre (1) ou non (0)
+   char * valeur;
+   registreMiseAJour miseAJour; // Invoquée par le
+                                // registre lors d'une
+                                // modification du
+                                // paramètre
    void * prive;    // Un pointeur à disposition de l'utilisateur
+                    // Ce sera un pointeur vers un registre si
+                    // estUnRegistre == 1
 } parametre;
 
 /**
@@ -61,32 +59,69 @@ static registre * registreSysteme = NULL;
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Création d'un paramètre
+ * @brief Mise-à-jour d'un paramètre en invoquant la fonction définie
  */
-parametre * parametreCreer(char * nom, typeParametre type, void * valeur)
+void parametreMettreAJour(parametre * p)
 {
-   parametre * result = (parametre *) kmalloc(sizeof(parametre));
-
-   printk("Creation du param %s de type %d\n", nom, type);
-   if (result != NULL) {
-      result->nom = kmalloc(strlen(nom) +1);
-      memcpy(result->nom, nom, strlen(nom) +1);
-      result->type = type;
-      result->v.pointeur = valeur;
+  if ((p != NULL) && (p->miseAJour != NULL)) {
+      p->miseAJour(p->prive, p->valeur);
    }
-   
-   return result;
 }
 
 /**
- * @brief Définition de la fonction de mis à jour du paramètre
+ * @brief Affectation de la valeur d'un paramètre
  */
-void parametreDefinirMiseAJour(parametre * param,
-			       void ( (*mettreAJour) (parametre *)),
-			       void * prive)
+void parametreAffecterValeur(parametre * p, char * v)
 {
-   param->mettreAJour = mettreAJour;
+   if (p->valeur != NULL) {
+      kfree(p->valeur);
+   }  
+   p->valeur = kmalloc(strlen(v) +1);
+   memcpy(p->valeur, v, strlen(v) +1);
+
+   // On répercute la mise-à-jour
+   parametreMettreAJour(p);
+}
+
+/**
+ * @brief Affectation du nom d'un paramètre
+ */
+void parametreAffecterNom(parametre * p, char * n)
+{
+   if (p->nom != NULL) {
+      kfree(p->nom);
+   }  
+   p->nom = kmalloc(strlen(n) +1);
+   memcpy(p->nom, n, strlen(n) +1);
+}
+
+/**
+ * @brief Définition de la fonction de mise à jour du paramètre
+ */
+void parametreAffecterMiseAJour(parametre * param,
+                                void * prive,
+				registreMiseAJour miseAJour)
+{
+   param->miseAJour = miseAJour;
    param->prive = prive;
+}
+
+/**
+ * @brief Création d'un paramètre
+ */
+parametre * parametreCreer(char * nom, char * valeur,
+			   void * prive, registreMiseAJour miseAJour)
+{
+   parametre * result = (parametre *) kmalloc(sizeof(parametre));
+
+   //printk("Creation du param '%s' en %d avec maj %d\n", nom, result, miseAJour);
+   if (result != NULL) {
+      memset(result, 0, sizeof(parametre));
+      parametreAffecterNom(result, nom);
+      parametreAffecterMiseAJour(result, prive, miseAJour);
+      parametreAffecterValeur(result, valeur);
+   } 
+   return result;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -116,7 +151,7 @@ void listeParametresInserer(listeParametres * lp, parametre * p)
 {
    chainonParametre * cp = (chainonParametre *) kmalloc(sizeof(chainonParametre));
 
-   printk("Insertion dans 0x%x ...\n", lp);
+   //printk_debug(DBG_KERNEL_REGISTRE, "Insertion dans 0x%x ...\n", lp);
    if (cp != NULL) {
       cp->parametre = p;
       cp->suivant = lp->premier;
@@ -125,13 +160,29 @@ void listeParametresInserer(listeParametres * lp, parametre * p)
          lp->premier->precedent = cp;
       }
       lp->premier = cp;
-      printk("  0x%x premier = 0x%x\n", lp, cp);
+      //      printk_debug(DBG_KERNEL_REGISTRE, "  0x%x premier = 0x%x\n", lp, cp);
       if (lp->dernier == NULL) {
          lp->dernier = cp;
       }
    }
 }
 
+parametre * listeParametresChercher(listeParametres * lp, char * nom)
+{
+   chainonParametre * cp = lp->premier;
+
+   while ((cp != NULL) && (strcmp(nom, cp->parametre->nom))) {
+      cp = cp-> suivant;
+   }
+
+   // On l'a trouvé ?
+   if (cp != NULL) {
+     return cp->parametre;
+   }
+   
+   return NULL;
+}
+  
 /*----------------------------------------------------------------------------*/
 /* Les registres.                                                             */
 /*----------------------------------------------------------------------------*/
@@ -153,7 +204,7 @@ registre * registreCreer(char * nom)
 }
 
 /**
- * @brief Recherche d'un sous registe (direct) dans un registre. NULL si inexistant.
+ * @brief Recherche d'un sous registre (direct) dans un registre. NULL si inexistant.
  */
 registre * registreChercherSousRegistre(registre * b, char * nomSr)
 {
@@ -163,9 +214,9 @@ registre * registreChercherSousRegistre(registre * b, char * nomSr)
    if ((b != NULL) && (b->parametres != NULL)) {
       for (ch = b->parametres->premier ; (ch != NULL) && (result == NULL) ; ch = ch->suivant) {
          // Si on trouve une sous-base avec le bon nom, on la renvoie
-	 if (   (ch->parametre->type == typeParametreRegistre)
+         if (   (ch->parametre->estUnRegistre)
 	     && (strcmp(nomSr, ch->parametre->nom) == 0)){
-            return ch->parametre->v.registre;
+            return (registre *) ch->parametre->prive;
 	 }
       }
    }
@@ -176,7 +227,7 @@ registre * registreChercherSousRegistre(registre * b, char * nomSr)
 /**
  * @brief Ajout d'un parametre dans un registre
  * 
- * Attention, aucune vérification n'est faite, si bien qu'on doublon
+ * Attention, aucune vérification n'est faite, si bien qu'un doublon
  * peut apparaître
  */
 void registreAjouterParametre(registre * reg, parametre * param)
@@ -201,12 +252,14 @@ registre * registreAjouterSousRegistre(registre * reg, char * nomSr)
 
    // Si non, on le crée
    if (result == NULL) {
+   
       // Création du (sous) reg
       result = registreCreer(nomSr);
 
       // On en fait un paramètre
-      sRParam = parametreCreer(nomSr, typeParametreRegistre, (void *) result);
-
+      sRParam = parametreCreer(nomSr, NULL, (void *) result, NULL);
+      sRParam->estUnRegistre = 1;
+      
       // On l'insère dans le registre père
       registreAjouterParametre(reg, sRParam);	 
    }
@@ -215,69 +268,10 @@ registre * registreAjouterSousRegistre(registre * reg, char * nomSr)
 }
 
 /**
- * @brief Ajout dans un registre d'un paramètre dont le nom est défini
- * dans un tableau.
- */ 
-void registreAjouterT(registre * reg,
-                      typeParametre type,
-                      char * valeur,
-                      va_list argList)
-{
-   char * chaine, * prochaine;
-   registre * regSS = reg; // La base du sous-système
-   
-   chaine = va_arg(argList, char *);
-   prochaine = va_arg(argList, char *);
-
-   while (chaine != NULL) {
-      // Si on n'est pas à la dernière, on descend dans l'arborescence
-      if (prochaine != NULL) {
-         regSS = registreChercherSousRegistre(reg, chaine);
-	 if (regSS == NULL) {
-            regSS = registreAjouterSousRegistre(reg, chaine);
-	 }
-	 if (regSS != NULL) {
-	   reg = regSS; // On travaille maintenant dans le sous reg
-	 }
-      // Si on est à la dernière, on peut placer la donnée
-      } else {
-	 registreAjouterParametre(regSS, parametreCreer(chaine, type, valeur));
-      }
-      // On avance
-      chaine = prochaine;
-      prochaine = va_arg(argList, char *);
-   }
-}
-
-/**
- * @brief Ajout d'un paramètre dans un registre
- *
- * Exemples 
- *   registreAjouter(b, typeParametreU32, "0xFF", "systeme", "debug", "mask", NULL);
- *      b.systeme.debug.mask <- (uint32_t)0xFF
- *   registreAjouter(b, typeParametreReg, "", "net", "ip", NULL);
- *      création du sous système ip dans le système net
- * 
- * Toute l'arborescence menant au paramètre est créée.
- */
-void registreAjouter(registre * reg,
-                     typeParametre type,
-                     char * valeur,
-                     ...)
-{
-   va_list   argList;
-
-   va_start(argList, valeur);
-   registreAjouterT(reg, type, valeur, argList);
-   va_end(argList);
-}
-
-/**
  * @brief Ajouter dans un registre un paramètre décrit dans une chaîne
  * de caractères.
  *
  * La chaîne doit être sous la forme "a.b.c=v"
- * Attention, elle va être modifiée !
  */
 #ifndef REGISTRE_NOM_SEPARATEUR
 #   define REGISTRE_NOM_SEPARATEUR '.'
@@ -285,17 +279,18 @@ void registreAjouter(registre * reg,
 #ifndef REGISTRE_AFFECTATION
 #   define REGISTRE_AFFECTATION '='
 #endif
-
 void registreAjouterC(registre * reg, char * chaine)
 {
-   char * debut;  // Pointeur sur le début du nom
-   char * fin;    // Pointeur sur la fin du nom courant
+   char * debut;    // Pointeur sur le début du nom
+   char * fin;      // Pointeur sur la fin du nom courant
    char   nom[512]; // Une chaine pour héberger temporairement le nom courant
-   int    lgNom;  // Longueur du nom courant
+   int    lgNom;    // Longueur du nom courant
    char * valeur;
    registre * regSS = reg; // La base du sous-système dans lequel on
 			   // va introduire
-
+   parametre * param; // Le parametre qu'on va créer/modifier
+   char * aff = NULL; // Pour restauter le signe d'affectation
+   
    // On fait pointer valeur sur la représentation ou une chaîne vide
    valeur = prochainDelimiteur(chaine, REGISTRE_AFFECTATION);
 
@@ -303,6 +298,7 @@ void registreAjouterC(registre * reg, char * chaine)
    // par un 0
    if (*valeur == REGISTRE_AFFECTATION) {
       *valeur = 0;
+      aff = valeur; // On note où il était
       valeur ++;
    }
    
@@ -319,7 +315,6 @@ void registreAjouterC(registre * reg, char * chaine)
       lgNom = fin - debut;
       memcpy(nom, debut, lgNom);
       nom[lgNom] = 0;
-      printk("    + '%s'\n", nom);
       // Si on a un séparateur, on descend dans l'arborescence, sinon,
       // on est sur le 0 final
       if (*fin == REGISTRE_NOM_SEPARATEUR) {
@@ -327,7 +322,7 @@ void registreAjouterC(registre * reg, char * chaine)
          // On descend dans l'arborescence
          regSS = registreChercherSousRegistre(reg, nom);
 	 if (regSS == NULL) {
-            regSS = registreAjouterSousRegistre(reg, nom);
+	   regSS = registreAjouterSousRegistre(reg, nom);
 	 }
 	 // Eventuellement en la créant
 	 if (regSS != NULL) {
@@ -338,22 +333,121 @@ void registreAjouterC(registre * reg, char * chaine)
          debut = fin + 1;
       // Si on est à la dernière, on peut placer la donnée
       } else {
-	 registreAjouterParametre(regSS, parametreCreer(nom, typeParametreChaine, valeur));
+         param = listeParametresChercher(regSS->parametres, nom);
+         if (param == NULL) {
+             param = parametreCreer(nom, valeur, NULL, NULL);
+	     listeParametresInserer(regSS->parametres, param);
+	 } else {
+             parametreAffecterValeur(param, valeur);
+	 }
 	
          //  On en arrive à la fin
          debut = fin;
       }
    }
-
+   // On restaure le symbole d'affectation 
+   if (aff) {
+     *aff = REGISTRE_AFFECTATION;
+   }
 }
 
 /**
- * @brief Lecture dans un registre d'un paramètre dont le nom est donné
- * sous forme de tableau.
+ *  @brief : affectation de la valeur/fonction de maj d'un paramètre
+ *  @param base : le registre dans lequel est le paramètre
+ *  @param valeur : la valeur du paramètre sous forme de chaîne (ou
+ *  NULL)
+ *  @param miseAJour : la fonction de mise à jour (ou NULL)
+ *  @param listargs : le nom sous forme de liste de chaînes
+ *
+ *  si miseAJour == NULL alors
+ *     la valeur est affectée au paramètre
+ *     si la fonction de mise-à-jour existe alors
+ *        elle est invoquée (avec cette nouvelle valeur)
+ *     finsi
+ *  sinon
+ *     la fonction de mise-à-jour est affectée
+ *     si le paramètre n'avait pas de valeur définie, alors
+ *        On lui affecte celle passée en paramètre
+ *     fin si
+ *     la fonction de mise-à-jour est invoquée
+ *  finsi
  */
-int registreLireT(registre * reg, uint32_t * valeur, va_list argList)
+void registreAffecterParametreT(registre * reg,
+                                char * valeur,
+				void * prive,
+                                registreMiseAJour miseAJour,
+                                va_list argList)
 {
-   int result = -ENOENT;
+   char * chaine, * prochaine;
+   registre * regSS = reg; // La base du sous-système
+   parametre * param;
+   
+   chaine = va_arg(argList, char *);
+   prochaine = va_arg(argList, char *);
+
+   //printk("Affectation dans %s ...\n", reg->nom);
+   while (chaine != NULL) {
+      // Si on n'est pas à la dernière, on descend dans l'arborescence
+      // en la créant si nécessaire
+      if (prochaine != NULL) {
+         regSS = registreChercherSousRegistre(reg, chaine);
+	 if (regSS == NULL) {
+	   regSS = registreAjouterSousRegistre(reg, chaine);
+	 }
+	 if (regSS != NULL) {
+	    reg = regSS; // On travaille maintenant dans le sous reg
+	 }
+      // Si on est à la dernière, on peut affecter le paramètre
+      } else {
+         // On le récupère s'il existait
+         param = listeParametresChercher(reg->parametres, chaine);
+	 // On le crée sinon
+	 if (param == NULL) {
+            param = parametreCreer(chaine, valeur, prive, miseAJour);
+	    listeParametresInserer(reg->parametres, param);
+	 } else {
+            // Si c'est une nouvelle valeur, on appelle la mise-à-jour
+	    if (miseAJour == NULL) {
+               parametreAffecterValeur(param, valeur);
+	    } else { // Affectation de la mise-à-jour
+               parametreAffecterMiseAJour(param, prive, miseAJour);
+	       // La valeur fournie avec une fonction de mise-à-jour
+	       // est une valeur par défaut, qui n'est utile qu'en
+               // l'absence de valeur déjà renseignée
+	       if (param->valeur == NULL) {
+                  parametreAffecterValeur(param, valeur);
+	       } else { // Sinon il faut appliquer la valeur présente
+                  parametreMettreAJour(param);  
+	       }
+	    }
+	 }
+      }
+      // On avance
+      chaine = prochaine;
+      prochaine = va_arg(argList, char *);
+   }
+}
+
+void registreAffecterParametre(registre * reg,
+                               char * valeur,
+			       void * prive,
+                               registreMiseAJour miseAJour,
+                               ...)
+{
+   va_list   argList;
+
+   va_start(argList, miseAJour);
+   registreAffecterParametreT(reg, valeur, prive, miseAJour, argList);
+   va_end(argList);
+}
+
+/**
+ * @brief récupération d'un paramètre dans un registre, NULL si
+ * inexistant
+  */
+parametre * registreObtenirParametre(registre * reg, va_list argList)
+{
+   parametre * result = NULL;
 
    char * chaine, * prochaine;
    chainonParametre * ch;
@@ -368,15 +462,15 @@ int registreLireT(registre * reg, uint32_t * valeur, va_list argList)
       if (prochaine != NULL) {
          regSS = registreChercherSousRegistre(reg, chaine);
 	 if (regSS == NULL) {
-            return -ENOENT;
+            return result;
 	 }
          reg = regSS;
       // Si on est à la dernière, on peut lire la donnée
       } else {
          for (ch = regSS->parametres->premier; ch != NULL; ch = ch->suivant){
+            // Si on la trouve, c'est bon
             if (strcmp(ch->parametre->nom, chaine) == 0) {
-               *valeur = ch->parametre->v.u32;
-	       return 0;
+               return ch->parametre;
             }
          }
       }
@@ -402,20 +496,13 @@ void registreAfficher(registre * reg, int profondeur)
    for (ch = reg->parametres->premier; ch != NULL; ch = ch->suivant){
       for (p = 0 ; p < profondeur; p++) {printk("   ");}
       printk("%s : ", ch->parametre->nom);
-      switch (ch->parametre->type){
-         case typeParametreRegistre :
-	   printk("(reg)\n");
-	   registreAfficher(ch->parametre->v.registre, profondeur +1);
-         break ;
-         case typeParametreU32 :  
-	   printk("0x%x\n", ch->parametre->v.u32);
-         break;
-         default :  
-	   printk("%p\n", ch->parametre->v.pointeur);
-         break;
+      if (ch->parametre->estUnRegistre){
+         printk("(reg)\n");
+         registreAfficher((registre *)ch->parametre->prive, profondeur +1);
+      } else {
+         printk("%s\n", ch->parametre->valeur);
       }
    }
-   
 }
 
 /*----------------------------------------------------------------------------*/
@@ -428,6 +515,10 @@ void registreAfficher(registre * reg, int profondeur)
 void registreSystemeInitialiser()
 {
    registreSysteme = registreCreer("ManuX-Param");     
+
+#ifdef MANUX_DEBUG
+   A FAIRE : introduire les masque de debug avec la valeur par défaut
+#endif   
 }
 
 /**
@@ -447,33 +538,19 @@ void registreSystemeAjouterC(char * chaine)
  * donné comme une liste de paramètres.
  * 
  * Exemple
- *    registreSystemeAjouterParametre(typeParametreU32, 0xC0ffeeab,
- *    "net", "ip", "addr", NULL);
+ *    registreSystemeAjouterParametre("192.168.10.2/24", &netif,
+ *    netIpAddr, "net", "ip", "addr", NULL);
  */
-void registreSystemeAjouterParametre(typeParametre type,
-                                    char * valeur,
-                                    ...)
+void registreSystemeAffecterParametre(char * valeur,
+		                      void * prive,
+                                      registreMiseAJour miseAJour, 
+                                      ...)
 {
    va_list   argList;
 
-   va_start(argList, valeur);
-   registreAjouterT(registreSysteme, type, valeur, argList);
+   va_start(argList, miseAJour);
+   registreAffecterParametreT(registreSysteme, valeur, prive, miseAJour, argList);
    va_end(argList);    
-}
-
-/**
- * @brief Lecture d'un paramètre dans le registre du système
- */
-int registreSystemeLire(uint32_t * valeur, ...)
-{
-   va_list   argList;
-   int result;
-   
-   va_start(argList, valeur);
-   result = registreLireT(registreSysteme, valeur, argList);
-   va_end(argList);
-   
-   return result;
 }
 
 /**

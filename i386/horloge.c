@@ -1,8 +1,10 @@
-/*----------------------------------------------------------------------------*/
-/*      Implémentation des sous-programmes de gestion de l'horloge matérielle.*/
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
-/*----------------------------------------------------------------------------*/
+/**
+ * @file : i386/horloge.c
+ * @brief Implantation des sous-programmes de gestion de l'horloge matérielle.
+ *                                                                            
+ *                                                     (C) Manu Chaput 2000-2025
+ */
+
 #include <manux/config.h>
 #include <manux/debug.h>
 #include <manux/intel-8259a.h>

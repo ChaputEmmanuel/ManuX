@@ -1,6 +1,6 @@
 /**
  * @file debug.c
- * @brief Les outlis de débogage
+ * @brief Les outils de débogage
  *
  *                                                     (C) Manu Chaput 2023-2024
  */

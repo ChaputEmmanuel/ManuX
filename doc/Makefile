@@ -24,6 +24,7 @@ DOCS_PDF = index.pdf \
            memoire-part.pdf \
 	   taches-part.pdf \
            synchronisation-part.pdf \
+           registres-part.pdf \
            userland-part.pdf
 
 DOCS_HT = $(DOCS_PDF:.pdf=.ht)

@@ -32,6 +32,7 @@
 #define DBG_KERNEL_A_FAIRE    0x00000800
 #define DBG_KERNEL_BOOTLOADER 0x00001000
 #define DBG_KERNEL_TUBE       0x00002000
+#define DBG_KERNEL_REGISTRE   0x00004000
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
 /**
@@ -41,12 +42,12 @@
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
  | DBG_KERNEL_NET        \
+ | DBG_KERNEL_REGISTRE      \
  			       )
 # define masqueDebugageFichier (0x00000000\
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_NET        \
-			       )
+				)
 
 #ifdef MANUX_DEBUGMASK_VAR
    extern uint32_t _masqueDebugageConsole;
@@ -67,6 +68,7 @@
  | DBG_KERNEL_SYSFI      \
  | DBG_KERNEL_TUBE       \
  | DBG_KERNEL_NET        \
+ | DBG_KERNEL_REGISTRE   \
 */
 
 /**

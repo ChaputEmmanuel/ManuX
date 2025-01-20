@@ -383,8 +383,7 @@ dans la sous-section \ref{subsection:bootparam}
    Le système {\em Multiboot} nécessite donc un entête devant le noyau
 avec des caractéristiques bien définies. Cette interface est
 relativement légère et constituée d'une structure de quelques dizaines
-d'octets. Elle est décrite par exemple sur la  page
-https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Architecture
+d'octets. Elle est décrite par exemple sur la  page \lstinline!https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Architecture!
 
    Le premier champ (intitulé \lstinline!magic!) doit avoir une valeur
 bien définie (\lstinline!0x1BADB002!), ce qui permet au bootloader de
@@ -453,15 +452,15 @@ donc positionné avec un bit à un.
 
    Le début de l'entête est donc simplement celui-ci :
 
-\begin{lstlistings}
+\begin{lstlisting}
 ;-------------------------------------------------------------------------------
-; Quelques macros spécifiques à multiboot
+; Quelques macros specifiques a multiboot
 ;-------------------------------------------------------------------------------
 MULTIBOOT_PAGE_ALIGN   equ 0x00000001 ; Alignement des modules sur des pages
 MULTIBOOT_MEMORY_INFO  equ 0x00000002 ; Pour que multiboot nous donne le plan
 
 ;-------------------------------------------------------------------------------
-; Définition de notre entête
+; Definition de notre entete
 ;-------------------------------------------------------------------------------
 FLAGS    equ  MULTIBOOT_MEMORY_INFO 
 MAGIC    equ  0x1BADB002        
@@ -477,14 +476,14 @@ height        dd 0
 depth         dd 0
 
 ;-------------------------------------------------------------------------------
-; L'entête à proprement parler
+; L'entete a proprement parler
 ;-------------------------------------------------------------------------------
 section .multiboot
 align 4
 	dd MAGIC
 	dd FLAGS
 	dd CHECKSUM
-\end{lstlistings}  
+\end{lstlisting}  
 
    Cependant, pour simplifier un peu le passage de paramètre depuis le
 bootloader vers le noyau, l'entête contient également un peu de
@@ -505,10 +504,10 @@ risque de très rapidement utiliser ces registres généraux).
 
    La fin du fichier d'entête est donc finalement la suivante :
 
-\begin{lstlistings}
+\begin{lstlisting}
 ;-------------------------------------------------------------------------------
-; Le code de démarrage. On se contente d'initialiser le pointeur de pile, car
-; ce n'est pas prévu par multiboot. Apparemment GRUB le fait, mais pas le
+; Le code de demarrage. On se contente d'initialiser le pointeur de pile, car
+; ce n'est pas prevu par multiboot. Apparemment GRUB le fait, mais pas le
 ; loader de qemu par exemple.
 ;-------------------------------------------------------------------------------
 global _startManuX
@@ -527,7 +526,7 @@ _startManuX :
 	cli
 .FinDesTemps:	hlt
 	jmp .FinDesTemps
-\end{lstlistings}
+\end{lstlisting}
    
 %...............................................................................
 %
@@ -535,11 +534,11 @@ _startManuX :
 \subsubsection{Récupération des informations fournies par le bootloader}
 
    Grâce à l'entête ainsi construit, ManuX va pouvoir avoir accès aux
-informations fournies par le bootloader au travers des deux variables
-\lstinline!signatureBootloader! et \lstinline!_infoSysteme!. Une
-difficulté provient du fait que la majorité de ces informations sont
-dans une zone mémoire qui risque d'être écrasée lors de
-l'initialisation du noyau.
+informations fournies par le bootloader au travers des trois variables
+\lstinline!signatureBootloader!, \lstinline!_infoSysteme! et
+\lstinline!cmdLine!. Une difficulté provient du fait que la majorité
+de ces informations sont dans une zone mémoire qui risque d'être
+écrasée lors de l'initialisation du noyau.
 
    Pour remédier à ce problème, quelques outils sont définis dans
 \fichier{manux}{bootloader}{h} et implantés dans
@@ -547,15 +546,26 @@ l'initialisation du noyau.
 
    La structure \lstinline!InfoSysteme! décrit le début des données
 fournies par le bootloader. Elle ne couvre que les éléments qui
-intéressent ManuX : la taille mémoire et la ligne de commande.
+intéressent ManuX, soit essentiellement la taille mémoire.
 
-   La fonction \lstinline!bootloaderInitialiser()! a pour rôle
-d'initialiser des variables de ManuX en fonction du contenu de cette
-structure (qui est appelée à disparaître).
+   La variable \lstinline!cmdLine! contient quant à elle la ``ligne de
+commande'', c'est-à-dire les paramètres fournis au noyau (par exemple
+via \grub).
 
-   Elle doit être invoquée très tôt lors du démarrage de ManuX, a
-minima avant l'initialisation de la mémoire.
+   La fonction \lstinline!bootloaderInitialiser()! a donc pour rôle
+d'initialiser ces trois variables de ManuX en fonction du contenu de
+ces paramètres fournis par le bootloader dans des zones mémoires qui
+peuvent alors être réutilisées. Elle doit être invoquée très tôt lors
+du démarrage de ManuX, a minima avant l'initialisation de la mémoire.
 
+   La fonction \lstinline!bootloaderLireLigneCmd()! peut alors être
+invoquée à tout moment plus tard, afin de prendre en compte le contenu
+de la ligne de commande. On atendra donc avantageusement qu'un système
+de gestion de mémoire soit disponible !
+
+   Un exemple est donné par l'image \lstinline!bootparam! qui utilise
+en particulier le fichier \fichier{noyau/main-bootparam}{c}.
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * @file bootloader.c
  * @brief Gestion de l'interfaçage avec le bootloader
  *
- *                                                     (C) Manu Chaput 2000-2024 
+ *                                                     (C) Manu Chaput 2000-2025 
  */
 #include <manux/bootloader.h>
 #include <manux/debug.h>     // paniqueNoyau, assert
@@ -11,6 +11,9 @@
 
 #define CMDLINE_MAX_LENGTH 512
 
+/**
+ * @brief Zone destinée à héberger le contenu de la ligne de commande.
+ */
 static char cmdLine[CMDLINE_MAX_LENGTH];
 
 /**
@@ -33,13 +36,17 @@ InfoSysteme * _infoSysteme;
 /**
  * @brief Lecture des informations fournies par le bootloader
  *
- * Cette fonction doit être invoquée relativement tôt, car elle a la
+ *    Cette fonction doit être invoquée relativement tôt, car elle a la
  * charge de recopier des informations fournies par le bootloader. Ces
- * informations sont dans une zone mémoire que l'on risque ensuite
+ * informations étant dans une zone mémoire que l'on risque ensuite
  * d'utiliser.
+ *    Il s'agit de infoSysteme et cmdLine.
  */
 void bootloaderInitialiser()
 {
+   // On copie les infos dans la variable infoSysteme, qui est dans
+   // une zone que la gestion mémoire va considérée comme
+   // réservée. Ainsi le contenu est préservé.
    memcpy(&infoSysteme, _infoSysteme, sizeof(InfoSysteme));
   
    // Un petit message

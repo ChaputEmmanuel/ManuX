@@ -8,6 +8,7 @@ nav:
        - "Les outils" : outils-part.md
        - "Chargement en mémoire et boot" : boot-part.md
        - "Affichage" : affichage-part.md
+       - "Registres" : registres-part.md
        - "Interruptions" : inter-part.md
        - "La mémoire" : memoire-part.md
        - "Les appels système" : appel-systeme-part.md
