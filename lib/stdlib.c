@@ -21,3 +21,38 @@ void srand(uint32_t graine)
 {
    valeurAleatoire = graine;
 }
+
+int atoi(char * ch)
+{
+   int i = 0, result = 0;
+
+   while ((ch[i] >= '0') && (ch[i] <= '9')) {
+      result = 10 * result + ch[i++] - '0';
+   }
+   return result;
+}
+
+int atoihex(char * ch)
+{
+   int i = 2, result = 0;
+
+   if ((ch[0] == '0') && (ch[1] == 'x')) {
+     
+      while (   ((ch[i] >= '0') && (ch[i] <= '9'))
+	    || ((ch[i] >= 'A') && (ch[i] <= 'F')) 
+            || ((ch[i] >= 'a') && (ch[i] <= 'f'))) {
+	printk("[%c] ", ch[i]);
+         if ((ch[i] >= '0') && (ch[i] <= '9')) {
+            result = 16 * result + ch[i] - '0';
+	 } else if ((ch[i] >= 'A') && (ch[i] <= 'F')) {
+            result = 16 * result + 10 + ch[i] - 'A';
+	 } else {
+	   result = 16 * result + 10 + ch[i] - 'a';
+	 }
+         i++;
+      }
+   }
+   return result;
+}
+
+

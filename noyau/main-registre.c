@@ -6,6 +6,7 @@
  */
 #include <manux/config.h>
 #include <manux/types.h>     // TRUE
+#include <manux/stdlib.h>     // atoi
 #include <manux/console.h>
 #include <manux/printk.h>
 #include <manux/memoire.h>
@@ -22,16 +23,12 @@
 uint16_t a, b, c;
 void miseAJourPararametre(void * prive, char * valeur)
 {
-   int i = 0;
    uint16_t * n = (uint16_t *)prive;
 
    printk("Nouvelle valeur = '%s' pour 0x%x\n", valeur, prive);
 
    // Une conversion bas de gamme
-   *n = 0;
-   while (valeur[i]) {
-      *n = (*n) * 10 + valeur[i++] - '0';
-   }
+   *n = atoihex(valeur);   
 }
 			  
 void startManuX()
@@ -56,11 +53,11 @@ void startManuX()
 
    // Imaginons que la valeur 19 est affectée au paramètre a lors du
    // boot (eg via le bootloader).
-   registreSystemeAjouterC("test.a=19");
+   registreSystemeAjouterC("test.a=0x19");
 
    // La valeur 42 est affectée au paramètre b, mais d'une autre façon
    // (même résultat).
-   registreSystemeAffecterParametre("42", NULL, NULL,
+   registreSystemeAffecterParametre("0x42", NULL, NULL,
 	                            "test", "b", NULL);
 
    // Maintenant le sous-système test s'initialise. Il a une valeur
@@ -89,7 +86,7 @@ void startManuX()
    registreSystemeAffecterParametre("192.168.12.2", NULL, NULL,
 				   "reseau", "ip", "eth1", "addr", NULL);
 
-   registreSystemeAfficher();
+   //registreSystemeAfficher();
 
    printk("Finalement, le systeme va demarrer avec a=%d, b=%d et c=%d\n", a, b, c);
 

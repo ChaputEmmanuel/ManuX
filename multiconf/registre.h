@@ -18,6 +18,7 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/pc-i386.h>
+#include <config/stdlib.h>  // atoi
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>  // Pourquoi ?
 #include <config/kmalloc.h> 

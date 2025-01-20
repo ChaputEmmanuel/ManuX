@@ -19,4 +19,18 @@ uint32_t rand();
  */
 void srand(uint32_t graine);
 
+/**
+ * @brief Conversion d'une chaîne en entier
+ *
+ * Le début de la chaîne est converti en entier. 0 en cas d'erreur
+ */
+int atoi(char * ch);
+
+/**
+ * @brief Version hexadécimale de atoi()
+ *
+ * La chaîne doit impérativement commencer par 0x
+ */
+int atoihex(char * ch);
+
 #endif // MANUX_DEF_STDLIB
