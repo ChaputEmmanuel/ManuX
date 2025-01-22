@@ -1,6 +1,7 @@
 /**
- * @file  : main-registre.c
- * @brief : 
+ * @file  : main-bootreg.c
+ * @brief : Comment peupler le registre en fonction des paramètres de
+ * la ligne de commande  obtenus par le bootloader.
  *
  *                                                  (C) Manu Chaput 2024-2025 
  */
@@ -49,15 +50,9 @@ void startManuX()
    // On initialise le registre
    registreSystemeInitialiser();
 
-   // Imaginons que la valeur 19 est affectée au paramètre a lors du
-   // boot (eg via le bootloader).
-   registreSystemeAjouterC("test.a=0x19");
-
-   // La valeur 42 est affectée au paramètre b, mais d'une autre façon
-   // (même résultat).
-   registreSystemeAffecterParametre("0x42", NULL, NULL,
-	                            "test", "b", NULL);
-
+   // Analyse des paramètres obtenus par le bootloader
+   bootloaderLireLigneCmd();
+   
    // Maintenant le sous-système test s'initialise. Il a une valeur
    // par défaut pour a, b et c, mais celles de a et b ne seront pas
    // utilisées, puisqu'une valeur a déjà été donnée au boot.
@@ -69,20 +64,6 @@ void startManuX()
 
    registreSystemeAffecterParametre("69", &c, miseAJourPararametre,
 	                            "test", "c", NULL);
-
-   // Quelques autres paramètres, juste histoire de peupler un
-   // registre plus riche
-   registreSystemeAffecterParametre("0x483242FF", NULL, NULL,
-	                            "systeme", "debug", "mask", NULL);
-
-   registreSystemeAffecterParametre("TRUE", NULL, NULL,
-				   "systeme", "debug", "assert", NULL);
-
-   registreSystemeAffecterParametre("192.168.10.2", NULL, NULL, 
-				   "reseau", "ip", "eth0", "addr", NULL);
-
-   registreSystemeAffecterParametre("192.168.12.2", NULL, NULL,
-				   "reseau", "ip", "eth1", "addr", NULL);
 
    registreSystemeAfficher();
 

@@ -1,8 +1,8 @@
 /**
- * @file multiconf/registre.h
- * @brief Gestion dynamique des paramètres de ManuX dans un registre
+ * @file multiconf/boot-reg.h
+ * @brief Ajout dans le rergistre systèmes de paramètres fournis au boot
  *
- *                                                     (C) Manu Chaput 2023-2024
+ *                                                          (C) Manu Chaput 2025
  */
 
 #ifdef MANUX_FICHIER_CONFIG
@@ -12,7 +12,7 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-#define MANUX_FICHIER_MAIN main-registre
+#define MANUX_FICHIER_MAIN main-bootreg
 
 #include <config/base.h>
 #include <config/console.h>
@@ -22,6 +22,7 @@
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>  // Pourquoi ?
 #include <config/kmalloc.h> 
+#include <config/bootloader.h> // On va lire des paramètres fournis par le bootloader
 #include <config/registre.h>
 
 #include <config/verifications.h>

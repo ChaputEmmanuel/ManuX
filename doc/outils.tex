@@ -321,8 +321,35 @@ eux-mêmes (!).
 \subsubsection{La fonction {\tt printk\_debug}}
 
    Elle permet de produire des messages d'erreur qui seront envoyés de
-façon sélective en fonction de la valeur de \lstinline!masqueDebugage!
-qui doit être construite dans {\tt manux/debug.h}.
+façon sélective en fonction de la valeur de \lstinline!masqueDebugageConsole!
+et de \lstinline!masqueDebugageFichier!
+
+   Elle utilise pour cela les fonctionalités de la fonction
+\lstinline!printk()! et du journal, ce qui permet d'envoyer les
+messages de debug sur la console et/ou dans un fichier.
+
+%
+%
+%
+\paragraph{Les masques de débogages}
+
+   Deux masques de débogage sont définis : \lstinline!masqueDebugageConsole! et
+\lstinline!masqueDebugageFichier!. Ils sont définies dans
+\fichier{include/manux}{debug}{h}.
+
+   Si le paramètre de compilation \lstinline!MANUX_DEBUG_VAR! n'est
+pas défini, ces deux masques sont définis comme des macros. On ne peut
+donc pas trop jouer avec en cours d'exécution du noyau, \ldots
+
+   En revanche, si \lstinline!MANUX_DEBUG_VAR! est définie, c'est un
+nouveau monde qui s'ouvre à nous ! Ces variables sont en effet
+déclarées et initialisées dans \fichier{noyau}{debug}{c}, et elles
+peuvent alors être modifiées durant l'exécution du noyau.
+
+   Une utilisation particulièrement intéressante pourra en être faite
+au travers du registre (voir la doc) et des paramètres de boot, car il
+est alors possible de définir la valeur de ces masque via une option
+du bootloader.
 
 %...............................................................................
 %

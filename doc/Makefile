@@ -64,7 +64,7 @@ install :
 	scp -r ManuX root@www.manu-chaput.net:/var/www/html/
 
 clean :
-	rm -f *.aux *.log *.toc *.idx *.out *.bbl *.blg $(DOCS_PDF) docs/*.md  docs/*.html
+	rm -f *.aux *.log *.toc *.idx *.out *.bcf *.bbl *.blg $(DOCS_PDF) docs/*.md  docs/*.html
 	rm -rf ManuX
 	rm -rf docs/doxy
 	rm -rf docs/html

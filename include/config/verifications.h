@@ -91,3 +91,15 @@
 #if defined(MANUX_REGISTRE) && !defined(MANUX_KMALLOC)
 #   error "MANUX_REGISTRE nécessite MANUX_KMALLOC"
 #endif
+
+#if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_REGISTRE)
+#   error "MANUX_DEBUGMASK_VAR nécessite MANUX_REGISTRE"
+#endif
+
+#if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_STDLIB)
+#   error "MANUX_DEBUGMASK_VAR nécessite MANUX_STDLIB"
+#endif
+
+#if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_PRINTK)
+#   error "MANUX_DEBUGMASK_VAR nécessite MANUX_PRINTK"
+#endif

@@ -1,5 +1,6 @@
 /**
- *                                                  (C) Manu Chaput 2020-2023 */
+ *                                                  (C) Manu Chaput 2020-2025
+ */
 #include <manux/stdlib.h>
 
 static uint32_t valeurAleatoire = 4832;
@@ -41,7 +42,6 @@ int atoihex(char * ch)
       while (   ((ch[i] >= '0') && (ch[i] <= '9'))
 	    || ((ch[i] >= 'A') && (ch[i] <= 'F')) 
             || ((ch[i] >= 'a') && (ch[i] <= 'f'))) {
-	printk("[%c] ", ch[i]);
          if ((ch[i] >= '0') && (ch[i] <= '9')) {
             result = 16 * result + ch[i] - '0';
 	 } else if ((ch[i] >= 'A') && (ch[i] <= 'F')) {

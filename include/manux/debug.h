@@ -1,8 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*      Ma version des assertions et autres outils de debug.                  */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2023 */
-/*----------------------------------------------------------------------------*/
+/**
+ *      Ma version des assertions et autres outils de debug.
+ *
+ *                                                     (C) Manu Chaput 2000-2025
+ */
 #ifndef MANUX_DEBUG_DEF
 #define MANUX_DEBUG_DEF
 
@@ -38,23 +38,21 @@
 /**
  * @brief Définition des masques de débugage
  */
-#define masqueDebugageConsole (0x00000000 \
+#define _masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_NET        \
- | DBG_KERNEL_REGISTRE      \
  			       )
-# define masqueDebugageFichier (0x00000000\
+# define _masqueDebugageFichier (0x00000000\
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
 				)
 
 #ifdef MANUX_DEBUGMASK_VAR
-   extern uint32_t _masqueDebugageConsole;
-   extern uint32_t _masqueDebugageFichier;
+   extern uint32_t masqueDebugageConsole;
+   extern uint32_t masqueDebugageFichier;
 #else
-#   define _masqueDebugageConsole masqueDebugageConsole 
-#   define _masqueDebugageFichier masqueDebugageFichier 
+#   define masqueDebugageConsole _masqueDebugageConsole 
+#   define masqueDebugageFichier _masqueDebugageFichier 
 #endif // MANUX_DEBUGMASK_VAR
 /*
  | DBG_KERNEL_ERREUR     \
@@ -77,20 +75,20 @@
  */
 #ifdef MANUX_LIBI386  // pour les tops horloge
 #define printk_debug(lvl, fmt, args...)	 \
-   if (((lvl)& _masqueDebugageConsole) && ((lvl)& _masqueDebugageFichier)) {     \
+   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
       printk("{7} [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& _masqueDebugageFichier) {				\
+   } else if ((lvl)& masqueDebugageFichier) {				\
       printk("(7) [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& _masqueDebugageConsole) {				\
+   } else if ((lvl)& masqueDebugageConsole) {				\
       printk("[7] [%d] %s line %d : " fmt, nbTopHorloge, __FUNCTION__ , __LINE__, ## args); \
    }
 #else
 #define printk_debug(lvl, fmt, args...)	 \
-   if (((lvl)& _masqueDebugageConsole) && ((lvl)& _masqueDebugageFichier)) {     \
+   if (((lvl)& masqueDebugageConsole) && ((lvl)& masqueDebugageFichier)) {     \
       printk("{7} %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& _masqueDebugageFichier) {				\
+   } else if ((lvl)& masqueDebugageFichier) {				\
       printk("(7) %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
-   } else if ((lvl)& _masqueDebugageConsole) {				\
+   } else if ((lvl)& masqueDebugageConsole) {				\
       printk("[7] %s line %d : " fmt, __FUNCTION__ , __LINE__, ## args); \
    }
 #endif
@@ -128,4 +126,14 @@
 #define assert(cond) {}
 #endif
 
+/**
+ * @brief Initialisation du sytème de débogage
+ *
+ *    Cette phase d'initialisation n'est utile que si les masques de
+ * debogage sont implantés sous forme de variables (c'est-à-dire si
+ * MANUX_DEBUGMASK_VAR est définie) et si le registre est configuré
+ * (donc si MANUX_REGISTRE est définie).
+ *    Elle sert alors à placer les paramètres dans le registre.
+ */
+void debugInitialiser();   
 #endif

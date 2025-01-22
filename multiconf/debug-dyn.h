@@ -17,12 +17,15 @@
 #include <config/base.h>
 #include <config/console.h>
 #include <config/printk.h>
+#include <config/debug.h>
+#include <config/registre.h>
+#include <config/stdlib.h>   // Pour atoihex
 #include <config/pc-i386.h>
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>  // Pourquoi ?
 #include <config/kmalloc.h> 
 #include <config/bootloader.h> // On va lire des paramètres fournis par le bootloader
-#include <config/parametres.h> // Il nous faut évidemment le registre
+#include <config/registre.h> // Il nous faut évidemment le registre
 
 #include <config/verifications.h>
 
