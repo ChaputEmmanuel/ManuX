@@ -71,7 +71,7 @@ void gestionExceptionDiv0(TousRegistres registres,
 			  uint32_t numEx, uint32_t errCode,
 			  uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-   printk("Panique division par 0, ...\n");
+  printk("Caca %d, 0x%x\n", numEx, eip);
    gestionExceptionPanique(registres, numEx, errCode, eip, cs, eFlags);
 }
 
@@ -86,6 +86,7 @@ void gestionException(TousRegistres registres,
 #ifdef MANUX_INT_AUDIT
    nbItRecues[numEx] ++;
 #endif
+   printk("Prout %d, 0x%x\n", numEx, eip);
    fonctionDeGestionException[numEx](registres, numEx, errCode, eip, cs, eFlags);
 }
 
@@ -314,14 +315,14 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
 | ds : 0x---- | esi  = 0x-------- |                                            |\
 +-------------+-------------------+--------------------------------------------+\
 |             | edi  = 0x-------- | err = 0x                                   |\
-+-------------+-----------------(ESC pour cacher)------------------------------+";
++-------------+-----------------(Esp pour cacher)------------------------------+";
    
    char chiffre[16] = "0123456789ABCDEF";
    char * ecran = MANUX_CON_SCREEN;
    int i;
    uint32_t indice;
 
-   /* Sauvegardons l'écran dans un buffer avant de le pourrir */
+   // Sauvegardons l'écran dans un buffer avant de le pourrir
    memcpy(bufferEcran, ecran, 4000);
 
    // On fait un peu de place en haut de l'écran

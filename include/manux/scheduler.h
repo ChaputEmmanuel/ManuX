@@ -81,6 +81,11 @@ void ordonnanceur();
  * Basculer vers la prochaine tache à exécuter
  */
 
+/**
+ * @brief Création et ordonnancement d'une tâche noyau
+ */
+TacheID ordonnanceurCreerTacheNoyau(CorpsTache corpsTache);
+
 int sys_identifiantTache();
 /*
  * Obtention du numero de la tache en cours. WARNING ça n'a rien

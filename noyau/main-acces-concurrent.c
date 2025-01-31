@@ -46,6 +46,7 @@ void startManuX()
    kmallocInitialisation();
    
    // Le clavier nous permettra de basculer entre consoles
+   printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
 
    // Initialisation du journal
@@ -56,12 +57,8 @@ void startManuX()
    printk_debug(DBG_KERNEL_START, "Initialisation des AS ...\n");
    initialiserAppelsSysteme();
 
-   // Le clavier va nous servir à basculer entre consoles
-   printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
-   initialiserClavier();
-
    // On va utiliser des tubes, donc le système de fichiers
-   printk_debug(DBG_KERNEL_START, "Initialisation des fichiers ...\n");
+   //printk_debug(DBG_KERNEL_START, "Initialisation des fichiers ...\n");
    sfInitialiser();
 
    // Initialisation de la gestion des processus

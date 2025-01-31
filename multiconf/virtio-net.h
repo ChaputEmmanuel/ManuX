@@ -15,6 +15,24 @@
 #define MANUX_FICHIER_MAIN main-virtio-net
 
 #include <config/base.h>
+#include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
+#include <config/plan-memoire.h>
+#include <config/gestion-memoire.h>
+#include <config/kmalloc.h>
+#include <config/pc-i386.h>
+#include <config/synchronisation.h>
+#include <config/console.h>
+#include <config/printk.h>
+#include <config/taches.h>
+#include <config/stdlib.h>
+#include <config/reseau.h>
+#include <config/pci.h>
+#include <config/virtio.h>
+#undef MANUX_VIRTIO_CONSOLE
+
+/***** PREVIOUS
+       
+#include <config/base.h>
 #include <config/bootloader.h>
 #include <config/plan-memoire.h>
 #include <config/gestion-memoire.h>
@@ -26,10 +44,10 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/pc-i386.h>
-#include <config/pci.h>
-#include <config/virtio.h>
-#undef MANUX_VIRTIO_CONSOLE
-#include <config/reseau.h>
+
+
+
+*******/
 
 #include <config/verifications.h>
 

@@ -289,7 +289,14 @@ void interruptionAfficher()
  */
 void dummyTraiterClavier()
 {
-   Console * cons = tacheEnCours->console;
+   Console * cons
+
+#ifdef MANUX_CONSOLES_VIRTUELLES
+     = tacheEnCours->console;
+#else
+     = consoleNoyau();     
+#endif
+   
    char c[1] ;
    int i;
    
@@ -368,9 +375,7 @@ void aDummyKernelTask()
 #ifdef MANUX_CLAVIER_CONSOLE
       dummyTraiterClavier();
 #endif
-#ifdef MANUX_VIRTIO_NET
-      virtioReseauPoll(); // WARNING à virer !!!
-#endif
+
 #if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // rendre le verrou si le noyau n'est pas réentrant.
@@ -403,6 +408,8 @@ void initialiserScheduler()
    Tache * t0, *t1;
 
    dateDernierOrdonnancement = nbTopHorloge;
+
+   printk_debug(DBG_KERNEL_ORDON, "initialisation du scheduler ...\n");
 
    // Initialisation de la liste (vide) des tâches en cours
    initialiserListeTache(&listeTachesPretes);
@@ -460,63 +467,6 @@ void initialiserScheduler()
 
    printk_debug(DBG_KERNEL_ORDON, "scheduler is done\n");
 }
-
-#ifdef SUPPRIME
-/*
- * Insertion d'une nouvelle tâche dans l'ordonnanceur. La valeur
- * retournée est l'id de la tâche ou un code d'erreur.
- * WARNING a virer dès que la précédente est OK
- */
-TacheID ordonnancerTache(CorpsTache corpsTache, console * cons)
-{
-   Tache   * tache;
-
-#ifdef MANUX_TACHE_CONSOLE   
-   Console * cons;
-#   ifdef MANUX_CONSOLES_VIRTUELLES
-   if (nouvelleConsole) {
-      cons = creerConsoleVirtuelle();
-   } else {
-      if (tacheEnCours != NULL) {
-         cons = tacheEnCours->console;
-      } else { // Pour la première a priori
-         cons = NULL;//consoleNoyau();
-      }
-   }   
-#   endif // MANUX_CONSOLES_VIRTUELLES
-#endif // MANUX_TACHE_CONSOLE
-   
-   /* Création de la tache */
-#ifdef MANUX_TACHE_CONSOLE
-   tache = creerTache(corpsTache, cons);
-#else
-   tache = creerTache(corpsTache);
-#endif
-   if (tache == NULL) {
-      return -ENOMEM;
-   }
-
-   /* On insère la nouvelle tâche à la fin de la liste */
-   if (corpsTache) {
-      insererCelluleTache(&listeTachesPretes,
-                          tache,
-                          (CelluleTache*)tache+sizeof(Tache));
-      printk_debug(DBG_KERNEL_TACHE, "Tache inseree\n");
-
-   } else {
-     //printk("99999\n");
-      /* Cas particulier de la première tâche : */
-      /*   . on charge son task register ;      */
-      ltr(tache->indiceTSSDescriptor);
-      /*   . et on la déclare comme en cours.   */
-      tacheEnCours = tache;
-   }
-   //printk("00000\n");
-   
-   return tache->numero;
-}
-#endif
-
 
 #ifdef MANUX_APPELS_SYSTEME
 
@@ -590,7 +540,7 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
    } else {
       console = creerConsoleVirtuelle();
    }
-#else
+#   else
    console = consoleNoyau();
 #   endif // MANUX_CONSOLES_VIRTUELLES
    tacheSetConsole(tache, console);
@@ -600,5 +550,97 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
    
    return tache->numero;
 }
-
 #endif // MANUX_APPELS_SYSTEME
+
+/**
+ * @brief Création et ordonnancement d'une tâche noyau
+ */
+TacheID ordonnanceurCreerTacheNoyau(CorpsTache corpsTache)
+{
+   Tache   * tache;
+   
+   assert(tacheEnCours != NULL);
+
+   printk_debug(DBG_KERNEL_ORDON, "corpsTache = 0x%x\n", corpsTache);
+
+   // Création de la tâche
+   tache = tacheCreer(corpsTache);
+   if (tache == NULL) {
+      return -ENOENT;
+   }
+
+#ifdef MANUX_TACHE_CONSOLE
+   // Affectation de la console
+   tacheSetConsole(tache,  consoleNoyau());
+#endif
+
+   ordonnanceurAddTache(tache);
+   
+   return tache->numero;
+}
+
+
+
+
+
+
+
+
+
+
+
+#ifdef SUPPRIME
+/*
+ * Insertion d'une nouvelle tâche dans l'ordonnanceur. La valeur
+ * retournée est l'id de la tâche ou un code d'erreur.
+ * WARNING a virer dès que la précédente est OK
+ */
+TacheID ordonnancerTache(CorpsTache corpsTache, console * cons)
+{
+   Tache   * tache;
+
+#ifdef MANUX_TACHE_CONSOLE   
+   Console * cons;
+#   ifdef MANUX_CONSOLES_VIRTUELLES
+   if (nouvelleConsole) {
+      cons = creerConsoleVirtuelle();
+   } else {
+      if (tacheEnCours != NULL) {
+         cons = tacheEnCours->console;
+      } else { // Pour la première a priori
+         cons = NULL;//consoleNoyau();
+      }
+   }   
+#   endif // MANUX_CONSOLES_VIRTUELLES
+#endif // MANUX_TACHE_CONSOLE
+   
+   /* Création de la tache */
+#ifdef MANUX_TACHE_CONSOLE
+   tache = creerTache(corpsTache, cons);
+#else
+   tache = creerTache(corpsTache);
+#endif
+   if (tache == NULL) {
+      return -ENOMEM;
+   }
+
+   /* On insère la nouvelle tâche à la fin de la liste */
+   if (corpsTache) {
+      insererCelluleTache(&listeTachesPretes,
+                          tache,
+                          (CelluleTache*)tache+sizeof(Tache));
+      printk_debug(DBG_KERNEL_TACHE, "Tache inseree\n");
+
+   } else {
+     //printk("99999\n");
+      /* Cas particulier de la première tâche : */
+      /*   . on charge son task register ;      */
+      ltr(tache->indiceTSSDescriptor);
+      /*   . et on la déclare comme en cours.   */
+      tacheEnCours = tache;
+   }
+   //printk("00000\n");
+   
+   return tache->numero;
+}
+#endif

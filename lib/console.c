@@ -49,13 +49,15 @@ Console * consoleActive;
  * mémoire est déclarée ici.
  */
 static char copieEcranConsoleNoyau[2*MANUX_CON_COLONNES*MANUX_CON_LIGNES];
+#endif // MANUX_CONSOLES_VIRTUELLES
 
+/**
+ * @brief Si on gère le clavier, on prévoie une zone mémoire pour
+ * celui du noyau (qui est le seule si pas de consoles virtuelles).
+ */
 #ifdef MANUX_CLAVIER_CONSOLE
 static char bufferClavierNoyau[4096]; // WARNING taille 1 page, pas joli de le harcoder !
-#endif
-
-
-#endif // MANUX_CONSOLES_VIRTUELLES
+#endif // MANUX_CLAVIER_CONSOLE
 
 void consoleAffecterCouleurFond(Console * cons, Couleur coul)
 {
@@ -303,16 +305,16 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
    consoleEffacer(cons);
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   /* On l'insère après la console active dans la liste des consoles gérées */
+   // On l'insère après la console active dans la liste des consoles gérées
    cons->suivante = consoleActive->suivante;
    consoleActive->suivante = cons;
    cons->precedente = consoleActive;
    cons->suivante->precedente = cons;
    cons->numero = nombreDeConsoles++;
-#endif
+#endif // MANUX_CONSOLES_VIRTUELLES
 #ifdef MANUX_CLAVIER_CONSOLE
    consoleSetClavier(cons, NULL);
-#endif
+#endif // MANUX_CLAVIER_CONSOLE
 }
 
 #ifdef MANUX_CONSOLES_VIRTUELLES
@@ -339,11 +341,11 @@ Console * creerConsoleVirtuelle()
 
 #ifdef MANUX_CLAVIER_CONSOLE
    consoleSetClavier(result, allouerPage());
-#endif
+#endif // MANUX_CLAVIER_CONSOLE
 
 #ifdef MANUX_BASCULER_NOUVELLE_CONSOLE
    basculerVersConsole(result);
-#endif
+#endif // MANUX_BASCULER_NOUVELLE_CONSOLE
    
    return result;
 }
@@ -466,7 +468,7 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 
    return consoleLire(con, buffer, nbOctets);
 }
-#else
+#else  // MANUX_CLAVIER_CONSOLE
 /**
  * En l'absence de clavier, rien à lire !
  */
@@ -474,7 +476,7 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    return 0;
 }
-#endif
+#endif // MANUX_CLAVIER_CONSOLE
 
 #ifdef MANUX_FICHIER
 /**
@@ -526,7 +528,7 @@ void initialiserConsoleNoyau()
    
 #ifdef MANUX_CONSOLES_VIRTUELLES
    //! Si on utilise plusieurs consoles, on doit pouvoir sauvegarder
-   //! leur contenu, y compris pour celle du noyau
+   //! leu contenu, y compris pour celle du noyau
    _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
 
    //! C'est la première, la seule pour le moment, on l'active donc et

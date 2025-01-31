@@ -104,7 +104,7 @@ void handlerClavier(void * toto)
 #   endif
 
       if (codeClavier & 0x80) {
-	printk("(up)\n");
+	//printk("(up)\n");
       } else {
          if (cons->bufferClavier){ 
             if (cons->nbCarAttente < 4096) {
