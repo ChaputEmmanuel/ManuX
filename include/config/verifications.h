@@ -18,6 +18,11 @@
 #if defined(MANUX_VIRTIO_CONSOLE) && !defined(MANUX_FICHIER)
 #   error "MANUX_VIRTIO_CONSOLE nécessite MANUX_FICHIER"
 #endif
+
+#if defined(MANUX_PRINTK) && !defined(MANUX_CONSOLE)
+#   error "MANUX_PRINTK nécessite MANUX_CONSOLE"
+#endif
+
 /*
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_APPELS_SYSTEME)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_APPELS_SYSTEME"
@@ -50,6 +55,10 @@
 
 #if defined(MANUX_CLAVIER_CONSOLE) && !defined(MANUX_CLAVIER)
 #   error "MANUX_CLAVIER_CONSOLE nécessite MANUX_CLAVIER"
+#endif
+
+#if defined(MANUX_KMALLOC) && !defined(MANUX_GESTION_MEMOIRE)
+#   error "MANUX_KMALLOC nécessite MANUX_GESTION_MEMOIRE"
 #endif
 
 #if defined(MANUX_KMALLOC_STAT) && !defined(MANUX_KMALLOC)
@@ -90,10 +99,6 @@
 
 #if defined(MANUX_REGISTRE) && !defined(MANUX_KMALLOC)
 #   error "MANUX_REGISTRE nécessite MANUX_KMALLOC"
-#endif
-
-#if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_REGISTRE)
-#   error "MANUX_DEBUGMASK_VAR nécessite MANUX_REGISTRE"
 #endif
 
 #if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_STDLIB)

@@ -12,6 +12,13 @@
 #include <manux/types.h>
 
 /**
+ * A voir où cette adresse doit être définie
+ */
+#ifndef MANUX_ADRESSE_ECRAN
+#   define MANUX_ADRESSE_ECRAN 0xb8000
+#endif
+
+/**
  * Caractéristiques de l'écran physique
  */
 #define MANUX_CON_SCREEN   (char *)MANUX_ADRESSE_ECRAN

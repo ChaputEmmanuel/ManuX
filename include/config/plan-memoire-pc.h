@@ -1,5 +1,6 @@
 /**
- *   Définitions liées à l'organistion de la mémoire, en particulier lors du
+ * @file include/config/plan-memoire.h
+ * @brief Définitions liées à l'organistion de la mémoire, en particulier lors du
  * démarrage.
  *   Attention, tout ne devrait pas forcément être là, à reventiler un peu.
  */

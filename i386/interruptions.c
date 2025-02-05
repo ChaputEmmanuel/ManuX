@@ -24,7 +24,6 @@
 #endif
 #include <manux/tache.h>          // IntelTSS 
 #include <manux/string.h>         // memcpy 
-
 #define MANUX_SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
 
 #ifdef MANUX_APPELS_SYSTEME

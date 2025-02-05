@@ -5,6 +5,7 @@
  *                                                     (C) Manu Chaput 2000-2025 
  */
 #include <manux/bootloader.h>
+#include <manux/stdlib.h>    // atoihex
 #include <manux/debug.h>     // paniqueNoyau, assert
 #include <manux/string.h>    // memcpy, prochainDelimiteur
 #include <manux/registre.h>  // registreSystemeAjouterC
@@ -91,8 +92,6 @@ void bootloaderInitialiser()
    }
 }
 
-
-#ifdef MANUX_REGISTRE
 /**
  * @brief Analyse de la ligne de commande et insertion de paramètres
  * dans le registre
@@ -103,10 +102,12 @@ void bootloaderInitialiser()
 
 void bootloaderLireLigneCmd()
 {
+#ifdef MANUX_REGISTRE
    char   param[512] ; // Une chaîne de caractères qui contient le
-		  // paramètre en cours d'analyse
-   char * debut, * fin ; // Pointeurs
+                       // paramètre en cours d'analyse
    int lgParam;
+#endif
+   char * debut, * fin ; // Pointeurs
    
    // La ligne de commande est une liste d'éléments séparés par des
    // BOOTLOADER_CMD_SEPARATEUR
@@ -116,12 +117,21 @@ void bootloaderLireLigneCmd()
    while (strlen(debut)) {
       fin = prochainDelimiteur(debut, BOOTLOADER_CMD_SEPARATEUR);
       assert(fin > debut);   // Puisque strlen(debut) != 0
+
+#ifdef MANUX_REGISTRE   // A priori on place dans le registre
       lgParam = fin - debut;
       memcpy(param, debut, lgParam);
       param[lgParam] = 0;
-      printk("   -> '%s'\n", param);
-
       registreSystemeAjouterC(param);
+#else     // Si pas de registre, on gère ce qu'on sait faire
+#   ifdef MANUX_DEBUGMASK_VAR
+      if (strncmp(debut, NOM_MASQUE_CONSOLE, strlen(NOM_MASQUE_CONSOLE)) == 0) {
+         masqueDebugageConsole = atoihex(debut + strlen(NOM_MASQUE_CONSOLE)+1);
+      } else if (strncmp(debut, NOM_MASQUE_FICHIER, strlen(NOM_MASQUE_FICHIER)) == 0) {
+         masqueDebugageFichier = atoihex(debut + strlen(NOM_MASQUE_FICHIER)+1);
+      }
+#   endif // MANUX_DEBUGMASK_VAR
+#endif // MANUX_REGISTRE
       
       // Si on a un séparateur, on avance, sinon, on est sur le 0 final
       if (*fin == BOOTLOADER_CMD_SEPARATEUR) {
@@ -132,4 +142,3 @@ void bootloaderLireLigneCmd()
    }
 }
 
-#endif

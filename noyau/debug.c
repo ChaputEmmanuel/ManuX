@@ -35,9 +35,9 @@ void debugMiseAJourMasque(void * masque, char * valeur)
  */
 void debugInitialiser()
 {
+#if defined(MANUX_DEBUGMASK_VAR) && defined(MANUX_REGISTRE)
    char v[32];
 
-#if defined(MANUX_DEBUGMASK_VAR) && defined(MANUX_REGISTRE)
    snprintk(v, 32, "0x%x", _masqueDebugageConsole);
    registreSystemeAffecterParametre(v, &masqueDebugageConsole, debugMiseAJourMasque,
 				    "debug", "masque", "console", NULL);

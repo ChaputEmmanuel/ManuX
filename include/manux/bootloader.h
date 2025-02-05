@@ -69,14 +69,12 @@ extern InfoSysteme * _infoSysteme;
  */
 void bootloaderInitialiser();
 
-#ifdef MANUX_REGISTRE
 /**
- * @brief Analyse de la ligne de commande et insertion de paramètres
- * dans le registre
+ * @brief Analyse de la ligne de commande et modification de certains
+ * paramètres. Cette fonction estparticulièrement utile avec un
+ * regsitre. 
  */
 void bootloaderLireLigneCmd();
-
-#endif
 
 #endif
  

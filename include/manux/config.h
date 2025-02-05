@@ -18,7 +18,6 @@
 
 #include <config/base.h>
 #include <config/debug.h>
-#include <config/plan-memoire.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
 #include <config/systeme-fichiers.h>
 #include <config/ramdisk.h>

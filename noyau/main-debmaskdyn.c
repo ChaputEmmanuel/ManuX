@@ -1,29 +1,31 @@
 /**
- * @file  : main-debugmask-dyn.c
+ * @file  : main-debmaskdyn.c
  * @brief : Comment utiliser les options du bootloader pour modifier
- * les masques de débogage via le registre.
+ * les masques de débogage.
  *
- *    Après les initialisations nécessaires, quelques messages de
+ *   On n'utilise pas le registre ici, ce qui permet d'alléger
+ * sensiblement les choses. 
+ *
+ *   Après les initialisations nécessaires, quelques messages de
  * debogage sont affichés pour montrer l'impact des masques de debug.
  *
- *    On pourra par exemple passer en paramètre au bootloader
+ *   On pourra par exemple passer en paramètre au bootloader
  *
  * debug.masque.console=0x803
  *
- *    ou 
+ *   ou
+ *
  * debug.masque.console=0x003
  *
- *    Car 0x800 active les messages "a faire".
+ *   Car 0x800 active les messages "a faire".
  *                                                  (C) Manu Chaput 2000-2025 
  */
 #include <manux/config.h>
 #include <manux/types.h>     // TRUE
-#include <manux/console.h>
+#include <manux/console.h>   // Pour printk
 #include <manux/printk.h>
 #include <manux/memoire.h>
-#include <manux/kmalloc.h>
 #include <manux/bootloader.h>
-#include <manux/registre.h>
 
 #include <manux/debug.h>
 
@@ -37,23 +39,14 @@ void startManuX()
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
 
-   // Initialsation du système kmalloc
-   kmallocInitialisation();
-
-   // On initialise le registre
-   registreSystemeInitialiser();
-
-   // Initialisation du système de debug (il utilise le registre)
+   // Initialisation du système de debug
    debugInitialiser();
    
    // On peut maintenant analyser la ligne de commande
    bootloaderLireLigneCmd();
 
-   // On affiche le registre pour information
-   registreSystemeAfficher();
-
-   // Affichage desmasque, pour le plaisir
-   printk("Registre de debug : 0x%x (console) et 0x%x (fichier)\n",
+   // Affichage des masques, pour le plaisir
+   printk("Masques de debug : 0x%x (console) et 0x%x (fichier)\n",
 	  masqueDebugageConsole, masqueDebugageFichier);
 
    // Quelques messages de debug, pour vérifier

@@ -1,8 +1,9 @@
 /**
- * @file multiconf/registre.h
- * @brief Gestion dynamique du masque de debugage de ManuX
+ * @file multiconf/debug-dyn-reg.h
+ * @brief Gestion dynamique du masque de debugage de ManuX configuré
+ * au travers du registre.
  *
- *                                                     (C) Manu Chaput 2023-2024
+ *                                                     (C) Manu Chaput 2023-2025
  */
 
 #ifdef MANUX_FICHIER_CONFIG
@@ -12,7 +13,7 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
-#define MANUX_FICHIER_MAIN main-debugmask-dyn
+#define MANUX_FICHIER_MAIN main-debmaskdyn-reg
 
 #include <config/base.h>
 #include <config/console.h>
@@ -21,8 +22,7 @@
 #include <config/registre.h>
 #include <config/stdlib.h>   // Pour atoihex
 #include <config/pc-i386.h>
-#include <config/plan-memoire.h>
-#include <config/gestion-memoire.h>  // Pourquoi ?
+#include <config/gestion-memoire.h> 
 #include <config/kmalloc.h> 
 #include <config/bootloader.h> // On va lire des paramètres fournis par le bootloader
 #include <config/registre.h> // Il nous faut évidemment le registre

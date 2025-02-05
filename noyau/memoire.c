@@ -14,7 +14,7 @@
 #include <manux/atomique.h>
 #include <manux/pagination.h> /* ajouterPage() */
 #include <manux/console.h>
-#include <manux/i386.h>       // ADDR_VERS_PAGE
+#include <manux/i386.h>         // ADDR_VERS_PAGE
 
 /**
  * @brief Obtention des adresses de base.
