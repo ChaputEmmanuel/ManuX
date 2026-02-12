@@ -7,6 +7,30 @@
 structures de données pouvant être utilisées pour paramétrer les
 différents sous-systèmes.
 
+   
+%-------------------------------------------------------------------------------
+% Définition d'un registre
+%-------------------------------------------------------------------------------
+\subsection{Définition d'un registre}
+
+%-------------------------------------------------------------------------------
+% Implantation
+%-------------------------------------------------------------------------------
+\subsection{Implantation d'un registre}
+
+   Les registres sont définis dans \fichier{manux}{registre}{h} et
+implantés dans \fichier{lib}{registre}{c}.
+
+La fonction principale pour peupler le registre est la suivante
+
+\begin{lstinline]
+  void registreAffecterParametre(registre * reg,
+                               char * valeur,
+			       void * prive,
+                               registreMiseAJour miseAJour,
+                               ...);
+\end{lstinline}
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
@@ -14,3 +38,33 @@ différents sous-systèmes.
 
    Le registre {\tt ManuX-Param} est destiné à contenir les paramètres
 du noyau ManuX.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Exemple d'utilisation}
+
+   Un exemple d'utilisation simple du registre est donné dans
+\fichier{multiconf}{registre}{h}. Le code est dans le fichier
+\fichier{noyau}{main-registre}{c}.
+
+   Dans ce fichier, 4 paramètres sont initialisés de différentes
+façons :
+
+\begin{itemize}
+   \item{\tt a} reçoit une valeur au démarage, puis sa fonction de
+     mise-à-jour lui est affectée avec une valeur par défaut, qui
+     n'est donc pas utilisée.
+   \item{\tt b} reçoit une valeur au démarage, puis sa fonction de
+     mise-à-jour lui est affectée sans valeur par défaut.
+   \item{\tt c} ne reçoit pas de valeur au démarage, puis sa fonction
+     de mise-à-jour lui est affectée avec une valeur par défaut, qui
+     est donc utilisée.
+   \item{\tt d} reçoit une valeur au démarage, puis sa fonction de
+     mise-à-jour lui est affectée avec une valeur par défaut, qui
+     n'est donc pas utilisée, mais une nouvelle valeur lui est ensuite
+     affectée, qui est celle finalement utilisée.     
+\end{itemize}
+
+   Par soucis de simplicité, on n'utilise pas ici les outils de boot
+pour passer des paramètres, mais cela ne change rien.

@@ -41,14 +41,10 @@
 #define _masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_VIRTIO     \
- | DBG_KERNEL_NET        \
  			       )
 # define _masqueDebugageFichier (0x00000000\
  | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
- | DBG_KERNEL_VIRTIO     \
- | DBG_KERNEL_NET        \
 				)
 
 #ifdef MANUX_DEBUGMASK_VAR

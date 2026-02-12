@@ -21,6 +21,9 @@
 #include <manux/printk.h>
 #include <manux/debug.h>
 
+#if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
+#   include <manux/exclusion-mutuelle.h>
+#endif 
 /**
  * @brief :Le numero de la prochaine tache
  * (WARNING : et si on cycle ?) 

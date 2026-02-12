@@ -1,8 +1,9 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantation des sous-programmes de gestion des appels système.       */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2000-2021 */
-/*----------------------------------------------------------------------------*/
+/**
+   @file noyau/appelsysteme.c
+   @brief Implantation des sous-programmes de gestion des appels système.
+
+                                                     (C) Manu Chaput 2000-2025
+*/
 #include <manux/appelsysteme.h>
 
 #include <manux/errno.h>
@@ -33,9 +34,45 @@ int sys_dumbAS(ParametreAS as)
    printk("I am so useless, ...\n");
 
    attenteMilliSecondes(500);
+
+   printk("It took me some time, ...\n");
    
    return 4832;
 }
+
+#ifdef MANUX_AS_TEST_SYNCHRO
+/**
+ * @brief : Implantation d'un appel système permettant d'illustrer la
+ * synchronisation
+ *
+ *   La valeur du compteur est incrémentée de inc et une attente est
+ * réalisée en fonction du paramètre action.
+ */
+static int testSynchroCompteur = 0;
+#define MANUX_AS_TEST_SYNCHRO_DELAI 500
+
+int sys_testSynchroAS(ParametreAS as, int inc, int action)
+{
+   int x;
+
+   x = testSynchroCompteur;
+
+   switch (action) {
+      case 1 :
+         ordonnanceur();
+      break;
+      case 2:
+         attenteMilliSecondes(MANUX_AS_TEST_SYNCHRO_DELAI);
+      break;
+      default :
+   }
+
+   x += inc;
+   testSynchroCompteur = x;
+   
+   return testSynchroCompteur;
+}
+#endif // MANUX_AS_TEST_SYNCHRO
 
 /**
  * @brief : Implantation de l'appel système par défaut
@@ -74,6 +111,10 @@ void initialiserAppelsSysteme()
    }
    
    definirAppelSysteme(NBAS_DUMB, sys_dumbAS);
+
+#ifdef MANUX_AS_TEST_SYNCHRO
+   definirAppelSysteme(NBAS_TEST_SYNC, sys_testSynchroAS);
+#endif
    
    /* Envoyer une chaîne de caractères sur la console */
    definirAppelSysteme(NBAS_ECRIRE_CONS, sys_ecrireConsole);

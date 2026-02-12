@@ -85,7 +85,6 @@ void gestionException(TousRegistres registres,
 #ifdef MANUX_INT_AUDIT
    nbItRecues[numEx] ++;
 #endif
-   printk("Prout %d, 0x%x\n", numEx, eip);
    fonctionDeGestionException[numEx](registres, numEx, errCode, eip, cs, eFlags);
 }
 

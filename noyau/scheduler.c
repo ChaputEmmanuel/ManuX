@@ -4,11 +4,12 @@
 /* A voir : le paramètre "nouvelleConsole" n'a pas de sens s'il n'y a pas de  */
 /* consoles virtuelles, à supprimer dans ce cas ? Ca rendra le code moins     */
 /* lisible.                                                                   */
-/*                                                  (C) Manu Chaput 2000-2023 */
+/*                                                  (C) Manu Chaput 2000-2025 */
 /*----------------------------------------------------------------------------*/
 #include <manux/scheduler.h>
 
 #define DEBUG_MANUX_SCHEDULER
+#define MANUX_DUMMY_TASK  // WARNING, à mettre ailleurs
 
 #include <manux/errno.h>
 #include <manux/console.h>
@@ -117,6 +118,7 @@ void ordonnanceur()
 
    // Attention, si la tâche en cours n'est pas préemptible
    if (tacheEnCours->nonPreemptible) {
+      printk_debug(DBG_KERNEL_ORDON, "abandon (tache %d non preemptible)\n", tachePrecedente->numero);
       return;
    }
    
@@ -139,10 +141,12 @@ void ordonnanceur()
    // correspondant à son état
    
    // (2) on cherche la tâche suivante
-   // On prend la première tâche prête, il y en a au moins une : la dummy 
+   // On prend la première tâche prête, il y en a au moins une : la dummy
+   printk_debug(DBG_KERNEL_ORDON, "on cherche la suivante ...\n");   
    do {
       tacheEnCours = extraireTache(&listeTachesPretes);
    } while (tacheEnCours->etat != Tache_Prete); 
+   printk_debug(DBG_KERNEL_ORDON, "... ce sera la %d\n", tacheEnCours->numero);   
 
    tacheEnCours->etat = Tache_En_Cours;
  
@@ -222,7 +226,9 @@ void afficherEtatMutex()
 	celluleTache = celluleTache->suivant){
       printk("%d ", celluleTache->tache->numero);
    }
+#ifdef MANUX_EXCLUSION_MUTUELLE_AUDIT
    printk("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
+#endif
 }
 #endif
 
@@ -332,7 +338,7 @@ void dummyTraiterClavier()
 #endif
 	    break;
 #endif
-#if defined(MANUX_TACHES) && defined(MANUX_REENTRANT) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
          case 'x' :
             afficherEtatMutex();
 	 break;
@@ -354,18 +360,19 @@ void dummyTraiterClavier()
 #endif // MANUX_CLAVIER_CONSOLE
 
 #if defined(MANUX_TACHES)  // A virer non ? Scheduler sans tache, ...
+
+#if defined(MANUX_DUMMY_TASK)
 /**
  * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
  */
 void aDummyKernelTask()
 {
    while(1) {
-#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
+
+#if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // acquérir le verrou si le noyau n'est pas réentrant.
-#   if defined(MANUX_EXCLUSION_MUTUELLE)
       exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
-#   endif
       assert(tacheDansLeNoyau == 0);
       tacheDansLeNoyau = tacheEnCours->numero;
 #endif
@@ -376,17 +383,17 @@ void aDummyKernelTask()
       dummyTraiterClavier();
 #endif
 
-#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
+#if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // rendre le verrou si le noyau n'est pas réentrant.
       tacheDansLeNoyau = 0;
-#   if defined(MANUX_EXCLUSION_MUTUELLE)
       exclusionMutuelleSortir(&verrouGeneralDuNoyau);
 #endif
+
       ordonnanceur();
-#endif
    }
 }
+#endif // MANUX_DUMMY_TASK
 #endif // MANUX_TACHES
 /**
  * @brief Ajout d'une tâche dans l'ordonnanceur
@@ -405,7 +412,10 @@ void ordonnanceurAddTache(Tache * tache)
  */
 void initialiserScheduler()
 {
-   Tache * t0, *t1;
+   Tache * t1; // Le fil d'exécution en cours, qui deviendra init
+#ifdef MANUX_DUMMY_TASK
+   Tache * t2; // Ce sera la "dummy" task
+#endif // MANUX_DUMMY_TASK
 
    dateDernierOrdonnancement = nbTopHorloge;
 
@@ -421,35 +431,21 @@ void initialiserScheduler()
    initialiserListeTache(&listeTachesTerminees);
 
    // Création d'une tâche pour le fil actuel (premier numéro)
-   t0 = tacheCreer(NULL);
-   if (t0 == NULL) {
-      paniqueNoyau("impossible de creer la premiere tache !\n");
-   }
-#ifdef MANUX_TACHE_CONSOLE   
-   tacheSetConsole(t0, consoleNoyau());
-#endif
-   /* Cas particulier de la première tâche : */
-   /*   . et on la déclare comme en cours.   */
-   tacheEnCours = t0;
-   t0->etat = Tache_En_Cours;
-   
-   /*   . on charge son task register ;      */
-   ltr(t0->indiceTSSDescriptor);
-			
-   printk_debug(DBG_KERNEL_ORDON, "creons la dummy\n");
-
-   // Initialisation de la tache "aDummyKernelTask" (numéro 1)
-   t1 = tacheCreer(aDummyKernelTask);
-
-   printk_debug(DBG_KERNEL_ORDON, "la dummy est la ...\n");
-   
+   t1 = tacheCreer(NULL);
    if (t1 == NULL) {
-      paniqueNoyau("impossible de creer la seconde tache !\n");
+      paniqueNoyau("impossible de creer la premiere tache !\n");
    }
 #ifdef MANUX_TACHE_CONSOLE   
    tacheSetConsole(t1, consoleNoyau());
 #endif
-
+   /* Cas particulier de la première tâche : */
+   /*   . on la déclare comme en cours.   */
+   tacheEnCours = t1;
+   t1->etat = Tache_En_Cours;
+   
+   /*   . on charge son task register ;      */
+   ltr(t1->indiceTSSDescriptor);
+			
    // Avant de permettre à une deuxième tâche d'entrer en concurrence,
    // il faut s'assurer qu'on a la main sur le noyau.
 #if !defined(MANUX_REENTRANT) && defined(MANUX_EXCLUSION_MUTUELLE)
@@ -460,11 +456,29 @@ void initialiserScheduler()
    tacheDansLeNoyau = tacheEnCours->numero;
 #endif
 
-   printk_debug(DBG_KERNEL_ORDON, "on ajoute la t1 dans l'ordo\n");
+#ifdef MANUX_DUMMY_TASK
+   printk_debug(DBG_KERNEL_ORDON, "creons la dummy\n");
+
+   // Initialisation de la tache "aDummyKernelTask" (numéro 2)
+   t2 = tacheCreer(aDummyKernelTask);
+   
+   if (t2 == NULL) {
+      paniqueNoyau("impossible de creer la seconde tache !\n");
+   }
+
+   printk_debug(DBG_KERNEL_ORDON, "la dummy est la ...\n");
+
+#ifdef MANUX_TACHE_CONSOLE   
+   tacheSetConsole(t2, consoleNoyau());
+#endif
+
+   printk_debug(DBG_KERNEL_ORDON, "on ajoute la t2 dans l'ordo\n");
    
    // A partir de maintenant, nous ne sommes plus seuls
-   ordonnanceurAddTache(t1);
+   ordonnanceurAddTache(t2);
 
+#endif // MANUX_DUMMY_TASK
+   
    printk_debug(DBG_KERNEL_ORDON, "scheduler is done\n");
 }
 

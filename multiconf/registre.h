@@ -18,10 +18,10 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/pc-i386.h>
-#include <config/stdlib.h>  // atoi
-#include <config/plan-memoire.h>
-#include <config/gestion-memoire.h>  // Pourquoi ?
-#include <config/kmalloc.h> 
+#include <config/stdlib.h>           // atoi
+#include <config/bootloader.h>       // Pour infosys pour mémoire
+#include <config/gestion-memoire.h>  // Pour kmalloc
+#include <config/kmalloc.h>          // Le registre utilise kmalloc
 #include <config/registre.h>
 
 #include <config/verifications.h>

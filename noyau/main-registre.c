@@ -20,7 +20,7 @@
  * @brief Exemple de fonction de mise-à-jour d'un paramètre dans un
  * registre 
  */
-uint16_t a, b, c;
+uint16_t a = 1, b = 1, c = 1, d = 1;
 void miseAJourPararametre(void * prive, char * valeur)
 {
    uint16_t * n = (uint16_t *)prive;
@@ -53,22 +53,33 @@ void startManuX()
    // boot (eg via le bootloader).
    registreSystemeAjouterC("test.a=0x19");
 
-   // La valeur 42 est affectée au paramètre b, mais d'une autre façon
-   // (même résultat).
+   // La valeur 0x42 est affectée au paramètre b, mais d'une autre façon
+   // (même résultat) idem pour d qui reçoit 0x17
    registreSystemeAffecterParametre("0x42", NULL, NULL,
 	                            "test", "b", NULL);
+   registreSystemeAffecterParametre("0x17", NULL, NULL,
+	                            "test", "d", NULL);
 
    // Maintenant le sous-système test s'initialise. Il a une valeur
-   // par défaut pour a, b et c, mais celles de a et b ne seront pas
+   // par défaut pour a, c et d, mais celles de a et b ne seront pas
    // utilisées, puisqu'une valeur a déjà été donnée au boot.
-   registreSystemeAffecterParametre("23", &a, miseAJourPararametre,
+   registreSystemeAffecterParametre("0x23", &a, miseAJourPararametre,
 	                            "test", "a", NULL);
 
-   registreSystemeAffecterParametre("17", &b, miseAJourPararametre,
+   registreSystemeAffecterParametre(NULL, &b, miseAJourPararametre,
 	                            "test", "b", NULL);
 
-   registreSystemeAffecterParametre("69", &c, miseAJourPararametre,
+   registreSystemeAffecterParametre("0x69", &c, miseAJourPararametre,
 	                            "test", "c", NULL);
+
+   registreSystemeAffecterParametre("0x24", &d, miseAJourPararametre,
+	                            "test", "d", NULL);
+
+   // Imaginons que pour d on souhaite affecter une valeur (quitte à
+   // écraser celle définie au boot), par exemple une valeur donnée
+   // par une appli :
+   registreSystemeAffecterParametre("0x25", &d, NULL,
+	                            "test", "d", NULL);
 
    // Quelques autres paramètres, juste histoire de peupler un
    // registre plus riche
@@ -82,11 +93,11 @@ void startManuX()
 				   "reseau", "ip", "eth0", "addr", NULL);
 
    registreSystemeAffecterParametre("192.168.12.2", NULL, NULL,
-				   "reseau", "ip", "eth1", "addr", NULL);
+   				   "reseau", "ip", "eth1", "addr", NULL);
 
    registreSystemeAfficher();
 
-   printk("Finalement, le systeme va demarrer avec a=%d, b=%d et c=%d\n", a, b, c);
+   printk("Finalement, le systeme va demarrer avec a=0x%x, b=0x%x, c=0x%x et d=0x%x\n", a, b, c, d);
 
 }   /* startManuX */
 

@@ -75,10 +75,15 @@ void parametreAffecterValeur(parametre * p, char * v)
 {
    if (p->valeur != NULL) {
       kfree(p->valeur);
-   }  
-   p->valeur = kmalloc(strlen(v) +1);
-   memcpy(p->valeur, v, strlen(v) +1);
+   }
 
+   if (v != NULL) {
+      p->valeur = kmalloc(strlen(v) +1);
+      memcpy(p->valeur, v, strlen(v) +1);
+   } else {
+      p->valeur = NULL;
+   }
+   
    // On répercute la mise-à-jour
    parametreMettreAJour(p);
 }
@@ -104,6 +109,9 @@ void parametreAffecterMiseAJour(parametre * param,
 {
    param->miseAJour = miseAJour;
    param->prive = prive;
+
+   // On applique car il y a peut-être déjà une valeur
+   parametreMettreAJour(param);
 }
 
 /**
@@ -114,12 +122,11 @@ parametre * parametreCreer(char * nom, char * valeur,
 {
    parametre * result = (parametre *) kmalloc(sizeof(parametre));
 
-   //printk("Creation du param '%s' en %d avec maj %d\n", nom, result, miseAJour);
    if (result != NULL) {
       memset(result, 0, sizeof(parametre));
       parametreAffecterNom(result, nom);
-      parametreAffecterMiseAJour(result, prive, miseAJour);
       parametreAffecterValeur(result, valeur);
+      parametreAffecterMiseAJour(result, prive, miseAJour);
    } 
    return result;
 }
@@ -410,15 +417,13 @@ void registreAffecterParametreT(registre * reg,
 	    if (miseAJour == NULL) {
                parametreAffecterValeur(param, valeur);
 	    } else { // Affectation de la mise-à-jour
-               parametreAffecterMiseAJour(param, prive, miseAJour);
 	       // La valeur fournie avec une fonction de mise-à-jour
 	       // est une valeur par défaut, qui n'est utile qu'en
                // l'absence de valeur déjà renseignée
 	       if (param->valeur == NULL) {
                   parametreAffecterValeur(param, valeur);
-	       } else { // Sinon il faut appliquer la valeur présente
-                  parametreMettreAJour(param);  
 	       }
+               parametreAffecterMiseAJour(param, prive, miseAJour);
 	    }
 	 }
       }

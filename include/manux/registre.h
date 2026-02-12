@@ -2,6 +2,8 @@
  * @file include/manux/registre.h
  * @brief Gestion des registres (outils permettant de stocker des paramètres)
  *
+ *   Attention en cas de mise-à-jour : faire suivre la doc !!!
+ *
  *   Un registre est une structure arborescente contenant des
  * paramètres. Un registre doit d'abord être créé puis on peut y
  * insérer des paramètres avec la fonction
@@ -24,7 +26,7 @@
  * insertion dans le registre, la fonction de mise-à-jour ne peut donc
  * pas être invoquée.
  *
- *   La fonction d'affectation d'un paramètre dans un registre a donc
+ *    La fonction d'affectation d'un paramètre dans un registre a donc
  *  la signature suivante
  *
  *  void registreAffecterParametre(registre * base,
@@ -50,12 +52,17 @@
  *        elle est invoquée (avec cette nouvelle valeur)
  *     finsi
  *  sinon
- *     la fonction de mise-à-jour est affectée
  *     si le paramètre n'avait pas de valeur définie, alors
  *        On lui affecte celle passée en paramètre
  *     fin si
+ *     la fonction de mise-à-jour est affectée
  *     la fonction de mise-à-jour est invoquée
  *  finsi
+ *
+ *  Dit autrement, si une fonction de mise-à-jour est passée en
+ * paramètre, alors on ne se préoccupe pas de la valeur passée en
+ * paramètre, sinon on affecte la valeur (même nulle).
+ *  Dans tous les cas, on invoque la màj si elle existe.
  *
  *                                                       (C) E. Chaput 2024-2025
  */

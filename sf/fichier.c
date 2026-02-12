@@ -12,8 +12,6 @@
 #   include <manux/kmalloc.h>
 #endif
 
-#define MANUX_DEBUG_FS_BASE
-
 /**
  * @brief Lecture dans un fichier
  * @param f le fichier doit être != NULL

@@ -16,7 +16,6 @@
 #define MANUX_USR_INIT init-acces-concurrent.o
 
 #include <config/base.h>
-#include <config/plan-memoire.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
 #include <config/systeme-fichiers.h>
 #include <config/ramdisk.h>
