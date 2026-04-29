@@ -186,8 +186,7 @@ pourrez le trouver dans le fichier \fichier{boot}{bootsector}{nasm}.
    L'état de la mémoire à la fin du boot est décrite par la figure
 suivante. Les nombres sous les différentes zones expriment leur taille
 en nobre de pages (la taille d'une page est de 4 Ko). Les macros sont
-définies dans le fichier de configuration de \manux :
-\fichier{include/manux}{config}{h}.
+définies dans le fichier de configuration de \manux : \fichier{include/manux}{config}{h}. 
 
 \includegraphics{images/etat-memoire-boot.png}
 
@@ -433,6 +432,59 @@ fichier d'entête va être ajouté au noyau de sorte à ce qu'il puisse
 être pris en charge par \grub. Quelques informations seront ensuite
 utilisées par le noyau : la taille de la mémoire disponible, et les
 paramètres de la ligne de commande.  
+   
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Organisation de la mémoire au boot}
+
+   Lorsque \grub a chargé le noyau en mémoire, il lui passe la main et
+celui-ci doit donc s'occuper rapidement de la gestion de la
+mémoire. La structure est alors celle décrite par la figure suivante.
+
+\includegraphics{images/memoire-au-boot.png}
+
+   La première page est utilisée pour les handlers d'interruptions.
+
+   J'ai fait le choix de placer derrière la {\sc idt} puis la {\sc
+ gdt}. Leurs adresses et leurs tailles sont définies en ce sens dans
+   \fichier{include/config}{plan-memoire-pc}{h}.
+   
+
+   Lors du démarrage d'un {\sc pc}, le secteur de boot est placé à
+l'adresse {\tt 0x7C00} et \grub est chargé juste derrière à
+l'adresse {\tt 0x8000}. On ne peut évidemment pas demander à \grub de
+charger le noyau à une adresse qu'il occupe, je fais donc le choix de
+lui demander de charger ManuX à partir de la page 16, donc à l'adresse
+{\tt 0x10000}. Cette adresse également est définie dans le fichier
+\fichier{include/config}{plan-memoire-pc}{h} par la macro
+\lstinline!MANUX_KERNEL_START_ADDRESS!. C'est le linker qui utilise
+cette macro pour positionner le noyau.
+
+   Vient ensuite la pile du noyau qui est positionnée juste après le
+noyau (mais à une frontière de page). Cette place est définie dans le
+fichier de configuration du linker : \fichier{noyau}{manux}{ld}.
+
+   Je place ensuite derrière cet espace réservé à la pile une zone
+mémoire qui va me servir à la gestion des pages mémoire.
+   
+   À partir l'adresse {\tt 0x80000}, c'est le \bios{}. Dans un soucis
+de tranquillité, je vais considérer que les 512 Ko qui commencent à
+cette adresse sont inutilisables car réservés au \bios{}. Il y a moyen
+d'être un peu plus subtile, et d'en récupérer tout ou partie en
+fonction de la situation, mais on ne va pas s'y embêter pour le
+moment.
+
+   Tout ce qui est au delà est alors utilisable.
+   
+   Pour illustrer cela, la figure ci-dessous montre l'exécution d'un 
+noyau qui alloue quelques pages après son démarrage.    
+
+\includegraphics{images/memoire-allocation-pages.png}
+
+   On peut constater que les quelques premières pages allouées sont
+situées entre la {\sc gdt} et le noyau et que les suivantes sont
+allouées après la gestion mémoire.
    
 %-------------------------------------------------------------------------------
 %

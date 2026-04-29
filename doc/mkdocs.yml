@@ -1,4 +1,10 @@
 site_name: "ManuX"
+site_url: https://manux.manu-chaput.net
+
+use_directory_urls: false
+theme:
+  name: readthedocs
+
 extra_css:
     - css/pandoc.css
 nav:

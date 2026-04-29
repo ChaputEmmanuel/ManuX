@@ -174,6 +174,9 @@ void listeParametresInserer(listeParametres * lp, parametre * p)
    }
 }
 
+/**
+ * @brief Recherche d'un paramètre dans une liste
+ */
 parametre * listeParametresChercher(listeParametres * lp, char * nom)
 {
    chainonParametre * cp = lp->premier;
@@ -433,6 +436,11 @@ void registreAffecterParametreT(registre * reg,
    }
 }
 
+/**
+ * @brief La fonction fournie pour affecter un paramètre dans un
+ * registre 
+ *
+ */
 void registreAffecterParametre(registre * reg,
                                char * valeur,
 			       void * prive,

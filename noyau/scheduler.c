@@ -338,7 +338,10 @@ void dummyTraiterClavier()
 #endif
 	    break;
 #endif
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+#if  defined(MANUX_TACHES) \
+ &&  defined(MANUX_SYNCHRONISATION) \
+ &&  defined(MANUX_EXCLUSION_MUTUELLE) \
+ && !defined(MANUX_REENTRANT)
          case 'x' :
             afficherEtatMutex();
 	 break;

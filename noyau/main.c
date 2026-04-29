@@ -1,8 +1,15 @@
 /**
- * @file :
+ * @file : noyau/main.c
  * @brief : Un exemple de début de noyau.
+ *
+ * J'intègre à peu près tout dans ce noyau, donc régulièrement il ne
+ * compile pas ou ne fonctionne pas car il n'est pas complètement à
+ * jours avec mes dernières modifications.
+ * Il est de plus assez pénible à lire car j'utilise intensivement les
+ * conditions du préprocesseurs pour bien les identifier. Dans une
+ * utilisation plus classique, la plupart doivent disparaître.
  *                                                                            
- *                                                     (C) Manu Chaput 2000-2024
+ *                                                     (C) Manu Chaput 2000-2026
  **/
 #undef MANUX_RAMDISK
 
@@ -11,10 +18,12 @@
 #include <manux/bootloader.h>
 #endif
 #include <manux/errno.h>
+#ifdef MANUX_CONSOLE
 #include <manux/console.h>
+#endif // MANUX_CONSOLE
 #ifdef MANUX_CLAVIER
 #include <manux/clavier.h>
-#endif
+#endif // MANUX_CLAVIER
 #include <manux/tache.h>
 #include <manux/horloge.h>        // initialiserHorloge
 #include <manux/scheduler.h>
@@ -75,58 +84,59 @@ INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
 void startManuX()
 {
+#ifdef MANUX_CONSOLE
+#   ifdef MANUX_FICHIER
+   consoleInitialisationINoeud(&iNoeudConsole);
+#   else
+   // Initialisation de la console noyau (n'utilise rien !)
+   consoleInitialisation();
+#   endif
+#endif
+
+#if MANUX_ARCH == i386
    union {
       uint32_t registres[3];
       char     caracteres[13];
    } descriptionProc;
 
-   // Initialisation de la console noyau
-#ifdef MANUX_FICHIER   
-   consoleInitialisationINoeud(&iNoeudConsole);
-#else
-   consoleInitialisation();
-#endif
-
-#ifdef MANUX_BOOTLOADER
-   bootloaderInitialiser();
-#endif
-   
-#ifdef MANUX_RAMDISK
-   uint32_t adresseRamdisk = infoSysteme.adresseRamdiskHi * 65536
-                         + infoSysteme.adresseRamdiskLo;
-#endif
-   
    // Lecture du nom du processeur
    descriptionProcesseur(0, descriptionProc.registres);
    descriptionProc.caracteres[12] = 0;
 
-   // Affichage du premier message
+   // Affichage d'un premier message
    printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
 		descriptionProc.caracteres);
+#endif
 
-#ifdef MANUX_GESTION_MEMOIRE
+#ifdef MANUX_BOOTLOADER
+   // Initialisation du bootloader : infoSysteme, cmdLine, ...
+   printk_debug(DBG_KERNEL_START, "Initialisation du bootloader ...\n");
+   bootloaderInitialiser();
+
    // Affichage de la mémoire disponible 
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
 		infoSysteme.memoireDeBase,
 		infoSysteme.memoireEtendue);
-
-   /* Initialisation de la gestion mémoire */
+#endif
+   
+#ifdef MANUX_GESTION_MEMOIRE
+   // Initialisation de la gestion des pages mémoire (utilise le
+   // bootloader)
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
 #endif
-   
-   /* Initilisation des descripteurs de segments */
+
+   // Initilisation des descripteurs de segments
    initialiserGDT();
 
-   /* Initialisation de la table des interruptions */
+   // Initialisation de la table des interruptions
    initialiserIDT();   
 
 #ifdef MANUX_JOURNAL
    // Initialisation du journal
    printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
    journalInitialiser();
-   //journalInitialiserINoeud(&iNoeudConsole);
    printk_debug(DBG_KERNEL_START, "Journal initialise ...\n");
 #endif
 
@@ -182,7 +192,7 @@ void startManuX()
       printk_debug(DBG_KERNEL_START, "Ramdisk (a %d de taille %d Ko) ...\n",
 	     adresseRamdisk, infoSysteme.tailleRamdisk);
       initialiserRamDisk(adresseRamdisk, infoSysteme.tailleRamdisk);
-      printk_debug(DBG_KERNEL_START, "Ramdisk initilise\n");
+      printk_debug(DBG_KERNEL_START, "Ramdisk initialise\n");
    }
 #endif
 
@@ -190,7 +200,7 @@ void startManuX()
    // Initialisation du clavier
    printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
-   printk_debug(DBG_KERNEL_START, "Clavier initalise\n");
+   printk_debug(DBG_KERNEL_START, "Clavier initialise\n");
 #endif
 
 #ifdef MANUX_TACHES
@@ -199,7 +209,6 @@ void startManuX()
    initialiserScheduler();
    printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
 #endif
-   while(1){};   
 
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();
@@ -212,10 +221,18 @@ void startManuX()
    printk_debug(DBG_KERNEL_START, "kmalloc initialise\n");
 #endif
 
+#ifdef MANUX_REGISTRE
+   // Initialisation du registre (utilise kmalloc)
+   printk_debug(DBG_KERNEL_START, "Initialisation du registre ...\n");
+   registreSystemeInitialiser();
+   printk_debug(DBG_KERNEL_START, "Registre initialise...\n");
+#endif
+
 #ifdef MANUX_CONSOLES_VIRTUELLES
    // On va maintenant faire de la tâche en cours une tâche "banale"
    tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
 #endif
+   while(1){};
 
    init();
 }   /* startManuX */

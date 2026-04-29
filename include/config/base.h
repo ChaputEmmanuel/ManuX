@@ -42,3 +42,12 @@
 #ifndef MANUX_NB_CYCLES_CALIBRAGE
 #   define MANUX_NB_CYCLES_CALIBRAGE MANUX_FREQUENCE_HORLOGE
 #endif
+
+/**
+ * @brief Quelle architecture ?
+ *
+ * Une seule possible pour le moment, mais on peut rêver non ?
+ */
+#ifndef MANUX_ARCH
+#  define MANUX_ARCH i386
+#endif

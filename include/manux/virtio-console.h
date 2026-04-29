@@ -2,6 +2,7 @@
  * @file virtio-console.h
  * @brief Définition des éléments de base des consoles virtio
  *
+ *                                                     (C) Manu Chaput 2025-2026
  */
 #ifndef VIRTIO_CONSOLE_DEF
 #define VIRTIO_CONSOLE_DEF
@@ -32,5 +33,13 @@ void virtioConsoleTraiterBuffers();
  * @brief Initialisation des périphériques
  */
 int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole);
+
+#ifdef MANUX_VIRTIO_AUDIT
+/**
+ * @brief Affichage de la seule console, à ds fins de debug
+ */
+int virtioConsoleAfficher();
+
+#endif // MANUX_VIRTIO_AUDIT
 
 #endif

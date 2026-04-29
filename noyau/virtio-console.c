@@ -1,5 +1,6 @@
 /**
  * @file virtio-console.c
+ * @brief Implantation de la console de type virtio
  *
  * A faire : la gestion de la mémoire n'est pas terrible ! J'alloue
  * une page pour chaque nouveau message et je la supprime lorsque je
@@ -26,7 +27,7 @@
 #include <manux/string.h>
 
 /**
- * Description d'un périphérique virtio console
+ * @brif Description d'un périphérique virtio console
  */
 typedef struct VirtioConsole_t {
    VirtioPeripherique    virtioPeripherique; 
@@ -34,13 +35,15 @@ typedef struct VirtioConsole_t {
 } VirtioConsole;
 
 /**
+ * @brief Variable globale stockant la seule console virtio !
  * WARNING : pour le moment on crée un unique périphérique
  */
 VirtioConsole virtioConsole; 
- static int    nbPageAlloueesIci = 0;
+
+static int    nbPageAlloueesIci = 0;
 
 /**
- * Gestion des buffers utilisés par le périphérique
+ * @brief Gestion des buffers utilisés par le périphérique
  */
 #define NB_BUFF_TRAITES 16
 void virtioConsoleTraiterBuffers(VirtioConsole * vc)
@@ -264,4 +267,16 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
    return ESUCCES;
 }
 
+#ifdef MANUX_VIRTIO_AUDIT
+/**
+ * @brief Affichage de la console, à des fins de debug
+ */
+int virtioConsoleAfficher()
+{
+   VirtioConsole * vc = &virtioConsole;
 
+   printk("Console virtio 0x%x (%d it):\n", vc, vc->nbItRecues);
+   printk("   Etat de sa file :\n");
+}
+
+#endif // MANUX_VIRTIO_AUDIT

@@ -19,7 +19,7 @@
 #include <config/printk.h>
 #include <config/pc-i386.h>
 #include <config/stdlib.h>  // atoi
-#include <config/plan-memoire.h>
+#include <config/plan-memoire-pc.h>
 #include <config/gestion-memoire.h>  // Pourquoi ?
 #include <config/kmalloc.h> 
 #include <config/bootloader.h> // On va lire des paramètres fournis par le bootloader

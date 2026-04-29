@@ -16,13 +16,9 @@
 
 #include <config/base.h>
 #include <config/bootloader.h>
-#include <config/plan-memoire.h>
+#include <config/plan-memoire-pc.h>
 #include <config/gestion-memoire.h>
 #include <config/kmalloc.h>   // Parce que dans tâche, on hérite des fichiers
-#include <config/taches.h>
-#include <config/synchronisation.h>
-#undef MANUX_EXCLUSION_MUTUELLE_AUDIT
-#undef MANUX_CONDITION_AUDIT
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/systeme-fichiers.h>

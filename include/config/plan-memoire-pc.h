@@ -48,7 +48,7 @@
  * Position de l'IDT (Interrupt Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_IDT
-#   define MANUX_ADRESSE_IDT  0x41000 //0x31000
+#   define MANUX_ADRESSE_IDT  0x1000 //0x48000 //0x41000 //0x31000
 #endif
 
 #ifndef MANUX_IDT_NB_PAGES
@@ -59,7 +59,7 @@
  * Position de la GDT (Global Descriptor Table) du noyau.
  */
 #ifndef MANUX_ADRESSE_GDT
-#   define MANUX_ADRESSE_GDT  0x42000 //0x32000
+#   define MANUX_ADRESSE_GDT  0x2000 //0x49000 //0x42000 //0x32000
 #endif
 
 #ifndef MANUX_GDT_NB_PAGES
@@ -70,7 +70,7 @@
  * Adresse de la fonction _startManuX de main.c
  */
 #ifndef MANUX_KERNEL_START_ADDRESS
-#   define MANUX_KERNEL_START_ADDRESS 0x20000
+#   define MANUX_KERNEL_START_ADDRESS 0x10000
 #endif
 
 #ifndef MANUX_STACK_SEG_16

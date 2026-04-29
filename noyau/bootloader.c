@@ -85,10 +85,11 @@ void bootloaderInitialiser()
    // Informations de la ligne de commande (eg GRUB)
    if ((infoSysteme.flags & MULTIBOOT_INFO_CMDLINE) == MULTIBOOT_INFO_CMDLINE) {
       printk_debug(DBG_KERNEL_BOOTLOADER, "Command line : \"%s\"\n", infoSysteme.ligneCommande);
+
+      // On sauvegarde ça
       int l = strlen(infoSysteme.ligneCommande);
       memcpy(cmdLine, infoSysteme.ligneCommande, ((l > CMDLINE_MAX_LENGTH)?CMDLINE_MAX_LENGTH:l));
       cmdLine[(l > CMDLINE_MAX_LENGTH)?CMDLINE_MAX_LENGTH:l] = 0;
-      printk_debug(DBG_KERNEL_BOOTLOADER, "Command line : \"%s\"\n", infoSysteme.ligneCommande);
    }
 }
 

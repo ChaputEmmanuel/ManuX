@@ -20,7 +20,7 @@ enrichi et utilisé à d'autres fins.
 
    Le second est la {\em pagination}. L'idée ici est de découper la
 mémoire en {\em pages} de taille fixe. Chaque page pourra être dotée
-de propriétées qui lui sont propre. La pagination va nécessiter la
+de propriétés qui lui sont propre. La pagination va nécessiter la
 mise en place d'un certain nombre de tables d'indirection, ce qui peut
 sembler un peu lourd, mais qui va en particulier permettre de la
 mémoire virtuelle, de l'isolation entre les tâches, \ldots
@@ -42,7 +42,7 @@ adresse logique est composée de deux parties : un {\em segment}, et un
 {\em offset}.
 
    Le segment est une partie de la mémoire, et l'offset un déplacement
-dans le segment, comme l'illustre la figure \ref{Fig-1}. On
+dans le segment, comme l'illustre la figure \ref{figure:adresse-logique} ci-dessous. On
 peut donc voir ça comme une découpe de la mémoire 
 en zones (ou segments) logiques et/ou comme une façon d'accéder à des
 adresses plus élevées que ce que permet la taille des registres.
@@ -54,10 +54,11 @@ adresses plus élevées que ce que permet la taille des registres.
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=0.6\textwidth]{adresse-logique.png}
-\caption{\label{Fig-1}Adresse logique}
+\includegraphics[width=0.6\textwidth]{images/adresse-logique.png}
+\caption{\label{figure:adresse-logique}Principe d'une adresse logique}
 \end{center}
 \end{figure} 
+
 
    Le segment est contenu dans un registre qui peut être fourni
 explicitement ou implicitement par l'instruction. Il donne donc
@@ -69,16 +70,12 @@ On a dit qu'un registre ne pouvait pas contenir une adresse entière).
    En fait, le registre en question permet d'accéder à un {\em
 descripteur de segment}. C'est évidemment ce dernier (que nous
 allons décrire par la suite) qui donne, entre autres, l'adresse du
-segment. La figure \ref{Figure:addlogsel} illustre cette indirection.
+segment. La figure \ref{figure:adresse-logique-sel} illustre cette indirection.
 
-\note{
 \begin{figure}[htbp]
-$$
-\includegraphics[width=0.4\textwidth]{adresse-logique-sel}
-$$
-\caption{\label{Figure:addlogsel}Adresse logique et sélecteur de segment}
+\includegraphics[width=0.4\textwidth]{images/adresse-logique-sel}
+\caption{\label{figure:adresse-logique-sel}Adresse logique et sélecteur de segment}
 \end{figure} 
-}
 
 %-------------------------------------------------------------------------------
 %      Segmentation
@@ -228,6 +225,10 @@ $$
 \caption{\label{Figure:addline}Structure d'une adresse linéaire.}
 \end{figure} 
 }
+
+   \includegraphics[width=0.8\textwidth]{adresse-lineaire}
+
+   
    Les bits de poids forts ({\tt Dir}) donnent la position dans le
 répertoire de page de l'adresse d'une table de pages. Les bits
 suivants ({\tt Page}) donnent la position dans dans cette table de
@@ -331,10 +332,10 @@ garderons bien d'aller y lire ou écrire pour autre chose !
    L'état de cette mémoire à la fin du boot (décrit plus haut) est
 donné  par la figure \ref{etat-memoire-boot-2} que nous redonnons ici.
 
-\begin{figure}[htbp]
-\includegraphics[width=\textwidth]{etat-memoire-boot}
-\caption{\label{fig:etat-memoire-boot-2}État de la mémoire après le boot}
-\end{figure} 
+%\begin{figure}[htbp]
+\includegraphics[width=\textwidth]{images/etat-memoire-boot}
+%\caption{\label{fig:etat-memoire-boot-2}État de la mémoire après le boot}
+%\end{figure} 
 
    Il est important de l'avoir en tête pour la suite afin de
 déterminer quelles sont les zones que nous pouvos allouer et celles
@@ -360,6 +361,9 @@ $$
   pages mémoire}
 \end{figure} 
 }
+
+\includegraphics[width=0.5\textwidth]{images/proprietaire-page}
+
 \subparagraph{Initialisation}
 
 

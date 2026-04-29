@@ -43,7 +43,7 @@ void startManuX()
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
 
-   // Initialsation du système kmalloc
+   // Initialisation du système kmalloc
    kmallocInitialisation();
 
    // On initialise le registre

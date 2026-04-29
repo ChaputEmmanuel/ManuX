@@ -17,7 +17,7 @@
 
 
 #include <config/base.h>
-#include <config/plan-memoire.h>
+#include <config/plan-memoire-pc.h>
 #include <config/pc-i386.h>         // Besoin des interuptions pour les AS
 #include <config/appels-systeme.h>
 #include <config/gestion-memoire.h>

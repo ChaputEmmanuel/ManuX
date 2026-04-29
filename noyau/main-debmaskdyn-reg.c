@@ -30,24 +30,27 @@
 
 void startManuX()
 {
-   // Initialisation de la console noyau
+   // Initialisation de la console noyau (n'utilise rien !)
    consoleInitialisation();
 
+   // Initialisation de infoSysteme et cmdLine
    bootloaderInitialiser();
 
+   // Initialisation de la gestion des pages mémoire (utilise le
+   // bootloader)
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
 
    // Initialsation du système kmalloc
    kmallocInitialisation();
 
-   // On initialise le registre
+   // Initialisation du registre (utilise kmalloc)
    registreSystemeInitialiser();
 
-   // Initialisation du système de debug (il utilise le registre)
+   // Initialisation du système de debug (utilise le registre)
    debugInitialiser();
    
-   // On peut maintenant analyser la ligne de commande
+   // Analyse de la ligne de commande (utilise le registre)
    bootloaderLireLigneCmd();
 
    // On affiche le registre pour information

@@ -16,6 +16,7 @@
 #include <manux/virtio-console.h>
 
 #define NB_LIGNES 1280
+
 void testerVirtioConsole(Fichier * f)
 {
    printk("On commence ...\n");
@@ -66,7 +67,7 @@ void startManuX()
 
    testerVirtioConsole(&fichierVirtioConsole);
 
-   while(1){}; // WARNING : faire une fonction d'attente de vidage de
+   //      while(1){}; // WARNING : faire une fonction d'attente de vidage de
 	       // virtio !
    
 }   /* startManuX */

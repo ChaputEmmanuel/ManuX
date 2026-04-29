@@ -1,12 +1,12 @@
-/*----------------------------------------------------------------------------*/
-/*      Implantation des sous-programme de manipulation de la mémoire sous    */
-/*   ManuX.                                                                   */
-/*      On fait pour le moment un truc hyper minimaliste, sans aucune forme   */
-/*   de vérification, le but étant juste de fournir un service élémentaire    */
-/*   aux autres parties du noyau afin d'en avancer le développement.          */
-/*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
-/*----------------------------------------------------------------------------*/
+/**
+ *   @brief Implantation des sous-programme de manipulation de la mémoire sous
+ *   ManuX.
+ *      On fait pour le moment un truc hyper minimaliste, sans aucune forme 
+ *   de vérification, le but étant juste de fournir un service élémentaire
+ *   aux autres parties du noyau afin d'en avancer le développement.
+ *
+ *                                                     (C) Manu Chaput 2000-2026
+ */
 #include <manux/config.h>
 #include <manux/types.h>      /* TacheID */
 #include <manux/debug.h>      /* assert */
@@ -52,7 +52,8 @@ int nombrePagesSysteme = MANUX_NOMBRE_PAGES_SYSTEME;
  * tableau suivant (0 <=> page libre). WARNING, pour le moment,
  * c'est 1 ou 0 (utilisé ou libre).
  */
-TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
+//TacheID * proprietairePage = (TacheID *)MANUX_AFFECTATION_PAGES ;
+TacheID * proprietairePage;
 
 /*
  * Le nombre global de pages dans le système
@@ -66,7 +67,7 @@ static int nombreDePagesAllouees = 0;
 static void inline reserverPage(uint32_t i)
 {
    if (proprietairePage[i] != (TacheID)0) {
-      paniqueNoyau("Page %d deja prise\n", i);
+     paniqueNoyau("Page 0x%x (%d) deja prise\n", i, i);
    }
    nombreDePagesAllouees++;
    proprietairePage[i] = (TacheID)1;  // WARNING
@@ -101,14 +102,18 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    uint32_t i;                  // Pour compter les pages initialisées 
    uint32_t tailleProprietaire; // Taille nécessaire pour les gérer
    uint32_t nbrePagesManuX, nbrePagesPile;
-   
+
+   // On met l'allocation des pages après la pile
+   proprietairePage  =  (TacheID *)adresseLimitePileManuX;
+
+   // On affiche un petit récapitulatif
    printk_debug(DBG_KERNEL_MEMOIRE, "base = %d, et = %d\n",
 		tailleMemoireDeBase, tailleMemoireEtendue);
-
    printk_debug(DBG_KERNEL_MEMOIRE, "noyau d = 0x%x , f = 0x%x\n", adresseDebutManuX, adresseFinManuX);
    printk_debug(DBG_KERNEL_MEMOIRE, "pile  d = 0x%x , f = 0x%x\n", adressePileManuX, adresseLimitePileManuX);
+   printk_debug(DBG_KERNEL_MEMOIRE, "mem   d = 0x%x\n", proprietairePage);
 
-   /* Les tailles sont données en Ko */
+   // Les tailles sont données en Ko
    nombrePages = (tailleMemoireDeBase + tailleMemoireEtendue) / 4;
 
    printk_debug(DBG_KERNEL_MEMOIRE, "%d pages de %d octets\n",
@@ -117,11 +122,11 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    /* De combien de pages a-t-on besoin pour les gérer ? */
    /* Pour le moment, la gestion d'une page demande 4 octets (bientôt 1 bit !) */
    tailleProprietaire = 4 * nombrePages  / MANUX_TAILLE_PAGE; 
-   printk_debug(DBG_KERNEL_MEMOIRE, "tp %d\n", tailleProprietaire);
+   printk_debug(DBG_KERNEL_MEMOIRE, "taille proprietaire %d\n", tailleProprietaire);
    
-   /* Le tableau d'allocation des pages ne doit pas télescoper le noyau !*/
+   // Le tableau d'allocation des pages ne doit pas télescoper le BIOS !
    assert((void*)(proprietairePage + tailleProprietaire*MANUX_TAILLE_PAGE)
-	  < (void *)MANUX_KERNEL_START_ADDRESS);
+	  < (void *)MANUX_ADRESSE_BIOS);
 
    // Par défaut tout est libre
    for (i = 0; i < nombrePages; i++) {
@@ -130,24 +135,34 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
 
    // Les handlers : WARNING est-ce utile ?
    reserverPage(0);
-
-   printk_debug(DBG_KERNEL_MEMOIRE, "Page  0x0         pour les gestionnaires\n");
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x00 a 0x00 pour les handlers\n", 1);
    
-   // La table d'allocation de la mémoire
-   for (i=0 ; i < tailleProprietaire; i++){
-     reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
+   // La IDT
+   for (i=0 ; i < MANUX_IDT_NB_PAGES; i++) {
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_IDT)+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%2x a 0x%2x pour la gestion memoire\n",
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
-		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
-   
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x0%x a 0x0%x pour la IDT\n",
+		MANUX_IDT_NB_PAGES,
+		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT),
+		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT) + MANUX_IDT_NB_PAGES-1);
+
+   // La GDT
+   for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
+      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
+   }
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x0%x a 0x0%x pour la GDT\n",
+		MANUX_GDT_NB_PAGES,
+		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT),
+		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT) + MANUX_GDT_NB_PAGES-1);
+
    // Le noyau
    nbrePagesManuX = (adresseFinManuX-adresseDebutManuX)/MANUX_TAILLE_PAGE
      + (((adresseFinManuX-adresseDebutManuX)%MANUX_TAILLE_PAGE)?1:0);
    for (i=0 ; i < nbrePagesManuX; i++) {
       reserverPage(ADDR_VERS_PAGE(adresseDebutManuX)+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour le noyau\n",
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x%2x a 0x%2x pour le noyau\n",
+		nbrePagesManuX,
 		ADDR_VERS_PAGE(adresseDebutManuX),
 		ADDR_VERS_PAGE(adresseDebutManuX)+nbrePagesManuX-1);
 
@@ -157,31 +172,27 @@ void initialiserMemoire(uint32_t tailleMemoireDeBase,
    for (i=0 ; i < nbrePagesPile; i++) {
       reserverPage(ADDR_VERS_PAGE(adressePileManuX)+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la pile\n",
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x%2x a 0x%2x pour la pile\n",
+		nbrePagesPile,
 		ADDR_VERS_PAGE(adressePileManuX),
-		ADDR_VERS_PAGE(adresseLimitePileManuX)+nbrePagesPile-1);
+                ADDR_VERS_PAGE(adresseLimitePileManuX-1));
+   //		ADDR_VERS_PAGE()+nbrePagesPile-1);
 
-   // La IDT
-   for (i=0 ; i < MANUX_IDT_NB_PAGES; i++) {
-      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_IDT)+i);
+   // La table d'allocation de la mémoire
+   for (i=0 ; i < tailleProprietaire; i++){
+      reserverPage(ADDR_VERS_PAGE(((uint32_t)proprietairePage))+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la IDT\n",
-		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT),
-		ADDR_VERS_PAGE(MANUX_ADRESSE_IDT) + MANUX_IDT_NB_PAGES-1);
-
-   // La GDT
-   for (i=0 ; i < MANUX_GDT_NB_PAGES; i++) {
-      reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_GDT)+i);
-   }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour la GDT\n",
-		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT),
-		ADDR_VERS_PAGE(MANUX_ADRESSE_GDT) + MANUX_GDT_NB_PAGES-1);
-
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x%2x a 0x%2x pour gestion memoire\n",
+		tailleProprietaire,
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)),
+		ADDR_VERS_PAGE(((uint32_t)proprietairePage)) + tailleProprietaire-1);
+   
    // Le BIOS (indéboulonable !)
    for (i=0 ; i < MANUX_BIOS_NB_PAGES; i++) {
       reserverPage(ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+i);
    }
-   printk_debug(DBG_KERNEL_MEMOIRE, "Pages 0x%x a 0x%x pour le BIOS\n",
+   printk_debug(DBG_KERNEL_MEMOIRE, "%3d pg 0x%2x a 0x%2x pour le BIOS\n",
+		MANUX_BIOS_NB_PAGES,
 		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS),
 		ADDR_VERS_PAGE(MANUX_ADRESSE_BIOS)+MANUX_BIOS_NB_PAGES-1);
 
@@ -232,10 +243,10 @@ void * allouerPage()
       reserverPage(numeroPage);
       pageAllouee = (void *) (numeroPage * MANUX_TAILLE_PAGE);
    }
-
+   /*
    printk_debug(DBG_KERNEL_MEMOIRE, "Page 0x%x allouee\n",
 		numeroPage);
-
+   */
    return pageAllouee;
 }
 

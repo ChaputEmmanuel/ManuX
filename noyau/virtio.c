@@ -30,8 +30,9 @@ static int nbRendus =0;
 #define min(a, b) (((a)<(b))?(a):(b))
 #define max(a, b) (((a)>(b))?(a):(b))
 
+#ifdef MANUX_VIRTIO_AUDIT
 /**
- * Affichage de l état d'une file, à des fins de debug
+ * @brief Affichage de l état d'une file, à des fins de debug
  */
 void virtioAfficherFile(VirtioFileVirtuelle * fv)
 {
@@ -79,6 +80,7 @@ void virtioAfficherFile(VirtioFileVirtuelle * fv)
 		fv->buffersDisponibles->indicesDesBuffer[2]
 		);
 }
+#endif // MANUX_VIRTIO_AUDIT
 
 /**
  * Création d'une file de communication.
@@ -406,7 +408,7 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
       do {
          // On récupère les données et leur longueur
          ad = (uint32_t)fv->tableDescripteurs[indiceBuffer].adresse;
-	 printk("{%d @ %d}\n", longueur, ad);
+	 //printk("{%d @ %d}\n", longueur, ad);
          bu[result] = (void *) ad;
 	 lg[result] = min(longueur, fv->tableDescripteurs[indiceBuffer].longueur); 
          longueur -= lg[result];
@@ -421,11 +423,11 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
 	 // les fournir
       } while ((result < nb)
 	       && (!finDeChaine));
-      if (!finDeChaine) {
+      /*      if (!finDeChaine) {
 	printk("[7] Ca pue du cul !\n");
       } else {
 	printk("[7] Fin de chaine !\n");
-      }
+	}*/
       // On vient de traiter un buffer (peut-être une chaîne)
       fv->dernierIndiceUtilise++;  
    }

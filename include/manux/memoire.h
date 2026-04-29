@@ -26,12 +26,15 @@
  */
 extern int nombrePagesSysteme;
 
+/**
+ * @brief Initialisation de la mémoire au niveau pages.
+ *
+ * Cette initialisation est nécessaire avant toute demande
+ * d'allocation. C'est elle qui va permettre de mettre en place le
+ * mécanisme d'allocation des pages dans le système.
+ */
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue);
-/*
- * Initialisation de la mémoire. Nécessaire avant toute
- * demande d'allocation.
- */
 
 void * allouerPage();
 /*

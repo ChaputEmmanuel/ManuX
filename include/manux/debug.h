@@ -36,15 +36,13 @@
 #define DBG_KERNEL_ALL        0xFFFFFFFF
 
 /**
- * @brief Définition des masques de débugage
+ * @brief Définition des masques de débogage
  */
 #define _masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_ERREUR     \
+ | DBG_KERNEL_VIRTIO     \
  | DBG_KERNEL_START      \
  			       )
 # define _masqueDebugageFichier (0x00000000\
- | DBG_KERNEL_ERREUR     \
- | DBG_KERNEL_START      \
 				)
 
 #ifdef MANUX_DEBUGMASK_VAR
@@ -64,6 +62,7 @@
  | DBG_KERNEL_ALL        \
  | DBG_KERNEL_AS         \
  | DBG_KERNEL_SYSFI      \
+ | DBG_KERNEL_BOOTLOADER \
  | DBG_KERNEL_TUBE       \
  | DBG_KERNEL_VIRTIO     \
  | DBG_KERNEL_NET        \

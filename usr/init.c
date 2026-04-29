@@ -71,7 +71,7 @@ void init()
    int n=2; // nombre de messages affichés
 
    printf("Greetings from userland !\n");
-   
+   while(1){};   
    n = creerNouvelleTache(deuxiemeTache, FALSE);
 
    for (n = 0; n < 10000000; n++) {

@@ -18,7 +18,7 @@
 #include <config/console.h>
 #include <config/printk.h>
 #include <config/pc-i386.h>
-#include <config/plan-memoire.h>
+#include <config/plan-memoire-pc.h>
 #include <config/gestion-memoire.h>  // Pourquoi ?
 #include <config/bootloader.h>
 

@@ -15,3 +15,9 @@ taille.conf
 **/*.log
 **/Manux.pdf
 noyaux/*
+.cache/
+.emacs.desktop
+doc/ManuX/
+doc/docs/doxy/
+doc/outils-part.run.xml
+**/.emacs.*
