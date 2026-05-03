@@ -405,3 +405,39 @@ void gestionExceptionPanique(TousRegistres registres,
    halt();
 }
 
+#ifdef MANUX_INT_AUDIT
+/**
+ * @brief Affichage des IT reçues
+ *
+ * Le but est de présenter un écran synthétique avec le nombre
+ * d'occurences de chacune des interruptions.
+ */
+void interruptionAfficher()
+{
+   int i;
+
+   printk("----[ Exceptions ]--------------------------\n");
+   for (i = 0; i < MANUX_NB_EXCEPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+   
+   printk("----[ IRQ ]---------------------------------\n");
+   for (i = MANUX_NB_EXCEPTIONS; i < MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+   
+   printk("----[ Interruptions ]-----------------------\n");
+   for (i = MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ; i < MANUX_NB_INTERRUPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printk("\n");
+}
+#endif // MANUX_INT_AUDIT

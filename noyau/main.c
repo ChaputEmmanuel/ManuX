@@ -17,6 +17,9 @@
 #ifdef MANUX_BOOTLOADER
 #include <manux/bootloader.h>
 #endif
+#ifdef MANUX_REGISTRE
+#   include <manux/registre.h>
+#endif
 #include <manux/errno.h>
 #ifdef MANUX_CONSOLE
 #include <manux/console.h>

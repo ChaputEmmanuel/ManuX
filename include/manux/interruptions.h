@@ -108,7 +108,15 @@ void setFrequenceTimer(uint16_t freqHz);
  * @brief Décompte des interruptions reçues
  */
 #ifdef MANUX_INT_AUDIT
-extern uint32_t nbItRecues[MANUX_NB_INTERRUPTIONS];
+//extern uint32_t nbItRecues[MANUX_NB_INTERRUPTIONS];  // WARNING : exporté pour qui ?
+/**
+ * @brief Affichage des IT reçues
+ *
+ * Le but est de présenter un écran synthétique avec le nombre
+ * d'occurences de chacune des interruptions.
+ */
+void interruptionAfficher();
 #endif // MANUX_INT_AUDIT
 
-#endif
+#endif //  INTERRUPTION_DEF
+

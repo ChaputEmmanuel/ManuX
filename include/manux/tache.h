@@ -156,4 +156,14 @@ TacheID sysFork();
 int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds);
 #endif
 
+/**
+ * @brief Affichage de l'état d'une tâche à des fins de debug
+ */
+void afficherEtatUneTache(Tache * tache);
+
+/**
+ * @brief Affichage des tâches
+ */
+void afficherEtatTaches();
+
 #endif

@@ -12,6 +12,7 @@ OBJETS      = 	$(MANUX_FICHIER_MAIN).o
 OBJETS     +=   $(if $(MANUX_BOOTLOADER), bootloader.o)
 OBJETS     +=   $(if $(MANUX_TACHES), listetaches.o tache.o)
 OBJETS     +=   $(if $(MANUX_TACHES), scheduler.o)
+OBJETS     +=   $(if $(MANUX_DUMMY_TASK), dummy-task.o)
 OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), memoire.o)
 OBJETS     +=   $(if $(MANUX_PAGINATION), pagination.o)
 OBJETS     +=   $(if $(MANUX_OUTILS_SYNCHRO), semaphore.o)

@@ -9,7 +9,6 @@
 #include <manux/scheduler.h>
 
 #define DEBUG_MANUX_SCHEDULER
-#define MANUX_DUMMY_TASK  // WARNING, à mettre ailleurs
 
 #include <manux/errno.h>
 #include <manux/console.h>
@@ -29,15 +28,9 @@
 #include <manux/interruptions.h> /* nbTopHorloge */
 #include <manux/i386.h>          /* ltr */
 #include <manux/appelsysteme.h>  /* console() */
-#include <manux/temps.h>         /* secondesDansTemps */
-#ifdef MANUX_KMALLOC_STAT
-#   include <manux/kmalloc.h>    // kmallocAfficherStatistiques
-#endif
-#ifdef MANUX_VIRTIO_CONSOLE
-#   include <manux/virtio-console.h> // A virer
-#endif
-#ifdef MANUX_VIRTIO_NET
-#   include <manux/virtio-net.h> // A virer
+
+#ifdef MANUX_DUMMY_TASK
+#   include <manux/dummy-task.h>
 #endif
 
 extern TacheID numeroProchaineTache ;
@@ -167,237 +160,6 @@ void ordonnanceur()
    printk_debug(DBG_KERNEL_ORDON, "back (vers tache %d)\n", tacheEnCours->numero);
 }
 
-void afficherEtatUneTache(Tache * tache)
-{
-  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
-       tache->numero,
-         (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
-          tache->nbActivations,
-	  totalMinutesDansTemps(tache->tempsExecution),
-	  secondesDansTemps(tache->tempsExecution),
-          tache,
-#ifdef MANUX_TACHE_CONSOLE
-          tache->console,
-#else
-          0x00, // WARNING : bof
-#endif
-          tache->ldt);
-}
-
-#ifdef MANUX_AS_AUDIT
-/**
- * @brief Affichage sur la console des AS de chaque tâche
- */
-void appelsSystemeAfficher()
-{
-   CelluleTache * celluleTache;
-
-   printk("\nTache  | Appels Systeme (num:in/out)\n");
-   printk("-------+----------------------------------------\n");
-   for (celluleTache = listeToutesLesTaches.tete;
-      celluleTache != NULL;
-      celluleTache = celluleTache->suivant){
-      printk("%3d    | ", celluleTache->tache->numero);
-
-      for (int i=0; i < NB_MAX_APPELS_SYSTEME; i++) {
-         if (celluleTache->tache->nbAppelsSystemeIn[i]) {
-	    printk("%d:%d/%d ", i,
-		   celluleTache->tache->nbAppelsSystemeIn[i],
-		   celluleTache->tache->nbAppelsSystemeOut[i]);
-         }
-      }
-      printk("\n");
-   }
-}
-#endif
-
-#if  defined(MANUX_TACHES) \
- &&  defined(MANUX_SYNCHRONISATION) \
- &&  defined(MANUX_EXCLUSION_MUTUELLE) \
- && !defined(MANUX_REENTRANT)
-/**
- * @brief Etat du verrou général
- */
-void afficherEtatMutex()
-{
-   printk("\n-- Tache dans le noyau : %d \n-- Taches en attente : ", tacheDansLeNoyau);
-   for (CelluleTache * celluleTache = verrouGeneralDuNoyau.tachesEnAttente.tete;
-        celluleTache != NULL;
-	celluleTache = celluleTache->suivant){
-      printk("%d ", celluleTache->tache->numero);
-   }
-#ifdef MANUX_EXCLUSION_MUTUELLE_AUDIT
-   printk("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
-#endif
-}
-#endif
-
-/**
- * @brief Affichage des tâches
- */
-void afficherEtatTaches()
-{
-   CelluleTache * celluleTache;
-
-   printk("\n ------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
-	  totalMinutesDansTemps(nbTopHorloge),
-	  secondesDansTemps(nbTopHorloge),
-	  nbTopHorloge);
-
-   printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
-   printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
-   for (celluleTache = listeToutesLesTaches.tete;
-      celluleTache != NULL;
-      celluleTache = celluleTache->suivant){
-        afficherEtatUneTache(celluleTache->tache);
-   }
-   printk("\n------------------------------------------------------------------------------\n");
-}
-
-/**
- * @brief Affichage des IT reçues
- *
- * Le but est de présenter un écran synthétique avec le nombre
- * d'occurences de chacune des interruptions.
- */
-void interruptionAfficher()
-{
-   int i;
-
-   printk("----[ Exceptions ]--------------------------\n");
-   for (i = 0; i < MANUX_NB_EXCEPTIONS ; i ++) {
-      if (nbItRecues[i]) {
-         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
-      }
-   }
-   printk("\n");
-   
-   printk("----[ IRQ ]---------------------------------\n");
-   for (i = MANUX_NB_EXCEPTIONS; i < MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ ; i ++) {
-      if (nbItRecues[i]) {
-         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
-      }
-   }
-   printk("\n");
-   
-   printk("----[ Interruptions ]-----------------------\n");
-   for (i = MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ; i < MANUX_NB_INTERRUPTIONS ; i ++) {
-      if (nbItRecues[i]) {
-         printk(" [ %3x : %5d ]", i, nbItRecues[i]); 
-      }
-   }
-   printk("\n");
-}
-
-#ifdef MANUX_CLAVIER_CONSOLE
-/**
- * @brief Gestion du clavier pour la dummy
- */
-void dummyTraiterClavier()
-{
-   Console * cons
-
-#ifdef MANUX_CONSOLES_VIRTUELLES
-     = tacheEnCours->console;
-#else
-     = consoleNoyau();     
-#endif
-   
-   char c[1] ;
-   int i;
-   
-   while (cons->nbCarAttente) {
-      c[0] = 0;
-      consoleLire(cons, c, 1);
-      switch (c[0]) {
-#ifdef MANUX_AS_AUDIT
-         case 'a' :
-            appelsSystemeAfficher();
-         break;
-#endif
-         case 'c' :
-	    for (i = 0; i < 24; i++)
-	       printk("\n");
-         break;
-         case 'h' :
-	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\ns(ynchronisation)\n");
-	 break;
-         case 'i' :
-            interruptionAfficher();
-	 break;
-         case 'p' :
-            afficherEtatTaches();
-	 break;
-#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT) || defined(MANUX_CONDITION_AUDIT)
-         case 's' :
-#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
-            exclusionsMutuellesAfficherEtat();
-#endif
-#if defined(MANUX_CONDITION_AUDIT)
-            conditionsAfficherEtat();
-#endif
-	    break;
-#endif
-#if  defined(MANUX_TACHES) \
- &&  defined(MANUX_SYNCHRONISATION) \
- &&  defined(MANUX_EXCLUSION_MUTUELLE) \
- && !defined(MANUX_REENTRANT)
-         case 'x' :
-            afficherEtatMutex();
-	 break;
-#endif
-         case 'm' :
-#ifdef MANUX_KMALLOC_STAT
-            kmallocAfficherStatistiques("");
-#else
-            printk(" Memoire : %d / %d pages allouees\n",
-	    nombrePagesAllouees(), nombrePagesTotal());
-#endif
-	 break;
-         default :
-	   //            printk("Unknown [0x%x] pressed\n", c[0]);
-         break;
-      }
-   }
-}
-#endif // MANUX_CLAVIER_CONSOLE
-
-#if defined(MANUX_TACHES)  // A virer non ? Scheduler sans tache, ...
-
-#if defined(MANUX_DUMMY_TASK)
-/**
- * Le corps d'une tâche à exécuter lorsqu'on n'a que ça à faire, ...
- */
-void aDummyKernelTask()
-{
-   while(1) {
-
-#if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
-      // Cette tâche passe sa vie dans le noyau, elle doit donc
-      // acquérir le verrou si le noyau n'est pas réentrant.
-      exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
-      assert(tacheDansLeNoyau == 0);
-      tacheDansLeNoyau = tacheEnCours->numero;
-#endif
-
-      printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
-
-#ifdef MANUX_CLAVIER_CONSOLE
-      dummyTraiterClavier();
-#endif
-
-#if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
-      // Cette tâche passe sa vie dans le noyau, elle doit donc
-      // rendre le verrou si le noyau n'est pas réentrant.
-      tacheDansLeNoyau = 0;
-      exclusionMutuelleSortir(&verrouGeneralDuNoyau);
-#endif
-
-      ordonnanceur();
-   }
-}
-#endif // MANUX_DUMMY_TASK
-#endif // MANUX_TACHES
 /**
  * @brief Ajout d'une tâche dans l'ordonnanceur
  *
@@ -411,7 +173,7 @@ void ordonnanceurAddTache(Tache * tache)
 }
 
 /**
- * @brief Iniitalisation de l'ordonnanceur
+ * @brief Initialisation de l'ordonnanceur
  */
 void initialiserScheduler()
 {
@@ -486,7 +248,6 @@ void initialiserScheduler()
 }
 
 #ifdef MANUX_APPELS_SYSTEME
-
 /**
  * @brief Implantation de l'AS d'obtention de l'identifiant
  */

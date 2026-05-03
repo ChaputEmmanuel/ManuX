@@ -271,7 +271,7 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
 /**
  * @brief Affichage de la console, à des fins de debug
  */
-int virtioConsoleAfficher()
+void virtioConsoleAfficher()
 {
    VirtioConsole * vc = &virtioConsole;
 

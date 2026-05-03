@@ -5,6 +5,7 @@
  *                                                     (C) Manu Chaput 2000-2024
  */
 #include <manux/tache.h>
+#include <manux/temps.h>
 #include <manux/scheduler.h>  /* tacheEnCours */
 #include <manux/memoire.h>
 #include <manux/segment.h>
@@ -269,7 +270,7 @@ Tache * tacheCreer(CorpsTache corpsTache)
    return tache;
 }
 
-#ifdef MANUX_TACHE_CONSOLE   
+#ifdef MANUX_TACHE_CONSOLE
 /**
  * @brief Affectation d'une console à une tâche
  */
@@ -285,7 +286,7 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
    f = fichierCreer(i, O_WRONLY, 0);
    
    tache->fichiers[0] =  f;
-#endif
+#endif  // MANUX_FICHIER
 }
 
 #ifdef MANUX_FICHIER
@@ -337,6 +338,49 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
 
    return result;
 }
-#endif
+#endif   // MANUX_FICHIER
 
+#endif   // MANUX_TACHE_CONSOLE
+
+/**
+ * @brief Affichage de l'état d'une tâche à des fins de debug
+ */
+void afficherEtatUneTache(Tache * tache)
+{
+  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
+       tache->numero,
+         (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
+          tache->nbActivations,
+	  totalMinutesDansTemps(tache->tempsExecution),
+	  secondesDansTemps(tache->tempsExecution),
+          tache,
+#ifdef MANUX_TACHE_CONSOLE
+          tache->console,
+#else
+          0x00, // WARNING : bof
 #endif
+          tache->ldt);
+}
+
+/**
+ * @brief Affichage des tâches
+ */
+void afficherEtatTaches()
+{
+   CelluleTache * celluleTache;
+
+   printk("\n ------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
+	  totalMinutesDansTemps(nbTopHorloge),
+	  secondesDansTemps(nbTopHorloge),
+	  nbTopHorloge);
+
+   printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
+   printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
+   for (celluleTache = listeToutesLesTaches.tete;
+      celluleTache != NULL;
+      celluleTache = celluleTache->suivant){
+        afficherEtatUneTache(celluleTache->tache);
+   }
+   printk("\n------------------------------------------------------------------------------\n");
+}
+

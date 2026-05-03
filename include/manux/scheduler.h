@@ -76,10 +76,10 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
  * son créateur.
  */
 
-void ordonnanceur();
-/*
- * Basculer vers la prochaine tache à exécuter
+/**
+ * @brief Basculer vers la prochaine tache à exécuter
  */
+void ordonnanceur();
 
 /**
  * @brief Création et ordonnancement d'une tâche noyau

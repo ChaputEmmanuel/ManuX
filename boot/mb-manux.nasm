@@ -37,7 +37,9 @@ align 4
 global _startManuX
 extern _adresseLimitePileManuX
 extern startManuX
-
+%ifdef MANUX_DUMMY_TASK
+extern aDummyKernelTask
+%endif
 %ifdef MANUX_BOOTLOADER
 extern signatureBootloader
 extern _infoSysteme
@@ -54,5 +56,8 @@ _startManuX :
  
 	cli
 .FinDesTemps:	hlt
+%ifdef MANUX_DUMMY_TASK
+	call aDummyKernelTask
+%endif
 	jmp .FinDesTemps
 

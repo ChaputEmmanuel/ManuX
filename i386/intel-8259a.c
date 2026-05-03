@@ -14,7 +14,6 @@
 #include <manux/types.h>
 #include <manux/errno.h>
 
-#include <manux/interruptions.h> // nbItRecues
 #include <manux/intel-8259a.h>
 
 /**
@@ -199,10 +198,6 @@ void i8259aGestionIRQ(TousRegistres registres, uint32_t numIRQ,
 {
    int i;
 
-#ifdef MANUX_INT_AUDIT
-   nbItRecues[numIRQ] ++;
-#endif
-   
    // On accuse réception auprès du PIC
    i8259aAckIRQ(numIRQ);
 
