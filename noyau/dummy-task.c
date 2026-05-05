@@ -4,6 +4,7 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
+#include "manux/printk.h"
 #include <manux/dummy-task.h>
 #include <manux/debug.h>   // printk_debug
 #ifdef MANUX_TACHES
@@ -34,6 +35,14 @@
 #if defined(MANUX_CONDITION)
 #   include <manux/condition.h>  // exclusionsMutuellesAfficherEtat
 #endif
+
+#ifdef MANUX_DEBUGMASK_VAR
+void debugMasqueAfficher()
+{
+   printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsole);
+   printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+}
+#endif // MANUX_DEBUGMASK_VAR
 
 #ifdef MANUX_AS_AUDIT
 /**
@@ -113,6 +122,11 @@ void dummyTraiterClavier()
 	    for (i = 0; i < 24; i++)
 	       printk("\n");
          break;
+#ifdef MANUX_DEBUGMASK_VAR
+         case 'd' :
+            debugMasqueAfficher();
+	 break;
+#endif  // MANUX_DEBUGMASK_VAR
          case 'h' :
 	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\ns(ynchronisation)\n");
 	 break;

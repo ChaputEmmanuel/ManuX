@@ -146,6 +146,8 @@ void consoleAfficherN(Console * cons, char * msg, int nbOctets)
 
    while (nbOctets) {
       switch (*msg) {
+         // WARNING : les codes C ci dessous (\n \r) devraient être
+         // transformés en code ASCII par printk.
          case '\n' :
             avancerLigne(cons);
          case '\r' :
@@ -454,6 +456,21 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
    }
 
    return lu;
+}
+
+/**
+ * @brief Lecture d'un entier dans la console
+ *
+ * Cette fonction est un peu un hack, elle ne devrait pas exister, ou
+ * ne pas être là.
+ */   
+int consoleLireEntier(Console * cons)
+{
+   int result = 0;
+   int n = cons->indiceProchainCar;
+
+   while (cons->
+   return result;
 }
 
 /**
