@@ -56,7 +56,15 @@ static char copieEcranConsoleNoyau[2*MANUX_CON_COLONNES*MANUX_CON_LIGNES];
  * celui du noyau (qui est le seule si pas de consoles virtuelles).
  */
 #ifdef MANUX_CLAVIER_CONSOLE
-static char bufferClavierNoyau[4096]; // WARNING taille 1 page, pas joli de le harcoder !
+/**
+ * @brief Le buffer clavier du noyau
+ * WARNING taille 1 page, pas joli de le harcoder, mais je veux que la
+ * console soit opérationnelle le plus tôt possible, y compris avant
+ * les outils d'allocation mémoire afin de les déboguer. Peut-être on
+ * peut reporter l'initialisation du clavier à plus tard, ...
+ */
+static char bufferClavierNoyau[4096]; 
+
 #endif // MANUX_CLAVIER_CONSOLE
 
 void consoleAffecterCouleurFond(Console * cons, Couleur coul)
@@ -269,6 +277,7 @@ void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
 void consoleSetClavier(Console * cons, void * buffer)
 {
    // Le buffer accueillant le clavier
+   cons->tailleBuffer = 4096; // WARNING !!
    cons->bufferClavier = buffer;
    cons->nbCarAttente = 0;
    cons->indiceProchainCar = 0;
@@ -462,14 +471,41 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
  * @brief Lecture d'un entier dans la console
  *
  * Cette fonction est un peu un hack, elle ne devrait pas exister, ou
- * ne pas être là.
- */   
+ * ne pas être là. C'est une horreur, il faudrait des mutex, ...
+ */
+#define EST_CHIFFRE_DEC(x) ((x>= '0') && (x<= '9'))
+#define EST_CHIFFRE_HEX(x) (((x>= '0') && (x<= '9')) ||((x>= 'a') && (x<= 'f')))
+
 int consoleLireEntier(Console * cons)
 {
    int result = 0;
    int n = cons->indiceProchainCar;
 
-   while (cons->
+   do {
+      // On attend qu'il y ai qqchose
+      while (cons->nbCarAttente == 0)
+         ordonnanceur();
+
+      // On lit tant qu'il y a des chiffres et on arrête quand il y a
+      // autre chose
+      while ((cons->nbCarAttente)
+          && (EST_CHIFFRE_HEX(cons->bufferClavier[cons->indiceProchainCar]))  
+   	  ) {
+         if (EST_CHIFFRE_DEC(cons->bufferClavier[cons->indiceProchainCar])) {
+	    result = 16 * result + cons->bufferClavier[cons->indiceProchainCar] - '0';
+	 } else {
+	    result = 16 * result + cons->bufferClavier[cons->indiceProchainCar] - 'a' + 10;
+	 }
+         cons->nbCarAttente--;
+         cons->indiceProchainCar++;  // WARNING modulo taille !!!
+      }
+   } while ((cons->nbCarAttente == 0)
+	  ||(EST_CHIFFRE_HEX(cons->bufferClavier[cons->indiceProchainCar])));
+   // On supprime le caractère qui nous a fait finir (WARNING !!)
+   if (cons->nbCarAttente) {
+      cons->nbCarAttente--;
+      cons->indiceProchainCar++;  // WARNING modulo taille !!!
+   }
    return result;
 }
 

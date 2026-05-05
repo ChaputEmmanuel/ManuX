@@ -54,12 +54,25 @@ typedef struct _Console {
 #endif
 
 #ifdef MANUX_CLAVIER_CONSOLE
+   // WARNING : à mettre dans clavier.h
    unsigned char     * bufferClavier;     // Pour les données du clavier
+   uint16_t            tailleBuffer;
    uint16_t            nbCarAttente;
    uint16_t            indiceProchainCar; // Le prochain caractère à lire
 #endif
   
 } Console;
+
+
+#ifdef MANUX_CLAVIER_CONSOLE
+/**
+ * @brief Lecture d'un entier dans la console
+ *
+ * Cette fonction est un peu un hack, elle ne devrait pas exister, ou
+ * ne pas être là.
+ */
+int consoleLireEntier(Console * cons);
+#endif
 
 /**
  * @brief Initialisation du système de console sans notion de fichier

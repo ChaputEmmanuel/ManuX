@@ -42,6 +42,16 @@ void debugMasqueAfficher()
    printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsole);
    printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
 }
+void debugMasqueModifier()
+{
+   printk("masqueDebugageConsole : ");
+   masqueDebugageConsole = consoleLireEntier(consoleNoyau());
+   printk("0x%x\n", masqueDebugageConsole);
+   printk("masqueDebugageFichier : ");
+   masqueDebugageFichier = consoleLireEntier(consoleNoyau());
+   printk("0x%x\n", masqueDebugageFichier);
+}
+
 #endif // MANUX_DEBUGMASK_VAR
 
 #ifdef MANUX_AS_AUDIT
@@ -125,6 +135,9 @@ void dummyTraiterClavier()
 #ifdef MANUX_DEBUGMASK_VAR
          case 'd' :
             debugMasqueAfficher();
+	 break;
+         case 'D' :
+            debugMasqueModifier();
 	 break;
 #endif  // MANUX_DEBUGMASK_VAR
          case 'h' :
