@@ -10,6 +10,7 @@
 
 #include <manux/config.h>
 #include <manux/types.h>
+#include <manux/ascii.h>
 
 /**
  * A voir où cette adresse doit être définie
@@ -55,10 +56,5 @@ typedef enum {
    COUL_FOND_GRIS_CLAIR      = 0x70,
    COUL_CLIGNOTANT           = 0x80
 } Couleur;
-
-/*
- * Définition de certains caractères ASCII
- */
-#define ASCII_ESC 27
 
 #endif

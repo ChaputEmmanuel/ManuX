@@ -2,8 +2,9 @@
  * @file printk.c
  * @bried Implantion des fonctions de base d'entrée-sortie.                     
  *                                                                            
- *                                                  (C) Manu Chaput 2000-2023 
+ *                                                     (C) Manu Chaput 2000-2026 
  *                                                                            */
+#include "manux/kmalloc-zs.h"
 #include <manux/printk.h>
 
 #ifdef MANUX_JOURNAL
@@ -154,8 +155,12 @@ int snprintk(char * str, size_t l, char * format, ...)
 void printk(char * format, ...)
 {
    va_list   argList;
-   char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une getion dynamique
+#ifdef MANUX_KMALLOC
+   char    * chaine = kmalloc(MAX_PRINTK_LENGTH);
+#else
+   char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une gestion dynamique
                             // attention aux risques de telescopage avec la pile !
+#endif // MANUX_KMALLOC   
    int       result __attribute__((unused));
 
    va_start(argList, format);
@@ -167,6 +172,10 @@ void printk(char * format, ...)
    journaliser(chaine);
 #else
    consoleNoyauAfficher(chaine);
+#endif
+
+#ifdef MANUX_KMALLOC
+   kfree(chaine);
 #endif
 }
 
