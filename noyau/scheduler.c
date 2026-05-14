@@ -234,7 +234,11 @@ void initialiserScheduler()
    printk_debug(DBG_KERNEL_ORDON, "la dummy est la ...\n");
 
 #ifdef MANUX_TACHE_CONSOLE   
+#ifdef MANUX_DUMMY_TASK_CONSOLE
+   tacheSetConsole(t2, creerConsoleVirtuelle());
+#else   
    tacheSetConsole(t2, consoleNoyau());
+#endif
 #endif
 
    printk_debug(DBG_KERNEL_ORDON, "on ajoute la t2 dans l'ordo\n");

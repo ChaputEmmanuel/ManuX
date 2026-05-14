@@ -23,12 +23,15 @@ void startManuX()
    printk("%c[0m", ASCII_ESC);
 
    // Monter et descendre
-   printk("%c[3FX", ASCII_ESC);
-   printk("%c[2EX", ASCII_ESC);
+   printk("%c[44mFond bleu\n", ASCII_ESC);
+   printk("%c[42mFond vert\n", ASCII_ESC);
 
+   // Changement de fond
+   printk("%c[3FX", ASCII_ESC);
+     
    // Positionnement absolu
    printk("%c[12;40H+", ASCII_ESC);
-   
+
 }   /* startManuX */
 
 

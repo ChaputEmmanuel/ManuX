@@ -155,7 +155,7 @@ int snprintk(char * str, size_t l, char * format, ...)
 void printk(char * format, ...)
 {
    va_list   argList;
-#ifdef MANUX_KMALLOC
+#ifdef MANUX_KMALLOC_NON   // WARNING : Ca ne marche pas (kmalloc pas initialisé)
    char    * chaine = kmalloc(MAX_PRINTK_LENGTH);
 #else
    char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une gestion dynamique
@@ -174,7 +174,7 @@ void printk(char * format, ...)
    consoleNoyauAfficher(chaine);
 #endif
 
-#ifdef MANUX_KMALLOC
+#ifdef MANUX_KMALLOC_NON
    kfree(chaine);
 #endif
 }

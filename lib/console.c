@@ -11,6 +11,7 @@
  *                                                     (C) Manu Chaput 2000-2026 
  *                                                                            */
 #include "manux/ascii.h"
+#include "manux/ecran.h"
 #include <manux/console.h>
 
 #include <manux/errno.h>
@@ -71,7 +72,7 @@ static char bufferClavierNoyau[4096];
 
 void consoleAffecterCouleurFond(Console * cons, Couleur coul)
 {
-   cons->attribut = (cons->attribut & 0x0F)|(coul<<4);
+   cons->attribut = (cons->attribut & 0x0F)|(coul);
 }
 
 void consoleAffecterCouleurTexte(Console * cons, Couleur coul)
@@ -226,10 +227,19 @@ void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
          cons->colonne = MIN(cons->nbColonnes, n); 
       break;
       case 'H' : // CUP: Cursor position n, m (default 1)
-         n = n?n:1;
-         m = m?m:1;
+         n = n?n:1 - 1;  // Ca commence à 1 mais moi à 0
+         m = m?m:1 - 1;
          cons->ligne = MIN(cons->nbLignes, n); 
          cons->colonne = MIN(cons->nbColonnes, m); 
+      break;
+      case 'J' : // ED : Erase in Display
+         if (n == 0) {
+            // On efface tout à partir du curseur
+         } else if (n == 1) {
+            // On efface tout jusqu'au curseur
+         } else if (n == 2) {
+            consoleEffacer(cons);
+         }
       break;
       case 'm' : // SGR : Select Graphic Rendition
          consoleSelectGraphicRendition(cons, n);
@@ -593,7 +603,6 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
 int consoleLireEntier(Console * cons)
 {
    int result = 0;
-   int n = cons->indiceProchainCar;
 
    do {
       // On attend qu'il y ai qqchose

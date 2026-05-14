@@ -4,9 +4,10 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
-#include "manux/printk.h"
+#include <manux/printk.h>
 #include <manux/dummy-task.h>
 #include <manux/debug.h>   // printk_debug
+
 #ifdef MANUX_TACHES
 #   include <manux/tache.h>
 #endif // MANUX_TACHES
@@ -37,11 +38,98 @@
 #endif
 
 #ifdef MANUX_DEBUGMASK_VAR
+char * debugFlagNames[32] = {
+  "ERREUR",
+  "START",
+  "PAGIN",
+  "SYSFI",
+  "ORDON",
+  "TACHE",
+  "MEMOIRE",
+  "AS",
+  "PCI",
+  "NET",
+  "VIRTIO",
+  "A_FAIRE",
+  "BOOTLOADER",
+  "TUBE",
+  "REGISTRE",
+  "ALL"
+};
+
+#define MIN(a, b) (((a)<(b))?(a):(b))
+#define MAX(a, b) (((a)>(b))?(a):(b))
+uint32_t masqueDebugageConsoleSave;
+void debugMasqueAfficherFlag(int n)
+{
+   uint32_t f;
+
+   f = 1 << n;
+   if (f & masqueDebugageConsoleSave) {
+      printk("%c[47m");
+   } else {
+      printk("%c[40m");
+   }
+   if (f & masqueDebugageFichier) {
+      printk("%c[31m");
+   } else {
+      printk("%c[37m");
+   }
+   printk("%c[%d;%dH%s", ASCII_ESC, n+2, 5, debugFlagNames[n]);
+   printk("%c[0m");
+}
+
 void debugMasqueAfficher()
 {
-   printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsole);
+   int      n;
+   char     c;
+   int      i = 0;
+
+   masqueDebugageConsoleSave = masqueDebugageConsole;
+   masqueDebugageConsole = 0x00;
+
+   printk("%c[2J", ASCII_ESC);
+   printk("i = Haut / k = bas / j = Console / l = fichier / espace = fin\n");
+
+   for (n = 0 ; n < 15 ; n++) {
+      debugMasqueAfficherFlag(n);
+   }
+   printk("%c[20;0H");
+   printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
    printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+
+   do {
+      while (consoleLire(consoleNoyau(), &c, 1) == 0){};  // WARNING
+      printk("%c[%d;%dH ", ASCII_ESC, i+2, 4);
+      switch (c) {
+         case 'i' :
+            i--; 
+            i = MAX(i, 0);
+         break;
+         case 'k' :
+            i++; 
+            i = MIN(i, 14);
+         break;
+         case 'j' :
+            masqueDebugageConsoleSave = masqueDebugageConsoleSave ^(1 << i);
+            debugMasqueAfficherFlag(i);
+            printk("%c[20;0H");
+            printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
+            printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+         break;
+         case 'l' :
+            masqueDebugageFichier = masqueDebugageFichier ^(1 << i);
+            debugMasqueAfficherFlag(i);
+            printk("%c[20;0H");
+            printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
+            printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+         break;
+      }
+      printk("%c[%d;%dH>", ASCII_ESC, i+2, 4);
+   } while (c != ' ');
+   masqueDebugageConsole = masqueDebugageConsoleSave;
 }
+
 void debugMasqueModifier()
 {
    printk("masqueDebugageConsole : ");
@@ -193,7 +281,6 @@ void dummyTraiterClavier()
 void aDummyKernelTask()
 {
    while(1) {
-
 #if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
       // acquérir le verrou si le noyau n'est pas réentrant.
