@@ -4,6 +4,7 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
+#include "manux/ascii.h"
 #include <manux/printk.h>
 #include <manux/dummy-task.h>
 #include <manux/debug.h>   // printk_debug
@@ -66,41 +67,46 @@ void debugMasqueAfficherFlag(int n)
 
    f = 1 << n;
    if (f & masqueDebugageConsoleSave) {
-      printk("%c[47m");
+      printkc("%c[47m");
    } else {
-      printk("%c[40m");
+      printkc("%c[40m");
    }
    if (f & masqueDebugageFichier) {
-      printk("%c[31m");
+      printkc("%c[31m");
    } else {
-      printk("%c[37m");
+      printkc("%c[37m");
    }
-   printk("%c[%d;%dH%s", ASCII_ESC, n+2, 5, debugFlagNames[n]);
-   printk("%c[0m");
+   printkc("%c[%d;%dH%s", ASCII_ESC, n+2, 5, debugFlagNames[n]);
+   printkc("%c[0m");
 }
 
 void debugMasqueAfficher()
 {
-   int      n;
-   char     c;
-   int      i = 0;
-
+   int       n;
+   char      c;
+   int       i = 0;
+   
    masqueDebugageConsoleSave = masqueDebugageConsole;
    masqueDebugageConsole = 0x00;
 
-   printk("%c[2J", ASCII_ESC);
-   printk("i = Haut / k = bas / j = Console / l = fichier / espace = fin\n");
+   printkc("%c[2J", ASCII_ESC);
 
    for (n = 0 ; n < 15 ; n++) {
       debugMasqueAfficherFlag(n);
    }
-   printk("%c[20;0H");
-   printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
-   printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+   printkc("%c[20;0H");
+   printkc("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
+   printkc("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+
+   printkc("%c[30m", ASCII_ESC);
+   printkc("%c[42m", ASCII_ESC);
+
+   printkc("%c[24;0Hi = Haut / k = bas / j = Console / l = fichier / espace = fin                  ", ASCII_ESC);
+   printkc("%c[0m", ASCII_ESC);
 
    do {
-      while (consoleLire(consoleNoyau(), &c, 1) == 0){};  // WARNING
-      printk("%c[%d;%dH ", ASCII_ESC, i+2, 4);
+      while (consoleLire(tacheEnCours->console, &c, 1) == 0){};  // WARNING
+      printkc("%c[%d;%dH ", ASCII_ESC, i+2, 4);
       switch (c) {
          case 'i' :
             i--; 
@@ -113,31 +119,31 @@ void debugMasqueAfficher()
          case 'j' :
             masqueDebugageConsoleSave = masqueDebugageConsoleSave ^(1 << i);
             debugMasqueAfficherFlag(i);
-            printk("%c[20;0H");
-            printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
-            printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+            printkc("%c[20;0H");
+            printkc("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
+            printkc("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
          break;
          case 'l' :
             masqueDebugageFichier = masqueDebugageFichier ^(1 << i);
             debugMasqueAfficherFlag(i);
-            printk("%c[20;0H");
-            printk("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
-            printk("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
+            printkc("%c[20;0H");
+            printkc("masqueDebugageConsole = 0x%x\n", masqueDebugageConsoleSave);
+            printkc("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
          break;
       }
-      printk("%c[%d;%dH>", ASCII_ESC, i+2, 4);
+      printkc("%c[%d;%dH>", ASCII_ESC, i+2, 4);
    } while (c != ' ');
    masqueDebugageConsole = masqueDebugageConsoleSave;
 }
 
 void debugMasqueModifier()
 {
-   printk("masqueDebugageConsole : ");
+   printkc("masqueDebugageConsole : ");
    masqueDebugageConsole = consoleLireEntier(consoleNoyau());
-   printk("0x%x\n", masqueDebugageConsole);
-   printk("masqueDebugageFichier : ");
+   printkc("0x%x\n", masqueDebugageConsole);
+   printkc("masqueDebugageFichier : ");
    masqueDebugageFichier = consoleLireEntier(consoleNoyau());
-   printk("0x%x\n", masqueDebugageFichier);
+   printkc("0x%x\n", masqueDebugageFichier);
 }
 
 #endif // MANUX_DEBUGMASK_VAR
@@ -150,24 +156,61 @@ void appelsSystemeAfficher()
 {
    CelluleTache * celluleTache;
 
-   printk("\nTache  | Appels Systeme (num:in/out)\n");
-   printk("-------+----------------------------------------\n");
+   printkc("\nTache  | Appels Systeme (num:in/out)\n");
+   printkc("-------+----------------------------------------\n");
    for (celluleTache = listeToutesLesTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
-      printk("%3d    | ", celluleTache->tache->numero);
+      printkc("%3d    | ", celluleTache->tache->numero);
 
       for (int i=0; i < NB_MAX_APPELS_SYSTEME; i++) {
          if (celluleTache->tache->nbAppelsSystemeIn[i]) {
-	    printk("%d:%d/%d ", i,
+	    printkc("%d:%d/%d ", i,
 		   celluleTache->tache->nbAppelsSystemeIn[i],
 		   celluleTache->tache->nbAppelsSystemeOut[i]);
          }
       }
-      printk("\n");
+      printkc("\n");
    }
 }
 #endif  // MANUX_AS_AUDIT
+
+#ifdef MANUX_INT_AUDIT
+/**
+ * @brief Affichage des IT reçues
+ *
+ * Le but est de présenter un écran synthétique avec le nombre
+ * d'occurences de chacune des interruptions.
+ */
+void interruptionAfficher()
+{
+   int i;
+
+   printkc("----[ %d Exceptions ]--------------------------\n", MANUX_NB_EXCEPTIONS);
+   for (i = 0; i < MANUX_NB_EXCEPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printkc("\n");
+   
+   printkc("----[ %d IRQ ]---------------------------------\n", MANUX_NB_IRQ);
+   for (i = MANUX_NB_EXCEPTIONS; i < MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ ; i ++) {
+      if (nbItRecues[i]) {
+         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printkc("\n");
+   
+   printkc("----[ %d Interruptions ]-----------------------\n", MANUX_NB_INTERRUPTIONS);
+   for (i = MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ; i < MANUX_NB_INTERRUPTIONS ; i ++) {
+      if (nbItRecues[i]) {
+         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+      }
+   }
+   printkc("\n");
+}
+#endif // MANUX_INT_AUDIT
 
 #if  defined(MANUX_TACHES) \
  &&  defined(MANUX_SYNCHRONISATION) \
@@ -178,31 +221,89 @@ void appelsSystemeAfficher()
  */
 void afficherEtatMutex()
 {
-   printk("\n-- Tache dans le noyau : %d \n-- Taches en attente : ", tacheDansLeNoyau);
+   printkc("\n-- Tache dans le noyau : %d \n-- Taches en attente : ", tacheDansLeNoyau);
    for (CelluleTache * celluleTache = verrouGeneralDuNoyau.tachesEnAttente.tete;
         celluleTache != NULL;
 	celluleTache = celluleTache->suivant){
-      printk("%d ", celluleTache->tache->numero);
+      printkc("%d ", celluleTache->tache->numero);
    }
 #ifdef MANUX_EXCLUSION_MUTUELLE_AUDIT
-   printk("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
+   printkc("\n-- %d ent / %d sor\n", verrouGeneralDuNoyau.nbEntrees, verrouGeneralDuNoyau.nbSorties);
 #endif // MANUX_EXCLUSION_MUTUELLE_AUDIT
 }
 #endif
 
 #ifdef MANUX_CLAVIER_CONSOLE
+void dummyMessageAide();
+
+typedef struct _MenuDebogage {
+   char touche;
+   void (*action)();
+   char * aide;
+} MenuDebogage;
+
+MenuDebogage menuDebogage[] = {
+  {'h', dummyMessageAide, "Afficher ce menu d'aide"},
+  {'d', debugMasqueAfficher, "Editer les masques de debug"},
+  {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
+  {'i', interruptionAfficher, "Voir le decompte des interruptions"},
+  {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
+  {0, NULL, NULL}
+};  
+int menuActif = 0;
+
+void dummyMessageAide()
+{
+   int i;
+   
+   printkc("%c[2JBienvenu dans la tache d'observation/debogage\n", ASCII_ESC);
+   printkc("\n\n");
+   printkc("Vous pouvez utiliser les touches suivantes :\n");
+   printkc("\n\n");
+
+   for (i = 0; menuDebogage[i].touche != 0; i++){
+      printkc("   [%c]   %s\n", menuDebogage[i].touche, menuDebogage[i].aide);
+   }
+}
+
+/**
+ * @brief
+ */
+void afficherMenuActif()
+{
+   printkc("%c[2J", ASCII_ESC);
+   menuDebogage[menuActif].action();
+   printkc("%c[30m", ASCII_ESC);  // WARNING macro
+   printkc("%c[42m", ASCII_ESC);
+   printkc("%c[24;0H<espace> refresh, <h> aide                                                     ", ASCII_ESC);
+   printkc("%c[m", ASCII_ESC);
+}
+
 /**
  * @brief Gestion du clavier pour la dummy
  */
+void dummyTraiterClavierV2()
+{
+   Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
+   
+   char c;
+   int i;
+   
+   while (cons->nbCarAttente) {
+      consoleLire(cons, &c, 1);
+      for (i = 0; menuDebogage[i].touche != 0; i++){
+	 if (c == menuDebogage[i].touche) {
+            menuActif = i;
+	    afficherMenuActif();
+         } else if (c == ' ') {   // Mise-à-jour
+	    afficherMenuActif();
+	 }
+      }
+   }  
+}
 void dummyTraiterClavier()
 {
-   Console * cons
-
-#ifdef MANUX_CONSOLES_VIRTUELLES
-     = tacheEnCours->console;
-#else
-     = consoleNoyau();     
-#endif
+   Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
    
    char c[1] ;
    int i;
@@ -218,7 +319,7 @@ void dummyTraiterClavier()
 #endif
          case 'c' :
 	    for (i = 0; i < 24; i++)
-	       printk("\n");
+	       printkc("\n");
          break;
 #ifdef MANUX_DEBUGMASK_VAR
          case 'd' :
@@ -229,7 +330,7 @@ void dummyTraiterClavier()
 	 break;
 #endif  // MANUX_DEBUGMASK_VAR
          case 'h' :
-	   printk("c(lear screen)\nh(elp)\np(rocessus)\nm(emoire)\ni(nterruptions)\ns(ynchronisation)\n");
+	   dummyMessageAide();
 	 break;
          case 'i' :
             interruptionAfficher();
@@ -259,14 +360,15 @@ void dummyTraiterClavier()
 #ifdef MANUX_KMALLOC_STAT
             kmallocAfficherStatistiques("");
 #else
-            printk(" Memoire : %d / %d pages allouees\n",
+            printkc(" Memoire : %d / %d pages allouees\n",
 	    nombrePagesAllouees(), nombrePagesTotal());
 #endif
 	 break;
          default :
-	   //            printk("Unknown [0x%x] pressed\n", c[0]);
+	   //            printkc("Unknown [0x%x] pressed\n", c[0]);
          break;
       }
+      dummyMessageAide();
    }
 }
 #endif // MANUX_CLAVIER_CONSOLE
@@ -280,6 +382,7 @@ void dummyTraiterClavier()
  */
 void aDummyKernelTask()
 {
+   dummyMessageAide(); // WARNING : mutex ?
    while(1) {
 #if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc
@@ -292,7 +395,7 @@ void aDummyKernelTask()
       printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
 #ifdef MANUX_CLAVIER_CONSOLE
-      dummyTraiterClavier();
+      dummyTraiterClavierV2();
 #endif
 
 #if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)

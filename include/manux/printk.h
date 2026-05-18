@@ -45,6 +45,7 @@
  *    %[n][l[l]]{dxo} %s \n
  */
 void printk(char * format, ...);
+void printkc(char * format, ...);
 
 /**
  * @brief : Écriture formattée dans une chaîne de caractères

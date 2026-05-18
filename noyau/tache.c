@@ -347,7 +347,7 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
  */
 void afficherEtatUneTache(Tache * tache)
 {
-  printk(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
+  printkc(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
        tache->numero,
          (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
           tache->nbActivations,
@@ -369,18 +369,18 @@ void afficherEtatTaches()
 {
    CelluleTache * celluleTache;
 
-   printk("\n ------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
+   printkc("\n ------------------------<SCHEDULER t = %d:%d (%d)>----------------------------\n",
 	  totalMinutesDansTemps(nbTopHorloge),
 	  secondesDansTemps(nbTopHorloge),
 	  nbTopHorloge);
 
-   printk("\n Num prochaine tache : %d\n", numeroProchaineTache);
-   printk(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
+   printkc("\n Num prochaine tache : %d\n", numeroProchaineTache);
+   printkc(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
    for (celluleTache = listeToutesLesTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){
         afficherEtatUneTache(celluleTache->tache);
    }
-   printk("\n------------------------------------------------------------------------------\n");
+   printkc("\n------------------------------------------------------------------------------\n");
 }
 

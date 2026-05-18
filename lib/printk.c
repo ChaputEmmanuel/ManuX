@@ -5,6 +5,7 @@
  *                                                     (C) Manu Chaput 2000-2026 
  *                                                                            */
 #include "manux/kmalloc-zs.h"
+#include "manux/scheduler.h"
 #include <manux/printk.h>
 
 #ifdef MANUX_JOURNAL
@@ -152,6 +153,12 @@ int snprintk(char * str, size_t l, char * format, ...)
    return result;
 }
 
+/**
+ * @brief La fonction d'affichage à utiliser dans le noyau
+ *
+ * Elle utilise le journal s'il y en a un, et sinon la console du
+ * noyau.
+ */
 void printk(char * format, ...)
 {
    va_list   argList;
@@ -179,3 +186,38 @@ void printk(char * format, ...)
 #endif
 }
 
+/**
+ * @brief Un fonction d'affichage pour écrire dans la console de la
+ * tâche en cours
+ *
+ * Je n'en suis pas très fier, mais j'ai besoin d'un truc comme ça
+ * pour les tâches purement noyau comme dummyTask.
+ */
+#ifdef MANUX_CONSOLES_VIRTUELLES
+void printkc(char * format, ...)
+{
+   va_list   argList;
+#ifdef MANUX_KMALLOC_NON   // WARNING : Ca ne marche pas (kmalloc pas initialisé)
+   char    * chaine = kmalloc(MAX_PRINTK_LENGTH);
+#else
+   char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une gestion dynamique
+                            // attention aux risques de telescopage avec la pile !
+#endif // MANUX_KMALLOC   
+   int       result __attribute__((unused));
+
+   va_start(argList, format);
+   result = vsnprintk(chaine, MAX_PRINTK_LENGTH, format, argList);
+   va_end(argList);
+
+   // On affiche 
+   consoleAfficher(tacheEnCours->console, chaine);
+
+#ifdef MANUX_KMALLOC_NON
+   kfree(chaine);
+#endif
+}
+// Si on n'a pas de console virtuelle, printkc ne peut pas faire mieux
+// que printk
+#else
+#   define printkc printk
+#endif

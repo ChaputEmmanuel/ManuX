@@ -111,8 +111,8 @@ INoeud * consoleCreerINOeud(Console * c);
 #   endif // MANUX_MALLOC
 #endif // MANUX_FICHIER
 
-/*
- * Choix des couleurs de texte et de fond (voir l'enum ci dessus)
+/**
+ * @brief Choix des couleurs de texte et de fond (voir l'enum ci dessus)
  */
 void consoleAffecterCouleurFond(Console * cons, Couleur coul);
 

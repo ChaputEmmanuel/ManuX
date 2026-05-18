@@ -147,13 +147,18 @@ inline void consoleAfficherCaractere(Console * cons, char c)
 #define MAX(a, b) (((a)>(b))?(a):(b))
 
 /**
- * @brief
+ * @brief Choix des couleurs de texte et fond de la console
+ *
+ * Il s'agit essentiellement d'une correspondance depuis les couleurs
+ * proposées dans les escape codes ASCII vers les codes définis par le
+ * BIOS.
  */
 void consoleSelectGraphicRendition(Console * cons, int m)
 {
    switch (m) {
       case 0 : 
-         consoleAffecterCouleurTexte(cons, COUL_TXT_BLANC);
+         // WARNING utiliser la macro de défaut
+         consoleAffecterCouleurTexte(cons, COUL_TXT_GRIS_CLAIR);
          consoleAffecterCouleurFond(cons, COUL_FOND_NOIR);
       break;
       case 30 : 
@@ -165,12 +170,46 @@ void consoleSelectGraphicRendition(Console * cons, int m)
       case 32 : 
          consoleAffecterCouleurTexte(cons, COUL_TXT_VERT);
       break;
+      case 33 : 
+         consoleAffecterCouleurTexte(cons, COUL_TXT_JAUNE);
+      break;
       case 34 :
          consoleAffecterCouleurTexte(cons, COUL_TXT_BLEU);
+      break;
+      case 35 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_MAGENTA);
+      break;
+      case 36 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_CYAN);
       break;
       case 37 :
          consoleAffecterCouleurTexte(cons, COUL_TXT_BLANC);
       break;
+      case 90 : 
+         consoleAffecterCouleurTexte(cons, COUL_TXT_GRIS);
+      break;
+      case 91 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_ROUGE_CLAIR);
+      break;
+      case 92 : 
+         consoleAffecterCouleurTexte(cons, COUL_TXT_VERT_CLAIR);
+      break;
+      case 93 : 
+         consoleAffecterCouleurTexte(cons, COUL_TXT_JAUNE);
+      break;
+      case 94 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_BLEU_CLAIR);
+      break;
+      case 95 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_MAGENTA_CLAIR);
+      break;
+      case 96 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_CYAN_CLAIR);
+      break;
+      case 97 :
+         consoleAffecterCouleurTexte(cons, COUL_TXT_BLANC);
+      break;
+
       case 40 : 
          consoleAffecterCouleurFond(cons, COUL_FOND_NOIR);
       break;
@@ -180,12 +219,46 @@ void consoleSelectGraphicRendition(Console * cons, int m)
       case 42 : 
          consoleAffecterCouleurFond(cons, COUL_FOND_VERT);
       break;
+      case 43 : 
+         consoleAffecterCouleurFond(cons, COUL_FOND_JAUNE);
+      break;
       case 44 :
          consoleAffecterCouleurFond(cons, COUL_FOND_BLEU);
       break;
-      case 47 :
-         consoleAffecterCouleurFond(cons, COUL_FOND_GRIS_CLAIR);
+      case 45 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_MAGENTA);
       break;
+      case 46 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_CYAN);
+      break;
+      case 47 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_BLANC);
+      break;
+      case 100 : 
+         consoleAffecterCouleurFond(cons, COUL_FOND_GRIS);
+      break;
+      case 101 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_ROUGE_CLAIR);
+      break;
+      case 102 : 
+         consoleAffecterCouleurFond(cons, COUL_FOND_VERT_CLAIR);
+      break;
+      case 103 : 
+         consoleAffecterCouleurFond(cons, COUL_FOND_JAUNE);
+      break;
+      case 104 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_BLEU_CLAIR);
+      break;
+      case 105 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_MAGENTA_CLAIR);
+      break;
+      case 106 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_CYAN_CLAIR);
+      break;
+      case 107 :
+         consoleAffecterCouleurFond(cons, COUL_FOND_BLANC);
+      break;
+
       default:
       break;
    }
@@ -429,7 +502,7 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
    cons->colonne = 0;
    cons->nbLignes = MANUX_CON_LIGNES;
    cons->nbColonnes = MANUX_CON_COLONNES;
-   cons->attribut = COUL_TXT_GRIS_CLAIR | COUL_FOND_NOIR;
+   cons->attribut = MANUX_COULEUR_TEXTE | MANUX_COULEUR_FOND;
 
    /* Initialisation du verrou */
 #ifdef MANUX_CONSOLE_AVEC_MUTEX
@@ -746,7 +819,7 @@ void consoleInitialiserINoeud(INoeud * i, Console * c)
 int consoleInitialisationINoeud(INoeud * iNoeudConsole)
 {
    //! On initialise la console
-   initialiserConsoleNoyau();
+   consoleInitialisation();
 
    //! On initialise l'INoeud qui la décrit
    consoleInitialiserINoeud(iNoeudConsole,  &_consoleNoyau);
