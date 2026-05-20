@@ -31,6 +31,8 @@ uint32_t attenteCalibre;
  */
 void handlerHorloge(void * inutile)
 {
+   (void) inutile;
+   
    nbTopHorloge++;
 
 #if defined(MANUX_TACHES) && defined(MANUX_PREEMPTIF) 
@@ -58,7 +60,8 @@ void setFrequenceHorloge(uint16_t freqHz)
 /**
  * @brief Calibrage de la fonction mdelay()
  */
-void __attribute__((optimize("O0"))) attenteCalibrer()
+NO_OPTIMIZE
+void attenteCalibrer()
 {
    Temps    t;
    uint32_t n = 0;
@@ -105,7 +108,8 @@ void initialiserHorloge()
 /**
  * @brief Attente active de n millisecondes
  */
-void __attribute__((optimize("O0"))) attenteMilliSecondes(int n)
+NO_OPTIMIZE
+void attenteMilliSecondes(int n)
 {
    uint32_t m = n * attenteCalibre;
    uint32_t c = 0;

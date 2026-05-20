@@ -55,7 +55,8 @@ int sys_fermer(ParametreAS as, int fd)
 {
    Fichier * f;
    int result = EBADF;
-
+   (void) as;
+   
    printk_debug(DBG_KERNEL_SYSFI, "in\n");
    
    if (tacheEnCours == NULL) {
@@ -79,7 +80,8 @@ int sys_ecrire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
    int result;
-
+   (void) as;
+   
    printk_debug(DBG_KERNEL_SYSFI, "sys_ecrire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
    if (tacheEnCours == NULL) {
@@ -102,7 +104,8 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 {
    Fichier * f;
    int result;
-
+   (void) as;
+   
    printk_debug(DBG_KERNEL_SYSFI, "sys_lire fd = %d, b = %d, nb = %d IN\n", fd, buffer, nbOctets);
 
    if (tacheEnCours == NULL) {

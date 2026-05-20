@@ -101,6 +101,12 @@ void neRienFaire(TousRegistres registres,
 		 uint32_t eip, uint32_t cs, uint32_t eFlags,
 		 uint32_t numIt)
 {
+   (void) registres;
+   (void) eip;
+   (void) cs;
+   (void) eFlags;
+   (void) numIt;
+   
    printk("neRienFaire %d\n", numIt);
 }
 
@@ -302,6 +308,8 @@ static char bufferEcran[4000];
 void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
 		    uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
+   (void) registres;
+  
    /* A définir ailleurs lorsque ce sera au point */
    char *ecranPanique ="\
 +-------------+-------------------+--------32--28--24--20--16--12---8---4---0--+\
@@ -374,7 +382,7 @@ void gestionExceptionPanique(TousRegistres registres,
 {
    char * ecran = MANUX_CON_SCREEN;
    int d = 1;
-   char c;
+   unsigned char c;
 
    ecranDeLaMort(errCode, numIt, registres, eip, cs, eFlags);
 

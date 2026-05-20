@@ -68,7 +68,13 @@ ASM_DEF     = -D MANUX_BOOT_START_ADDRESS=$(MANUX_BOOT_START_ADDRESS) \
 	      -D MANUX_INT_BASE_IRQ=$(MANUX_INT_BASE_IRQ) \
 	      -D MANUX_NB_INTERRUPTIONS=$(MANUX_NB_INTERRUPTIONS) \
 	      -D MANUX_NB_EXCEPTIONS=$(MANUX_NB_EXCEPTIONS) \
-              -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK)
+              -D MANUX_PREMIER_SECT_RAMDISK=$(MANUX_PREMIER_SECT_RAMDISK) \
+	      -D MANUX_KERNEL_TASK_TSS_IND=$(MANUX_KERNEL_TASK_TSS_IND) \
+	      -D MANUX_HANDLER_IRQ=$(MANUX_HANDLER_IRQ) \
+
+ASM_DEF     += $(if $(MANUX_APPELS_SYSTEME), -D MANUX_APPELS_SYSTEME)
+ASM_DEF     += $(if $(MANUX_CLAVIER), -D MANUX_CLAVIER)
+
 
 ASM_DEF += $(if $(MANUX_BOOTLOADER), -D MANUX_BOOTLOADER)
 
@@ -167,40 +173,12 @@ RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX
 
 #--------------------------------------------------------------------------
-# Les paramètres du gcc
-#
-#   "-fno-stack-protector" permet d'éviter les "undefined references to
-# `__stack_chk_fail'" sur les GCC récents
-#
-#   "-nostdinc -fno-builtin -nodefaultlibs -nostartfiles" permettent
-# de n'utiliser aucune fonctions prédéfinies ou de librairies standard
-#
-#   Optimisation
-#     -O2 par défaut
-#     -O0 pour debuguer
-#
+#    Lecture des options en fonction du compilateur
 #--------------------------------------------------------------------------
-CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
-           -g -ggdb -gdwarf  \
-	   -I$(ROOTDIR)/include  \
-           -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
-           -fno-toplevel-reorder \
-           -fno-stack-protector \
-           -O4 \
-	 # -mpreferred-stack-boundary=2 (par défaut c'est 4, d'où des "sub $0x10,%esp")
-         # -fomit-frame-pointer
-
-CFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))
-
-#..........................................................................
-#   Les flags pour le monde utilisateur
-#..........................................................................
-UCFLAGS   = -fno-pie -m32 -march=i686 -Wall \
-           -I../usr/include \
-           -nostdinc -fno-builtin \
-           -fomit-frame-pointer \
-           -fno-toplevel-reorder \
-           -fno-stack-protector \
-           -O2
-
-#UCFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))
+ifndef CC
+CC=gcc
+endif
+ifeq "$(CC)" "cc"
+CC=gcc
+endif
+include $(ROOTDIR)/make.$(CC)

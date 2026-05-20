@@ -37,8 +37,8 @@ MethodesFichier tubeMethodesFichier;
  */
 typedef struct _tube {
    uint8_t * donnees;   //< Pointeur sur la zone de données
-   int taille;          //< Nombre d'octets présents dans le tube
-   int indiceProchain ; //< Position de la prochaine insertion
+   uint32_t  taille;          //< Nombre d'octets présents dans le tube
+   uint32_t  indiceProchain ; //< Position de la prochaine insertion
 
    int nbEcrivains;
    int nbLecteurs;
@@ -53,6 +53,8 @@ typedef struct _tube {
 int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    Tube * tube = (Tube *) f->iNoeud->prive;
+   (void)iNoeud;
+   (void)mode;
    
    exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
 
@@ -103,9 +105,9 @@ int tubeFermer(Fichier * f)
  */
 size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
-   Tube * tube;
-   int n = 0;
-   int nbOctetsEcrits = 0; // Le nombre d'octets déja écrits
+   Tube *   tube;
+   uint32_t n = 0;
+   uint32_t nbOctetsEcrits = 0; // Le nombre d'octets déja écrits
 
    printk_debug(DBG_KERNEL_TUBE, "in\n");
    
@@ -243,7 +245,8 @@ int sys_tube(ParametreAS as, int * fds)
    INoeud  * iNoeud;
    Fichier * fichiers[2];
    Tube    * tube;
-
+   (void) as;
+   
    printk_debug(DBG_KERNEL_TUBE, "Creation d'un tube (lire = 0x%x) ...\n", tubeLire);
 
    // Création de la structure

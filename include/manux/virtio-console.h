@@ -23,13 +23,6 @@
 #define VIRTIO_CONSOLE_PORT0_OUT  1
 
 /**
- * Cette fonction va voir si quelquechose est dispo
- * Elle doit sûrement disparaître, mais je vais tenter de faire un
- * peu de polling
- */
-void virtioConsoleTraiterBuffers();
-
-/**
  * @brief Initialisation des périphériques
  */
 int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole);

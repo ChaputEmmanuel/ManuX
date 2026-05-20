@@ -4,8 +4,8 @@
  *                                                                            
  *                                                     (C) Manu Chaput 2000-2026 
  *                                                                            */
-#include "manux/kmalloc-zs.h"
-#include "manux/scheduler.h"
+#include <manux/kmalloc-zs.h>
+#include <manux/scheduler.h>
 #include <manux/printk.h>
 
 #ifdef MANUX_JOURNAL
@@ -36,7 +36,7 @@
  */
 int vsnprintk(char * str, const size_t l, char * format, va_list argList)
 {
-   int       indice = 0;
+   size_t    indice = 0;
    long long int       n;   // valeur associée à un %[l]d
    char      nombre[10];    // chaîne du nombre
    char    * s;             // valeur associée à un %s
@@ -113,7 +113,8 @@ affent :          switch (prefixe) {
 		  }
                break;
                case 'c' :
-                  c = va_arg(argList, char );
+		 c = (char)va_arg(argList, int);
+		  //                  c = va_arg(argList, char );
                   in = 0;
                   str[indice++] = c;
                break;

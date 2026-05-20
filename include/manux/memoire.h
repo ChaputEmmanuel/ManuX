@@ -45,7 +45,7 @@ void * allouerPage();
  *    NULL sinon
  */
 
-void * allouerPages(unsigned int nombre);
+void * allouerPages(uint32_t nombre);
 /*
  * Réservation d'un nombre choisi de pages (de 4 Ko) contigues.
  *

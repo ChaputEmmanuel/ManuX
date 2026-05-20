@@ -3,6 +3,7 @@
 /*                                                                            */
 /*                                                  (C) Manu Chaput 2000-2021 */
 /*----------------------------------------------------------------------------*/
+#include "manux/stddef.h"
 #include <manux/string.h>
 
 /**
@@ -55,7 +56,7 @@ int strlen(const char * s)
 
 int strncmp(const char *s1, const char *s2, size_t n)
 {
-   int i;
+   size_t i;
 
    // On cherche la première différence
    for (i = 0 ; (i < n) && (s1[i] == s2[i]) ; i++) { }

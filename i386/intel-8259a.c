@@ -198,6 +198,11 @@ void i8259aGestionIRQ(TousRegistres registres, uint32_t numIRQ,
 {
    int i;
 
+   (void) registres;
+   (void) eip;
+   (void) cs;
+   (void) eFlags;
+   
    // On accuse réception auprès du PIC
    i8259aAckIRQ(numIRQ);
 

@@ -58,13 +58,15 @@ TacheID * proprietairePage;
 /*
  * Le nombre global de pages dans le système
  */
-static int nombrePages = 0;
-static int nombreDePagesAllouees = 0;
+static uint32_t nombrePages = 0;
+static uint32_t nombreDePagesAllouees = 0;
 
 /*
  * Marquer une page comme réservée. WARNING : il faut se protéger par un mutex
  */
-static void inline reserverPage(uint32_t i)
+inline
+static
+void reserverPage(uint32_t i)
 {
    if (proprietairePage[i] != (TacheID)0) {
      paniqueNoyau("Page 0x%x (%d) deja prise\n", i, i);
@@ -91,7 +93,9 @@ void libererPage(void * pageLiberee)
 /*
  * Marquer une page comme libre (WARNING trouve un plus joli nom)
  */
-static void inline demarquerPage(uint32_t i)
+static
+inline
+void demarquerPage(uint32_t i)
 {
    proprietairePage[i] = (TacheID)0;
 }
@@ -229,8 +233,8 @@ void * reserverPageSysteme()
 
 void * allouerPage()
 {
-   void * pageAllouee = NULL;
-   int    numeroPage = 0;
+   void *   pageAllouee = NULL;
+   uint32_t numeroPage = 0;
 
    // On cherche la première page libre
    while (  (numeroPage < nombrePages)
@@ -263,7 +267,7 @@ int nombrePagesTotal()
 /**
  * Combien de pages libes à partir de la page numeroPage incluse ?
  */
-int nombrePagesLibres(unsigned int numeroPage)
+uint32_t nombrePagesLibres(uint32_t numeroPage)
 {
    int result = 0;
 
@@ -276,10 +280,10 @@ int nombrePagesLibres(unsigned int numeroPage)
 /** 
  * Allocation de plusieurs pages contigues
  */
-void * allouerPages(unsigned int nombre)
+void * allouerPages(uint32_t nombre)
 {
-   void * result = NULL;
-   int    numeroPage = 0;
+   void *   result = NULL;
+   uint32_t numeroPage = 0;
 
    // On cherche la première page libre
    while (  (numeroPage < nombrePages - nombre)
@@ -291,7 +295,7 @@ void * allouerPages(unsigned int nombre)
 
    /* Si on trouve une page dispo */
    if ((numeroPage < nombrePages)  && (nombrePagesLibres(numeroPage) >= nombre)){
-     for (int i = numeroPage; i < numeroPage+nombre; i++) {
+     for (uint32_t i = numeroPage; i < numeroPage+nombre; i++) {
          reserverPage(i);
      }
      result = (void *) (numeroPage * MANUX_TAILLE_PAGE);
@@ -305,6 +309,8 @@ int AS_obtenirPages(ParametreAS p, int nbPages)
 {
    Page unePage;
    Tache * tache = tacheEnCours;
+
+   (void) p;
 
    /* Pour le moment, on ne sait faire qu'une à la fois */
    if (nbPages != 1) {

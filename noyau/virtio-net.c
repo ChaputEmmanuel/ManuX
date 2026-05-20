@@ -327,6 +327,8 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
  */
 void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
 {
+   (void) vr; // WARNING, pas normal
+   
    // On va construire un tableau de buffers (et un de leurs
    // longueurs) pour passer à virtioFournirBuffers
    void                * buffers[2];

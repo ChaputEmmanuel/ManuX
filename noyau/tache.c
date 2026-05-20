@@ -40,7 +40,7 @@ void basculerVersTache(Tache * tache)
 {
    volatile uint32_t selecteur[2] = {0 , tache->indiceTSSDescriptor};
 
-   __asm__ __volatile__ ("ljmp %0"::"m" (*selecteur));
+   __asm__ __volatile__ ("ljmp * %0"::"m" (*selecteur));
 }
 
 /**
@@ -295,7 +295,9 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
  *
  * Attention : doit être protégé par un mutex !
  */
-static int inline tacheNumFichierLibre(Tache * tache)
+inline
+static
+int tacheNumFichierLibre(Tache * tache)
 {
    int result = 0;
 

@@ -150,7 +150,7 @@ inline void consoleAfficherCaractere(Console * cons, char c)
  * @brief Choix des couleurs de texte et fond de la console
  *
  * Il s'agit essentiellement d'une correspondance depuis les couleurs
- * proposées dans les escape codes ASCII vers les codes définis par le
+ * proposées dans les escape codes ANSI vers les codes définis par le
  * BIOS.
  */
 void consoleSelectGraphicRendition(Console * cons, int m)
@@ -265,7 +265,7 @@ void consoleSelectGraphicRendition(Console * cons, int m)
 }
 
 /**
- * @brief Traitement d'un code d'échappement ASCII de type CSI
+ * @brief Traitement d'un code d'échappement ANSI de type CSI
  *
  * Voir par exemple https://en.wikipedia.org/wiki/ANSI_escape_code
  *
@@ -277,12 +277,14 @@ void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
    switch (c) {
       case 'F' : // CPL : Cursor beginning of n(=1) lines up
          cons->colonne = 0;
+	 [[fallthrough]];
       case 'A' : // CUU : Cursor up n (default n=1) cell
          n = n?n:1;
          cons->ligne = MAX(cons->ligne - n, 0); 
       break;
       case 'E' : // CNL : Cursor beginning of n(=1) lines down
          cons->colonne = 0;
+	 [[fallthrough]];
       case 'B' : // CUD : Cursor down n (default n=1) cell
          n = n?n:1;
          cons->ligne = MIN(cons->ligne + n, cons->nbLignes); 
@@ -317,13 +319,11 @@ void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
       case 'm' : // SGR : Select Graphic Rendition
          consoleSelectGraphicRendition(cons, n);
       break;
-
-      default :
    }
 }
 
 /**
- * @brief Gestion des codes d’échappement ASCII
+ * @brief Gestion des codes d’échappement ANSI
  *
  * On ne gère pour le moment que certains codes CSI.
  * Voir par exemple https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -402,6 +402,7 @@ void consoleAfficherN(Console * cons, char * msg, int nbOctets)
       switch (*msg) {
          case ASCII_LINE_FEED :        // '\n'
             avancerLigne(cons);
+	    [[fallthrough]];
          case ASCII_CARRIAGE_RETURN :  // '\r'
             cons->colonne = 0;
          break;
@@ -736,6 +737,11 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
  */
 int consoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
+   (void) iNoeud;
+   (void) f;
+   (void) fanions;
+   (void) mode;
+
    return ESUCCES;
 }
 
@@ -869,6 +875,8 @@ int consoleInitialisation()
  */
 int sys_ecrireConsole(ParametreAS as, void * msg, int n)
 {
+   (void) as; // Juste pour ne pas écraser les paramètres
+   
    //! Si on a attribué une console à  chaque tâche, on va la chercher
    //! Si ce n'est pas le cas, on prend la seule console, celle du
    //! noyau

@@ -149,6 +149,7 @@ void aiguillerMessage(char ** message,
       break ;
       case '{' :
          *cons = TRUE;
+	 [[fallthrough]];
       case '(' :
          *fic = TRUE;
       break ;

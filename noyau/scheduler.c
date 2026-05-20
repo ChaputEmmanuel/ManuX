@@ -284,7 +284,10 @@ uint32_t AS_console()
  */
 int sys_basculerTache(ParametreAS as)
 {
+   (void) as;
+
    assert(tacheEnCours != NULL);
+
    ordonnanceur();
 
    return 0;
@@ -304,6 +307,8 @@ TacheID sys_creerTache(ParametreAS as, CorpsTache corpsTache, booleen shareConso
 #ifdef MANUX_TACHE_CONSOLE
    Console * console;
 #endif
+
+   (void) as;
    
    assert(tacheEnCours != NULL);
 

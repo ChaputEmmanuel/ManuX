@@ -44,6 +44,10 @@ static int    nbPageAlloueesIci = 0;
 
 /**
  * @brief Gestion des buffers utilisés par le périphérique
+ *
+ * Cette fonction va voir si quelquechose est dispo
+ * Elle doit sûrement disparaître, mais je vais tenter de faire un
+ * peu de polling
  */
 #define NB_BUFF_TRAITES 16
 void virtioConsoleTraiterBuffers(VirtioConsole * vc)
@@ -208,6 +212,10 @@ size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
  */
 size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
 {
+   (void) f;
+   (void) b;
+   (void) l;
+ 
    printk_debug(DBG_KERNEL_VIRTIO, "in\n");
 
    return 0;
@@ -215,6 +223,10 @@ size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
 
 int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
+   (void) iNoeud;
+   (void) fanions;
+   (void) mode;
+
    f->prive = &virtioConsole; // WARNING, il peut y en avoir plusieurs 
 
    return ESUCCES;

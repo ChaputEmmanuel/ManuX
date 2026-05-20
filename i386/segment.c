@@ -60,7 +60,8 @@ int setDescripteurTSS(DescriptorTable * dt,
    return (dt->taille++)<<3;
 }
 
-void inline chargerGDT(DescriptorTable * gdt)
+inline
+void chargerGDT(DescriptorTable * gdt)
 /*
  * Chargement effectif de la GDT ; lgdt prend en paramètre l'adresse
  * d'une zone contenant la taille puis l'adresse de la GDT.

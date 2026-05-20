@@ -18,7 +18,7 @@
  * Longueur maximale d'une chaîne affichable (à supprimer dès qu'on
  * aura de la mémoire dynamique)
  */
-#define MAX_PRINTK_LENGTH 512
+#define MAX_PRINTK_LENGTH 2048 //512
 
 /**
  * @brief Les différentes préfixes pour les niveaux de criticité

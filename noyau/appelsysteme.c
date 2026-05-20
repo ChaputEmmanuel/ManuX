@@ -31,6 +31,7 @@ void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
  */
 int sys_dumbAS(ParametreAS as)
 {
+   (void) as;
    printk("I am so useless, ...\n");
 
    attenteMilliSecondes(500);

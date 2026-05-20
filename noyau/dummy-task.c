@@ -4,7 +4,11 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
-#include "manux/ascii.h"
+#include "manux/ecran.h"
+#include <manux/ascii.h>
+#ifdef MANUX_KMALLOC
+#   include <manux/kmalloc-zs.h>
+#endif
 #include <manux/printk.h>
 #include <manux/dummy-task.h>
 #include <manux/debug.h>   // printk_debug
@@ -99,7 +103,7 @@ void debugMasqueAfficher()
    printkc("masqueDebugageFichier = 0x%x\n", masqueDebugageFichier);
 
    printkc("%c[30m", ASCII_ESC);
-   printkc("%c[42m", ASCII_ESC);
+   printkc("%c[100m", ASCII_ESC);
 
    printkc("%c[24;0Hi = Haut / k = bas / j = Console / l = fichier / espace = fin                  ", ASCII_ESC);
    printkc("%c[0m", ASCII_ESC);
@@ -233,8 +237,12 @@ void afficherEtatMutex()
 }
 #endif
 
+/*----------------------------------------------------------------------------*/
+/* Gestion des menus.                                                         */
+/*----------------------------------------------------------------------------*/
 #ifdef MANUX_CLAVIER_CONSOLE
 void dummyMessageAide();
+void dummyCopieEcran();
 
 typedef struct _MenuDebogage {
    char touche;
@@ -267,6 +275,43 @@ void dummyMessageAide()
 }
 
 /**
+ * @brief Copie du contenu de la console via printk
+ */
+#define TAILLE_ECRAN (MANUX_CON_LIGNES*MANUX_CON_COLONNES)
+
+void dummyCopieEcran()
+{
+   int s = TAILLE_ECRAN - 1 - 80;   // - 80 pour ne pas copier la ligne d'aide 
+   int d = s; // Destination
+   char * ecran = tacheEnCours->console->adresseEcran;
+   
+#ifdef MANUX_KMALLOC
+   char * buffer = kmalloc(TAILLE_ECRAN);
+#else
+   char buffer[TAILLE_ECRAN];
+#endif
+
+   buffer[d--] = 0;
+   buffer[d--] = '\n';
+   
+   // On consomme les espace de fin
+   for (; ((s >=0) && (ecran[2*s] == ' ')); s--) {}
+
+   while (s >= 0) {
+     if (((TAILLE_ECRAN - 1 - s)% MANUX_CON_COLONNES) == 0) {
+         buffer[d--] = '\n';
+     }
+     buffer[d--] = ecran[2*s];
+     s--;
+   }
+   printk(buffer+d+1);
+   
+#ifdef MANUX_KMALLOC
+   kfree(buffer);
+#endif
+}
+
+/**
  * @brief
  */
 void afficherMenuActif()
@@ -275,14 +320,14 @@ void afficherMenuActif()
    menuDebogage[menuActif].action();
    printkc("%c[30m", ASCII_ESC);  // WARNING macro
    printkc("%c[42m", ASCII_ESC);
-   printkc("%c[24;0H<espace> refresh, <h> aide                                                     ", ASCII_ESC);
+   printkc("%c[24;0H<espace> refresh <h> aide <!> log ecran                                        ", ASCII_ESC);
    printkc("%c[m", ASCII_ESC);
 }
 
 /**
  * @brief Gestion du clavier pour la dummy
  */
-void dummyTraiterClavierV2()
+void dummyTraiterClavier()
 {
    Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
    
@@ -297,16 +342,17 @@ void dummyTraiterClavierV2()
 	    afficherMenuActif();
          } else if (c == ' ') {   // Mise-à-jour
 	    afficherMenuActif();
+         } else if (c == '!') {   // printk
+            dummyCopieEcran();
 	 }
       }
    }  
 }
-void dummyTraiterClavier()
+void dummyTraiterClavierOld()
 {
    Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
    
    char c[1] ;
-   int i;
    
    while (cons->nbCarAttente) {
       c[0] = 0;
@@ -317,21 +363,6 @@ void dummyTraiterClavier()
             appelsSystemeAfficher();
          break;
 #endif
-         case 'c' :
-	    for (i = 0; i < 24; i++)
-	       printkc("\n");
-         break;
-#ifdef MANUX_DEBUGMASK_VAR
-         case 'd' :
-            debugMasqueAfficher();
-	 break;
-         case 'D' :
-            debugMasqueModifier();
-	 break;
-#endif  // MANUX_DEBUGMASK_VAR
-         case 'h' :
-	   dummyMessageAide();
-	 break;
          case 'i' :
             interruptionAfficher();
 	 break;
@@ -365,7 +396,7 @@ void dummyTraiterClavier()
 #endif
 	 break;
          default :
-	   //            printkc("Unknown [0x%x] pressed\n", c[0]);
+           printkc("Unknown [0x%x] pressed\n", c[0]);
          break;
       }
       dummyMessageAide();
@@ -395,7 +426,7 @@ void aDummyKernelTask()
       printk_debug(DBG_KERNEL_ORDON, "aDummyKernelTask running\n");
 
 #ifdef MANUX_CLAVIER_CONSOLE
-      dummyTraiterClavierV2();
+      dummyTraiterClavier();
 #endif
 
 #if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)

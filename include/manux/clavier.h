@@ -16,7 +16,7 @@ void initialiserClavier();
  * Initialisation du clavier, à appeler avant toute utilisation de ce dernier.
  */
 
-void handlerClavier();
+void handlerClavier(void * toto);
 /*
  * Le handler de l'interruption clavier
  */

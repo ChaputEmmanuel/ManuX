@@ -31,7 +31,7 @@ void kfree(void * p);
 
 
 #ifdef MANUX_KMALLOC_STAT
-void kmallocAfficherStatistiques();
+void kmallocAfficherStatistiques(char * prefixe);
 #endif // KMALLOC_STAT
 
 #endif // DEF_KMALLOC_ZS
