@@ -94,7 +94,7 @@ void consoleEffacer(Console * cons)
    cons->colonne = 0;
 }
 
-void scrollUp(Console * cons)
+static void scrollUp(Console * cons)
 /*
  * Remonté de l'écran d'une ligne
  */
@@ -113,7 +113,7 @@ void scrollUp(Console * cons)
    }
 }
 
-void avancerLigne(Console * cons)
+static void avancerLigne(Console * cons)
 {
    assert(cons->nbLignes != 0);
 
@@ -128,8 +128,10 @@ void avancerLigne(Console * cons)
  * L'attribut est là pour maintenir la compilation même sans
  * optimisation (donc pour le debogage) 
  */
+static
+inline
  __attribute__((always_inline))
-inline void consoleAfficherCaractere(Console * cons, char c)
+void consoleAfficherCaractere(Console * cons, char c)
 {
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2] = c;
    cons->adresseEcran[(cons->nbColonnes*cons->ligne+cons->colonne)*2+1] = cons->attribut;
@@ -153,7 +155,7 @@ inline void consoleAfficherCaractere(Console * cons, char c)
  * proposées dans les escape codes ANSI vers les codes définis par le
  * BIOS.
  */
-void consoleSelectGraphicRendition(Console * cons, int m)
+static void consoleSelectGraphicRendition(Console * cons, int m)
 {
    switch (m) {
       case 0 : 
@@ -272,7 +274,7 @@ void consoleSelectGraphicRendition(Console * cons, int m)
  * Codes actuellement gérés : CUU, CUD, CUF, CUB, CNL, CPL, CHA, CUP
  *
  */
-void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
+static void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
 {
    switch (c) {
       case 'F' : // CPL : Cursor beginning of n(=1) lines up
@@ -333,7 +335,7 @@ void consoleTraiterAEC_CSI(Console * cons, int n, int m, char c)
  * @param nbOctets est la longueur maximale de la chaîne
  * @return nombre d'octets consommés 
  */
-int consoleGererAEC(Console * cons, char * msg, int nbOctets)
+static int consoleGererAEC(Console * cons, char * msg, int nbOctets)
 {
    int a=0, b=0;  //< Il peut y avoir deux coefficients
    char c;        //< Le code lui-même
@@ -453,7 +455,7 @@ void consoleAfficherEntier(Console * cons, int n)
    }
 }
 
-void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
+static void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
 {
    char chiffre[17] = "0123456789abcdef";
    char nombre[2*nbOctets+2];
@@ -472,7 +474,7 @@ void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
 }
 
 #ifdef MANUX_CLAVIER_CONSOLE
-void consoleSetClavier(Console * cons, void * buffer)
+static void consoleSetClavier(Console * cons, void * buffer)
 {
    // Le buffer accueillant le clavier
    cons->tailleBuffer = 4096; // WARNING !!
@@ -487,7 +489,7 @@ void consoleSetClavier(Console * cons, void * buffer)
  *
  * Les espaces mémoire doivent avoir été alloués par ailleurs.
  */
-void consoleInitialiser(Console * cons, char * adresseEcran)
+static void consoleInitialiser(Console * cons, char * adresseEcran)
 {
    //! Adresse de la zone d'écran. L'affichage consiste en fait à
    //! écrire des choses dans la zone mémoire pointée
@@ -530,7 +532,7 @@ void consoleInitialiser(Console * cons, char * adresseEcran)
 /**
  * @brief : Création (avec allocation mémoire) d'une console
  */
-Console * creerConsoleVirtuelle()
+Console * creerConsoleVirtuelle(void)
 {
    Console * result;
    void    * page;
@@ -626,7 +628,7 @@ void basculerVersConsole(Console * suivante)
 /*
  * Basculer vers la console suivante
  */
-void basculerVersConsoleSuivante()
+void basculerVersConsoleSuivante(void)
 {
    assert(consoleActive != NULL);
 
@@ -712,7 +714,8 @@ int consoleLireEntier(Console * cons)
  * On va chercher des données éventuellement mises à dispo par le
  * clavier. 
  */
-size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
+[[maybe_unused]]   // Juste affectée
+static size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Console * con = f->iNoeud->prive;
 
@@ -722,7 +725,8 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 /**
  * En l'absence de clavier, rien à lire !
  */
-size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
+[[maybe_unused]]    // Juste affectée
+static size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    return 0;
 }
@@ -735,7 +739,7 @@ size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
  * WARNING : si vraiment rien à faire, on peut supprimer (la méthode
  * ouvrir peut ne pas être implantée)
  */
-int consoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
+static int consoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    (void) iNoeud;
    (void) f;
@@ -772,7 +776,7 @@ MethodesFichier consoleMethodesFichier = {
  * @brief Initialisation de la console du noyau
  *
  */
-void initialiserConsoleNoyau()
+static void initialiserConsoleNoyau(void)
 {
    //! Le gros du travail est fait par initialiserConsole
    consoleInitialiser(&_consoleNoyau, MANUX_CON_SCREEN);
@@ -783,7 +787,7 @@ void initialiserConsoleNoyau()
    
 #ifdef MANUX_CONSOLES_VIRTUELLES
    //! Si on utilise plusieurs consoles, on doit pouvoir sauvegarder
-   //! leu contenu, y compris pour celle du noyau
+   //! leur contenu, y compris pour celle du noyau
    _consoleNoyau.adresseEcranCopie = copieEcranConsoleNoyau;
 
    //! C'est la première, la seule pour le moment, on l'active donc et
@@ -797,14 +801,14 @@ void initialiserConsoleNoyau()
 /**
  * @brief Obtention d'un pointeur sur la console par défaut
  */
-Console * consoleNoyau()
+Console * consoleNoyau(void)
 {
    return &_consoleNoyau;
 }
 
 #ifdef MANUX_FICHIER
 
-void consoleInitialiserINoeud(INoeud * i, Console * c)
+static void consoleInitialiserINoeud(INoeud * i, Console * c)
 {
    i->typePeripherique.majeur = MANUX_CONSOLE_MAJEUR;
 #ifdef MANUX_CONSOLES_VIRTUELLES
@@ -858,7 +862,7 @@ INoeud * consoleCreerINoeud(Console * c)
 /**
  * @brief Initialisation du système de console. 
  */
-int consoleInitialisation()
+int consoleInitialisation(void)
 {
    initialiserConsoleNoyau();
 

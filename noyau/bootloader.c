@@ -43,7 +43,7 @@ InfoSysteme * _infoSysteme;
  * d'utiliser.
  *    Il s'agit de infoSysteme et cmdLine.
  */
-void bootloaderInitialiser()
+void bootloaderInitialiser(void)
 {
    // On copie les infos dans la variable infoSysteme, qui est dans
    // une zone que la gestion mémoire va considérée comme
@@ -101,7 +101,7 @@ void bootloaderInitialiser()
 #   define BOOTLOADER_CMD_SEPARATEUR ','
 #endif
 
-void bootloaderLireLigneCmd()
+void bootloaderLireLigneCmd(void)
 {
 #ifdef MANUX_REGISTRE
    char   param[512] ; // Une chaîne de caractères qui contient le

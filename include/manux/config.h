@@ -28,7 +28,7 @@
 #include <config/gestion-memoire.h>
 #include <config/debug.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
-#include <config/systeme-fichiers.h>
+#include <config/systeme-fichiers.h>  // Nécessaire pour consoles virtuelles
 #include <config/ramdisk.h>
 #include <config/appels-systeme.h>
 #include <config/consoles-virtuelles.h>

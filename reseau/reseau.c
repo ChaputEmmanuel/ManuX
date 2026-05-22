@@ -18,7 +18,8 @@
  */
 ListeBufferReseau * listeBuffersRecus = NULL;
 
-void reseauTraiterReceptions()
+static
+void reseauTraiterReceptions(void)
 {
    printk_debug(DBG_KERNEL_NET, "A-t-on des buffers a recevoir ?\n");
    while (1) {
@@ -33,7 +34,7 @@ void reseauTraiterReceptions()
 /**
  * @brief Initialisation du sous-système réseau
  */
-void reseauInitialiser()
+void reseauInitialiser(void)
 {
    printk_debug(DBG_KERNEL_NET, "Initialisation du sous systeme reseau\n");
 

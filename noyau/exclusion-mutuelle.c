@@ -28,7 +28,8 @@ typedef struct _ListeExclusionsMutuelles {
 /**
  * @brief Création d'une liste d'exclusions mutuelles
  */
-ListeExclusionsMutuelles * listeExclusionsMutuellesCreer()
+static
+ListeExclusionsMutuelles * listeExclusionsMutuellesCreer(void)
 {
    ListeExclusionsMutuelles * result;
 
@@ -47,6 +48,7 @@ ListeExclusionsMutuelles * listeExclusionsMutuellesCreer()
  * @brief Insertion d'une exclusionMutuelle dans une liste (au début)
  *
  */
+static
 void listeExclusionsMutuellesInserer(ListeExclusionsMutuelles * l, ExclusionMutuelle * c)
 {
    CelluleExclusionMutuelle * cell = (CelluleExclusionMutuelle *) kmalloc(sizeof(CelluleExclusionMutuelle));
@@ -75,7 +77,7 @@ static ListeExclusionsMutuelles * listeExclusionsMutuelles = NULL;
 /**
  * @brief Affichage de l'état des variables d'exclusion mutuelle
  */
-void exclusionsMutuellesAfficherEtat()
+void exclusionsMutuellesAfficherEtat(void)
 {
    CelluleExclusionMutuelle * cell;
    CelluleTache * cellT;

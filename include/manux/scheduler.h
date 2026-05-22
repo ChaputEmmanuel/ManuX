@@ -56,7 +56,7 @@ extern struct _ExclusionMutuelle verrouGeneralDuNoyau;
 extern TacheID tacheDansLeNoyau;
 #endif
 
-void initialiserScheduler();
+void initialiserScheduler(void);
 /*
  * Déclencher le scheduler avant toute création de tache
  */
@@ -79,20 +79,20 @@ TacheID ordonnancerTache(CorpsTache corpsTache, booleen nouvelleConsole);
 /**
  * @brief Basculer vers la prochaine tache à exécuter
  */
-void ordonnanceur();
+void ordonnanceur(void);
 
 /**
  * @brief Création et ordonnancement d'une tâche noyau
  */
 TacheID ordonnanceurCreerTacheNoyau(CorpsTache corpsTache);
 
-int sys_identifiantTache();
+int sys_identifiantTache(void);
 /*
  * Obtention du numero de la tache en cours. WARNING ça n'a rien
  * à faire là ...
  */
 
-uint32_t AS_console();
+uint32_t AS_console(void);
 /*
  * Obtention de la console de la tache en cours. WARNING ça n'a rien
  * à faire là ...

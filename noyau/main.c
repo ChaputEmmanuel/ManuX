@@ -73,7 +73,8 @@
 #   include <manux/virtio-console.h>
 #endif
 
-extern void init(); // Faire un init.h
+void startManuX(void);  // WARNING faire un include ?
+extern void init(void); // Faire un init.h
 
 #ifdef MANUX_VIRTIO_CONSOLE
 INoeud iNoeudVirtioConsole;
@@ -85,7 +86,7 @@ Fichier fichierVirtioConsole;
  */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
-void startManuX()
+void startManuX(void)
 {
 #ifdef MANUX_CONSOLE
 #   ifdef MANUX_FICHIER
@@ -235,7 +236,6 @@ void startManuX()
    // On va maintenant faire de la tâche en cours une tâche "banale"
    tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
 #endif
-   while(1){};
 
    init();
 }   /* startManuX */

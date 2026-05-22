@@ -78,7 +78,7 @@ int consoleLireEntier(Console * cons);
  * @brief Initialisation du système de console sans notion de fichier
  * @return ESUCCES en cas de succès, autre chose sinon
  */
-int consoleInitialisation();
+int consoleInitialisation(void);
 
 #ifdef MANUX_FICHIER
 /**
@@ -158,7 +158,7 @@ void consoleAfficherRegistre(Console * cons, int nbOctets, int reg);
 /**
  * @brief Obtention d'un pointeur sur la console par défaut
  */
-Console * consoleNoyau();
+Console * consoleNoyau(void);
 
 #ifdef MANUX_CLAVIER_CONSOLE
 /**
@@ -179,7 +179,7 @@ int consoleLire(Console * cons, void * buffer, int nbOctets);
 /**
  * @brief : Création (avec allocation mémoire) d'une console
  */
-Console * creerConsoleVirtuelle();
+Console * creerConsoleVirtuelle(void);
 
 /*
  * Pointeur vers la console active
@@ -194,7 +194,7 @@ void basculerVersConsole(Console * cons);
 /*
  * Basculer vers la prochaine console virtuelle
  */
-void basculerVersConsoleSuivante();
+void basculerVersConsoleSuivante(void);
 
 #endif  // MANUX_CONSOLES_VIRTUELLES
 

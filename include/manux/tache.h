@@ -35,7 +35,7 @@ typedef enum _EtatTache {
 /*
  * Définition du type du "main" d'une nouvelle tâche
  */
-typedef void (CorpsTache());
+typedef void (CorpsTache(void));
 
 /*
  * Définition de la structure TSS (Task State Segment)
@@ -139,7 +139,7 @@ void basculerVersTache(Tache * tache);
  * Exécuter une tâche. A l'utilisation exclusive du scheduler
  */
 
-TacheID sysFork();
+TacheID sysFork(void);
 /*
  * Implantation de l'appel système fork
  */
@@ -164,6 +164,6 @@ void afficherEtatUneTache(Tache * tache);
 /**
  * @brief Affichage des tâches
  */
-void afficherEtatTaches();
+void afficherEtatTaches(void);
 
 #endif

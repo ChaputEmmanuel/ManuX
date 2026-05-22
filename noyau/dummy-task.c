@@ -4,13 +4,14 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
-#include "manux/ecran.h"
+#include <manux/ecran.h>
 #include <manux/ascii.h>
 #ifdef MANUX_KMALLOC
 #   include <manux/kmalloc-zs.h>
 #endif
 #include <manux/printk.h>
 #include <manux/dummy-task.h>
+
 #include <manux/debug.h>   // printk_debug
 
 #ifdef MANUX_TACHES
@@ -65,6 +66,7 @@ char * debugFlagNames[32] = {
 #define MIN(a, b) (((a)<(b))?(a):(b))
 #define MAX(a, b) (((a)>(b))?(a):(b))
 uint32_t masqueDebugageConsoleSave;
+static
 void debugMasqueAfficherFlag(int n)
 {
    uint32_t f;
@@ -84,7 +86,8 @@ void debugMasqueAfficherFlag(int n)
    printkc("%c[0m");
 }
 
-void debugMasqueAfficher()
+static
+void debugMasqueAfficher(void)
 {
    int       n;
    char      c;
@@ -140,7 +143,9 @@ void debugMasqueAfficher()
    masqueDebugageConsole = masqueDebugageConsoleSave;
 }
 
-void debugMasqueModifier()
+[[maybe_unused]]
+static
+void debugMasqueModifier(void)
 {
    printkc("masqueDebugageConsole : ");
    masqueDebugageConsole = consoleLireEntier(consoleNoyau());
@@ -156,7 +161,8 @@ void debugMasqueModifier()
 /**
  * @brief Affichage sur la console des AS de chaque tâche
  */
-void appelsSystemeAfficher()
+static
+void appelsSystemeAfficher(void)
 {
    CelluleTache * celluleTache;
 
@@ -186,7 +192,8 @@ void appelsSystemeAfficher()
  * Le but est de présenter un écran synthétique avec le nombre
  * d'occurences de chacune des interruptions.
  */
-void interruptionAfficher()
+static
+void interruptionAfficher(void)
 {
    int i;
 
@@ -241,26 +248,30 @@ void afficherEtatMutex()
 /* Gestion des menus.                                                         */
 /*----------------------------------------------------------------------------*/
 #ifdef MANUX_CLAVIER_CONSOLE
-void dummyMessageAide();
-void dummyCopieEcran();
+static void dummyMessageAide(void);
+static void dummyCopieEcran(void);
 
 typedef struct _MenuDebogage {
    char touche;
-   void (*action)();
+   void (*action)(void);
    char * aide;
 } MenuDebogage;
 
 MenuDebogage menuDebogage[] = {
   {'h', dummyMessageAide, "Afficher ce menu d'aide"},
+#ifdef MANUX_DEBUGMASK_VAR
   {'d', debugMasqueAfficher, "Editer les masques de debug"},
+#endif
+#ifdef MANUX_APPELS_SYSTEME
   {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
+#endif
   {'i', interruptionAfficher, "Voir le decompte des interruptions"},
   {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
   {0, NULL, NULL}
 };  
 int menuActif = 0;
 
-void dummyMessageAide()
+static void dummyMessageAide(void)
 {
    int i;
    
@@ -279,7 +290,7 @@ void dummyMessageAide()
  */
 #define TAILLE_ECRAN (MANUX_CON_LIGNES*MANUX_CON_COLONNES)
 
-void dummyCopieEcran()
+static void dummyCopieEcran(void)
 {
    int s = TAILLE_ECRAN - 1 - 80;   // - 80 pour ne pas copier la ligne d'aide 
    int d = s; // Destination
@@ -314,7 +325,7 @@ void dummyCopieEcran()
 /**
  * @brief
  */
-void afficherMenuActif()
+static void afficherMenuActif(void)
 {
    printkc("%c[2J", ASCII_ESC);
    menuDebogage[menuActif].action();
@@ -327,7 +338,7 @@ void afficherMenuActif()
 /**
  * @brief Gestion du clavier pour la dummy
  */
-void dummyTraiterClavier()
+static void dummyTraiterClavier(void)
 {
    Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
    
@@ -348,60 +359,6 @@ void dummyTraiterClavier()
       }
    }  
 }
-void dummyTraiterClavierOld()
-{
-   Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
-   
-   char c[1] ;
-   
-   while (cons->nbCarAttente) {
-      c[0] = 0;
-      consoleLire(cons, c, 1);
-      switch (c[0]) {
-#ifdef MANUX_AS_AUDIT
-         case 'a' :
-            appelsSystemeAfficher();
-         break;
-#endif
-         case 'i' :
-            interruptionAfficher();
-	 break;
-         case 'p' :
-            afficherEtatTaches();
-	 break;
-#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT) || defined(MANUX_CONDITION_AUDIT)
-         case 's' :
-#if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
-            exclusionsMutuellesAfficherEtat();
-#endif
-#if defined(MANUX_CONDITION_AUDIT)
-            conditionsAfficherEtat();
-#endif
-	    break;
-#endif
-#if  defined(MANUX_TACHES) \
- &&  defined(MANUX_SYNCHRONISATION) \
- &&  defined(MANUX_EXCLUSION_MUTUELLE) \
- && !defined(MANUX_REENTRANT)
-         case 'x' :
-            afficherEtatMutex();
-	 break;
-#endif
-         case 'm' :
-#ifdef MANUX_KMALLOC_STAT
-            kmallocAfficherStatistiques("");
-#else
-            printkc(" Memoire : %d / %d pages allouees\n",
-	    nombrePagesAllouees(), nombrePagesTotal());
-#endif
-	 break;
-         default :
-           printkc("Unknown [0x%x] pressed\n", c[0]);
-         break;
-      }
-      dummyMessageAide();
-   }
-}
 #endif // MANUX_CLAVIER_CONSOLE
 
 /**
@@ -411,7 +368,7 @@ void dummyTraiterClavierOld()
  * les événements clavier sur la console noyau. Grâce à ça c'est elle
  * qui permet d'afficher quelques informations sur le système
  */
-void aDummyKernelTask()
+void aDummyKernelTask(void)
 {
    dummyMessageAide(); // WARNING : mutex ?
    while(1) {

@@ -11,7 +11,7 @@ extern int toucheTouche;
 #define portDonneesClavier 0x60
 #define portCmdClavier     0x64
 
-void initialiserClavier();
+void initialiserClavier(void);
 /*
  * Initialisation du clavier, à appeler avant toute utilisation de ce dernier.
  */

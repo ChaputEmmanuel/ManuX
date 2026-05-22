@@ -30,7 +30,8 @@ typedef struct _ListeConditions {
 /**
  * @brief création d'une liste de conditions
  */
-ListeConditions * listeConditionsCreer()
+static
+ListeConditions * listeConditionsCreer(void)
 {
    ListeConditions * result;
 
@@ -46,6 +47,7 @@ ListeConditions * listeConditionsCreer()
  * @brief Insertion d'une condition dans une liste (au début)
  *
  */
+static
 void listeConditionsInserer(ListeConditions * l, Condition * c)
 {
    CelluleCondition * cell = (CelluleCondition *) kmalloc(sizeof(CelluleCondition));
@@ -74,7 +76,7 @@ static ListeConditions * listeConditions = NULL;
 /**
  * @brief Affichage de l'état des variables condition
  */
-void conditionsAfficherEtat()
+void conditionsAfficherEtat(void)
 {
    CelluleCondition * cell;
    CelluleTache * cellT;

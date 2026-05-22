@@ -29,6 +29,7 @@ void * vecteurAppelsSysteme[NB_MAX_APPELS_SYSTEME];
 /**
  * @brief : Implantation de l'appel système inutile (pour tests)
  */
+static
 int sys_dumbAS(ParametreAS as)
 {
    (void) as;
@@ -78,6 +79,7 @@ int sys_testSynchroAS(ParametreAS as, int inc, int action)
 /**
  * @brief : Implantation de l'appel système par défaut
  */
+static
 int sys_erreurAS(ParametreAS as)
 {
    paniqueNoyau("Appel systeme %d non implante !\n", as.eax);
@@ -103,7 +105,7 @@ int definirAppelSysteme(int num, void * appel)
    }
 }
 
-void initialiserAppelsSysteme()
+void initialiserAppelsSysteme(void)
 {
    printk_debug(DBG_KERNEL_AS, "vecteur des AS = 0x%x\n", vecteurAppelsSysteme);
 
@@ -146,6 +148,9 @@ void initialiserAppelsSysteme()
 #endif   
 }
 
+/**
+ * @brief Prélude à un appel système
+ */
 void entrerAppelSysteme(uint32_t num)
 {
    printk_debug(DBG_KERNEL_AS, "Appel sys %d IN\n", num);
@@ -171,6 +176,9 @@ void entrerAppelSysteme(uint32_t num)
 #endif   
 }
 
+/**
+ * @brief Fin d'un appel système
+ */
 void sortirAppelSysteme(uint32_t num)
 {
    

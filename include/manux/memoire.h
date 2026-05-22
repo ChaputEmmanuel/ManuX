@@ -36,7 +36,7 @@ extern int nombrePagesSysteme;
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue);
 
-void * allouerPage();
+void * allouerPage(void);
 /*
  * Réservation d'une page (de 4 Ko)
  *
@@ -61,9 +61,9 @@ void libererPage(void * pageLiberee);
  * vérification n'est effectuée.
  */
 
-int nombrePagesAllouees();
+int nombrePagesAllouees(void);
 
-int nombrePagesTotal();
+int nombrePagesTotal(void);
 
 #ifdef MANUX_AS
 int AS_obtenirPages(ParametreAS p, int nbPages);

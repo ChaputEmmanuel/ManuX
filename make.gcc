@@ -8,8 +8,9 @@
 # de n'utiliser aucune fonctions prédéfinies ou de librairies standard
 #
 #   Warning
-#     -Wall     Active beaucoup de warnings classiques, mais pas tous.
-#     -Wextra   Ajoute des warnings plus stricts : paramètres inutilisés, comparaisons douteuses, etc.
+#     -Wall                 Active beaucoup de warnings classiques, mais pas tous.
+#     -Wextra               Ajoute des warnings plus stricts : paramètres inutilisés, comparaisons douteuses, etc.
+#     -Wmissing-prototypes  Toutes les fonctions doivent être static ou déclarées dans le .h  !
 #
 #   Optimisation
 #     -O2 par défaut
@@ -27,6 +28,8 @@ CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
            -O4 \
 	   -Wall \
 	   -Wextra\
+	   -Werror=implicit-function-declaration \
+	   -Wstrict-prototypes \
 	   
 	 # -mpreferred-stack-boundary=2 (par défaut c'est 4, d'où des "sub $0x10,%esp")
          # -fomit-frame-pointer

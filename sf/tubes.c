@@ -50,6 +50,7 @@ typedef struct _tube {
 /**
   * @brief Ouverture d'un tube en tant que Fichier 
   */
+static
 int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    Tube * tube = (Tube *) f->iNoeud->prive;
@@ -75,6 +76,7 @@ int tubeOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 /**
   * @brief Fermeture d'un tube en tant que Fichier 
   */
+static
 int tubeFermer(Fichier * f)
 {
 
@@ -103,6 +105,7 @@ int tubeFermer(Fichier * f)
 /**
  * @brief Écriture dans un fichier
  */
+static
 size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Tube *   tube;
@@ -155,6 +158,7 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
    return nbOctetsEcrits;  
 }
 
+static
 size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
 {
    Tube * tube;

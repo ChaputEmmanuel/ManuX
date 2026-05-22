@@ -135,5 +135,5 @@
  * (donc si MANUX_REGISTRE est définie).
  *    Elle sert alors à placer les paramètres dans le registre.
  */
-void debugInitialiser();   
+void debugInitialiser(void);   
 #endif

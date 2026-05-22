@@ -28,7 +28,7 @@
 #define MANUX_SELECTEUR_SEGMENT_CODE 0x08      /* WARNING a mettre ailleurs */
 
 #ifdef MANUX_APPELS_SYSTEME
-extern void handlerAppelSysteme();  /* WARNING à définir dans un .h */
+extern void handlerAppelSysteme(void);  /* WARNING à définir dans un .h */
 #endif
 
 /**
@@ -67,6 +67,7 @@ void gestionExceptionPanique(TousRegistres registres,
  * @brief : En cas de division par zéro
  *
  */
+static
 void gestionExceptionDiv0(TousRegistres registres,
 			  uint32_t numEx, uint32_t errCode,
 			  uint32_t eip, uint32_t cs, uint32_t eFlags)
@@ -97,6 +98,7 @@ FonctionGestionInterruption fonctionDeGestionInterruption[MANUX_NB_SOFT_INT];
 /**
  * Une fonction de gestion qui ne fait rien !
  */
+static
 void neRienFaire(TousRegistres registres,
 		 uint32_t eip, uint32_t cs, uint32_t eFlags,
 		 uint32_t numIt)
@@ -130,6 +132,7 @@ void gestionInterruption(TousRegistres registres,
 /**
  * @brief Affectation du gestionnaire de l'interruption i
  */
+static
 void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
 {
    idt[i].itg.offsetFaible = ((uint32_t)handler & 0xFFFF);
@@ -144,6 +147,7 @@ void positionnerHandlerInterruption(IDT idt, int i, Handler handler)
  * lidt prend en paramètre l'adresse d'une zone contenant la taille puis
  * l'adresse de l'IDT.
  */
+static
 void chargerIDT(IDT idt)
 {
    volatile uint8_t argument[6];
@@ -178,7 +182,7 @@ int definirFonctionGestionInterruption(int num,
 /**
  * @brieg Initialisation de de la table des descripteurs d'interruption
  */
-void initialiserIDT()
+void initialiserIDT(void)
 {
    int i;
    IDT idt = (IDT) MANUX_ADRESSE_IDT;
@@ -305,6 +309,7 @@ void initialiserIDT()
  */
 static char bufferEcran[4000];
 
+static
 void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
 		    uint32_t eip, uint32_t cs, uint32_t eFlags)
 {

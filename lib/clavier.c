@@ -25,7 +25,7 @@
 int codeClavier = 0; // Code de la dernière touche manipulée
 int shiftActif  = 0;
 
-void initialiserClavier()
+void initialiserClavier(void)
 {
    codeClavier = 0;
 

@@ -231,7 +231,7 @@ void * reserverPageSysteme()
 }
 */
 
-void * allouerPage()
+void * allouerPage(void)
 {
    void *   pageAllouee = NULL;
    uint32_t numeroPage = 0;
@@ -254,12 +254,12 @@ void * allouerPage()
    return pageAllouee;
 }
 
-int nombrePagesAllouees()
+int nombrePagesAllouees(void)
 {
   return nombreDePagesAllouees;
 }
 
-int nombrePagesTotal()
+int nombrePagesTotal(void)
 {
   return nombrePages;
 }
@@ -267,6 +267,7 @@ int nombrePagesTotal()
 /**
  * Combien de pages libes à partir de la page numeroPage incluse ?
  */
+static
 uint32_t nombrePagesLibres(uint32_t numeroPage)
 {
    int result = 0;
@@ -305,6 +306,11 @@ void * allouerPages(uint32_t nombre)
 }
 
 #if defined(MANUX_APPELS_SYSTEME) && defined(MANUX_PAGINATION)
+/*
+ * WARNING : pas encore utilisé ?!
+ */
+[[maybe_unused]]
+static
 int AS_obtenirPages(ParametreAS p, int nbPages)
 {
    Page unePage;

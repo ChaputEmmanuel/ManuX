@@ -17,6 +17,7 @@ uint32_t masqueDebugageFichier = _masqueDebugageFichier;
 /**
  * @brief Mise à jour d'un masque de debug via le registre
  */
+static
 void debugMiseAJourMasque(void * masque, char * valeur)
 {
    uint32_t * _masque = (uint32_t *)masque;
@@ -33,7 +34,7 @@ void debugMiseAJourMasque(void * masque, char * valeur)
  * (donc si MANUX_REGISTRE est définie).
  *    Elle sert alors à placer les paramètres dans le registre.
  */
-void debugInitialiser()
+void debugInitialiser(void)
 {
 #if defined(MANUX_DEBUGMASK_VAR) && defined(MANUX_REGISTRE)
    char v[32];

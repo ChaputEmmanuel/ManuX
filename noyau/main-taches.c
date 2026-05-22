@@ -15,21 +15,21 @@
 #include <manux/memoire.h>
 #include <manux/bootloader.h>
 
-void albert()
+void albert(void)
 {
    for (int n = 0; n < 10; n++) {
-      printk("O");
+      printkc("Je suis albert !\n");
    }
 }
 
-void barnabe()
+void barnabe(void)
 {
    for (int n = 0; n < 10; n++) {
-      printk("X");
+      printkc("X");
    }
 }
 
-void startManuX()
+void startManuX(void)
 {
    Tache * t0, *t1;
 
@@ -61,20 +61,20 @@ void startManuX()
    initialiserScheduler();
 
    // Affichage d'un message
-   consoleNoyauAfficher("Creation de deux taches ...\n");
+   printk("Creation de deux taches ...\n");
 
    t0 = tacheCreer(albert);
-   //   tacheSetConsole(t0, creerConsoleVirtuelle());
-   t1 = tacheCreer(barnabe);
-   //tacheSetConsole(t1, creerConsoleVirtuelle());
-
+   tacheSetConsole(t0, creerConsoleVirtuelle());
    ordonnanceurAddTache(t0);
+   
+   t1 = tacheCreer(barnabe);
+   tacheSetConsole(t1, creerConsoleVirtuelle());
    ordonnanceurAddTache(t1);
 
    for (int i = 0; i < 2; i++) {
       ordonnanceurAddTache(tacheCreer(barnabe));
    }
-   printk("FINI ! ");
+   printk("FINI !\n");
    while(1){};
 }   /* startManuX */
 

@@ -12,7 +12,7 @@
 /**
  * @brief Initialisation du sytème kmalloc 
  */
-void kmallocInitialisation();
+void kmallocInitialisation(void);
 
 #ifdef MANUX_KMALLOC_STAT
 void kmallocAfficherStatistiques(char *prefixe);

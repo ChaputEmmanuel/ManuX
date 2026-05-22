@@ -29,6 +29,7 @@ uint32_t attenteCalibre;
 /*
  * Le handler du timer
  */
+static
 void handlerHorloge(void * inutile)
 {
    (void) inutile;
@@ -45,6 +46,7 @@ void handlerHorloge(void * inutile)
 /*
  * Configuration de la fréquence du circuit
  */ 
+static
 void setFrequenceHorloge(uint16_t freqHz)
 {
    uint16_t decompte;
@@ -61,7 +63,8 @@ void setFrequenceHorloge(uint16_t freqHz)
  * @brief Calibrage de la fonction mdelay()
  */
 NO_OPTIMIZE
-void attenteCalibrer()
+static
+void attenteCalibrer(void)
 {
    Temps    t;
    uint32_t n = 0;
@@ -89,7 +92,7 @@ void attenteCalibrer()
 /** 
  * @brief Initialisation du système d'horloge
  */
-void initialiserHorloge()
+void initialiserHorloge(void)
 {
 
    // Initialisation de la fréquence de l'horloge matérielle

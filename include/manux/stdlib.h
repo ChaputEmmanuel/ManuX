@@ -12,7 +12,7 @@
 /**
  * @brief Génération d'un nombre "aléatoire" entre 0 et RAND_MAX 
  */
-uint32_t rand();
+uint32_t rand(void);
 
 /**
  * @brief Modification de la graine du générateur "aléatoire"

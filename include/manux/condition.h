@@ -62,7 +62,7 @@ void conditionDiffuser(Condition * cond);
 /**
  * @brief Affichage de l'état des variables condition
  */
-void conditionsAfficherEtat();
+void conditionsAfficherEtat(void);
 
 #endif //  defined(MANUX_CONDITION_AUDIT)
 

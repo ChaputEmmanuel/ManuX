@@ -95,6 +95,7 @@ void virtioAfficherFile(VirtioFileVirtuelle * fv)
  * On va donc calculer la taille de chacune de ces deux parties
  * (alignées sur une page).
  */
+static
 int virtioCreerFileVirtuelle(VirtioFileVirtuelle * fileVirtuelle,
                              uint16_t tailleFile)
 {

@@ -49,7 +49,8 @@ void basculerVersTache(Tache * tache)
  * C'est cette fonction qui va invoquer la fonction associée à la
  * tâche et qui devra nettoyer à la fin.
  */
-void tacheExecuter()
+static
+void tacheExecuter(void)
 {
 #if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
    // On commmence en mode noyau, ...
@@ -367,7 +368,7 @@ void afficherEtatUneTache(Tache * tache)
 /**
  * @brief Affichage des tâches
  */
-void afficherEtatTaches()
+void afficherEtatTaches(void)
 {
    CelluleTache * celluleTache;
 

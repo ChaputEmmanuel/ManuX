@@ -50,6 +50,7 @@ static int    nbPageAlloueesIci = 0;
  * peu de polling
  */
 #define NB_BUFF_TRAITES 16
+static
 void virtioConsoleTraiterBuffers(VirtioConsole * vc)
 {
    void *bf [NB_BUFF_TRAITES];
@@ -86,6 +87,7 @@ void virtioConsoleTraiterBuffers(VirtioConsole * vc)
 /**
  *  Cf [3] section 2.4.2
  */
+static
 void virtioConsoleGestionInt(void * pr)
 {
    VirtioConsole * vc = (VirtioConsole *) pr;
@@ -111,6 +113,7 @@ void virtioConsoleGestionInt(void * pr)
  * @brief Initialisation d'un périphérique console virtio
  *
  */
+static
 int virtioConsoleInitPeripherique(int PCINumeroPeripherique)
 {
    PCIEquipement       * pciEquip = PCIEquipementNumero(PCINumeroPeripherique);
@@ -170,6 +173,7 @@ MethodesFichier virtioConsoleMethodesFichier;
 /**
  * @brief : fonction d'écriture dans un périphérique virtio-console
  */
+static
 size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
 {
    VirtioConsole * vc = (VirtioConsole *)f->prive;
@@ -210,6 +214,7 @@ size_t virtioConsoleEcrire(Fichier * f, void * b, size_t l)
 /**
  * @brief : fonction de lecture dans un périphérique virtio-console
  */
+static
 size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
 {
    (void) f;
@@ -221,6 +226,7 @@ size_t virtioConsoleLire(Fichier * f, void * b, size_t l)
    return 0;
 }
 
+static
 int virtioConsoleOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
 {
    (void) iNoeud;
@@ -283,7 +289,7 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole)
 /**
  * @brief Affichage de la console, à des fins de debug
  */
-void virtioConsoleAfficher()
+void virtioConsoleAfficher(void)
 {
    VirtioConsole * vc = &virtioConsole;
 

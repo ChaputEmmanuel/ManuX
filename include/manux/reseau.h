@@ -18,16 +18,6 @@ extern ListeBufferReseau * listeBuffersRecus;
 /**
  * @brief Initialisation du sous système réseau
  */
-void reseauInitialiser();
-
-/**
- * @brief
- */
-void reseauEnregistrerPilote(ReseauPilote * p);
-
-/**
- * @brief
- */
-void reseauAjouterInterface(ReseauPilote * p, void * d);
+void reseauInitialiser(void);
 
 #endif

@@ -45,7 +45,7 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em);
  * @brief Affichage de l'état des variables d'exclusion mutuelle
  */
 
-void exclusionsMutuellesAfficherEtat();
+void exclusionsMutuellesAfficherEtat(void);
 
 #endif // defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
 

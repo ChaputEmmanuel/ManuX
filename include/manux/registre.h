@@ -107,7 +107,7 @@ void registreAffecterParametre(registre * reg,
 /**
  * @brief Initialisation du registre système
  */
-void registreSystemeInitialiser();
+void registreSystemeInitialiser(void);
 
 /**
  * @brief Ajouter un paramètre au registre système de ManuX
@@ -128,7 +128,7 @@ void registreSystemeAjouterC(char * chaine);
 /**
  * @brief Affichage du registre de ManuX
  */
-void registreSystemeAfficher();
+void registreSystemeAfficher(void);
 
 #endif   // REGISTRE
 

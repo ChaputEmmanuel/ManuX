@@ -31,7 +31,7 @@ int virtioConsoleInitialisation(INoeud * iNoeudVirtioConsole);
 /**
  * @brief Affichage de la seule console, à ds fins de debug
  */
-void virtioConsoleAfficher();
+void virtioConsoleAfficher(void);
 
 #endif // MANUX_VIRTIO_AUDIT
 

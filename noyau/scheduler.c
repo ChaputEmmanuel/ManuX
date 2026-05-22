@@ -92,7 +92,7 @@ Tache * tacheEnCours = NULL;
  *
  * C'est cette fonction qui détermine la prochaine tâche à exécuter.
  */
-void ordonnanceur()
+void ordonnanceur(void)
 {
    Tache * tachePrecedente = tacheEnCours;
 
@@ -175,7 +175,7 @@ void ordonnanceurAddTache(Tache * tache)
 /**
  * @brief Initialisation de l'ordonnanceur
  */
-void initialiserScheduler()
+void initialiserScheduler(void)
 {
    Tache * t1; // Le fil d'exécution en cours, qui deviendra init
 #ifdef MANUX_DUMMY_TASK
@@ -256,7 +256,7 @@ void initialiserScheduler()
 /**
  * @brief Implantation de l'AS d'obtention de l'identifiant
  */
-int sys_identifiantTache()
+int sys_identifiantTache(void)
 {
    return (int)tacheEnCours->numero;
 }
@@ -267,7 +267,7 @@ int sys_identifiantTache()
  *
  * Le nom de cette fonction est à changer
  */
-uint32_t AS_console()
+uint32_t AS_console(void)
 {
    if (schedulerEnCours) {
       return (uint32_t)tacheScheduler->console;

@@ -12,15 +12,25 @@
  */
 typedef struct _ReseauPilote {
    char * nom;
-   void (* recevoirTrame)(); // La fonction permettant d'aller
-			     // récupérer des trames de façon
-			     // asynchrone 
+   void (* recevoirTrame)(void *); // La fonction permettant d'aller
+			           // récupérer des trames de façon
+			           // asynchrone 
 } ReseauPilote;
 
 typedef struct _ReseauInterface {
    ReseauPilote * pilote;
    void * prive;
 } ReseauInterface;
+
+/**
+ * @brief
+ */
+void reseauEnregistrerPilote(ReseauPilote * p);
+
+/**
+ * @brief
+ */
+void reseauAjouterInterface(ReseauPilote * p, void * d);
 
 
 #endif

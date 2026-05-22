@@ -77,7 +77,7 @@ void kmallocAfficherStatistiques(char *prefixe)
 /**
  * @brief Initialisation du sytème kmalloc 
  */
-void kmallocInitialisation()
+void kmallocInitialisation(void)
 {
    // Pour le moment, on commence à vide !
 
@@ -107,6 +107,7 @@ static inline uint16_t ordreDe(uint16_t taille)
 /**
  * @brief Découpe d'un bloc d'ordre o en deux blocs d'ordre o-1
  */
+static
 void decouperUnBloc(uint16_t o)
 {
    enteteBlocMemoire * origine = blocsLibres[o];
@@ -206,6 +207,7 @@ void * kmalloc(size_t n)
  * est sorti des blocsLibres). Il n'est pas modifié si le bloc siamois
  * n'est pas libre. Dans tous les cas, il est réintégré.
  */
+static
 void reintegrerBloc(enteteBlocMemoire * bloc)
 {
    uint16_t ordre = bloc->e.alloue.ordre; //< Ordre du bloc à intégrer

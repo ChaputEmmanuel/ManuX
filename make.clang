@@ -11,6 +11,9 @@ CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
 	   -Wimplicit-function-declaration \
 	   -Wall \
 	   -Wextra\
+	   -Werror=implicit-function-declaration \
+ 	   -Wstrict-prototypes \
+	   -Wmissing-prototypes	   \
 
 CFLAGS   +=   $(if $(MANUX_FICHIER_CONFIG), --include $(MANUX_FICHIER_CONFIG))
 

@@ -8,8 +8,8 @@ include ../make.rules
 OBJETS      = interruptions.o \
               horloge.o \
               intel-8259a.o \
-              arith64.o \
               interBasNiveau.elf \
+#              arith64.o \
 #              gestionGDT.elf
 
 OBJETS     +=   $(if $(MANUX_GESTION_MEMOIRE), segment.o)

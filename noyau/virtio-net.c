@@ -110,6 +110,7 @@ uint8_t unBufferALaCon[4096] ={0};
 /**
  * @brief Affichage d'un paquet
  */
+static
 void netDumpPacket(uint8_t * packet, int lg)
 {
    int i;
@@ -120,6 +121,8 @@ void netDumpPacket(uint8_t * packet, int lg)
    if (i % 8 != 7) printk("\n");
 }
 
+[[maybe_unused]]
+static
 void virtioNetTraiterEmissions(VirtioReseau * vr)
 {
    // OK, mais on les traite de quoi ?
@@ -144,6 +147,7 @@ void virtioNetTraiterEmissions(VirtioReseau * vr)
  * Lorsque le périphérique nous prévient, on doit aller chercher une
  * trame (ou plusieurs) sur la file de réception.
  */
+static
 void virtioNetRecevoirTrame(VirtioReseau * vr)
 {
    uint8_t             * buffers[2];
@@ -183,6 +187,7 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
 /**
  * @brief
  */
+static
 void virtioNetRecevoirTramePartieBasse(void * _vr)
 {
    VirtioReseau * vr = (VirtioReseau *)_vr;
@@ -193,7 +198,7 @@ void virtioNetRecevoirTramePartieBasse(void * _vr)
 /**
  * @brief
  */
-void virtioReseauPoll()
+void virtioReseauPoll(void)
 {
   virtioNetRecevoirTrame(&virtioReseau);
 }
@@ -201,6 +206,7 @@ void virtioReseauPoll()
 /**
  *  Cf [3] section 2.4.2
  */
+static
 void virtioNetGestionInt(void * pr)
 {
    VirtioReseau * vr = (VirtioReseau *) pr;
@@ -239,6 +245,7 @@ ReseauPilote virtioPiloteReseau = {
  * Séquence d'après [3] page 25 et section 2.2.1 (voir aussi [1]
  * section 3 mais en restant prudent !)
  */
+static
 int virtioNetInitPeripherique(int PCINumeroPeripherique)
 {
    PCIEquipement       * pciEquip = PCIEquipementNumero(PCINumeroPeripherique);
@@ -325,6 +332,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
 /**
  * Émission d'une trame via une interface ...
  */
+static
 void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
 {
    (void) vr; // WARNING, pas normal
@@ -360,7 +368,7 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
 /**
  * @brief Initialisation des périphériques
  */
-int virtioNetInit()
+int virtioNetInit(void)
 {
    int PCINumeroPeripherique;
   
@@ -389,7 +397,7 @@ int virtioNetInit()
 }
 
 //Pour voir si je peux en faire 2 et avoir 2 IT
-void virtioNetTestDeuxiemeEmission()
+void virtioNetTestDeuxiemeEmission(void)
 {
    printk_debug(DBG_KERNEL_NET, "in\n");
    virtioNetEmettre(&virtioReseau, requeteARP2);

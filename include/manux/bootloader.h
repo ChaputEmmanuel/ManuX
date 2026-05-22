@@ -67,14 +67,14 @@ extern InfoSysteme * _infoSysteme;
  * informations sont dans une zole mémoire que l'on risque ensuite
  * d'utiliser.
  */
-void bootloaderInitialiser();
+void bootloaderInitialiser(void);
 
 /**
  * @brief Analyse de la ligne de commande et modification de certains
  * paramètres. Cette fonction estparticulièrement utile avec un
  * regsitre. 
  */
-void bootloaderLireLigneCmd();
+void bootloaderLireLigneCmd(void);
 
 #endif
  

@@ -18,7 +18,7 @@
  * les événements clavier sur la console noyau. Grâce à ça c'est elle
  * qui permet d'afficher quelques informations sur le système
  */
-void aDummyKernelTask();
+void aDummyKernelTask(void);
 
 
 #endif // DUMMYTASK_DEF

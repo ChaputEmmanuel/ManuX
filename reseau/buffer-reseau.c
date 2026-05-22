@@ -49,7 +49,7 @@ BufferReseau * bufferReseauCreer(void * donnees, int taille)
 /**
  * @brief Création d'une liste vide de buffers réseau
  */
-ListeBufferReseau * listeBufferReseauCreer()
+ListeBufferReseau * listeBufferReseauCreer(void)
 {
    ListeBufferReseau * result = (ListeBufferReseau *)kmalloc(sizeof(ListeBufferReseau));
 

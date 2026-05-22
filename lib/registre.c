@@ -61,7 +61,7 @@ static registre * registreSysteme = NULL;
 /**
  * @brief Mise-à-jour d'un paramètre en invoquant la fonction définie
  */
-void parametreMettreAJour(parametre * p)
+static void parametreMettreAJour(parametre * p)
 {
   if ((p != NULL) && (p->miseAJour != NULL)) {
       p->miseAJour(p->prive, p->valeur);
@@ -71,7 +71,7 @@ void parametreMettreAJour(parametre * p)
 /**
  * @brief Affectation de la valeur d'un paramètre
  */
-void parametreAffecterValeur(parametre * p, char * v)
+static void parametreAffecterValeur(parametre * p, char * v)
 {
    if (p->valeur != NULL) {
       kfree(p->valeur);
@@ -91,7 +91,7 @@ void parametreAffecterValeur(parametre * p, char * v)
 /**
  * @brief Affectation du nom d'un paramètre
  */
-void parametreAffecterNom(parametre * p, char * n)
+static void parametreAffecterNom(parametre * p, char * n)
 {
    if (p->nom != NULL) {
       kfree(p->nom);
@@ -103,7 +103,7 @@ void parametreAffecterNom(parametre * p, char * n)
 /**
  * @brief Définition de la fonction de mise à jour du paramètre
  */
-void parametreAffecterMiseAJour(parametre * param,
+static void parametreAffecterMiseAJour(parametre * param,
                                 void * prive,
 				registreMiseAJour miseAJour)
 {
@@ -117,7 +117,7 @@ void parametreAffecterMiseAJour(parametre * param,
 /**
  * @brief Création d'un paramètre
  */
-parametre * parametreCreer(char * nom, char * valeur,
+static parametre * parametreCreer(char * nom, char * valeur,
 			   void * prive, registreMiseAJour miseAJour)
 {
    parametre * result = (parametre *) kmalloc(sizeof(parametre));
@@ -138,7 +138,7 @@ parametre * parametreCreer(char * nom, char * valeur,
 /**
  * @brief Création d'une liste (vide) de paramètres
  */
-listeParametres * listeParametresCreer()
+static listeParametres * listeParametresCreer(void)
 {
    listeParametres * result = (listeParametres *)kmalloc(sizeof(listeParametres));
 
@@ -154,7 +154,7 @@ listeParametres * listeParametresCreer()
  *
  * Attention aucune vérification n'est faite, un doublon peut apparaître
  */
-void listeParametresInserer(listeParametres * lp, parametre * p)
+static void listeParametresInserer(listeParametres * lp, parametre * p)
 {
    chainonParametre * cp = (chainonParametre *) kmalloc(sizeof(chainonParametre));
 
@@ -177,7 +177,7 @@ void listeParametresInserer(listeParametres * lp, parametre * p)
 /**
  * @brief Recherche d'un paramètre dans une liste
  */
-parametre * listeParametresChercher(listeParametres * lp, char * nom)
+static parametre * listeParametresChercher(listeParametres * lp, char * nom)
 {
    chainonParametre * cp = lp->premier;
 
@@ -216,6 +216,7 @@ registre * registreCreer(char * nom)
 /**
  * @brief Recherche d'un sous registre (direct) dans un registre. NULL si inexistant.
  */
+static
 registre * registreChercherSousRegistre(registre * b, char * nomSr)
 {
    registre * result = NULL;
@@ -240,6 +241,7 @@ registre * registreChercherSousRegistre(registre * b, char * nomSr)
  * Attention, aucune vérification n'est faite, si bien qu'un doublon
  * peut apparaître
  */
+static
 void registreAjouterParametre(registre * reg, parametre * param)
 {
    listeParametresInserer(reg->parametres, param);
@@ -252,6 +254,7 @@ void registreAjouterParametre(registre * reg, parametre * param)
  * registre existait déjà, il n'est pas créé, mais le pointeur est
  * correctement retourné.
  */
+static
 registre * registreAjouterSousRegistre(registre * reg, char * nomSr)
 {
    registre * result;
@@ -289,6 +292,7 @@ registre * registreAjouterSousRegistre(registre * reg, char * nomSr)
 #ifndef REGISTRE_AFFECTATION
 #   define REGISTRE_AFFECTATION '='
 #endif
+static
 void registreAjouterC(registre * reg, char * chaine)
 {
    char * debut;    // Pointeur sur le début du nom
@@ -382,6 +386,7 @@ void registreAjouterC(registre * reg, char * chaine)
  *     la fonction de mise-à-jour est invoquée
  *  finsi
  */
+static
 void registreAffecterParametreT(registre * reg,
                                 char * valeur,
 				void * prive,
@@ -458,6 +463,8 @@ void registreAffecterParametre(registre * reg,
  * @brief récupération d'un paramètre dans un registre, NULL si
  * inexistant
   */
+[[maybe_unused]]
+static
 parametre * registreObtenirParametre(registre * reg, va_list argList)
 {
    parametre * result = NULL;
@@ -498,6 +505,7 @@ parametre * registreObtenirParametre(registre * reg, va_list argList)
 /**
  * @brief Affichage (via printk) d'un registre
  */
+static
 void registreAfficher(registre * reg, int profondeur)
 {
    chainonParametre * ch;
@@ -525,7 +533,7 @@ void registreAfficher(registre * reg, int profondeur)
 /**
  * @brief Création du registre du système
  */
-void registreSystemeInitialiser()
+void registreSystemeInitialiser(void)
 {
    registreSysteme = registreCreer("ManuX-Param");     
 
@@ -569,7 +577,7 @@ void registreSystemeAffecterParametre(char * valeur,
 /**
  * @brief Affichage du registre système
  */
-void registreSystemeAfficher()
+void registreSystemeAfficher(void)
 {
     registreAfficher(registreSysteme, 0);   
 }

@@ -16,6 +16,7 @@
  * @brief Lecture dans un fichier
  * @param f le fichier doit être != NULL
  */
+static
 int fichierLire(Fichier * f, void * buffer, int nbOctets)
 {
    int result = -EBADF;
@@ -125,7 +126,7 @@ int sys_lire(ParametreAS as, int fd, void * buffer, int nbOctets)
 }
 #endif //MANUX_APPELS_SYSTEME
 
-void sfInitialiser()
+void sfInitialiser(void)
 {
 #ifdef MANUX_APPELS_SYSTEME
    definirAppelSysteme(NBAS_FERMER, sys_fermer);

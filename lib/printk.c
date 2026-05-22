@@ -19,7 +19,7 @@
 #include <manux/debug.h>
 
 #include <manux/arith64.h>
-#include "../i386/arith64.c"   // WARNING, pourquoi dois-je faire ça ?
+//#include "../i386/arith64.c"   // WARNING, pourquoi dois-je faire ça ?
 
 #define chiffre "0123456789abcdef"
 
@@ -37,7 +37,8 @@
 int vsnprintk(char * str, const size_t l, char * format, va_list argList)
 {
    size_t    indice = 0;
-   long long int       n;   // valeur associée à un %[l]d
+   //   long long int       n;   // valeur associée à un %[l]d
+   long int       n;   // valeur associée à un %[l]d
    char      nombre[10];    // chaîne du nombre
    char    * s;             // valeur associée à un %s
    char      c;             // Affichage d'un caractère
@@ -79,7 +80,7 @@ int vsnprintk(char * str, const size_t l, char * format, va_list argList)
                   base = 10;
 affent :          switch (prefixe) {
                      case 2 :
-		        n = va_arg(argList, long long int);
+		       n = 0; //;va_arg(argList, long long int); WARNING
 		     break;
                      case 1 :
 		        n = va_arg(argList, long int);
@@ -95,7 +96,7 @@ affent :          switch (prefixe) {
                   in = 0;
                   do {
                      nombre[in++] = chiffre[n%base];
-                     n = n/base;
+                     n = n/base;   // n est défini comme long long, 
 		  } while (n != 0);
                   while (nbChiffres > in) {
                      nbChiffres--;
@@ -169,7 +170,7 @@ void printk(char * format, ...)
    char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une gestion dynamique
                             // attention aux risques de telescopage avec la pile !
 #endif // MANUX_KMALLOC   
-   int       result __attribute__((unused));
+   [[maybe_unused]] int result;
 
    va_start(argList, format);
    result = vsnprintk(chaine, MAX_PRINTK_LENGTH, format, argList);
@@ -204,7 +205,7 @@ void printkc(char * format, ...)
    char      chaine[MAX_PRINTK_LENGTH];   // WARNING, il faut une gestion dynamique
                             // attention aux risques de telescopage avec la pile !
 #endif // MANUX_KMALLOC   
-   int       result __attribute__((unused));
+   [[maybe_unused]] int result;
 
    va_start(argList, format);
    result = vsnprintk(chaine, MAX_PRINTK_LENGTH, format, argList);

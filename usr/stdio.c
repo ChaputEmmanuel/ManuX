@@ -31,8 +31,9 @@ appelSysteme2(NBAS_ECRIRE_CONS, int, ecrireConsole, char *, int);
 
 /**
  * @brief Un premier printf
+ *
  * WARNING on utlise une fonction qui n'est pas définie dans usr ! il
- * faudra changer ça un jour, ...
+ * faudra changer ça un jour, en mettant un vsnprintf copié de vsnprintk !
  */
 void printf(char * format, ...)
 {

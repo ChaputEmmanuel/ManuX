@@ -118,6 +118,7 @@ uint8_t PCILireOctet(uint8_t bus, uint8_t slot, uint8_t fonction, uint8_t offset
  *
  * WARNING : On recherche les équipements sur un seul bus pour le moment.
  */
+static
 void PCIEnumerationDesEquipementsDuBus(uint8_t bus)
 {
    uint8_t  numEquipement;  // Pour boucler
@@ -176,7 +177,7 @@ void PCIEnumerationDesEquipementsDuBus(uint8_t bus)
    }
 }
 
-void PCIEnumerationDesEquipements()
+void PCIEnumerationDesEquipements(void)
 {
    uint8_t bus;
 

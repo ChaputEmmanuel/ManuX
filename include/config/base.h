@@ -55,7 +55,6 @@
 /**
  * @brief Quelques macros me permettant de tenir compte du compilateur
  */
-
 #ifdef __clang__
 # define NO_OPTIMIZE __attribute__((optnone))
 #elif defined(__GNUC__)
@@ -63,3 +62,4 @@
 #else
 # define NO_OPTINO_OPTIMIZE Attention
 #endif
+
