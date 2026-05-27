@@ -2,7 +2,7 @@
  * @file tache.c
  * @brief Implantation des sous-programmes de gestion des tâches.
  *
- *                                                     (C) Manu Chaput 2000-2024
+ *                                                     (C) Manu Chaput 2000-2026
  */
 #include <manux/tache.h>
 #include <manux/temps.h>
@@ -21,6 +21,8 @@
 #include <manux/string.h>     // memcpy
 #include <manux/printk.h>
 #include <manux/debug.h>
+
+#define printkc printk
 
 #if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
 #   include <manux/exclusion-mutuelle.h>
@@ -350,7 +352,7 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
  */
 void afficherEtatUneTache(Tache * tache)
 {
-  printkc(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
+   printkc(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
        tache->numero,
          (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
           tache->nbActivations,

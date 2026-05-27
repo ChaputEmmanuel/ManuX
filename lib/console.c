@@ -455,24 +455,6 @@ void consoleAfficherEntier(Console * cons, int n)
    }
 }
 
-static void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
-{
-   char chiffre[17] = "0123456789abcdef";
-   char nombre[2*nbOctets+2];
-   int i = 0;
-
-   for (i = 0; i<2*nbOctets; i++) {
-      nombre[i] = chiffre[reg%16];
-      reg = reg / 16;
-   };
-   nombre[i++] = 'x';
-   nombre[i] = '0';
-   for (; i>=0; i--) {
-     assert(cons->nbColonnes != 0);
-      consoleAfficherCaractere(cons, nombre[i]);
-   }
-}
-
 #ifdef MANUX_CLAVIER_CONSOLE
 static void consoleSetClavier(Console * cons, void * buffer)
 {
@@ -560,6 +542,25 @@ Console * creerConsoleVirtuelle(void)
    
    return result;
 }
+
+static void consoleAfficherEntierHex(Console * cons, int nbOctets, uint32_t reg)
+{
+   char chiffre[17] = "0123456789abcdef";
+   char nombre[2*nbOctets+2];
+   int i = 0;
+
+   for (i = 0; i<2*nbOctets; i++) {
+      nombre[i] = chiffre[reg%16];
+      reg = reg / 16;
+   };
+   nombre[i++] = 'x';
+   nombre[i] = '0';
+   for (; i>=0; i--) {
+     assert(cons->nbColonnes != 0);
+      consoleAfficherCaractere(cons, nombre[i]);
+   }
+}
+
 
 /*
  * Basculer vers une console virtuelle. Attention, elle doit exister.
@@ -660,7 +661,6 @@ int consoleLire(Console * cons, void * buffer, int nbOctets)
      cons->indiceProchainCar = (cons->indiceProchainCar + aLire); // WARNING FAUX !
      cons->nbCarAttente = cons->nbCarAttente - aLire;
 
-     //     printk("(0x%x) LIRE copie %d, ipc = %d, nb = %d\n", cons, aLire, cons->indiceProchainCar, cons->nbCarAttente);
      lu = lu + aLire;
    }
 
@@ -728,6 +728,10 @@ static size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 [[maybe_unused]]    // Juste affectée
 static size_t consoleFichierLire(Fichier * f, void * buffer, size_t nbOctets)
 {
+   (void) f;
+   (void) buffer;
+   (void) nbOctets;
+
    return 0;
 }
 #endif // MANUX_CLAVIER_CONSOLE

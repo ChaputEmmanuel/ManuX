@@ -45,7 +45,21 @@
  *    %[n][l[l]]{dxo} %s \n
  */
 void printk(char * format, ...);
+
+/**
+ * @brief Une version de printk qui écrit dans la console de la tâche
+ * en cours
+ *
+ * C'est un peu un printf en monde noyau, ...
+ */
+#ifdef MANUX_CONSOLES_VIRTUELLES
 void printkc(char * format, ...);
+
+// Si on n'a pas de console virtuelle, printkc ne peut pas faire mieux
+// que printk
+#else
+#   define printkc printk
+#endif
 
 /**
  * @brief : Écriture formattée dans une chaîne de caractères

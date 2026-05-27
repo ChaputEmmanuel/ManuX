@@ -15,14 +15,16 @@
 #include <manux/memoire.h>
 #include <manux/bootloader.h>
 
-void albert(void)
+void startManuX(void) ;
+
+static void albert(void)
 {
    for (int n = 0; n < 10; n++) {
       printkc("Je suis albert !\n");
    }
 }
 
-void barnabe(void)
+static void barnabe(void)
 {
    for (int n = 0; n < 10; n++) {
       printkc("X");

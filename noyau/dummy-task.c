@@ -43,6 +43,16 @@
 #   include <manux/condition.h>  // exclusionsMutuellesAfficherEtat
 #endif
 
+
+/*----------------------------------------------------------------------------*/
+/*   Ci dessous les différentes fonctions qui sont impliquées dans des menus  */
+/* de la dummyTask. Elles ne peuvent être invoquées que si la gestion du      */
+/* clavier est opérationnelle (et donc les menus utilisables !)               */
+/*    C'est pourquoi ils sont dans ce gros ifdef (sinon on peut les en sortir */
+/* et les mettre en maybe_unused).                                            */
+/*----------------------------------------------------------------------------*/
+#ifdef MANUX_CLAVIER_CONSOLE    // On ne peut pas les gérer sans clavier !
+
 #ifdef MANUX_DEBUGMASK_VAR
 char * debugFlagNames[32] = {
   "ERREUR",
@@ -247,7 +257,6 @@ void afficherEtatMutex()
 /*----------------------------------------------------------------------------*/
 /* Gestion des menus.                                                         */
 /*----------------------------------------------------------------------------*/
-#ifdef MANUX_CLAVIER_CONSOLE
 static void dummyMessageAide(void);
 static void dummyCopieEcran(void);
 
@@ -257,20 +266,26 @@ typedef struct _MenuDebogage {
    char * aide;
 } MenuDebogage;
 
+/**
+ * @brief Définition et initialisation du menu de la dummyTask
+ */
 MenuDebogage menuDebogage[] = {
   {'h', dummyMessageAide, "Afficher ce menu d'aide"},
 #ifdef MANUX_DEBUGMASK_VAR
   {'d', debugMasqueAfficher, "Editer les masques de debug"},
-#endif
+#endif // MANUX_DEBUGMASK_VAR
 #ifdef MANUX_APPELS_SYSTEME
   {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
-#endif
+#endif // MANUX_APPELS_SYSTEME
   {'i', interruptionAfficher, "Voir le decompte des interruptions"},
   {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
   {0, NULL, NULL}
 };  
 int menuActif = 0;
 
+/**
+ * @brief Affichage de l'aide des menues de la dummyTask
+ */
 static void dummyMessageAide(void)
 {
    int i;
@@ -300,7 +315,7 @@ static void dummyCopieEcran(void)
    char * buffer = kmalloc(TAILLE_ECRAN);
 #else
    char buffer[TAILLE_ECRAN];
-#endif
+#endif   // MANUX_KMALLOC
 
    buffer[d--] = 0;
    buffer[d--] = '\n';
@@ -319,11 +334,11 @@ static void dummyCopieEcran(void)
    
 #ifdef MANUX_KMALLOC
    kfree(buffer);
-#endif
+#endif // MANUX_KMALLOC
 }
 
 /**
- * @brief
+ * @brief Invocation du menu choisi et affichage cohérent
  */
 static void afficherMenuActif(void)
 {
@@ -337,6 +352,9 @@ static void afficherMenuActif(void)
 
 /**
  * @brief Gestion du clavier pour la dummy
+ *
+ * Tant qu'il y a des caractères à lire, on les traite en affichant en
+ * particulier le menu correspondant.
  */
 static void dummyTraiterClavier(void)
 {
@@ -370,7 +388,10 @@ static void dummyTraiterClavier(void)
  */
 void aDummyKernelTask(void)
 {
+#ifdef MANUX_CLAVIER_CONSOLE
    dummyMessageAide(); // WARNING : mutex ?
+#endif
+
    while(1) {
 #if defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
       // Cette tâche passe sa vie dans le noyau, elle doit donc

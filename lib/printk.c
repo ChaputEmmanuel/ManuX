@@ -33,7 +33,10 @@
  * C'est cette  fonction qui fait tout le travail. Elle écrit dans une
  * chaîne de caractères (allouée par l'appelant) en prenant garde de
  * ne pas dépasser, quitte à ne pas tout écrire.
+ *
+ * WARNING : elle a un clone dans userland, ...
  */
+static
 int vsnprintk(char * str, const size_t l, char * format, va_list argList)
 {
    size_t    indice = 0;
@@ -114,8 +117,7 @@ affent :          switch (prefixe) {
 		  }
                break;
                case 'c' :
-		 c = (char)va_arg(argList, int);
-		  //                  c = va_arg(argList, char );
+                  c = (char)va_arg(argList, int);
                   in = 0;
                   str[indice++] = c;
                break;
@@ -218,8 +220,4 @@ void printkc(char * format, ...)
    kfree(chaine);
 #endif
 }
-// Si on n'a pas de console virtuelle, printkc ne peut pas faire mieux
-// que printk
-#else
-#   define printkc printk
 #endif

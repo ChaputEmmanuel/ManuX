@@ -7,6 +7,10 @@
 #   "-nostdinc -fno-builtin -nodefaultlibs -nostartfiles" permettent
 # de n'utiliser aucune fonctions prédéfinies ou de librairies standard
 #
+#   Architecture
+#     -march=386            Avant j'utilisais -m686
+#     -m32                  int, long, and pointer types to 32 bits
+#
 #   Warning
 #     -Wall                 Active beaucoup de warnings classiques, mais pas tous.
 #     -Wextra               Ajoute des warnings plus stricts : paramètres inutilisés, comparaisons douteuses, etc.
@@ -19,7 +23,7 @@
 #==========================================================================
 CC	= gcc
 
-CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
+CFLAGS   = -fno-pie -m32 -march=i386  \
            -g -ggdb -gdwarf  \
 	   -I$(ROOTDIR)/include  \
            -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
@@ -30,6 +34,7 @@ CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
 	   -Wextra\
 	   -Werror=implicit-function-declaration \
 	   -Wstrict-prototypes \
+	   -Wmissing-prototypes	   \
 	   
 	 # -mpreferred-stack-boundary=2 (par défaut c'est 4, d'où des "sub $0x10,%esp")
          # -fomit-frame-pointer
