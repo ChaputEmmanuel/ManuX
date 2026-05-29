@@ -14,6 +14,7 @@ PDFLATEX = pdflatex
 DOXYGEN = doxygen
 PANDOC = pandoc
 DOCS_PDF = index.pdf \
+           vue-globale-part.pdf \
            presentation-part.pdf \
            outils-part.pdf \
            boot-part.pdf \

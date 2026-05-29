@@ -10,6 +10,7 @@ extra_css:
 nav:
     - Home: index.md
     - Sections :
+       - "La version courte" : vue-globale-part.md
        - "Présentation générale" : presentation-part.md
        - "Les outils" : outils-part.md
        - "Chargement en mémoire et boot" : boot-part.md
