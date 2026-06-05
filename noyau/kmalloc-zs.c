@@ -6,6 +6,7 @@
  * La technique utilisée ici est celle des zones siamoises (buddy
  * system)
  */
+#include "manux/printk.h"
 #include <manux/debug.h>        // assert
 #include <manux/memoire.h>
 #include <manux/kmalloc-zs.h>
@@ -55,22 +56,21 @@ uint32_t nbAlloc[MANUX_KMALLOC_ORDRE_MAX+1] = {0};
 uint32_t nbFree[MANUX_KMALLOC_ORDRE_MAX+1] = {0};
 #endif // MANUX_KMALLOC_STAT
 
-void kmallocAfficherStatistiques(char *prefixe)
+void kmallocAfficherStatistiques(void)
 {
     uint16_t ordre;
     enteteBlocMemoire * bloc;
     int nb;
 
-    printk("%s Pages allouees (kmalloc) / total : %d (%d) / %d\n",
-	   prefixe,
+    printkc("Pages allouees (kmalloc) / total : %d (%d) / %d\n",
 	   nombrePagesAllouees(), nbPagesAllouees, nombrePagesTotal());
-    printk("ordre alloc free  blocs\n");
+    printkc("ordre alloc free  blocs\n");
     for (ordre = MANUX_KMALLOC_ORDRE_MIN ; ordre <= MANUX_KMALLOC_ORDRE_MAX; ordre++) {
        nb=0;
        for (bloc = blocsLibres[ordre]; bloc != NULL; bloc = bloc->e.suivant){
           nb++;
        }
-       printk("   %2d  %4d  %4d  %4d\n", ordre, nbAlloc[ordre], nbFree[ordre], nb);
+       printkc("   %2d  %4d  %4d  %4d\n", ordre, nbAlloc[ordre], nbFree[ordre], nb);
     }
 }
 

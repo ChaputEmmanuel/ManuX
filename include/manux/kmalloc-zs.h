@@ -14,10 +14,6 @@
  */
 void kmallocInitialisation(void);
 
-#ifdef MANUX_KMALLOC_STAT
-void kmallocAfficherStatistiques(char *prefixe);
-#endif
-
 /** 
  * @brief Allocation d'une zone de n octets
  * @return Pointeur sur la zone en cas de succès, NULL en cas d'échec 
@@ -29,9 +25,8 @@ void * kmalloc(size_t n);
  */
 void kfree(void * p);
 
-
 #ifdef MANUX_KMALLOC_STAT
-void kmallocAfficherStatistiques(char * prefixe);
+void kmallocAfficherStatistiques(void);
 #endif // KMALLOC_STAT
 
 #endif // DEF_KMALLOC_ZS

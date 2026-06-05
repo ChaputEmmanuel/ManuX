@@ -6,9 +6,6 @@
  */
 #include <manux/ecran.h>
 #include <manux/ascii.h>
-#ifdef MANUX_KMALLOC
-#   include <manux/kmalloc-zs.h>
-#endif
 #include <manux/printk.h>
 #include <manux/dummy-task.h>
 
@@ -28,7 +25,7 @@
 #   include <manux/appelsysteme.h>
 #endif
 #ifdef MANUX_KMALLOC_STAT
-#   include <manux/kmalloc.h>    // kmallocAfficherStatistiques
+#   include <manux/kmalloc.h>    // kmalloc kmallocAfficherStatistiques
 #endif
 #ifdef MANUX_VIRTIO_CONSOLE
 #   include <manux/virtio-console.h> // A virer
@@ -279,6 +276,9 @@ MenuDebogage menuDebogage[] = {
 #endif // MANUX_APPELS_SYSTEME
   {'i', interruptionAfficher, "Voir le decompte des interruptions"},
   {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
+#ifdef MANUX_KMALLOC_STAT
+  {'m', kmallocAfficherStatistiques, "Voir l'etat des allocations memoire"},
+#endif // MANUX_KMALLOC_STAT
   {0, NULL, NULL}
 };  
 int menuActif = 0;
@@ -290,7 +290,7 @@ static void dummyMessageAide(void)
 {
    int i;
    
-   printkc("%c[2JBienvenu dans la tache d'observation/debogage\n", ASCII_ESC);
+   printkc("%c[2JBienvenue dans la tache d'observation/debogage\n", ASCII_ESC);
    printkc("\n\n");
    printkc("Vous pouvez utiliser les touches suivantes :\n");
    printkc("\n\n");
