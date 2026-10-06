@@ -1,7 +1,8 @@
 /**
- * @file
- * @brief
- *                                                                  (C) Manu Chaput 2025
+ * @file include/manux/buffer-reseau.h
+ * @brief Définition des buffers réseau et les fonctions associcées
+ *
+ *                                                             (C) Manu Chaput 2025-2026
  */
 #ifndef BUFFER_RESEAU
 #define BUFFER_RESEAU
@@ -30,7 +31,6 @@ typedef struct _ListeBufferReseau ListeBufferReseau;
  */
 BufferReseau * bufferReseauCreer(void * donnees, int taille);
 
-
 /**
  * @brief Création d'une liste vide de buffers réseau
  */
@@ -52,5 +52,10 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b);
  * NULL si liste inexistante ou vide
  */
 BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l);
+
+/**
+ * @brief Affichage de la liste de buffers
+ */
+void listeBufferReseauAfficher(ListeBufferReseau * l);
 
 #endif

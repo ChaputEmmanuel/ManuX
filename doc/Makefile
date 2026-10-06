@@ -63,7 +63,7 @@ serve :
 	mkdocs serve
 
 install :
-	scp -r ManuX root@www.manu-chaput.net:/var/www/manux/
+	scp -r ManuX root@www.manu-chaput.net:/var/www/manux.manu-chaput.net/
 
 clean :
 	rm -f *.aux *.log *.toc *.idx *.out *.bcf *.bbl *.blg $(DOCS_PDF) docs/*.md  docs/*.html

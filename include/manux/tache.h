@@ -1,8 +1,8 @@
-/*----------------------------------------------------------------------------*/
-/*      Définition des taches de ManuX-32.                                    */
-/*                                                                            */
-/*                                     (C) Manu Chaput 2000, 2001, 2002, 2003 */
-/*----------------------------------------------------------------------------*/
+/**
+ *      Définition des taches de ManuX-32.
+ *
+ *                                                     (C) Manu Chaput 2000-2026
+ **/
 #ifndef TACHES_DEF
 #define TACHES_DEF
 
@@ -15,7 +15,7 @@
 
 #ifdef MANUX_APPELS_SYSTEME
 #   include  <manux/appelsysteme.h>
-#endif
+#endif // MANUX_APPELS_SYSTEME
 
 /*
  * Taille de la Local Descriptor Table de chaque tâche
@@ -108,7 +108,6 @@ typedef struct _Tache {
    uint32_t           nbAppelsSystemeIn[NB_MAX_APPELS_SYSTEME]; //< Décompte du nombre d'AS
    uint32_t           nbAppelsSystemeOut[NB_MAX_APPELS_SYSTEME]; //< Décompte du nombre d'AS
 #endif
-
   
 } Tache;
 

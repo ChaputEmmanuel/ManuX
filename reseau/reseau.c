@@ -48,3 +48,10 @@ void reseauInitialiser(void)
    printk_debug(DBG_KERNEL_NET, "Tache de traitement des receptions lancee\n");
 }
 
+/**
+ * @brief Affichage de la liste de buffers de réception
+ */
+void reseauAfficherListeReception()
+{
+   listeBufferReseauAfficher(listeBuffersRecus);
+}

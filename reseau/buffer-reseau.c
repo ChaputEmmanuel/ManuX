@@ -83,10 +83,10 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b)
 
    if (c) {
       c->br = b;
-      c->suivant = l->dernier;
-      l->dernier = c;
-      if (l->premier == NULL) {
-         l->premier = c;
+      c->suivant = l->premier;
+      l->premier = c;
+      if (l->dernier == NULL) {
+         l->dernier = c;
       }
       return 1;
    } else {
@@ -116,3 +116,31 @@ BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l)
       return NULL;
    }
 }
+
+/**
+ * @brief Affichage de la liste de buffers
+ */
+void listeBufferReseauAfficher(ListeBufferReseau * l)
+{
+   int n = 0;
+   CelluleBufferReseau * cell;
+   uint8_t * data;
+   
+   if (!listeBufferReseauVide(l)) {
+      for (cell = l->premier; cell != NULL; cell = cell->suivant) {
+         n++;
+      }
+      printkc("Il y a %d paquet(s) dans la file :\n", n);
+      for (cell = l->premier; cell != NULL; cell = cell->suivant) {
+	data = (uint8_t*)cell->br->donnees;
+	printkc("l=%d : 0x%x 0x%x 0x%x 0x%x\n", cell->br->taille,
+		data[0],
+		data[1],
+		data[2],
+		data[3]);
+      }
+   } else {
+      printkc("File reseau pas encore initialisee ...\n");
+   }
+}
+

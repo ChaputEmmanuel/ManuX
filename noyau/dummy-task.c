@@ -4,6 +4,8 @@
  * pour de l'affichage  pour le moment.
  *                                                     (C) Manu Chaput 2000-2026
  */
+#include <manux/config.h>
+
 #include <manux/ecran.h>
 #include <manux/ascii.h>
 #include <manux/printk.h>
@@ -17,7 +19,7 @@
 #include <manux/scheduler.h>
 #ifdef MANUX_CONSOLE
 #   include <manux/console.h>
-#endif
+#endif  // MANUX_CONSOLE
 #ifdef MANUX_CLAVIER_CONSOLE
 #   include <manux/clavier.h>
 #endif
@@ -39,7 +41,9 @@
 #if defined(MANUX_CONDITION)
 #   include <manux/condition.h>  // exclusionsMutuellesAfficherEtat
 #endif
-
+#if defined(MANUX_RESEAU)
+#   include <manux/reseau.h>
+#endif
 
 /*----------------------------------------------------------------------------*/
 /*   Ci dessous les différentes fonctions qui sont impliquées dans des menus  */
@@ -279,12 +283,15 @@ MenuDebogage menuDebogage[] = {
 #ifdef MANUX_KMALLOC_STAT
   {'m', kmallocAfficherStatistiques, "Voir l'etat des allocations memoire"},
 #endif // MANUX_KMALLOC_STAT
-  {0, NULL, NULL}
+#if defined(MANUX_BUFFER_RESEAU)
+  {'r', reseauAfficherListeReception, "Voir la liste de reception"},
+#endif // MANUX_BUFFER_RESEAU
+   {0, NULL, NULL}
 };  
 int menuActif = 0;
 
 /**
- * @brief Affichage de l'aide des menues de la dummyTask
+ * @brief Affichage de l'aide des menus de la dummyTask
  */
 static void dummyMessageAide(void)
 {

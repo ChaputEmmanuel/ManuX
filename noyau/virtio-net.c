@@ -115,10 +115,11 @@ void netDumpPacket(uint8_t * packet, int lg)
 {
    int i;
    for (i = 0; i < lg; i++) {
-      printk(" 0x%2x ", packet[i]);
-      if (i % 8 == 7) printk("\n");
+      printk("%2x ", packet[i]);
+      if (i % 8 == 7) printk(" ");
+      if (i % 16 == 15) printk("\n");
    }
-   if (i % 8 != 7) printk("\n");
+   if (i % 16 != 15) printk("\n");
 }
 
 [[maybe_unused]]
@@ -170,13 +171,14 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    br = bufferReseauCreer(buffers[1], longueurs[1]);
 
    // On va maintenant le placer dans une liste qui sera traitée plus tard.
+   printk("on insere ...\n");
    listeBufferReseauInserer(listeBuffersRecus, br);
 #endif
    
    printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
 		vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
 
-   if (nbLu) {
+   if (nbLu) {printk("RECU : \n");
       netDumpPacket(buffers[1], longueurs[1]);
    }
 
@@ -390,7 +392,7 @@ int virtioNetInit(void)
    }
 
    // Test d'émission
-   //   virtioNetEmettre(&virtioReseau, requeteARP);
+   virtioNetEmettre(&virtioReseau, requeteARP);
 
    printk_debug(DBG_KERNEL_NET, "out\n");
    return ESUCCES;

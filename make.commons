@@ -127,6 +127,9 @@ QEMU_VIRTIO_CONSOLE = -chardev stdio,id=charconsole0             \
 #                   -device virtconsole,chardev=cons1 \
 #                   -chardev stdio,id=cons1
 
+#--------------------------------------------------------------------------
+#    Variantes de configuration du réseau
+#--------------------------------------------------------------------------
 # Utilisation d'une interface TAP ? Attention il faut être root
 QEMU_VIRTIO_TAP  = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -netdev tap,id=v1 \
@@ -136,8 +139,27 @@ QEMU_VIRTIO_FWD  = -device virtio-net-pci,mac=c0:ff:ee:de:ad:be,netdev=v1 \
                    -netdev user,id=v1,hostfwd=tcp::4832-:4832 \
                    -object filter-dump,id=f1,netdev=v1,file=dump.dat
 # Choix, au final, du mode de fonctionnement réseau
-QEMU_VIRTIO_NET  = $(QEMU_VIRTIO_FWD)
 
+#--------------------------------------------------------------------------
+#    On ajoute le réseau si NET est configuré
+#--------------------------------------------------------------------------
+ifdef NET
+ifeq "$(NET)" ""
+   NET=FWD
+endif
+
+ifeq "$(NET)" "TAP"
+   QEMU_VIRTIO_NET  = $(QEMU_VIRTIO_TAP)
+else
+   QEMU_VIRTIO_NET  = $(QEMU_VIRTIO_FWD)
+endif
+else
+   QEMU_VIRTIO_NET  = 
+endif
+
+#--------------------------------------------------------------------------
+#   Construction des commandes de lancement
+#--------------------------------------------------------------------------
 RUN_MANUX_FLOPPY = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
@@ -161,6 +183,7 @@ RUN_MANUX_ISO    = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
+		   $(QELU_VIRTIO_NET) \
 		   -cdrom
 
 RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
@@ -168,6 +191,7 @@ RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
 		   $(QEMU_DEBUG) \
+		   $(QELU_VIRTIO_NET) \
 		   -cdrom
 
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX

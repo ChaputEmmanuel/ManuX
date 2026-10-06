@@ -6,12 +6,15 @@
 /* lisible.                                                                   */
 /*                                                  (C) Manu Chaput 2000-2025 */
 /*----------------------------------------------------------------------------*/
+#include <manux/config.h>
 #include <manux/scheduler.h>
 
 #define DEBUG_MANUX_SCHEDULER
 
 #include <manux/errno.h>
-#include <manux/console.h>
+#ifdef MANUX_CONSOLE
+#   include <manux/console.h>
+#endif
 #include <manux/io.h>
 #include <manux/memoire.h>       /* NULL, allouerPage */
 #if defined(MANUX_SYNCHRONISATION)

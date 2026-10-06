@@ -2,11 +2,12 @@
  * @file main-acces-concurrent.c
  * @brief Un exemple pitoyable de début de noyau.
  *
- *                                                     (C) Manu Chaput 2000-2023
+ *                                                     (C) Manu Chaput 2000-2026
  */
 #include <manux/config.h>
 #include <manux/errno.h>
 #include <manux/debug.h>      // A virer j'espère !
+#include <manux/clavier.h>
 #include <manux/console.h>
 #include <manux/kmalloc.h>    // Pour l'initialisation
 #include <manux/printk.h>
@@ -18,7 +19,9 @@
 #include <manux/reseau.h>
 #include <manux/virtio-net.h>
 
-void startManuX()
+void startManuX(void);  // WARNING faire un include ?
+
+void startManuX(void)
 {
    // Récupération des informations depuis le bootloader
    bootloaderInitialiser();
@@ -40,9 +43,14 @@ void startManuX()
    // Initialisation de l'allocateur généraliste
    kmallocInitialisation();
    
+   // Initialisation du clavier
+   initialiserClavier();
+   printk_debug(DBG_KERNEL_START, "Clavier initialise\n");
+
    // Initialisation de la gestion des processus
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
+   tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
 
    // On a besoin de l'horloge pour l'ordonnanceur
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
@@ -63,8 +71,9 @@ void startManuX()
    }
 
    printk_debug(DBG_KERNEL_START, "C'est parti mon kiki ...\n");
+   virtioNetTestDeuxiemeEmission();
 
-   while(1){};
+   while(1) {};
 }   /* _startManuX */
 
 

@@ -20,4 +20,9 @@ extern ListeBufferReseau * listeBuffersRecus;
  */
 void reseauInitialiser(void);
 
+/**
+ * @brief Affichage de la liste de buffers de réception
+ */
+void reseauAfficherListeReception(void);
+
 #endif
