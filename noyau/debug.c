@@ -45,5 +45,6 @@ void debugInitialiser(void)
    snprintk(v, 32, "0x%x", _masqueDebugageConsole);
    registreSystemeAffecterParametre(v, &masqueDebugageFichier, debugMiseAJourMasque,
 				    "debug", "masque", "fichier", NULL);
+
 #endif
 }

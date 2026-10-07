@@ -39,7 +39,7 @@ dans une zone mémoire non volatile, sur une machine distante, \ldots
 %===============================================================================
 %
 %===============================================================================
-\section{Démarage à partir d'une disquette}
+\subsection{Démarage à partir d'une disquette}
 
    Nous allons donc devoir mettre en \oe{}uvre le boot du noyau dans
 cette configuration. Pour cela, nous allons construire un fichier qui
@@ -75,7 +75,7 @@ construire chaque partie.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Construction du fichier de démarrage}
+\subsubsection{Construction du fichier de démarrage}
 
    Afin de permettre un démarrage ``à l'ancienne'' par un boot sur
 disquette du \textsc{ pc}, nous allons donc construire une image de disquette
@@ -117,7 +117,7 @@ regardons les interactions entre les trois éléments.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Liens entre les trois éléments}
+\subsubsection{Liens entre les trois éléments}
 
    Les trois parties de codes évoquées ici (le secteur de boot, le
 code d'initialisation et le noyau) ne sont pas liées entre elles (par
@@ -137,7 +137,7 @@ placés à des adresses connues et faire un saut à ces adresses.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Le secteur de boot}
+\subsubsection{Le secteur de boot}
 
    Lorsqu'on allume un \textsc{ pc} normalement configuré avec une disquette dans
 le premier lecteur, le \textsc{ bios} charge le premier secteur de la diquette en
@@ -181,7 +181,7 @@ pourrez le trouver dans le fichier \fichier{boot}{bootsector}{nasm}.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{État de la mémoire après le chargement}
+\subsubsection{État de la mémoire après le chargement}
 
    L'état de la mémoire à la fin du boot est décrite par la figure
 suivante. Les nombres sous les différentes zones expriment leur taille
@@ -201,7 +201,7 @@ donne la main au code d'initialisation.
 %-------------------------------------------------------------------------------
 %      L'initialisation
 %-------------------------------------------------------------------------------
-\subsection{L'initialisation}
+\subsubsection{L'initialisation}
 
    Le "programme" d'initialisation est traditionnellement consacré à la détection
 et à l'initialisation (original, vu son nom !) du matériel. Sur un \pc de
@@ -227,7 +227,7 @@ comme :
 %...............................................................................
 %      Passage en mode protégé
 %...............................................................................
-\subsubsection{Passage en mode protégé}
+\paragraph{Passage en mode protégé}
 
    Les processeurs Intel démarre dans un mode de fonctionnement appelé
 le {\em mode réel} (real mode). Dans ce mode, la mémoire est accédé de
@@ -242,7 +242,7 @@ immédiat, il nécessite un peu de travail.
 %...............................................................................
 %      Passage des informations au noyau
 %...............................................................................
-\subsubsection{Passage des informations au noyau}
+\paragraph{Passage des informations au noyau}
 
    La plupart des informations recueillies par l'initialisation peuvent se
 révéler particulièrement intéressantes pour le noyau. Il est donc important de
@@ -303,7 +303,7 @@ cohérente la structure C et la zone mémoire gérée en assembleur.
 %...............................................................................
 %      Détection de la mémoire
 %...............................................................................
-\subsubsection{Détection de la mémoire}
+\paragraph{Détection de la mémoire}
 
    En ce qui concerne cette détection, nous allons encore une fois
 utiliser un service du \bios, au travers de l'interruption 0x12 qui va
@@ -316,7 +316,7 @@ nous fournir ces informations.
 %===============================================================================
 %
 %===============================================================================
-\section{Utilisation de {\em Multiboot}}
+\subsection{Utilisation de {\em Multiboot}}
 
    Nous allons ici utiliser la spécification {\em Multiboot} définie
 par la {\em Free Software Foundation} qui va nous permettre d'utiliser
@@ -331,12 +331,12 @@ hors d'age !
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Structure du fichier chargé par {\em Multiboot}}
+\subsubsection{Structure du fichier chargé par {\em Multiboot}}
 
    Nous devons construire un fichier qui sera fourni à {\em
 Multiboot}.  Nous allons utiliser ici la version 1 de {\em Multiboot} (et
 non {\em Multiboot2}). On trouvera la spécification par exemple
-\href{ici}{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html}.
+\href{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html}{ici}.
 
    Un tel fichier contient essentiellement notre noyau, mais doit avoir
 une structure particulière afin d'être pris en charge~:
@@ -377,12 +377,14 @@ dans la sous-section \ref{subsection:bootparam}
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Structure de l'entête}
+\subsubsection{Structure de l'entête}
 
    Le système {\em Multiboot} nécessite donc un entête devant le noyau
 avec des caractéristiques bien définies. Cette interface est
 relativement légère et constituée d'une structure de quelques dizaines
-d'octets. Elle est décrite par exemple sur la  page \lstinline!https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Architecture!
+d'octets. Elle est décrite par exemple sur
+\href{https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Architecture}{cette
+  page}.
 
    Le premier champ (intitulé \lstinline!magic!) doit avoir une valeur
 bien définie (\lstinline!0x1BADB002!), ce qui permet au bootloader de
@@ -396,7 +398,7 @@ la mémoire ou de la vidéo).
    Le  troisième champ (\lstinline!checksum!) est une somme de
 contrôle sur les deux champs précédents.
 
-   Les autre champs doivent être présents, mais leur utilité est
+   Les autres champs doivent être présents, mais leur utilité est
 conditionnée par le champ \lstinline!flags!, nous ne nous y
 intéresserons pas ici.   
 
@@ -432,64 +434,23 @@ fichier d'entête va être ajouté au noyau de sorte à ce qu'il puisse
 être pris en charge par \grub. Quelques informations seront ensuite
 utilisées par le noyau : la taille de la mémoire disponible, et les
 paramètres de la ligne de commande.  
-   
+
+   Le fichier d'entête est essentiellement descriptif (même si j'ai
+fait le choix d'y mettre un peu de code). Cela ne mérite pas mieux
+qu'un peu d'assembleur et c'est réalisé dans le fichier
+\fichier{boot}{mb-manux.nasm}. Il est compilé via l'assembleur \nasm
+puis ajouté au noyau lors de l'édition de liens. Nous allons le
+décrire ci-dessous.
+
+   L'utilisation par le noyau des informations fournies par le
+bootloader se fait de façon plus classique, elle est définie dans le
+fichier \fichier{include/manux}{bootloader}{h} et implantée dans
+\fichier{noyau}{bootloader}{c}. Nous la décrirons plus bas.
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Organisation de la mémoire au boot}
-
-   Lorsque \grub a chargé le noyau en mémoire, il lui passe la main et
-celui-ci doit donc s'occuper rapidement de la gestion de la
-mémoire. La structure est alors celle décrite par la figure suivante.
-
-\includegraphics{images/memoire-au-boot.png}
-
-   La première page est utilisée pour les handlers d'interruptions.
-
-   J'ai fait le choix de placer derrière la {\sc idt} puis la {\sc
- gdt}. Leurs adresses et leurs tailles sont définies en ce sens dans
-   \fichier{include/config}{plan-memoire-pc}{h}.
-   
-
-   Lors du démarrage d'un {\sc pc}, le secteur de boot est placé à
-l'adresse {\tt 0x7C00} et \grub est chargé juste derrière à
-l'adresse {\tt 0x8000}. On ne peut évidemment pas demander à \grub de
-charger le noyau à une adresse qu'il occupe, je fais donc le choix de
-lui demander de charger ManuX à partir de la page 16, donc à l'adresse
-{\tt 0x10000}. Cette adresse également est définie dans le fichier
-\fichier{include/config}{plan-memoire-pc}{h} par la macro
-\lstinline!MANUX_KERNEL_START_ADDRESS!. C'est le linker qui utilise
-cette macro pour positionner le noyau.
-
-   Vient ensuite la pile du noyau qui est positionnée juste après le
-noyau (mais à une frontière de page). Cette place est définie dans le
-fichier de configuration du linker : \fichier{noyau}{manux}{ld}.
-
-   Je place ensuite derrière cet espace réservé à la pile une zone
-mémoire qui va me servir à la gestion des pages mémoire.
-   
-   À partir l'adresse {\tt 0x80000}, c'est le \bios{}. Dans un soucis
-de tranquillité, je vais considérer que les 512 Ko qui commencent à
-cette adresse sont inutilisables car réservés au \bios{}. Il y a moyen
-d'être un peu plus subtile, et d'en récupérer tout ou partie en
-fonction de la situation, mais on ne va pas s'y embêter pour le
-moment.
-
-   Tout ce qui est au delà est alors utilisable.
-   
-   Pour illustrer cela, la figure ci-dessous montre l'exécution d'un 
-noyau qui alloue quelques pages après son démarrage.    
-
-\includegraphics{images/memoire-allocation-pages.png}
-
-   On peut constater que les quelques premières pages allouées sont
-situées entre la {\sc gdt} et le noyau et que les suivantes sont
-allouées après la gestion mémoire.
-   
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{Structure de l'entête}
+\subsubsection{Structure de l'entête}
 
    En ce qui concerne ManuX, l'entête est
 implanté dans le fichier \fichier{boot}{mb-manux}{nasm}.
@@ -593,7 +554,7 @@ de ces informations sont dans une zone mémoire qui risque d'être
 écrasée lors de l'initialisation du noyau.
 
    Pour remédier à ce problème, quelques outils sont définis dans
-\fichier{manux}{bootloader}{h} et implantés dans
+\fichier{include/manux}{bootloader}{h} et implantés dans
 \fichier{noyau}{bootloader}{c}.
 
    La structure \lstinline!InfoSysteme! décrit le début des données
@@ -618,28 +579,15 @@ de gestion de mémoire soit disponible !
    Un exemple est donné par l'image \lstinline!bootparam! qui utilise
 en particulier le fichier \fichier{noyau/main-bootparam}{c}.
    
-%-------------------------------------------------------------------------------
-%
-%-------------------------------------------------------------------------------
-\subsection{Réalisation d'une image {\sc iso}}
-
-   La cible {\tt iso}  du {\tt Makefile} principal permet de générer
-un fichier {\sc iso} qui peut être utilisé pour démarrer ManuX sur une
-machine physique ou virtuelle.
-
-   La cible {\tt multiso} du {\tt Makefile} principal permet de
-générer une image {\sc iso} intégrant un noyau pour chaque fichier de
-configuration présent dans le répertoire {\tt multiconf}.
-
 %===============================================================================
 %
 %===============================================================================
-\section{Démarrage du noyau}
+\subsection{Démarrage du noyau}
 
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Démarrage du noyau ({\tt noyau/main.c})}
+\subsubsection{Démarrage du noyau ({\tt noyau/main.c})}
 
    La dernière action du programme d'initalisation est donc l'exécution
 de la fonction \lstinline!_start()!. Comme je l'ai dit précédemment,
@@ -655,7 +603,7 @@ de base dont il aura besoin.
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
-\subsection{Obtention des paramètres passés par le {\em bootloader}}
+\subsubsection{Obtention des paramètres passés par le {\em bootloader}}
 
    Grâce à Grub, qui implante {\em Multiboot}, nous pouvons passer des
 paramètres au noyau. La figure suivante montre un exemple de ligne de

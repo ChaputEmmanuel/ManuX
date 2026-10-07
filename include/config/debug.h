@@ -2,7 +2,7 @@
  * @file config/debug.h
  * @brief Configuration du débugage de ManuX
  *
- *                                                      (C) E. Chaput 2022-2025
+ *                                                      (C) E. Chaput 2022-2026
  */
 
 /**
@@ -17,7 +17,7 @@
 /**
  * Si les masques sont définis dans des variables, elles peuvent être
  * modifiées via le bootloader, au travers du registre ou
- * directement. Les macrod ci-dessous définissent le nom à affecter.
+ * directement. Les macros ci-dessous définissent le nom à affecter.
  */
 #define NOM_MASQUE_CONSOLE "debug.masque.console"
 #define NOM_MASQUE_FICHIER "debug.masque.fichier"

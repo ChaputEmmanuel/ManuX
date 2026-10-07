@@ -3,30 +3,16 @@
  * @brief : Un exemple de début de noyau.
  *
  * J'intègre à peu près tout dans ce noyau, donc régulièrement il ne
- * compile pas ou ne fonctionne pas car il n'est pas complètement à
- * jours avec mes dernières modifications.
- * Il est de plus assez pénible à lire car j'utilise intensivement les
- * conditions du préprocesseurs pour bien les identifier. Dans une
- * utilisation plus classique, la plupart doivent disparaître.
- *                                                                            
+ * compile pas ou ne fonctionne pas.
  *                                                     (C) Manu Chaput 2000-2026
  **/
-#undef MANUX_RAMDISK
 
 #include <manux/config.h>
-#ifdef MANUX_BOOTLOADER
 #include <manux/bootloader.h>
-#endif
-#ifdef MANUX_REGISTRE
-#   include <manux/registre.h>
-#endif
+#include <manux/registre.h>
 #include <manux/errno.h>
-#ifdef MANUX_CONSOLE
 #include <manux/console.h>
-#endif // MANUX_CONSOLE
-#ifdef MANUX_CLAVIER
 #include <manux/clavier.h>
-#endif // MANUX_CLAVIER
 #include <manux/tache.h>
 #include <manux/horloge.h>        // initialiserHorloge
 #include <manux/scheduler.h>
@@ -34,52 +20,27 @@
 #include <manux/io.h>
 #include <manux/segment.h>
 #include <manux/memoire.h>
-#ifdef MANUX_STDLIB
 #include <manux/stdlib.h>
-#endif
-#ifdef MANUX_KMALLOC
 #include <manux/kmalloc.h>
-#endif
 #include <manux/atomique.h>
-#ifdef MANUX_APPELS_SYSTEME
 #include <manux/appelsysteme.h>
-#endif
-#ifdef MANUX_PCI
 #include <manux/pci.h>
-#endif
-#ifdef MANUX_RAMDISK
 #include <manux/ramdisk.h>
-#endif
-#ifdef MANUX_PRINTK
 #include <manux/printk.h>
-#endif
 #include <manux/debug.h>
 #include <manux/limites.h>
-#ifdef MANUX_PAGINATION
-#   include <manux/pagination.h>
-#endif
-#ifdef MANUX_JOURNAL
-#   include <manux/journal.h>
-#endif
-#ifdef MANUX_FICHIER
-#   include <manux/fichier.h>
-#endif
-#ifdef MANUX_RESEAU
-#   ifdef MANUX_VIRTIO_NET
-#      include <manux/virtio-net.h>
-#   endif
-#endif
-#ifdef MANUX_VIRTIO_CONSOLE
-#   include <manux/virtio-console.h>
-#endif
+#include <manux/pagination.h>
+#include <manux/journal.h>
+#include <manux/fichier.h>
+#include <manux/virtio-net.h>
+#include <manux/virtio-console.h>
 
 void startManuX(void);  // WARNING faire un include ?
 extern void init(void); // Faire un init.h
 
-#ifdef MANUX_VIRTIO_CONSOLE
+// Pour manipuler la console virtuelle comme un fichier
 INoeud iNoeudVirtioConsole;
 Fichier fichierVirtioConsole;
-#endif
 
 /**
  * Configuration de la console
@@ -88,14 +49,8 @@ INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
 void startManuX(void)
 {
-#ifdef MANUX_CONSOLE
-#   ifdef MANUX_FICHIER
+   // Initialisation de la console manipulée comme un fichier
    consoleInitialisationINoeud(&iNoeudConsole);
-#   else
-   // Initialisation de la console noyau (n'utilise rien !)
-   consoleInitialisation();
-#   endif
-#endif
 
 #if MANUX_ARCH == i386
    union {
@@ -112,58 +67,54 @@ void startManuX(void)
 		descriptionProc.caracteres);
 #endif
 
-#ifdef MANUX_BOOTLOADER
    // Initialisation du bootloader : infoSysteme, cmdLine, ...
    printk_debug(DBG_KERNEL_START, "Initialisation du bootloader ...\n");
    bootloaderInitialiser();
 
-   // Affichage de la mémoire disponible 
-   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
-		infoSysteme.memoireDeBase,
-		infoSysteme.memoireEtendue);
-#endif
-   
-#ifdef MANUX_GESTION_MEMOIRE
    // Initialisation de la gestion des pages mémoire (utilise le
    // bootloader)
    printk_debug(DBG_KERNEL_START, "Initialisation memoire ...\n");
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
-#endif
 
-   // Initilisation des descripteurs de segments
+   // Affichage de la mémoire disponible 
+   printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
+		infoSysteme.memoireDeBase,
+		infoSysteme.memoireEtendue);
+
+   // Initialisation des descripteurs de segments
    initialiserGDT();
 
    // Initialisation de la table des interruptions
    initialiserIDT();   
 
-#ifdef MANUX_JOURNAL
+   // Initialisation de la pagination
+   printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
+   initialiserPagination(infoSysteme.memoireEtendue);
+   printk_debug(DBG_KERNEL_START, "Pagination initialisee\n");
+
+   // Initilisation du système kmalloc
+   printk_debug(DBG_KERNEL_START, "Initialisation de kmalloc ...\n");
+   kmallocInitialisation();
+
+   // Initialisation du système de debug
+   printk_debug(DBG_KERNEL_START, "Initialisation du debug ...\n");
+   debugInitialiser();
+
    // Initialisation du journal
    printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
    journalInitialiser();
    printk_debug(DBG_KERNEL_START, "Journal initialise ...\n");
-#endif
 
-#ifdef MANUX_PAGINATION
-   /* Initialisation de la pagination */
-   printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
-   initialiserPagination(infoSysteme.memoireEtendue);
-   printk_debug(DBG_KERNEL_START, "Pagination initialisee\n");
-#endif
-   
-#ifdef MANUX_APPELS_SYSTEME
-   /* Initialisation de la table des appels système*/
+   // Initialisation de la table des appels système
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
    printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
-#endif
    
-#ifdef MANUX_PCI
-   /* Initialisation du bus PCI */
+   // Initialisation du bus PCI
    printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
    PCIEnumerationDesEquipements();
    printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
-#endif
 
 #ifdef MANUX_VIRTIO_CONSOLE
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
@@ -190,16 +141,6 @@ void startManuX(void)
    printk_debug(DBG_KERNEL_START, "Systeme de fichiers initialise\n");
 #endif
 
-#ifdef MANUX_RAMDISK
-   // Initialisation du ramdisk 
-   if (infoSysteme.tailleRamdisk > 0) {
-      printk_debug(DBG_KERNEL_START, "Ramdisk (a %d de taille %d Ko) ...\n",
-	     adresseRamdisk, infoSysteme.tailleRamdisk);
-      initialiserRamDisk(adresseRamdisk, infoSysteme.tailleRamdisk);
-      printk_debug(DBG_KERNEL_START, "Ramdisk initialise\n");
-   }
-#endif
-
 #ifdef MANUX_CLAVIER
    // Initialisation du clavier
    printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
@@ -218,12 +159,6 @@ void startManuX(void)
    initialiserHorloge();
    printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
 
-#ifdef MANUX_KMALLOC
-   // Initilisation du système kmalloc
-   printk_debug(DBG_KERNEL_START, "Initialisation de kmalloc ...\n");
-   kmallocInitialisation();
-   printk_debug(DBG_KERNEL_START, "kmalloc initialise\n");
-#endif
 
 #ifdef MANUX_REGISTRE
    // Initialisation du registre (utilise kmalloc)

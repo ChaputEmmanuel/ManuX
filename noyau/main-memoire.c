@@ -1,6 +1,6 @@
 /**
  * @file  noyau/main-memoire.c
- * @brief Un exemple pitoyable de début de noyau.
+ * @brief Comment allouer une page mémoire dans le noyau ?
  *
  *                                                     (C) Manu Chaput 2000-2026
  */
@@ -8,7 +8,6 @@
 #include <manux/memoire.h>
 #include <manux/console.h>
 #include <manux/printk.h>
-#include <manux/debug.h>
 #include <manux/bootloader.h>
 #include <manux/i386.h>         // ADDR_VERS_PAGE
 

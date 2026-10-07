@@ -150,6 +150,19 @@ l'utilsation de {\tt printk}. On le compile de la façon suivante
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
+\subsection{Réalisation d'une image {\sc iso}}
+
+   La cible {\tt iso}  du {\tt Makefile} principal permet de générer
+un fichier {\sc iso} qui peut être utilisé pour démarrer ManuX sur une
+machine physique ou virtuelle.
+
+   La cible {\tt multiso} du {\tt Makefile} principal permet de
+générer une image {\sc iso} intégrant un noyau pour chaque fichier de
+configuration présent dans le répertoire {\tt multiconf}.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
 \subsection{Création d'un fichier \iso}
 
    Il est également possible de créer un fichier \iso contenant une ou

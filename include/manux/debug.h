@@ -39,12 +39,16 @@
  * @brief Définition des masques de débogage
  */
 #define _masqueDebugageConsole (0x00000000 \
- | DBG_KERNEL_VIRTIO     \
+ | DBG_KERNEL_ERREUR     \
  | DBG_KERNEL_START      \
  			       )
 # define _masqueDebugageFichier (0x00000000\
 				)
-
+/**
+ * @brief On déclare les masques comme des variables ou comme des
+ * macros en fonction de MANUX_DEBUGMASK_VAR.
+ */
+  
 #ifdef MANUX_DEBUGMASK_VAR
    extern uint32_t masqueDebugageConsole;
    extern uint32_t masqueDebugageFichier;
