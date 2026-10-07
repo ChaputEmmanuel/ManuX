@@ -510,6 +510,10 @@ variables déclarées dans le noyau. Elles pourront ainsi être
 manipulées plus confortablement par la suite (car le compilateur
 risque de très rapidement utiliser ces registres généraux).
 
+   Ces deux variables sont définies dans
+\fichier{include/manux}{multiboot}{h} et s'appellent
+\lstinline!signatureBootloader! et \lstinline!_infoSysteme!.
+   
    Une fois cette copie faite, ce code va pouvoir démarrer
  véritablement le noyau par un appel à la fonction
 \lstinline!startManuX()! qui sera implantée dans le fichier
@@ -530,7 +534,7 @@ extern signatureBootloader
 extern _infoSysteme
 
 _startManuX : 
-	mov esp, _adresseLimitePileManuX ; Initialisation du pointeur de pile
+        mov esp, _adresseLimitePileManuX ; Initialisation du pointeur de pile
         mov [signatureBootloader], eax   ; On fournit la signature du bootloader
         mov [_infoSysteme], ebx          ; Le pointeur sur les informations
 
@@ -538,7 +542,7 @@ _startManuX :
  
 	cli
 .FinDesTemps:	hlt
-	jmp .FinDesTemps
+        jmp .FinDesTemps
 \end{lstlisting}
    
 %...............................................................................
@@ -546,12 +550,12 @@ _startManuX :
 %...............................................................................
 \subsubsection{Récupération des informations fournies par le bootloader}
 
-   Grâce à l'entête ainsi construit, ManuX va pouvoir avoir accès aux
-informations fournies par le bootloader au travers des trois variables
-\lstinline!signatureBootloader!, \lstinline!_infoSysteme! et
-\lstinline!cmdLine!. Une difficulté provient du fait que la majorité
-de ces informations sont dans une zone mémoire qui risque d'être
-écrasée lors de l'initialisation du noyau.
+   Grâce à l'entête ainsi construit, \manux va pouvoir avoir accès aux
+informations fournies par le bootloader au travers des deux variables
+\lstinline!signatureBootloader! et \lstinline!_infoSysteme!. Une
+difficulté provient du fait que la majorité de ces informations sont
+dans une zone mémoire qui risque d'être écrasée lors de
+l'initialisation du noyau. 
 
    Pour remédier à ce problème, quelques outils sont définis dans
 \fichier{include/manux}{bootloader}{h} et implantés dans
@@ -559,7 +563,7 @@ de ces informations sont dans une zone mémoire qui risque d'être
 
    La structure \lstinline!InfoSysteme! décrit le début des données
 fournies par le bootloader. Elle ne couvre que les éléments qui
-intéressent ManuX, soit essentiellement la taille mémoire.
+intéressent \manux, soit essentiellement la taille mémoire.
 
    La variable \lstinline!cmdLine! contient quant à elle la ``ligne de
 commande'', c'est-à-dire les paramètres fournis au noyau (par exemple
