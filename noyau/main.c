@@ -97,6 +97,10 @@ void startManuX(void)
    printk_debug(DBG_KERNEL_START, "Initialisation de kmalloc ...\n");
    kmallocInitialisation();
 
+   // Initialisation du registre (utilise kmalloc)
+   printk_debug(DBG_KERNEL_START, "Initialisation du registre ...\n");
+   registreSystemeInitialiser();
+
    // Initialisation du système de debug
    printk_debug(DBG_KERNEL_START, "Initialisation du debug ...\n");
    debugInitialiser();
@@ -116,62 +120,35 @@ void startManuX(void)
    PCIEnumerationDesEquipements();
    printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
 
-#ifdef MANUX_VIRTIO_CONSOLE
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
       fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
       journalAffecterFichier(&fichierVirtioConsole);
    }
-   printk_debug(DBG_KERNEL_START, "Virtio console initialise...\n");
-#endif
 
-#ifdef MANUX_RESEAU
    // Initialisation du réseau
    printk_debug(DBG_KERNEL_START, "Initialisation du reseau ...\n");
-#   ifdef MANUX_VIRTIO_NET
    virtioNetInit();
-#   endif
-   printk_debug(DBG_KERNEL_START, "Reseau initialise\n");
-#endif
 
-#ifdef MANUX_FICHIER
    // Initialisation de la gestion des systèmes de fichiers
    printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers ...\n");
    sfInitialiser();
-   printk_debug(DBG_KERNEL_START, "Systeme de fichiers initialise\n");
-#endif
 
-#ifdef MANUX_CLAVIER
    // Initialisation du clavier
    printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
-   printk_debug(DBG_KERNEL_START, "Clavier initialise\n");
-#endif
 
-#ifdef MANUX_TACHES
    // Initialisation de la gestion des processus
    printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
-   printk_debug(DBG_KERNEL_START, "Scheduler initialise\n"); 
-#endif
 
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();
-   printk_debug(DBG_KERNEL_START, "Horloge initialisee\n");
 
-
-#ifdef MANUX_REGISTRE
-   // Initialisation du registre (utilise kmalloc)
-   printk_debug(DBG_KERNEL_START, "Initialisation du registre ...\n");
-   registreSystemeInitialiser();
-   printk_debug(DBG_KERNEL_START, "Registre initialise...\n");
-#endif
-
-#ifdef MANUX_CONSOLES_VIRTUELLES
    // On va maintenant faire de la tâche en cours une tâche "banale"
    tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
-#endif
 
+   // On passe dans userland
    init();
 }   /* startManuX */
 
