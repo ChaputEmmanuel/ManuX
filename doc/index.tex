@@ -44,7 +44,7 @@ il sera alors compilé :
 
 \begin{lstlisting}
  $ cd ManuX
- $ make
+ $ make CFG=printk
 \end{lstlisting}
 
    puis on pourra le démarrer :
@@ -52,6 +52,10 @@ il sera alors compilé :
 \begin{lstlisting}
  $ make run
 \end{lstlisting}
+
+   Sous vos yeux ébahis apparaît alors une fenêtre ressemblant à ceci :
+
+\includegraphics{images/screenshot-printk.png}
 
    On peut également créer une image iso intégrant plusieurs noyaux
 différents puis lancer le tout~:
@@ -61,6 +65,9 @@ différents puis lancer le tout~:
  $ make runiso
 \end{lstlisting}
 
+   Mais c'est une autre histoire, on verra ça dans la section dédiée
+aux outils.
+   
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
@@ -84,7 +91,7 @@ des outils suivants devraient suffire~:
 \subsection{Ok, mais ensuite ?}
 
    Si vous avez réussi la première épreuve, vous avez donc un système
-sur lequel vous pouvez compiler et faire tourner ManuX. Félicitation
+sur lequel vous pouvez compiler et faire tourner \manux. Félicitation
 et bienvenue dans mon monde \ldots
 
    Les différentes sections de ce document, forcément pas très à jour,
@@ -94,7 +101,10 @@ vos modifications.
 Bon courage !
 
    Ou plutôt, comme dirait Gandalf ``{\em Fuyez pauvres fous !}''
-  
+
+   À partir de là, je suggère de parcourir la section présentant ``la
+version courte'', dont l'objectif est de vous permettre de
+déterminer où aller chercher la suite des informations.
 
 \end{document}
 

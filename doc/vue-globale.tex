@@ -37,7 +37,11 @@ et je suppose que vous avez donc une assez bonne connaissance de
 
    Grâce à cette connaissance, nous sommes capables d'écrire du code
 qui permette d'exploiter notre système cible.
-   
+
+{\bf Si vous n'avez pas les bases minimales sur l'architecture d'un
+  système informatique classique, allez donc farfouiller le web pour
+  vous faire une culture et revenez plus tard !}
+
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
@@ -64,14 +68,18 @@ liens. Si nous avons peur de devoir déboguer notre code, il nous faudra
 nous venons d'écrire afin qu'il puisse être exécuté sur notre système
 cible.
 
+   {\bf
+   L'ensemble des outils nécessaires à la compilation et à l'exécution
+   de \manux sont décrits dans la section ``outils''.
+   }
 %-------------------------------------------------------------------------------
 %
 %-------------------------------------------------------------------------------
 \subsection{Chargez !}
 
    Nous voila bien partis, \ldots{} nous avons un système matériel et
-nous avons écrit du code (un noyau, aussi minimaliste soit-il), que
-nous avons compilé de sorte à l'exécuter sur le système.
+nous savons écrire du code (un noyau, aussi minimaliste soit-il), que
+nous savons compilé de sorte à l'exécuter sur le système.
 
    Mais pour cela, il faut ``charger le noyau'', c'est-à-dire faire en
 sorte qu'il se trouve quelque part ({\em a priori} dans la mémoire
@@ -94,4 +102,11 @@ exécuter notre noyau sur le système cible !
 %-------------------------------------------------------------------------------
 \subsection{Hello word !}
 
-   Maintenant
+   Maintenant que nous avons toutes les bases pour que le code de
+notre noyau soit dans la mémoire de la machine et puisse
+s'exécuter, nous allons commencer par le doter de fonctions
+d'affichage.
+
+   La construction de ces outils sera l'objet de la section
+   ``Affichage''.
+   
