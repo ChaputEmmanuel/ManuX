@@ -22,9 +22,10 @@
  */
 INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
 
-extern void init(); // Faire un init.h
+extern void init(void); // Faire un init.h
+void startManuX(void);
 
-void startManuX()
+void startManuX(void)
 {
    // Récupération des informations depuis le bootloader
    bootloaderInitialiser();

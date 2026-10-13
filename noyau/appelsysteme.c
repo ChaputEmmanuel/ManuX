@@ -53,7 +53,7 @@ int sys_dumbAS(ParametreAS as)
 static int testSynchroCompteur = 0;
 #define MANUX_AS_TEST_SYNCHRO_DELAI 500
 
-int sys_testSynchroAS(ParametreAS as, int inc, int action)
+static int sys_testSynchroAS(__attribute__((unused)) ParametreAS as, int inc, int action)
 {
    int x;
 

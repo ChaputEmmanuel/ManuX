@@ -91,6 +91,6 @@ void init()
    }
    fermer(fd[0]);
    fermer(fd[1]);
-   printf("Voila voila !\n");
-   while(1){};
+
+   //   while(1){};
 }

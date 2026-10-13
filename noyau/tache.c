@@ -22,7 +22,7 @@
 #include <manux/printk.h>
 #include <manux/debug.h>
 
-#define printkc printk
+//#define printkc printk
 
 #if defined(MANUX_TACHES) && defined(MANUX_EXCLUSION_MUTUELLE) && !defined(MANUX_REENTRANT)
 #   include <manux/exclusion-mutuelle.h>

@@ -211,7 +211,7 @@ void interruptionAfficher(void)
    printkc("----[ %d Exceptions ]--------------------------\n", MANUX_NB_EXCEPTIONS);
    for (i = 0; i < MANUX_NB_EXCEPTIONS ; i ++) {
       if (nbItRecues[i]) {
-         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+         printkc(" [ %3d : %5d ]", i, nbItRecues[i]); 
       }
    }
    printkc("\n");
@@ -219,7 +219,7 @@ void interruptionAfficher(void)
    printkc("----[ %d IRQ ]---------------------------------\n", MANUX_NB_IRQ);
    for (i = MANUX_NB_EXCEPTIONS; i < MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ ; i ++) {
       if (nbItRecues[i]) {
-         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+         printkc(" [ %3d : %5d ]", i, nbItRecues[i]); 
       }
    }
    printkc("\n");
@@ -227,7 +227,7 @@ void interruptionAfficher(void)
    printkc("----[ %d Interruptions ]-----------------------\n", MANUX_NB_INTERRUPTIONS);
    for (i = MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ; i < MANUX_NB_INTERRUPTIONS ; i ++) {
       if (nbItRecues[i]) {
-         printkc(" [ %3x : %5d ]", i, nbItRecues[i]); 
+         printkc(" [ %3d : %5d ]", i, nbItRecues[i]); 
       }
    }
    printkc("\n");
@@ -278,7 +278,9 @@ MenuDebogage menuDebogage[] = {
 #ifdef MANUX_APPELS_SYSTEME
   {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
 #endif // MANUX_APPELS_SYSTEME
+#ifdef MANUX_INT_AUDIT
   {'i', interruptionAfficher, "Voir le decompte des interruptions"},
+#endif // MANUX_INT_AUDIT
   {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
 #ifdef MANUX_KMALLOC_STAT
   {'m', kmallocAfficherStatistiques, "Voir l'etat des allocations memoire"},

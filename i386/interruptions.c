@@ -72,7 +72,6 @@ void gestionExceptionDiv0(TousRegistres registres,
 			  uint32_t numEx, uint32_t errCode,
 			  uint32_t eip, uint32_t cs, uint32_t eFlags)
 {
-  printk("Caca %d, 0x%x\n", numEx, eip);
    gestionExceptionPanique(registres, numEx, errCode, eip, cs, eFlags);
 }
 
@@ -122,6 +121,7 @@ void gestionInterruption(TousRegistres registres,
 {
    int idx = numIt-(MANUX_NB_EXCEPTIONS + MANUX_NB_IRQ);
 
+   printk("Coucou\n");
 #ifdef MANUX_INT_AUDIT
    nbItRecues[numIt] ++;
 #endif
