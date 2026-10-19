@@ -64,6 +64,7 @@ booleen basculerTacheDemande = TRUE; // WARNING à virer ? C'est pour
 #if defined(MANUX_TACHES) && defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
 ExclusionMutuelle verrouGeneralDuNoyau;
 TacheID tacheDansLeNoyau = 0;
+booleen ordonnancementEnAttente = FALSE;
 #endif
 
 /**
@@ -99,6 +100,20 @@ void ordonnanceur(void)
 {
    Tache * tachePrecedente = tacheEnCours;
 
+#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
+   if (tacheDansLeNoyau == tacheEnCours->numero) {
+      ordonnancementEnAttente = TRUE;
+      return;
+   }
+#endif // MANUX_SYNCHRONISATION & !MANUX_REENTRANT
+   /*
+   ATTENTION, A REVOIR ! SI ON N EST PAS REENTRANT, IL
+     FAUT REPORTER A LA FIN DE L'AS ... SAUF SI C'EST
+     UN APPEL EXPLCICTE SUITE A UNE MISE DANS UNE FILE
+     donc en fonction de l'état ?
+   */
+
+   
    assert(tacheEnCours != NULL);
 
    printk_debug(DBG_KERNEL_ORDON, "in (de tache %d)\n", tachePrecedente->numero);
@@ -126,11 +141,14 @@ void ordonnanceur(void)
    // Si on n'est pas là spontanément, on se considère en cours, mais
    // c'est fini pour le moment !
    if (tacheEnCours->etat == Tache_En_Cours) {
+      printk_debug(DBG_KERNEL_ORDON, "%d est en cours (%d), donc prete\n", tacheEnCours->numero, tacheEnCours->etat);
       tacheEnCours->etat = Tache_Prete;
    
       insererCelluleTache(&listeTachesPretes,
                           tacheEnCours,
                           (CelluleTache*)tacheEnCours+sizeof(Tache));
+   } else {
+     printk_debug(DBG_KERNEL_ORDON, "%d n'est PAS en cours (%d) !\n", tacheEnCours->numero, tacheEnCours->etat);
    }
 
    // Dans les autres cas, la tâche est sensée être dans une file
@@ -138,9 +156,13 @@ void ordonnanceur(void)
    
    // (2) on cherche la tâche suivante
    // On prend la première tâche prête, il y en a au moins une : la dummy
-   printk_debug(DBG_KERNEL_ORDON, "on cherche la suivante ...\n");   
+   printk_debug(DBG_KERNEL_ORDON, "on cherche la suivante dans ...\n");
+   listeTachesAfficher(&listeTachesPretes);
    do {
-      tacheEnCours = extraireTache(&listeTachesPretes);
+      tacheEnCours = extraireTache(&listeTachesPretes);  //WARNING Non ! 
+      printk_debug(DBG_KERNEL_ORDON, "-> %d (etat %d)\n",
+		   tacheEnCours->numero,
+		   tacheEnCours->etat);
    } while (tacheEnCours->etat != Tache_Prete); 
    printk_debug(DBG_KERNEL_ORDON, "... ce sera la %d\n", tacheEnCours->numero);   
 
@@ -158,9 +180,16 @@ void ordonnanceur(void)
       tacheEnCours->nbActivations++;
 
       printk_debug(DBG_KERNEL_ORDON, "out (vers tache %d)\n", tacheEnCours->numero);
+
+#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
+       ordonnancementEnAttente = FALSE;
+#endif
       basculerVersTache(tacheEnCours);
    }
    printk_debug(DBG_KERNEL_ORDON, "back (vers tache %d)\n", tacheEnCours->numero);
+#if defined(MANUX_SYNCHRONISATION) && !defined(MANUX_REENTRANT)
+       ordonnancementEnAttente = FALSE;
+#endif
 }
 
 /**
@@ -217,8 +246,9 @@ void initialiserScheduler(void)
    // Avant de permettre à une deuxième tâche d'entrer en concurrence,
    // il faut s'assurer qu'on a la main sur le noyau.
 #if !defined(MANUX_REENTRANT) && defined(MANUX_EXCLUSION_MUTUELLE)
-   printk_debug(DBG_KERNEL_ORDON, "on verouille le verrou\n");
-   
+   printk_debug(DBG_KERNEL_ORDON, "Non reentrant : on initialise et on ferme le verrou\n");
+
+   exclusionMutuelleInitialiser(&verrouGeneralDuNoyau);
    exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
    assert(tacheDansLeNoyau == 0);
    tacheDansLeNoyau = tacheEnCours->numero;

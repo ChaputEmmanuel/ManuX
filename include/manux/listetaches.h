@@ -2,7 +2,7 @@
 /*      Définition des opérations et types permettant de manipuler des listes */
 /*   de tâches.                                                               */
 /*                                                                            */
-/*                                                       (C) Manu Chaput 2000 */
+/*                                                  (C) Manu Chaput 2000-2026 */
 /*----------------------------------------------------------------------------*/
 #ifndef LISTETACHES_DEF
 #define LISTETACHES_DEF
@@ -38,5 +38,10 @@ struct _Tache * extraireTache(ListeTache * listeTaches);
  * Extraction de la dernière tache de la liste. Attention, aucune
  * désallocation de la Cellule n'est faite.
  */
+
+/**
+ * @brief Affichage (via printkc) d'une liste de tâches
+ */
+void listeTachesAfficher(ListeTache * listeTaches);
 
 #endif

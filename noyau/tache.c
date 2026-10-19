@@ -204,10 +204,10 @@ Tache * tacheCreer(CorpsTache corpsTache)
    tache->console = consoleNoyau();
 #endif
 
-#if defined(MANUX_APPEL_SYSTEME) && defined(MANUX_AS_AUDIT)
+#if defined(MANUX_APPELS_SYSTEME) && defined(MANUX_AS_AUDIT)
    for (int i = 0; i < NB_MAX_APPELS_SYSTEME; i++) {
-     nbAppelsSystemeIn[i] = 0;
-     nbAppelsSystemeOut[i] = 0;
+      tache->nbAppelsSystemeIn[i] = 0;
+      tache->nbAppelsSystemeOut[i] = 0;
    }
 #endif
    // A priori elle est préemptible

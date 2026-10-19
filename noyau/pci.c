@@ -184,10 +184,8 @@ void PCIEnumerationDesEquipements(void)
    printk_debug(DBG_KERNEL_PCI, "Enum. des equip. PCI ...\n");
    
    for (bus = 0; bus < MANUX_NB_BUS_PCI; bus++) {
-      printk(PRINTK_CRITIQUE"              - bus %3d/%3d\r", bus, MANUX_NB_BUS_PCI);
       PCIEnumerationDesEquipementsDuBus(bus);
    }
-   printk(PRINTK_CRITIQUE"\n");
 
    printk_debug(DBG_KERNEL_PCI, "%d equipements PCI\n", PCINombreEquipements);
 }

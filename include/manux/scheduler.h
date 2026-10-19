@@ -54,6 +54,7 @@ extern ListeTache listeTachesTerminees;
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
 extern struct _ExclusionMutuelle verrouGeneralDuNoyau;
 extern TacheID tacheDansLeNoyau;
+extern booleen ordonnancementEnAttente;
 #endif
 
 void initialiserScheduler(void);

@@ -64,3 +64,17 @@ Tache * extraireTache(ListeTache * listeTaches)
    return NULL;
 }
 
+/**
+ * @brief Affichage (via printkc) d'une liste de tâches
+ */
+void listeTachesAfficher(ListeTache * listeTaches)
+{
+   CelluleTache * celluleTache = listeTaches->tete;
+
+   while (celluleTache != NULL){
+     printk_debug(DBG_KERNEL_ORDON, "[ t%d (s%d)]\n",
+              celluleTache->tache->numero,
+              celluleTache->tache->etat);
+      celluleTache = celluleTache->suivant;
+   }
+}

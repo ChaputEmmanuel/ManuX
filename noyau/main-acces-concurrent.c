@@ -17,27 +17,23 @@
 #include <manux/clavier.h>
 #include <manux/pagination.h>
 
-/**
- * Configuration de la console
- */
-INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
-
 extern void init(void); // Faire un init.h
 void startManuX(void);
 
 void startManuX(void)
 {
+   // Initialisation de la console
+   consoleInitialisation();
+
    // Récupération des informations depuis le bootloader
    bootloaderInitialiser();
 
+   // Initialisation de la gestion des pages mémoire (utilise le
+   // bootloader)
    initialiserMemoire(infoSysteme.memoireDeBase,
 		      infoSysteme.memoireEtendue);
    
-   // Initialisation de la console noyau
-   consoleInitialisationINoeud(&iNoeudConsole);
-
    /* Initilisation des descripteurs de segments */
-   printk_debug(DBG_KERNEL_START, "Initialisation de la GDT ...\n");
    initialiserGDT();
 
    /* Initialisation de la table des interruptions */
@@ -47,27 +43,18 @@ void startManuX(void)
    kmallocInitialisation();
    
    // Le clavier nous permettra de basculer entre consoles
-   printk_debug(DBG_KERNEL_START, "Initialisation du clavier ...\n");
    initialiserClavier();
 
-   // Initialisation du journal
-   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
-   journalInitialiser();
-
    // On va utiliser des appels systèmes
-   printk_debug(DBG_KERNEL_START, "Initialisation des AS ...\n");
    initialiserAppelsSysteme();
 
    // On va utiliser des tubes, donc le système de fichiers
-   //printk_debug(DBG_KERNEL_START, "Initialisation des fichiers ...\n");
    sfInitialiser();
 
    // Initialisation de la gestion des processus
-   printk_debug(DBG_KERNEL_START, "Initialisation du scheduler ...\n");
    initialiserScheduler();
 
    // On a besoin de l'horloge pour l'ordonnanceur
-   printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge...\n");
    initialiserHorloge();
 
    printk_debug(DBG_KERNEL_START, "On passe en usr ...\n");

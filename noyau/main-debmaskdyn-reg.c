@@ -15,7 +15,7 @@
  * debug.masque.console=0x003
  *
  *    Car 0x800 active les messages "a faire".
- *                                                  (C) Manu Chaput 2000-2025 
+ *                                                  (C) Manu Chaput 2000-2026 
  */
 #include <manux/config.h>
 #include <manux/types.h>     // TRUE
@@ -28,7 +28,9 @@
 
 #include <manux/debug.h>
 
-void startManuX()
+void startManuX(void);
+
+void startManuX(void)
 {
    // Initialisation de la console noyau (n'utilise rien !)
    consoleInitialisation();
@@ -56,7 +58,7 @@ void startManuX()
    // On affiche le registre pour information
    registreSystemeAfficher();
 
-   // Affichage desmasque, pour le plaisir
+   // Affichage des masques, pour le plaisir
    printk("Registre de debug : 0x%x (console) et 0x%x (fichier)\n",
 	  masqueDebugageConsole, masqueDebugageFichier);
 

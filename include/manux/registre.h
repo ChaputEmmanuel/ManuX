@@ -130,5 +130,10 @@ void registreSystemeAjouterC(char * chaine);
  */
 void registreSystemeAfficher(void);
 
+/**
+ * @brief Le registre Système est-il initialisé ?
+ */
+int registreSystemeInitialise(void);
+
 #endif   // REGISTRE
 

@@ -2,7 +2,7 @@
  * @file debug.c
  * @brief Les outils de débogage
  *
- *                                                     (C) Manu Chaput 2023-2025
+ *                                                     (C) Manu Chaput 2023-2026
  */
 #include <manux/debug.h>
 #include <manux/printk.h>    // snprintk
@@ -15,7 +15,7 @@ uint32_t masqueDebugageFichier = _masqueDebugageFichier;
 #endif
 
 /**
- * @brief Mise à jour d'un masque de debug via le registre
+ * @brief Mise-à-jour d'un masque de debug via le registre
  */
 static
 void debugMiseAJourMasque(void * masque, char * valeur)
@@ -39,12 +39,13 @@ void debugInitialiser(void)
 #if defined(MANUX_DEBUGMASK_VAR) && defined(MANUX_REGISTRE)
    char v[32];
 
+   assert(registreSystemeInitialise());
+   
    snprintk(v, 32, "0x%x", _masqueDebugageConsole);
    registreSystemeAffecterParametre(v, &masqueDebugageConsole, debugMiseAJourMasque,
 				    "debug", "masque", "console", NULL);
    snprintk(v, 32, "0x%x", _masqueDebugageConsole);
    registreSystemeAffecterParametre(v, &masqueDebugageFichier, debugMiseAJourMasque,
 				    "debug", "masque", "fichier", NULL);
-
 #endif
 }

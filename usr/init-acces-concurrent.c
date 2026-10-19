@@ -92,5 +92,7 @@ void init()
    fermer(fd[0]);
    fermer(fd[1]);
 
-   //   while(1){};
+   // Nous sommes dans init, et le système s'arrête lorsque cette
+   // tâche se termine
+   while(1){};
 }

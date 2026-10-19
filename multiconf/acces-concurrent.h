@@ -16,13 +16,15 @@
 #define MANUX_USR_INIT init-acces-concurrent.o
 
 #include <config/base.h>
+#include <config/pc-i386.h>
 #include <config/bootloader.h>       // Nécessaire pour construire mon bootloader
 #include <config/systeme-fichiers.h>
 #include <config/ramdisk.h>
-#include <config/pc-i386.h>
 #include <config/appels-systeme.h>  // pour le mode utilisateur
 #include <config/consoles-virtuelles.h>
 #include <config/synchronisation.h>
+//#undef MANUX_REENTRANT
+#define MANUX_REENTRANT
 #include <config/printk.h>
 #include <config/journal.h>
 #include <config/taches.h>

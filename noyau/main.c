@@ -23,6 +23,7 @@
 #include <manux/stdlib.h>
 #include <manux/kmalloc.h>
 #include <manux/atomique.h>
+#include <manux/exclusion-mutuelle.h>
 #include <manux/appelsysteme.h>
 #include <manux/pci.h>
 #include <manux/ramdisk.h>
@@ -42,15 +43,14 @@ extern void init(void); // Faire un init.h
 INoeud iNoeudVirtioConsole;
 Fichier fichierVirtioConsole;
 
-/**
- * Configuration de la console
- */
-INoeud  iNoeudConsole;  // Le INoeud qui décrit la console
-
 void startManuX(void)
 {
-   // Initialisation de la console manipulée comme un fichier
-   consoleInitialisationINoeud(&iNoeudConsole);
+   // Initialisation de la console
+   consoleInitialisation();
+
+   // Initialisation du journal
+   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
+   journalInitialiser();
 
 #if MANUX_ARCH == i386
    union {
@@ -91,7 +91,6 @@ void startManuX(void)
    // Initialisation de la pagination
    printk_debug(DBG_KERNEL_START, "Initialisation pagination ...\n");
    initialiserPagination(infoSysteme.memoireEtendue);
-   printk_debug(DBG_KERNEL_START, "Pagination initialisee\n");
 
    // Initilisation du système kmalloc
    printk_debug(DBG_KERNEL_START, "Initialisation de kmalloc ...\n");
@@ -101,24 +100,20 @@ void startManuX(void)
    printk_debug(DBG_KERNEL_START, "Initialisation du registre ...\n");
    registreSystemeInitialiser();
 
+   // Analyse de la ligne de commande (utilise le registre)
+   bootloaderLireLigneCmd();
+
    // Initialisation du système de debug
    printk_debug(DBG_KERNEL_START, "Initialisation du debug ...\n");
    debugInitialiser();
 
-   // Initialisation du journal
-   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
-   journalInitialiser();
-   printk_debug(DBG_KERNEL_START, "Journal initialise ...\n");
-
    // Initialisation de la table des appels système
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
-   printk_debug(DBG_KERNEL_START, "Appels systeme initialises\n");
    
    // Initialisation du bus PCI
    printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
    PCIEnumerationDesEquipements();
-   printk_debug(DBG_KERNEL_START, "Bus PCI initialise...\n");
 
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
@@ -146,9 +141,17 @@ void startManuX(void)
    initialiserHorloge();
 
    // On va maintenant faire de la tâche en cours une tâche "banale"
+   printk_debug(DBG_KERNEL_START, "On se dote d'une console\n");
    tacheSetConsole(tacheEnCours, creerConsoleVirtuelle());
 
    // On passe dans userland
+   printk_debug(DBG_KERNEL_START, "On part chez init ...\n");
+
+#if !defined(MANUX_REENTRANT) && defined(MANUX_EXCLUSION_MUTUELLE)
+   tacheDansLeNoyau = 0;
+   exclusionMutuelleSortir(&verrouGeneralDuNoyau);
+#endif
+
    init();
 }   /* startManuX */
 

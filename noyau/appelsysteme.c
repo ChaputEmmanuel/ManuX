@@ -141,11 +141,6 @@ void initialiserAppelsSysteme(void)
    //definirAppelSysteme(NBAS_CONSOLE,        AS_console);
    //definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);
    //definirAppelSysteme(NBAS_FORK,           sysFork);
-
-#if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
-   tacheDansLeNoyau= 0;
-   exclusionMutuelleInitialiser(&verrouGeneralDuNoyau);
-#endif   
 }
 
 /**
@@ -185,18 +180,29 @@ void sortirAppelSysteme(uint32_t num)
    printk_debug(DBG_KERNEL_AS, "Appel sys %d OUT\n", num);
 
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
+
    /**
     * Spécialement pour le TP sur le tube : on fait comme si le noyau
     * était réentrant, mais juste pour cet AS
     */
-#   ifdef MANUX_TUBE_REENTRANT
+
+#   ifdef MANUX_TUBE_REETRANT
    if (num != NBAS_TUBE) {
 #   endif
+
    tacheDansLeNoyau = 0;
    exclusionMutuelleSortir(&verrouGeneralDuNoyau);
+
+   // Si un ordonnancement a été demandé alors que le noyau n'est pas
+   // réentrant alors il faut le réalisé maintenant
+   if (ordonnancementEnAttente) {
+      ordonnanceur();
+   }
+   
 #   ifdef MANUX_TUBE_REENTRANT
    }
 #   endif
+
 #endif
 
 #ifdef MANUX_AS_AUDIT

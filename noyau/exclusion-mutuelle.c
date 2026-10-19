@@ -7,7 +7,7 @@
 #include <manux/exclusion-mutuelle.h>
 #include <manux/stddef.h>   // NULL
 #include <manux/debug.h>    // assert, ...
-#include <manux/kmalloc.h>    // kmalloc, ...
+#include <manux/kmalloc.h>  // kmalloc, ...
 
 #if defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
 
@@ -82,23 +82,23 @@ void exclusionsMutuellesAfficherEtat(void)
    CelluleExclusionMutuelle * cell;
    CelluleTache * cellT;
 
-   printk("\nEtat des variables d'exclusion mutuelle sur le systeme :\n\n");
-   printk("Excl M  |   en |   so | Attente\n");
-   printk("--------+------+------+--------\n");
+   printkc("\nEtat des variables d'exclusion mutuelle sur le systeme :\n\n");
+   printkc("Excl M  |   en |   so | Attente\n");
+   printkc("--------+------+------+--------\n");
    if (listeExclusionsMutuelles != NULL) {
       for (cell = listeExclusionsMutuelles->tete; cell != NULL; cell = cell->suivant){
-         printk("0x%x | %4d | %4d | ",
+         printkc("0x%x  | %4d | %4d | ",
 	    cell->exclusionMutuelle,
 	    cell->exclusionMutuelle->nbEntrees,
 	    cell->exclusionMutuelle->nbSorties);
          for (cellT = cell->exclusionMutuelle->tachesEnAttente.tete ;
 	      cellT != NULL; cellT = cellT->suivant){
-            printk("%d ", cellT->tache->numero);
+            printkc("%d ", cellT->tache->numero);
           }
-          printk("\n");
+          printkc("\n");
        }
    }
-   printk("--------+------+------+--------\n");
+   printkc("--------+------+------+--------\n");
 }
 
 #endif // defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
@@ -165,6 +165,7 @@ void exclusionMutuelleSortir(ExclusionMutuelle * em)
    // Si on trouve une tâche en attente de cette exclusion mutuelle,
    // on la réveille.
    if ((ta = extraireTache(&(em->tachesEnAttente))) != NULL) {
+     printk_debug(DBG_KERNEL_ORDON, "On sort la %d\n", ta->numero);
       ta->etat = Tache_Prete;
       insererCelluleTache(&listeTachesPretes,
                           ta,

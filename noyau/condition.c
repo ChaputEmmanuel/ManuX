@@ -81,24 +81,24 @@ void conditionsAfficherEtat(void)
    CelluleCondition * cell;
    CelluleTache * cellT;
 
-   printk("\nEtat des variables de condition sur le systeme :\n\n");
-   printk("Cond    |    s |    d | Attente\n");
-   printk("--------+------+------+--------\n");
+   printkc("\nEtat des variables de condition sur le systeme :\n\n");
+   printkc("Cond    |    s |    d | Attente\n");
+   printkc("--------+------+------+--------\n");
 
    if (listeConditions != NULL) {
       for (cell = listeConditions->tete; cell != NULL; cell = cell->suivant){
-         printk("0x%x | %4d | %4d | ",
+         printkc("0x%x  | %4d | %4d | ",
 		cell->condition,
 		cell->condition->nbSignaler,
 		cell->condition->nbDiffuser);
          for (cellT = cell->condition->tachesEnAttente.tete ;
 	      cellT != NULL; cellT = cellT->suivant){
-            printk("%d ", cellT->tache->numero);
+            printkc("%d ", cellT->tache->numero);
          }
-         printk("\n");
+         printkc("\n");
       }
    }
-   printk("--------+------+------+--------\n");
+   printkc("--------+------+------+--------\n");
 }
 
 #endif //  defined(MANUX_CONDITION_AUDIT) && defined(MANUX_KMALLOC)

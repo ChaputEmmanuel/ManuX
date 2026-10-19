@@ -77,4 +77,5 @@ void init()
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(1);
    }
+   while (1) {}; // Si init termine, le noyau aussi
 }

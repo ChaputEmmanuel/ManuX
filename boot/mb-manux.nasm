@@ -55,9 +55,11 @@ _startManuX :
         call startManuX                  ; C'est parti
  
 	cli
-.FinDesTemps:	hlt
+.FinDesTemps:
+	hlt
+; WARNING j'avais prévu ça, mais ça me semble être une fausse bonne idée
 %ifdef MANUX_DUMMY_TASK
-	call aDummyKernelTask
+;	call aDummyKernelTask          
 %endif
 	jmp .FinDesTemps
 

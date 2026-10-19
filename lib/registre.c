@@ -581,3 +581,12 @@ void registreSystemeAfficher(void)
 {
     registreAfficher(registreSysteme, 0);   
 }
+
+/**
+ * @brief Le registre Système est-il initialisé ?
+ */
+int registreSystemeInitialise(void)
+{
+   return (registreSysteme != NULL);
+}
+  

@@ -40,9 +40,9 @@
  */
 #define _masqueDebugageConsole (0x00000000 \
  | DBG_KERNEL_ERREUR     \
- | DBG_KERNEL_START      \
  			       )
 # define _masqueDebugageFichier (0x00000000\
+ | DBG_KERNEL_ERREUR     \
 				)
 /**
  * @brief On déclare les masques comme des variables ou comme des

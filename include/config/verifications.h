@@ -108,3 +108,11 @@
 #if defined(MANUX_DEBUGMASK_VAR) && !defined(MANUX_PRINTK)
 #   error "MANUX_DEBUGMASK_VAR nécessite MANUX_PRINTK"
 #endif
+
+#if defined(MANUX_DUMMY_TASK) && !defined(MANUX_CLAVIER)
+#   error "MANUX_DUMMY_TASK nécessite MANUX_CLAVIER"
+#endif
+
+#if defined(MANUX_DUMMY_TASK) && !defined(MANUX_CONSOLE)
+#   error "MANUX_DUMMY_TASK nécessite MANUX_CONSOLE"
+#endif

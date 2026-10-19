@@ -238,10 +238,12 @@ void interruptionAfficher(void)
  &&  defined(MANUX_SYNCHRONISATION) \
  &&  defined(MANUX_EXCLUSION_MUTUELLE) \
  && !defined(MANUX_REENTRANT)
+void afficherEtatVerrouGeneral(void);
+
 /**
  * @brief Etat du verrou général
  */
-void afficherEtatMutex()
+void afficherEtatVerrouGeneral(void)
 {
    printkc("\n-- Tache dans le noyau : %d \n-- Taches en attente : ", tacheDansLeNoyau);
    for (CelluleTache * celluleTache = verrouGeneralDuNoyau.tachesEnAttente.tete;
@@ -255,6 +257,29 @@ void afficherEtatMutex()
 }
 #endif
 
+#if defined( MANUX_CONDITION_AUDIT) || defined (MANUX_EXCLUSION_MUTUELLE_AUDIT)
+static void afficherSynchro(void)
+{
+#ifdef MANUX_REENTRANT
+   printkc("Ce noyau est %c[31mreentrant%c[0m\n", ASCII_ESC, ASCII_ESC);
+#else
+   printkc("Ce noyau est n'est %c[32mpas reentrant%c[0m.\n", ASCII_ESC, ASCII_ESC);
+
+#if  defined(MANUX_TACHES)	    \
+ &&  defined(MANUX_SYNCHRONISATION) \
+ &&  defined(MANUX_EXCLUSION_MUTUELLE)
+     afficherEtatVerrouGeneral();
+#endif
+#endif
+
+#ifdef MANUX_CONDITION_AUDIT
+   conditionsAfficherEtat();
+#endif
+#ifdef MANUX_EXCLUSION_MUTUELLE_AUDIT
+   exclusionsMutuellesAfficherEtat();
+#endif
+}
+#endif // defined( MANUX_CONDITION_AUDIT) || defined (MANUX_EXCLUSION_MUTUELLE_AUDIT) 
 /*----------------------------------------------------------------------------*/
 /* Gestion des menus.                                                         */
 /*----------------------------------------------------------------------------*/
@@ -271,23 +296,27 @@ typedef struct _MenuDebogage {
  * @brief Définition et initialisation du menu de la dummyTask
  */
 MenuDebogage menuDebogage[] = {
-  {'h', dummyMessageAide, "Afficher ce menu d'aide"},
+   {'h', dummyMessageAide, "Afficher ce menu d'aide"},
 #ifdef MANUX_DEBUGMASK_VAR
-  {'d', debugMasqueAfficher, "Editer les masques de debug"},
+   {'d', debugMasqueAfficher, "Editer les masques de debug"},
 #endif // MANUX_DEBUGMASK_VAR
 #ifdef MANUX_APPELS_SYSTEME
-  {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
+   {'a', appelsSystemeAfficher, "Voir le decompte des appels systeme"},
 #endif // MANUX_APPELS_SYSTEME
 #ifdef MANUX_INT_AUDIT
-  {'i', interruptionAfficher, "Voir le decompte des interruptions"},
+   {'i', interruptionAfficher, "Voir le decompte des interruptions"},
 #endif // MANUX_INT_AUDIT
-  {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
+   {'p', afficherEtatTaches, "Voir l'etat des taches en cours"},
 #ifdef MANUX_KMALLOC_STAT
-  {'m', kmallocAfficherStatistiques, "Voir l'etat des allocations memoire"},
+   {'m', kmallocAfficherStatistiques, "Voir l'etat des allocations memoire"},
 #endif // MANUX_KMALLOC_STAT
 #if defined(MANUX_BUFFER_RESEAU)
-  {'r', reseauAfficherListeReception, "Voir la liste de reception"},
+   {'r', reseauAfficherListeReception, "Voir la liste de reception"},
 #endif // MANUX_BUFFER_RESEAU
+#if defined( MANUX_CONDITION_AUDIT) || defined (MANUX_EXCLUSION_MUTUELLE_AUDIT)
+   {'x', afficherSynchro, "Usage des outils de synchro"},
+#endif //
+   
    {0, NULL, NULL}
 };  
 int menuActif = 0;
@@ -397,6 +426,8 @@ static void dummyTraiterClavier(void)
  */
 void aDummyKernelTask(void)
 {
+  //      printk_debug(DBG_KERNEL_START, "aDummyKernelTask running\n");
+  //      printkc("Coucou les potos\n");
 #ifdef MANUX_CLAVIER_CONSOLE
    dummyMessageAide(); // WARNING : mutex ?
 #endif

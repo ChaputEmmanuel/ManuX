@@ -63,7 +63,7 @@ void journalInitialiserInoeud(INoeud * iNoeudConsole)
    fichierOuvrir(iNoeudConsole, consoleFichier, O_WRONLY, 0);
 
    // Affichons un petit message   
-   consoleNoyauAfficher("Journal+f de ManuX-32 \n");
+   //consoleNoyauAfficher("Journal+f de ManuX-32 \n");
 
    // A partir de maintenant, le journal est opérationnel
    journalInitialise = TRUE;
@@ -89,7 +89,7 @@ void journalInitialiser(void)
    // consoleAffecterCouleurTexte(consoleJournal, COUL_TXT_BLANC);
 
    // Affichons un petit message   
-   consoleNoyauAfficher("Journal de ManuX-32\n");
+   //consoleNoyauAfficher("Journal de ManuX-32\n");
 
    // A partir de maintenant, le journal est opérationnel
    journalInitialise = TRUE;
