@@ -23,11 +23,6 @@
  */
 #define MANUX_TUBES
 
-/** 
- * @brief : l'implantation des tubes est-elle ré-entrante ?
- */
-#define MANUX_TUBE_REENTRANT
-
 /**
  * @brief : lorsqu'on crée une tâche, hérite-t-elle des fichiers ouverts ?
  */

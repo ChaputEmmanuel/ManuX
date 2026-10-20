@@ -151,19 +151,9 @@ void entrerAppelSysteme(uint32_t num)
    printk_debug(DBG_KERNEL_AS, "Appel sys %d IN\n", num);
 
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
-   /**
-    * Spécialement pour le TP sur le tube : on fait comme si le noyau
-    * était réentrant, mais juste pour cet AS
-    */
-#   ifdef MANUX_TUBE_REENTRANT
-   if (num != NBAS_TUBE) {
-#   endif
    exclusionMutuelleEntrer(&verrouGeneralDuNoyau);
    assert(tacheDansLeNoyau == 0);
    tacheDansLeNoyau = tacheEnCours->numero;
-#   ifdef MANUX_TUBE_REENTRANT
-   }
-#   endif
 #endif
 
 #ifdef MANUX_AS_AUDIT
@@ -180,16 +170,6 @@ void sortirAppelSysteme(uint32_t num)
    printk_debug(DBG_KERNEL_AS, "Appel sys %d OUT\n", num);
 
 #if defined(MANUX_TACHES) && !defined(MANUX_REENTRANT)
-
-   /**
-    * Spécialement pour le TP sur le tube : on fait comme si le noyau
-    * était réentrant, mais juste pour cet AS
-    */
-
-#   ifdef MANUX_TUBE_REETRANT
-   if (num != NBAS_TUBE) {
-#   endif
-
    tacheDansLeNoyau = 0;
    exclusionMutuelleSortir(&verrouGeneralDuNoyau);
 
@@ -198,11 +178,6 @@ void sortirAppelSysteme(uint32_t num)
    if (ordonnancementEnAttente) {
       ordonnanceur();
    }
-   
-#   ifdef MANUX_TUBE_REENTRANT
-   }
-#   endif
-
 #endif
 
 #ifdef MANUX_AS_AUDIT

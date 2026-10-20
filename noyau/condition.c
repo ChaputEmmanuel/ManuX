@@ -82,12 +82,12 @@ void conditionsAfficherEtat(void)
    CelluleTache * cellT;
 
    printkc("\nEtat des variables de condition sur le systeme :\n\n");
-   printkc("Cond    |    s |    d | Attente\n");
-   printkc("--------+------+------+--------\n");
+   printkc("Cond     |    s |    d | Attente\n");
+   printkc("---------+------+------+--------\n");
 
    if (listeConditions != NULL) {
       for (cell = listeConditions->tete; cell != NULL; cell = cell->suivant){
-         printkc("0x%x  | %4d | %4d | ",
+         printkc("0x%5x  | %4d | %4d | ",
 		cell->condition,
 		cell->condition->nbSignaler,
 		cell->condition->nbDiffuser);
@@ -98,7 +98,7 @@ void conditionsAfficherEtat(void)
          printkc("\n");
       }
    }
-   printkc("--------+------+------+--------\n");
+   printkc("---------+------+------+--------\n");
 }
 
 #endif //  defined(MANUX_CONDITION_AUDIT) && defined(MANUX_KMALLOC)

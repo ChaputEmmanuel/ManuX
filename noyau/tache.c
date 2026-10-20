@@ -352,7 +352,7 @@ int tacheAjouterFichiers(Tache * tache, int n, Fichier * fichiers[], int * fds)
  */
 void afficherEtatUneTache(Tache * tache)
 {
-   printkc(" [  %d]  %s   %4d  %2d:%2d  0x%x   0x%x  0x%x\n",
+   printkc(" [  %d]  %s   %4d  %2d:%2d  0x%5x   0x%5x    0x%5x\n",
        tache->numero,
          (tache->etat == Tache_En_Cours)?"c":(((tache->etat == Tache_Prete)?"p":((tache->etat == Tache_Terminee)?"t":"b"))),
           tache->nbActivations,
@@ -380,7 +380,7 @@ void afficherEtatTaches(void)
 	  nbTopHorloge);
 
    printkc("\n Num prochaine tache : %d\n", numeroProchaineTache);
-   printkc(" [num] et   nbAc  tpsEx    tache   console       ldt\n");
+   printkc(" [num] et   nbAc  tpsEx    tache   console    ldt\n");
    for (celluleTache = listeToutesLesTaches.tete;
       celluleTache != NULL;
       celluleTache = celluleTache->suivant){

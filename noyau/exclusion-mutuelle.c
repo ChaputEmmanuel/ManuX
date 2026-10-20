@@ -83,11 +83,11 @@ void exclusionsMutuellesAfficherEtat(void)
    CelluleTache * cellT;
 
    printkc("\nEtat des variables d'exclusion mutuelle sur le systeme :\n\n");
-   printkc("Excl M  |   en |   so | Attente\n");
-   printkc("--------+------+------+--------\n");
+   printkc("Excl M   |   en |   so | Attente\n");
+   printkc("---------+------+------+--------\n");
    if (listeExclusionsMutuelles != NULL) {
       for (cell = listeExclusionsMutuelles->tete; cell != NULL; cell = cell->suivant){
-         printkc("0x%x  | %4d | %4d | ",
+         printkc("0x%5x  | %4d | %4d | ",
 	    cell->exclusionMutuelle,
 	    cell->exclusionMutuelle->nbEntrees,
 	    cell->exclusionMutuelle->nbSorties);
@@ -98,7 +98,7 @@ void exclusionsMutuellesAfficherEtat(void)
           printkc("\n");
        }
    }
-   printkc("--------+------+------+--------\n");
+   printkc("---------+------+------+--------\n");
 }
 
 #endif // defined(MANUX_EXCLUSION_MUTUELLE_AUDIT)
