@@ -10,7 +10,7 @@
  * Lorsqu'on crée une nouvelle console, est-ce que l'on bascule
  * automatiquement vers elle ? 
  */
-#define MANUX_BASCULER_NOUVELLE_CONSOLE
+//#define MANUX_BASCULER_NOUVELLE_CONSOLE
 
 /*
  * Affectation d'une console à chaque tâche. Si ce n'est pas le cas

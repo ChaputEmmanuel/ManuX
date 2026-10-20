@@ -552,8 +552,7 @@ variables correspondantes. Il fait ensute un appel à la fonction
 une boucle sans fin si jamais le noyau termine son exécution.
 
    {\bf À partir de maintenant, tout le code que nous allons écrire
-     fait pleinement partie du noyau. L'instruction \lstinline!call
-     startManuX! ci dessus est la dernière instruction exécutée en
+     fait pleinement partie du noyau. L'instruction \lstinline!call startManuX! ci dessus est la dernière instruction exécutée en
      dehors de \manux.}
    
 %...............................................................................
@@ -575,7 +574,7 @@ l'initialisation du noyau.
    \paragraph{En ce qui concerne \lstinline!signatureBootloader!}, elle va
 uniquement la vérifier par un code du genre~:
 
-\begin{listing}
+\begin{lstlisting}
    // Quel est le bootloader ?
    switch (signatureBootloader) {
       case MULTIBOOT_SIGNATURE :
@@ -587,10 +586,10 @@ uniquement la vérifier par un code du genre~:
       default :
          paniqueNoyau("Bootloader inconnue : 0x%x\n", signatureBootloader);
    }  
-\end{listing}
+\end{lstlisting}
 
 \paragraph{Pour ce qui est de \lstinline!_infoSysteme!} la situation
-est un peu différente puisque le noyau a besoin de conserver certaines
+est un peu differente puisque le noyau a besoin de conserver certaines
 informations pour plus tard.
 
    Une variable \lstinline!infoSysteme! est donc déclarée statiquement
@@ -611,11 +610,11 @@ intéressent \manux, soit essentiellement la taille mémoire.
 
 \begin{lstlisting}
 /**
- * @brief Structure passée en paramètre par la phase d'init
+ * @brief Structure passee en parametre par la phase d'init
  * (cf init-manux.nasm)
  */
 typedef struct _InfoSysteme {
-   uint32_t flags;           // Pour compatibilité avec multiboot
+   uint32_t flags;           // Pour compatibilite avec multiboot
    uint32_t memoireDeBase;   // En Ko
    uint32_t memoireEtendue;  // En Ko
    uint32_t peripheriqueDemarrage ;

@@ -3,6 +3,7 @@
  * @brief
  *                                                                  (C) Manu Chaput 2025
  */
+#include "manux/printk.h"
 #include <manux/buffer-reseau.h>
 #include <manux/debug.h>
 #include <manux/string.h>    // memcopy
@@ -131,13 +132,13 @@ void listeBufferReseauAfficher(ListeBufferReseau * l)
          n++;
       }
       printkc("Il y a %d paquet(s) dans la file :\n", n);
-      for (cell = l->premier; cell != NULL; cell = cell->suivant) {
-	data = (uint8_t*)cell->br->donnees;
-	printkc("l=%d : 0x%x 0x%x 0x%x 0x%x\n", cell->br->taille,
-		data[0],
-		data[1],
-		data[2],
-		data[3]);
+      for (cell = l->premier, n=0; (cell != NULL) && (n<20); cell = cell->suivant, n++) {
+         data = (uint8_t*)cell->br->donnees;
+         printkc("l=%4d : ", cell->br->taille);
+         for (int i=0; i< 16; i++) {
+	    printkc("%2x ", data[i]);
+	 };
+	 printkc("\n");
       }
    } else {
       printkc("File reseau pas encore initialisee ...\n");

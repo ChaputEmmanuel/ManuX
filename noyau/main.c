@@ -35,6 +35,7 @@
 #include <manux/fichier.h>
 #include <manux/virtio-net.h>
 #include <manux/virtio-console.h>
+#include <manux/logo.h>
 
 void startManuX(void);  // WARNING faire un include ?
 extern void init(void); // Faire un init.h
@@ -47,11 +48,9 @@ void startManuX(void)
 {
    // Initialisation de la console
    consoleInitialisation();
-
-   // Initialisation du journal
-   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
-   journalInitialiser();
-
+   printk(logoManuXTexte());
+   printk("\n\n");
+   
 #if MANUX_ARCH == i386
    union {
       uint32_t registres[3];
@@ -63,9 +62,16 @@ void startManuX(void)
    descriptionProc.caracteres[12] = 0;
 
    // Affichage d'un premier message
-   printk_debug(DBG_KERNEL_START, "32 bit ManuX running on a '%s' ...\n",
+   printk("ManuX 32 bits a votre service sur un '%s' ...\n",
 		descriptionProc.caracteres);
 #endif
+#ifdef MANUX_CONSOLES_VIRTUELLES
+   printk("\n\n                                              (ESC pour basculer entre consoles)\n");
+#endif
+
+   // Initialisation du journal
+   printk_debug(DBG_KERNEL_START, "Initialisation du journal ...\n");
+   journalInitialiser();
 
    // Initialisation du bootloader : infoSysteme, cmdLine, ...
    printk_debug(DBG_KERNEL_START, "Initialisation du bootloader ...\n");

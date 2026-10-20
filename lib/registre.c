@@ -503,7 +503,7 @@ parametre * registreObtenirParametre(registre * reg, va_list argList)
 }
 
 /**
- * @brief Affichage (via printk) d'un registre
+ * @brief Affichage (via printkc) d'un registre
  */
 static
 void registreAfficher(registre * reg, int profondeur)
@@ -511,17 +511,17 @@ void registreAfficher(registre * reg, int profondeur)
    chainonParametre * ch;
    int p;
 
-   for (p = 0 ; p < profondeur; p++) {printk("   ");}
-   printk("[%s]\n", reg->nom);
+   for (p = 0 ; p < profondeur; p++) {printkc("   ");}
+   printkc("[%s]\n", reg->nom);
 
    for (ch = reg->parametres->premier; ch != NULL; ch = ch->suivant){
-      for (p = 0 ; p < profondeur; p++) {printk("   ");}
-      printk("%s : ", ch->parametre->nom);
+      for (p = 0 ; p < profondeur; p++) {printkc("   ");}
+      printkc("%s : ", ch->parametre->nom);
       if (ch->parametre->estUnRegistre){
-         printk("(reg)\n");
+         printkc("(reg)\n");
          registreAfficher((registre *)ch->parametre->prive, profondeur +1);
       } else {
-         printk("%s\n", ch->parametre->valeur);
+         printkc("%s\n", ch->parametre->valeur);
       }
    }
 }

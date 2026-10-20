@@ -15,6 +15,8 @@ OBJETS     += $(if $(MANUX_JOURNAL), journal.o)
 OBJETS     += $(if $(MANUX_CLAVIER), clavier.o)
 OBJETS     += $(if $(MANUX_STDLIB), stdlib.o)
 OBJETS     += $(if $(MANUX_REGISTRE), registre.o)
+OBJETS     += logo.o
+
 #OBJETS     += $(if $(MANUX_GESTION_MEMOIRE), malloc.o)
 
 libmanux.a : $(MANUX_FICHIER_CONFIG) $(OBJETS)

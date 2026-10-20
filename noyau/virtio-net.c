@@ -110,6 +110,7 @@ uint8_t unBufferALaCon[4096] ={0};
 /**
  * @brief Affichage d'un paquet
  */
+[[maybe_unused]]
 static
 void netDumpPacket(uint8_t * packet, int lg)
 {
@@ -171,16 +172,11 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    br = bufferReseauCreer(buffers[1], longueurs[1]);
 
    // On va maintenant le placer dans une liste qui sera traitée plus tard.
-   printk("on insere ...\n");
    listeBufferReseauInserer(listeBuffersRecus, br);
 #endif
    
    printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
 		vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
-
-   if (nbLu) {printk("RECU : \n");
-      netDumpPacket(buffers[1], longueurs[1]);
-   }
 
    // On peut reprendre une activité normale
    //   virtioFileAutoriserInterruption(fv);

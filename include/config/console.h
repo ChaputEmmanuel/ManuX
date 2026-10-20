@@ -22,3 +22,4 @@
  * @brief protège-t-on les accès aux consoles ?
  */
 //#define MANUX_CONSOLE_AVEC_MUTEX
+

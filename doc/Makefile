@@ -62,6 +62,12 @@ build :
 serve :
 	mkdocs serve
 
+# Pour ne pas tout copier lorsque je modifie le LaTeX
+install-html :
+	scp -r ManuX/*.html root@www.manu-chaput.net:/var/www/manux.manu-chaput.net/ManuX
+install-img :
+	scp -r ManuX/images root@www.manu-chaput.net:/var/www/manux.manu-chaput.net/ManuX
+
 install :
 	scp -r ManuX root@www.manu-chaput.net:/var/www/manux.manu-chaput.net/
 

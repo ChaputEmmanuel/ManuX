@@ -126,7 +126,7 @@ void registreSystemeAffecterParametre(char * valeur,
 void registreSystemeAjouterC(char * chaine);
 
 /**
- * @brief Affichage du registre de ManuX
+ * @brief Affichage du registre de ManuX via printkc
  */
 void registreSystemeAfficher(void);
 

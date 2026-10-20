@@ -44,6 +44,9 @@
 #if defined(MANUX_RESEAU)
 #   include <manux/reseau.h>
 #endif
+#if defined(MANUX_REGISTRE)
+#   include <manux/registre.h>
+#endif
 
 /*----------------------------------------------------------------------------*/
 /*   Ci dessous les différentes fonctions qui sont impliquées dans des menus  */
@@ -313,6 +316,9 @@ MenuDebogage menuDebogage[] = {
 #if defined(MANUX_BUFFER_RESEAU)
    {'r', reseauAfficherListeReception, "Voir la liste de reception"},
 #endif // MANUX_BUFFER_RESEAU
+#if defined(MANUX_REGISTRE)
+   {'s', registreSystemeAfficher, "Afficher le registre systeme"},
+#endif // MANUX_REGISTRE
 #if defined( MANUX_CONDITION_AUDIT) || defined (MANUX_EXCLUSION_MUTUELLE_AUDIT)
    {'x', afficherSynchro, "Usage des outils de synchro"},
 #endif //
