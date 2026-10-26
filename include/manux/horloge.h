@@ -24,5 +24,10 @@ void initialiserHorloge(void);
  * Attention, ce n'est pas fiable !
  */
 void attenteMilliSecondes(int n);
- 
+
+/**
+ * @brief Implantation de l'appel système d'attente
+ */
+void sys_attendreMillisecondes(int nMs);
+
 #endif

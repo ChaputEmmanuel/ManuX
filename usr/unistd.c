@@ -29,3 +29,5 @@ appelSysteme1(NBAS_TUBE, int, tube, int *);
 #ifdef MANUX_AS_TEST_SYNCHRO
 appelSysteme2(NBAS_TEST_SYNC, int, testSynchro, int, int);
 #endif
+
+appelSysteme1(NBAS_ATTENDRE_MILLISEC, int, attendreMillisecondes, int);

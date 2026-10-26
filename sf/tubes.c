@@ -120,7 +120,7 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
    }
    tube = f->iNoeud->prive;
 
-   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
+   //   exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
    
    // On fait une boucle, car il est possible que l'on doive écrire en
    // deux fois si on est proche de la fin du tableau qui contient les
@@ -136,9 +136,22 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
       // On peut donc copier n octets dans le buffer à partir de la
       // position courante, sans risque de déborder
       memcpy(tube->donnees + tube->indiceProchain, buffer, n);
-
-      ordonnanceur(); // Pour forcer
+      /*
+      if ((tacheEnCours->numero == 3) || (tacheEnCours->numero == 4)) {
+	printk(">>>%d>>>", tacheEnCours->numero);
+      }
       
+      if (tacheEnCours->numero == 3) {
+         for(int i = 0; i<32; i++){
+            printkc("*");
+	    for (int j ; j < 999000000; j++){printkc("");};*/
+	    ordonnanceur();/*
+	} // Pour forcer
+      }
+      if ((tacheEnCours->numero == 3) || (tacheEnCours->numero == 4)) {
+	printk("<<<%d<<<", tacheEnCours->numero);
+      }
+			   */
       tube->indiceProchain = (tube->indiceProchain + n) % MANUX_TUBE_CAPACITE;
       tube->taille += n;
       
@@ -147,12 +160,13 @@ size_t tubeEcrire(Fichier * f, void * buffer, size_t nbOctets)
       nbOctetsEcrits += n;
    } while (n > 0);
 
+   /*
    if (nbOctetsEcrits > 0) {
       conditionSignaler(&(tube->nouvellesDonnees));
    }
    
    exclusionMutuelleSortir(&(tube->exclusionMutuelle));
-
+   */
    printk_debug(DBG_KERNEL_TUBE, "out\n");
 
    return nbOctetsEcrits;  
@@ -174,17 +188,19 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
       return -EINVAL;
    }
    tube = f->iNoeud->prive;
-
+   /*
    exclusionMutuelleEntrer(&(tube->exclusionMutuelle));
    printk_debug(DBG_KERNEL_TUBE, "mutex locked\n");
-
+   */
    // En cas de lecture bloquante, j'attends la dispo des données ou
    // la disparition du dernier écrivain
    if ((f->fanions & O_NONBLOCK) == 0) {
+     /*
       while ((tube->taille == 0) && (tube->nbEcrivains > 0)) {
         printk_debug(DBG_KERNEL_TUBE, "attente condition\n");
         conditionAttendre(&(tube->nouvellesDonnees), &(tube->exclusionMutuelle));
       }
+     */
    }
    // Je sais maintenant qu'il y a des données, ou alors qu'il n'y en
    // aura plus jamais, ou alors je suis en non bloquant, bref, je
@@ -218,7 +234,7 @@ size_t tubeLire(Fichier * f, void * buffer, size_t nbOctets)
       nbOctetsLus += n;
    } while (n > 0);
 
-   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
+   //   exclusionMutuelleSortir(&(tube->exclusionMutuelle));
 
    printk_debug(DBG_KERNEL_TUBE, "out\n");
 

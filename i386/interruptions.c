@@ -329,7 +329,7 @@ void ecranDeLaMort(uint32_t errCode, uint32_t itNum, TousRegistres registres,
 |             | edi  = 0x-------- | err = 0x                                   |\
 +-------------+-----------------(Esp pour cacher)------------------------------+";
    
-   char chiffre[16] = "0123456789ABCDEF";
+   char chiffre[17] = "0123456789ABCDEF";
    char * ecran = MANUX_CON_SCREEN;
    int i;
    uint32_t indice;

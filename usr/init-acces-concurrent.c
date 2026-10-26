@@ -13,7 +13,7 @@
 /**
  * @brief Taille du buffer utilisé en lecture
  */ 
-#define TAILLE_BUFFER 16
+#define TAILLE_BUFFER 64
 
 /**
  * @brief Nombres de lecteurs et écrivains
@@ -33,7 +33,6 @@ void lecteur()
    
    do {
       r = lire(fd[0], b, TAILLE_BUFFER - 1);
-      printf("[%d] lecture %d\n", identifiantTache(), r);
       if (r > 0) {
          b[r] = 0;
          printf(b);
@@ -56,7 +55,7 @@ void ecrivain()
    fermer(fd[0]);
 
    do {
-     printf("[%d] Je vais ecrire %d\n", identifiantTache(), strlen(b));
+      printf("[%d] Je vais ecrire %d\n", identifiantTache(), strlen(b));
       r = ecrire(fd[1], b, strlen(b));
       printf("[%d] Voila j'ai ecrit %d\n", identifiantTache(), r);
       if (r >= 0) {
@@ -64,7 +63,7 @@ void ecrivain()
       } else {
          printf("[%d] Erreur ecriture\n", identifiantTache());
       }
-   } while (r > 0);
+   } while ((r > 0) && (c < 4096)); // On arrête au bout de 4096 (un peu plus) 
 
    printf("[%d] En tout, j'ai ecrit %d !\n", identifiantTache(), c);
 
@@ -73,7 +72,8 @@ void ecrivain()
 
 void init()
 {
-  int r, l, e;
+   int r;
+   int l, e;
 
    printf("Bonjour le mode utilisateur !\n");
 
@@ -96,3 +96,89 @@ void init()
    // tâche se termine
    while(1){};
 }
+
+/*
+ * Ci dessous les fonctions utilisées pour la vidéo
+ */
+void ecrivainA()
+{
+   int r, c  = 0;
+   
+   char * b = "AAAAAAAAAAAAAAAA";
+
+   printf("[%d] Je suis l'ecrivain A.\n", identifiantTache());
+   fermer(fd[0]);
+
+   do {
+      printf("[%d] Je vais ecrire %d octets\n", identifiantTache(), strlen(b));
+      r = ecrire(fd[1], b, strlen(b)-c);
+      printf("[%d] Voila j'ai ecrit %d octets\n", identifiantTache(), r);
+      if (r >= 0) {
+         c += r;
+      } else {
+         printf("[%d] Erreur ecriture\n", identifiantTache());
+      }
+   } while ((r > 0) && (c < strlen(b)));
+
+   printf("[%d] En tout, l'ecrivain A a ecrit %d octets !\n", identifiantTache(), c);
+
+   fermer(fd[1]);
+}
+
+void ecrivainB()
+{
+   int r, c  = 0;
+   
+   char * b = "BBBBBBBBBBBB";
+
+   printf("[%d] Je suis l'ecrivain B.\n", identifiantTache());
+   fermer(fd[0]);
+
+   do {
+      printf("[%d] Je vais ecrire %d\n", identifiantTache(), strlen(b));
+      r = ecrire(fd[1], b, strlen(b)-c);
+      printf("[%d] Voila j'ai ecrit %d\n", identifiantTache(), r);
+      if (r >= 0) {
+         c += r;
+      } else {
+         printf("[%d] Erreur ecriture\n", identifiantTache());
+      }
+   } while ((r > 0) && (c < strlen(b)));
+
+   printf("[%d] En tout, l'ecrivain B a ecrit %d !\n", identifiantTache(), c);
+
+   fermer(fd[1]);
+}
+
+/**
+ * @brief Lancement du code en mode utilisateur
+ */
+void initBis()
+{
+   int r;
+
+   printf("Bonjour le mode utilisateur !\n");
+
+   r = tube(fd);
+
+   if ( r != ESUCCES) {
+      printf("r = %d : casse la pipe !?\n", r);
+   } else {
+      // On crée deux écrivains
+      creerNouvelleTache(ecrivainA, FALSE);
+      creerNouvelleTache(ecrivainB, FALSE);
+
+      // On les laisse un peu se battre !
+      attendreMillisecondes(500);
+
+      // Voyons le résultat avec un lecteur
+      creerNouvelleTache(lecteur, FALSE);
+   }
+   fermer(fd[0]);
+   fermer(fd[1]);
+
+   // Nous sommes dans init, et le système s'arrête lorsque cette
+   // tâche se termine
+   while(1){};
+}
+

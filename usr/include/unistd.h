@@ -45,4 +45,9 @@ int identifiantTache();
 int testSynchro(int increment, int action);
 #endif
 
+/**
+ * @brief Attente en millisecondes
+ */
+int attendreMillisecondes(int nMs);
+
 #endif

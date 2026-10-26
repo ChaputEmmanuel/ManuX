@@ -106,13 +106,6 @@ void ordonnanceur(void)
       return;
    }
 #endif // MANUX_SYNCHRONISATION & !MANUX_REENTRANT
-   /*
-   ATTENTION, A REVOIR ! SI ON N EST PAS REENTRANT, IL
-     FAUT REPORTER A LA FIN DE L'AS ... SAUF SI C'EST
-     UN APPEL EXPLCICTE SUITE A UNE MISE DANS UNE FILE
-     donc en fonction de l'état ?
-   */
-
    
    assert(tacheEnCours != NULL);
 

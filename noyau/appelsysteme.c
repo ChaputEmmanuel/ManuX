@@ -137,6 +137,9 @@ void initialiserAppelsSysteme(void)
 
    definirAppelSysteme(NBAS_IDENTIFIANT_TACHE, sys_identifiantTache);
 
+   // Attente en millisecondes
+   definirAppelSysteme(NBAS_ATTENDRE_MILLISEC, sys_attendreMillisecondes);
+   
    /* Les suivants sont à revoir */
    //definirAppelSysteme(NBAS_CONSOLE,        AS_console);
    //definirAppelSysteme(NBAS_OBTENIR_PAGES,  AS_obtenirPages);

@@ -122,3 +122,11 @@ void attenteMilliSecondes(int n)
    } while (c < m);
 }
 
+/**
+ * @brief Implantation de l'appel système d'attente
+ */
+void sys_attendreMillisecondes(int nMs)
+{
+   attenteMilliSecondes(nMs);
+}
+

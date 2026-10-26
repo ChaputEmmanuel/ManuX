@@ -25,8 +25,7 @@
 #include <config/appels-systeme.h>  // pour le mode utilisateur
 #include <config/consoles-virtuelles.h>
 #include <config/synchronisation.h>
-//#undef MANUX_REENTRANT
-#define MANUX_REENTRANT
+#undef MANUX_REENTRANT
 #include <config/printk.h>
 #include <config/journal.h>
 #include <config/taches.h>

@@ -37,5 +37,5 @@
 #ifdef MANUX_AS_TEST_SYNCHRO
 #   define NBAS_TEST_SYNC     12
 #endif
-
+#define NBAS_ATTENDRE_MILLISEC 13
 #endif // APPEL_SYSTEME_NUM_DEF
