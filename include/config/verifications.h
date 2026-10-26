@@ -116,3 +116,7 @@
 #if defined(MANUX_DUMMY_TASK) && !defined(MANUX_CONSOLE)
 #   error "MANUX_DUMMY_TASK nécessite MANUX_CONSOLE"
 #endif
+
+#if defined(MANUX_SUPPORT_BLOC) && !defined(MANUX_PILOTES)
+#   error "MANUX_SUPPORT_BLOC nécessite MANUX_PILOTES"
+#endif

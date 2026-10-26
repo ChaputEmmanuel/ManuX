@@ -28,6 +28,7 @@ MANUX_PARTS += $(if $(MANUX_LIBI386), i386)
 MANUX_PARTS += $(if $(MANUX_USR), usr)
 MANUX_PARTS += $(if $(MANUX_FICHIER), sf)
 MANUX_PARTS += $(if $(MANUX_RESEAU), reseau)
+MANUX_PARTS += $(if $(MANUX_PILOTES), pilotes)
 
 # Les sous-répertoires (pour le nettoyage par exemple)
 SOUS_REP  = $(MANUX_PARTS) $(DEMARAGE) 
@@ -81,6 +82,9 @@ $(LIBMANUX) :
 
 $(LIBRESEAU) :
 	(cd reseau ; make)
+
+$(LIBPILOTES) :
+	(cd pilotes ; make)
 
 $(NOYAU_ELF) : configuration  composants 
 	(cd noyau ; make noyau.elf)

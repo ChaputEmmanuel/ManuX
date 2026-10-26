@@ -7,7 +7,7 @@
  * qui permettent de sélectionner ou même paramétrer les
  * sous-systèmes.
  *
- *                                                    (C) E. Chaput 2022-2023 */
+ *                                                    (C) E. Chaput 2022-2026 */
 
 /**
  * @brief la signature d'un chargement par init-manux
@@ -51,6 +51,11 @@
 #ifndef MANUX_ARCH
 #  define MANUX_ARCH i386
 #endif
+
+/**
+ * @brief Parce que je le vaux bien
+ */
+#include <config/logo.h>
 
 /**
  * @brief Quelques macros me permettant de tenir compte du compilateur

@@ -25,11 +25,12 @@ endif
 CONFIG_FILES=$(ROOTDIR)/include/config/*.h
 
 # Position des librairies
-LIBI386   = $(if $(MANUX_LIBI386), $(ROOTDIR)/i386/libi386.a)
-LIBMANUX  = $(ROOTDIR)/lib/libmanux.a
-LIBRESEAU = $(ROOTDIR)/reseau/libreseau.a
-LIBSF     = $(ROOTDIR)/sf/libsf.a
-LIBUSR    = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)
+LIBI386    = $(if $(MANUX_LIBI386), $(ROOTDIR)/i386/libi386.a)
+LIBMANUX   = $(ROOTDIR)/lib/libmanux.a
+LIBRESEAU  = $(ROOTDIR)/reseau/libreseau.a
+LIBPILOTES = $(ROOTDIR)/pilotes/libpilotes.a
+LIBSF      = $(ROOTDIR)/sf/libsf.a
+LIBUSR     = $(if $(MANUX_USR), $(ROOTDIR)/usr/libusr.a)
 
 # Les fichiers contenant le noyau. Le premier est l'ELF sorti de LD,
 # le second en est une version binaire pour "mon" loader, et le

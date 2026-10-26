@@ -14,6 +14,7 @@ nav:
        - "Présentation générale" : presentation-part.md
        - "Les outils" : outils-part.md
        - "Chargement en mémoire et boot" : boot-part.md
+       - "Écrire du code dans ManuX" : coder-part.md
        - "Affichage" : affichage-part.md
        - "Registres" : registres-part.md
        - "Interruptions" : inter-part.md

@@ -68,9 +68,11 @@ inline
 static
 void reserverPage(uint32_t i)
 {
+#ifdef MANUX_PRINTK
    if (proprietairePage[i] != (TacheID)0) {
      paniqueNoyau("Page 0x%x (%d) deja prise\n", i, i);
    }
+#endif
    nombreDePagesAllouees++;
    proprietairePage[i] = (TacheID)1;  // WARNING
 }
@@ -81,10 +83,12 @@ void reserverPage(uint32_t i)
 void libererPage(void * pageLiberee)
 {
    int i = ((uint32_t) pageLiberee) / MANUX_TAILLE_PAGE;
-   
+
+#ifdef MANUX_PRINTK
    if (proprietairePage[i] == (TacheID)0) {
       paniqueNoyau("Liberation de la page %d non allouee !\n", i);
    }
+#endif
    nombreDePagesAllouees--;
    proprietairePage[i] = (TacheID)0;
   

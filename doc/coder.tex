@@ -1,0 +1,41 @@
+%===============================================================================
+%
+%===============================================================================
+\section{Écrire du code pour ManuX}
+
+   Le but de cette section est de montrer brièvement comment écrire du
+code dans le noyau \manux.
+
+   Je vais partir du principe que vous souhaitez ajouter une nouvelle
+fonctionalité à ManuX (c'est vexant, vous sous-entendez que ManuX n'a
+pas tout !?). Dans ce cas-là, le mieux est de construire une nouvelle
+version du noyau minimaliste puis d'y ajouter ce dont vous avez
+besoin.
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Les bases pour construire un noyau vide}
+
+   Imaginons que vous souhaitiez ajouter la fonctionalité `toto` au
+noyau. Vous allez donc chercher à construire un noyau que vous
+nommerez par exemple `test-toto`. Il faudra pour cela créer deux
+fichiers :
+
+\begin{itemize}
+   \item Le fichier `multiconf/test-toto.h` décrit la configuration du
+     noyau. Vous pourrez par exemple partir de `multiconf/nop.h` que
+     vous enrichirez ensuite.
+   \item Le fichier `noyau/main-test-toto.c` est quant à lui le
+     fichier d'initialisation du noyau. Vous pouvez là aussi partir de
+     `noyau/main-nop.c`. Le nom de ce fichier est défini dans
+     `multiconf/test-toto.h`.
+\end{itemize}
+
+   Suite à la création de ces deux fichiers, vous pourrez alors
+utiliser `make` pour compiler et lancer votre noyau :
+
+\begin{lstlisting}
+  $ make CFG=test-toto
+  $ make CFG=test-toto run
+\end{lstlisting}

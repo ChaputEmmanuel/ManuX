@@ -7,6 +7,7 @@ include ../make.rules    # Les règles les plus génériques
 LIBRAIRIES_MANUX = $(LIBI386) $(LIBMANUX) $(LIBUSR)
 LIBRAIRIES_MANUX += $(if  $(MANUX_FICHIER), $(LIBSF))
 LIBRAIRIES_MANUX += $(if  $(MANUX_RESEAU), $(LIBRESEAU))
+LIBRAIRIES_MANUX += $(if  $(MANUX_PILOTES), $(LIBPILOTES))
 
 OBJETS      = 	$(MANUX_FICHIER_MAIN).o
 OBJETS     +=   $(if $(MANUX_BOOTLOADER), bootloader.o)
