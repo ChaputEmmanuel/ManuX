@@ -1,4 +1,4 @@
-.PHONY: FORCE clean
+.PHONY: FORCE clean compile-db etags
 .SUFFIXES: .nasm .bin .obj .c
 
 # Les principales valeurs globales
@@ -55,6 +55,12 @@ usrconf :   $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
 	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)   | awk '/^#define MANUX_/' > usr/include/manux/config.h
 
 usrinc : $(USR_INC) usrconf
+
+# Mettre à jour la base de données pour clangd
+compile-db:
+	bear -- $(MAKE) -B CC=clang all
+
+etags: compile-db
 
 #...............................................................................
 #    Le fichier de configuration (une des premières choses à faire !)
