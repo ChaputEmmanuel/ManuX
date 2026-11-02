@@ -49,7 +49,7 @@
  * @brief On déclare les masques comme des variables ou comme des
  * macros en fonction de MANUX_DEBUGMASK_VAR.
  */
-  
+   
 #ifdef MANUX_DEBUGMASK_VAR
    extern uint32_t masqueDebugageConsole;
    extern uint32_t masqueDebugageFichier;
@@ -101,22 +101,37 @@
  * Affichage d'un message de panique
  */
 #ifdef MANUX_TACHES
-#define paniqueNoyau(fmt, args...)	                                  \
-  { 								\
-   printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero); \
-   printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
-   printk("" fmt, ## args);                                               \
-   asm( "hlt" );                                                          \
-}
-#else
-#define paniqueNoyau(fmt, args...)	                                  \
-{\
-   printk("\n*** PANIQUE NOYAU  ***\n");					\
-   printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);   \
-   printk("" fmt, ## args);                                               \
-   asm( "hlt" ); \
-}
-#endif
+#   ifdef MANUX_PRINTK
+#      define paniqueNoyau(fmt, args...)                                          \
+     {                                                                         \
+       printk("\n*** PANIQUE NOYAU (tache %d) ***\n", tacheEnCours->numero);   \
+       printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);    \
+       printk("" fmt, ##args);                                                 \
+       asm("hlt");                                                             \
+     }
+#   else // MANUX_PRINTK
+#      define paniqueNoyau(fmt, args...)                                       \
+     {                                                                         \
+       asm("hlt");                                                             \
+     }
+   
+#   endif // MANUX_PRINTK
+#else  // MANUX_TACHES
+#   ifdef MANUX_PRINTK
+#       define paniqueNoyau(fmt, args...)                                          \
+     {                                                                         \
+       printk("\n*** PANIQUE NOYAU  ***\n");                                   \
+       printk("%s (dans %s ligne %d)\n", __FUNCTION__, __FILE__, __LINE__);    \
+       printk("" fmt, ##args);                                                 \
+       asm("hlt");                                                             \
+     }
+#   else   // MANUX_PRINTK
+#      define paniqueNoyau(fmt, args...)                                          \
+     {                                                                         \
+       asm("hlt");                                                             \
+     }
+#   endif  // MANUX_PRINTK
+#endif  // MANUX_TACHES
 
 /*
  * Ma version simplifiée de assert
