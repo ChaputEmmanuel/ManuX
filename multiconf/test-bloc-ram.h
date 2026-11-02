@@ -16,11 +16,22 @@
 
 #include <config/base.h>
 #include <config/pc-i386.h>
+#include <config/bootloader.h>
+#include <config/plan-memoire-pc.h>
 #include <config/gestion-memoire.h>
-#include <config/plan-memoire-pc.h>  // MANUX_KERNEL_START_ADDRESS nécessaire pour ldd
+#include <config/systeme-fichiers.h>
 #include <config/pilotes.h>          // Les supports bloc sont des pilotes
 #include <config/support-bloc.h>     // On veut des supports bloc
 #include <config/support-bloc-ram.h> // C'est ce qu'on teste !
+#include <config/appels-systeme.h>
+#include <config/consoles-virtuelles.h>
+#include <config/printk.h>
+#include <config/taches.h>
+#include <config/synchronisation.h>
+#include <config/kmalloc.h>
+#undef MANUX_KMALLOC_STAT
+#include <config/clavier.h>
+#include <config/stdlib.h>
 
 #include <config/verifications.h>
 

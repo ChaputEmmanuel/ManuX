@@ -1,12 +1,17 @@
 /**
  * @file include/manux/support-bloc.h
  * @brief Définition des supports orientés bloc
- *                                                          (C) Manu Chaput 2026
+ *                                                     (C)      Manu Chaput 2026
+ *                                                           Baptiste Gomez 2026
  */
 #ifndef DEF_MANUX_SUPPORT_BLOC_RAM
 #define DEF_MANUX_SUPPORT_BLOC_RAM
 
 #include <manux/support-bloc.h>
+
+#ifndef TAILLE_BLOC_RAM
+#   define TAILLE_BLOC_RAM 8
+#endif
 
 /**
  * @bref Initialisation d'un support bloc en RAM

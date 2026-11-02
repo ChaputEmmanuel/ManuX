@@ -54,7 +54,6 @@ enteteBlocMemoire * blocsLibres[MANUX_KMALLOC_ORDRE_MAX+1] = {NULL};
 int32_t nbPagesAllouees = 0;
 uint32_t nbAlloc[MANUX_KMALLOC_ORDRE_MAX+1] = {0};
 uint32_t nbFree[MANUX_KMALLOC_ORDRE_MAX+1] = {0};
-#endif // MANUX_KMALLOC_STAT
 
 void kmallocAfficherStatistiques(void)
 {
@@ -73,6 +72,7 @@ void kmallocAfficherStatistiques(void)
        printkc("   %2d  %4d  %4d  %4d\n", ordre, nbAlloc[ordre], nbFree[ordre], nb);
     }
 }
+#endif // MANUX_KMALLOC_STAT
 
 /**
  * @brief Initialisation du sytème kmalloc 
@@ -267,10 +267,12 @@ void kfree(void * p)
    enteteBlocMemoire * bloc = (enteteBlocMemoire *)p ;
 
    bloc--;
- 
+
    if (bloc->e.alloue.magique != MANUX_KMALLOC_MAGIQUE) {
+#ifdef MANUX_PRINTK
      paniqueNoyau("Tentative de libérer un bloc 0x%x inconnu (m=0x%x, o=%d)\n",
 		  p, bloc->e.alloue.magique, bloc->e.alloue.ordre);
+#endif
    }
 
 #ifdef MANUX_KMALLOC_STAT

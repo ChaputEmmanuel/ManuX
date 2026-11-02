@@ -5,7 +5,7 @@
 /*----------------------------------------------------------------------------*/
 #include <manux/fichier.h>
 #include <manux/debug.h>
-#include <manux/string.h>       // bcopy
+#include <manux/string.h>       // memcpy
 #include <manux/scheduler.h>    // tacheEnCours
 #include <manux/errno.h>
 #ifdef MANUX_KMALLOC
@@ -16,7 +16,6 @@
  * @brief Lecture dans un fichier
  * @param f le fichier doit être != NULL
  */
-static
 int fichierLire(Fichier * f, void * buffer, int nbOctets)
 {
    int result = -EBADF;
@@ -26,6 +25,10 @@ int fichierLire(Fichier * f, void * buffer, int nbOctets)
    
       // On invoque la méthode associée
       result = f->iNoeud->methodesFichier->lire(f, buffer, nbOctets);
+   }
+
+   if (result > 0) { 
+      f->position += result;
    }
    
    printk_debug(DBG_KERNEL_SYSFI, "on renvoie %d\n", result);
@@ -43,6 +46,10 @@ int fichierEcrire(Fichier * f, void * buffer, int nbOctets)
       // On invoque la méthode associée
       result = f->iNoeud->methodesFichier->ecrire(f, buffer, nbOctets);
    }
+   if (result > 0) { 
+      f->position += result;
+   }
+
    printk_debug(DBG_KERNEL_SYSFI, "on renvoie %d\n", result);
    
    return result;
@@ -153,7 +160,8 @@ int fichierOuvrir(INoeud * iNoeud, Fichier * f, uint16_t fanions, uint16_t mode)
    f->iNoeud = iNoeud;
    f->fanions = fanions;
    f->mode = mode;
-
+   f->position = 0;
+   
    if (iNoeud->methodesFichier->ouvrir) {
       result = iNoeud->methodesFichier->ouvrir(iNoeud, f, fanions, mode);
    }
@@ -196,8 +204,8 @@ Fichier * fichierDupliquer(Fichier * f)
    if (result == NULL) {
       paniqueNoyau("Plus de memoire !\n");
    } else {
-      // On fait une coie simple, ...
-      bcopy(f, result, sizeof(Fichier));
+      // On fait une copie simple, ...
+      memcpy(result, f, sizeof(Fichier));
 
       // ... et on invoque la méthode d'ouverture, si elle a des
       // décomptes à faire, par exemple

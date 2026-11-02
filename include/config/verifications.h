@@ -29,8 +29,12 @@
 #endif
 */
 
+#if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_SYNCHRONISATION)
+#   error "MANUX_APPELS_SYSTEME nécessite MANUX_SYNCHRONISATION pour assurer les accès"
+#endif
+
 #if defined(MANUX_APPELS_SYSTEME) && !defined(MANUX_LIBI386)
-#   error "MANUX_APPELS_SYSTEME nécessite MANUX_LIBI386 (pour les interruptions"
+#   error "MANUX_APPELS_SYSTEME nécessite MANUX_LIBI386 (pour les interruptions)"
 #endif
 
 #if defined(MANUX_OUTILS_SYNCHRO) && !defined(MANUX_TACHES)
@@ -65,6 +69,10 @@
 #   error "MANUX_KMALLOC_STAT nécessite MANUX_KMALLOC"
 #endif
 
+#if defined(MANUX_KMALLOC_STAT) && !defined(MANUX_PRINTK)
+#   error "MANUX_KMALLOC_STAT nécessite MANUX_PRINTK"
+#endif
+
 #if defined(MANUX_TUBES) && !defined(MANUX_GESTION_MEMOIRE)
 #   error "MANUX_TUBES nécessite MANUX_GESTION_MEMOIRE"
 #endif
@@ -89,10 +97,11 @@
 #   error "MANUX_HERITER_FICHIERS nécessite MANUX_KMALLOC"
 #endif
 
+/*   Pourquoi !? Debug nécessite printk à la limite, ...
 #if defined(MANUX_FICHIER) && !defined(MANUX_PRINTK)
 #   error "MANUX_FICHIER nécessite MANUX_PRINTK"
 #endif
-
+*/
 #if defined(MANUX_GESTION_MEMOIRE) && !defined(MANUX_LIBI386)
 #   error "MANUX_GESTION_MEMOIRE nécessite MANUX_LIBI386"
 #endif
@@ -119,4 +128,8 @@
 
 #if defined(MANUX_SUPPORT_BLOC) && !defined(MANUX_PILOTES)
 #   error "MANUX_SUPPORT_BLOC nécessite MANUX_PILOTES"
+#endif
+
+#if defined(MANUX_INOEUDS) && !defined(MANUX_KMALLOC)
+#   error "MANUX_INOEUDS nécessite MANUX_KMALLOC pour allouer des inodes"
 #endif

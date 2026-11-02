@@ -4,13 +4,13 @@
  *
  *                                                     (C) Manu Chaput 2000-2026
  */
-#include "manux/ascii.h"
-#include "manux/ecran.h"
 #include <manux/config.h>
 #include <manux/console.h>
 #include <manux/printk.h>
 
-void startManuX()
+void startManuX(void);
+
+void startManuX(void)
 {
   uint8_t fond, texte, l, c;
 

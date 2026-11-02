@@ -48,9 +48,11 @@ typedef struct _Fichier {
    INoeud          * iNoeud;  //!< Caractérisation de la structure
    uint16_t          mode;    //!< FMODE_READ, FMODE_WRITE, ... pour création
    uint16_t          fanions; //!< O_RDONLY, O_NONBLOCK, O_SYNC
+   uint32_t          position;//!< Où en est on dans le fichier ? 
   //   MethodesFichier * methodes;
 } Fichier;
 
+int fichierLire(Fichier * f, void * buffer, int nbOctets);
 int fichierEcrire(Fichier * f, void * buffer, int nbOctets);
 
 #ifdef MANUX_APPELS_SYSTEME

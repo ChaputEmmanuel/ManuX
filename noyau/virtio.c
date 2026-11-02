@@ -409,7 +409,7 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
       do {
          // On récupère les données et leur longueur
          ad = (uint32_t)fv->tableDescripteurs[indiceBuffer].adresse;
-	 //printk("{%d @ %d}\n", longueur, ad);
+
          bu[result] = (void *) ad;
 	 lg[result] = min(longueur, fv->tableDescripteurs[indiceBuffer].longueur); 
          longueur -= lg[result];
@@ -424,11 +424,7 @@ int virtioFileRecupererBuffers(VirtioFileVirtuelle * fv,
 	 // les fournir
       } while ((result < nb)
 	       && (!finDeChaine));
-      /*      if (!finDeChaine) {
-	printk("[7] Ca pue du cul !\n");
-      } else {
-	printk("[7] Fin de chaine !\n");
-	}*/
+
       // On vient de traiter un buffer (peut-être une chaîne)
       fv->dernierIndiceUtilise++;  
    }

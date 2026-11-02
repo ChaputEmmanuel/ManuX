@@ -26,7 +26,7 @@
 #ifdef MANUX_AS_AUDIT
 #   include <manux/appelsysteme.h>
 #endif
-#ifdef MANUX_KMALLOC_STAT
+#ifdef MANUX_KMALLOC
 #   include <manux/kmalloc.h>    // kmalloc kmallocAfficherStatistiques
 #endif
 #ifdef MANUX_VIRTIO_CONSOLE

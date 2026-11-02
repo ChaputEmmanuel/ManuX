@@ -7,6 +7,7 @@
 #define DEF_MANUX_SUPPORT_BLOC
 
 #include <manux/types.h>
+#include <manux/fichier.h>
 
 typedef struct _SupportBlocMethodes SupportBlocMethodes;
 
@@ -34,5 +35,24 @@ typedef struct _SupportBlocMethodes {
  * @brief Enregistrement dans le système d'un support bloc
  */
 void supportBlocEnregistrer(SupportBloc *sb);
+
+/**
+ * @brief Lecture de blocs depuis un support bloc
+ */
+uint32_t supportBlocLireBlocs(SupportBloc *supportBloc,
+			  uint32_t indice, uint32_t nombre, void * buffer);
+
+/**
+ * @brief Écriture de blocs vers un support bloc
+ */
+uint32_t supportBlocEcrireBlocs(SupportBloc *supportBloc,
+			   uint32_t indice, uint32_t nombre, void * buffer);
+
+/**
+ * @brief Une fonction d'ouverture qui ne passe pas par le système de
+ * fichiers
+ * WARNING : à supprimer dès que possible
+ */
+Fichier * supportBlocOuvrirHorsSF(SupportBloc *sb);
 
 #endif
