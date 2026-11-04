@@ -7,8 +7,6 @@
 #include <manux/config.h>
 #include <manux/appelsysteme.h>
 
-#include <unistd.h>
-
 appelSysteme0(NBAS_BASCULER_TACHE, int, basculerTache);
 
 appelSysteme0(NBAS_IDENTIFIANT_TACHE, int, identifiantTache);
@@ -30,4 +28,4 @@ appelSysteme1(NBAS_TUBE, int, tube, int *);
 appelSysteme2(NBAS_TEST_SYNC, int, testSynchro, int, int);
 #endif
 
-appelSysteme1(NBAS_ATTENDRE_MILLISEC, int, attendreMillisecondes, int);
+appelSysteme1(NBAS_ATTENDRE_MILLISEC, int, attendreMillisecondes, uint32_t);

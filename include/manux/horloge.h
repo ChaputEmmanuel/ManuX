@@ -7,6 +7,7 @@
 #define HORLOGE_DEF
 
 #include <manux/types.h>   // Temps
+#include <manux/appelsysteme.h>   // ParametreAS
 
 /*
  * Le compteur incrémenté par l'horloge matérielle
@@ -28,6 +29,6 @@ void attenteMilliSecondes(int n);
 /**
  * @brief Implantation de l'appel système d'attente
  */
-void sys_attendreMillisecondes(int nMs);
+void sys_attendreMillisecondes(__attribute__((unused)) ParametreAS as, uint32_t nMs);
 
 #endif

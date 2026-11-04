@@ -76,6 +76,8 @@ void init()
    int l, e;
 
    printf("Bonjour le mode utilisateur !\n");
+   attendreMillisecondes(5000);
+   printf("C'est parti mon kiki !\n");
 
    r = tube(fd);
 

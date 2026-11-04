@@ -11,6 +11,7 @@
 #include <manux/horloge.h>
 #include <manux/io.h>           // outb
 #include <manux/memoire.h>      // NULL
+
 #ifdef MANUX_TACHES
 #   include <manux/scheduler.h>    // ordonnanceur
 #endif
@@ -125,8 +126,7 @@ void attenteMilliSecondes(int n)
 /**
  * @brief Implantation de l'appel système d'attente
  */
-void sys_attendreMillisecondes(int nMs)
-{
+void sys_attendreMillisecondes(__attribute__((unused)) ParametreAS as, uint32_t nMs) {
    attenteMilliSecondes(nMs);
 }
 

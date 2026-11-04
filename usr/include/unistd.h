@@ -48,6 +48,6 @@ int testSynchro(int increment, int action);
 /**
  * @brief Attente en millisecondes
  */
-int attendreMillisecondes(int nMs);
+int attendreMillisecondes(uint32_t nMs);
 
 #endif
