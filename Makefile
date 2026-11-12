@@ -66,7 +66,7 @@ etags: compile-db
 #    Le fichier de configuration (une des premières choses à faire !)
 #...............................................................................
 make.conf :  $(MANUX_FICHIER_CONFIG) $(CONFIG_FILES)
-	@cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {if (length($$3)){val=$$3}else{val="True"};print $$2"="val}' > make.conf
+	cpp -I$(ROOTDIR)/include -nostdinc -fno-builtin  -dM $(MANUX_FICHIER_CONFIG)  | awk '/^#define MANUX_/ {a=$$2;if (length($$3)){$$1=$$2="";val=substr($$0,3)}else{val="True"};print a"="val}' > make.conf
 
 
 FORCE:

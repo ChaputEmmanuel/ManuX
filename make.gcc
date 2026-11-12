@@ -7,14 +7,21 @@
 #   "-nostdinc -fno-builtin -nodefaultlibs -nostartfiles" permettent
 # de n'utiliser aucune fonctions prédéfinies ou de librairies standard
 #
+#   Je remplace  -fno-builtin par -ffreestanding qui ne suppose plus que
+#      - La bibliothèque standard C complète est disponible.
+#      - Le programme démarre nécessairement par main.
+#      - Les fonctions de la bibliothèque standard existent toutes.
+#
 #   Architecture
 #     -march=386            Avant j'utilisais -m686
 #     -m32                  int, long, and pointer types to 32 bits
 #
 #   Warning
 #     -Wall                 Active beaucoup de warnings classiques, mais pas tous.
-#     -Wextra               Ajoute des warnings plus stricts : paramètres inutilisés, comparaisons douteuses, etc.
-#     -Wmissing-prototypes  Toutes les fonctions doivent être static ou déclarées dans le .h  !
+#     -Wextra               Ajoute des warnings plus stricts : paramètres
+#                           inutilisés, comparaisons douteuses, etc.
+#     -Wmissing-prototypes  Toutes les fonctions doivent être static ou
+#                            déclarées dans le .h  !
 #
 #   Optimisation
 #     -O2 par défaut
@@ -26,7 +33,7 @@ CC	= gcc
 CFLAGS   = -fno-pie -m32 -march=i386  \
            -g -ggdb -gdwarf  \
 	   -I$(ROOTDIR)/include  \
-           -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
+           -nostdinc -nodefaultlibs -nostartfiles -ffreestanding \
            -fno-toplevel-reorder \
            -fno-stack-protector \
            -O4 \

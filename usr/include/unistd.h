@@ -1,10 +1,13 @@
-/*----------------------------------------------------------------------------*/
-/*      Définition des fonctions de base du mode utilisateur de ManuX.        */
-/*                                                                            */
-/*                                                  (C) Manu Chaput 2002-2021 */
-/*----------------------------------------------------------------------------*/
-#ifndef _UNISTD_H
-#define _UNISTD_H
+/**
+ * @file  : usr/include/unistd.h
+ * @brief : Définition des fonctions de base du mode utilisateur de ManuX.
+ *
+ * A renommer manustd.h pour laisser des choses plus classiques dans unistd ?
+ *
+ *                                                     (C) Manu Chaput 2002-2026
+ */
+#ifndef _MANUSTD_H
+#define _MANUSTD_H
 
 #include <manux/config.h>
 #include <manux/types.h>

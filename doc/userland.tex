@@ -3,6 +3,50 @@
 %===============================================================================
 \section{Compilation des exécutables}
 
+   Pour le moment, \manux n'a pas de ``loader'', si bien que les
+programmes utilisateur doivent être compilés et liés avec le reste du
+noyau. Il n'en demeure pas moins qu'un programme utilisateur n'accède
+pas au même jeu de fonctions ni aux mêmes fichiers inclus que le reste
+du noyau.
+
+%===============================================================================
+%
+%===============================================================================
+\section{Les fichiers inclus}
+
+   En mode utilisateur, les fichiers à inclure sont dans
+\lstinline!usr/include!.
+
+   Ils permettent d'accéder à quelques fonctions (c'est le prélude
+d'une librairie C, \ldots) et aux quelques appels système de \manux.
+   
+%===============================================================================
+%
+%===============================================================================
+\section{Les fonctions utilisables}
+
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{stdarg.h}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{stdarg.h}
+
+   Le fichier \lstinline!stdarg.h! permet d'utiliser les fonctions
+suivantes permettant de jouer avec les fonctions à nombre d'arguments
+vairable.
+
+\begin{lstlisting}
+#define va_start(ap, last)  __builtin_va_start(ap, last)
+#define va_arg(ap, type)    __builtin_va_arg(ap, type)
+#define va_end(ap)          __builtin_va_end(ap)
+#define va_copy(dst, src)   __builtin_va_copy(dst, src)
+#define __va_copy(dst, src) __builtin_va_copy(dst, src)
+\end{lstlisting}
 
 %===============================================================================
 %

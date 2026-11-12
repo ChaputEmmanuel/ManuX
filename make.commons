@@ -184,7 +184,6 @@ RUN_MANUX_ISO    = $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_CONSOLE) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
-		   $(QELU_VIRTIO_NET) \
 		   -cdrom
 
 RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
@@ -192,10 +191,21 @@ RUN_MANUX_ISO_DBG= $(QEMU_VERSION) \
 		   $(QEMU_VIRTIO_NET) \
 		   $(QEMU_RAMSIZE) \
 		   $(QEMU_DEBUG) \
-		   $(QELU_VIRTIO_NET) \
 		   -cdrom
 
 RUN_MANUX_VBOX   = vboxmanage startvm ManuX
+
+#--------------------------------------------------------------------------
+#    On se débarasse de certaines macros génantes définies par le
+# compilateur sur une toolchain Linux
+#--------------------------------------------------------------------------
+CPPFLAGS += -U__linux__ -U__linux -Ulinux -U__gnu_linux__
+CPPFLAGS += -U__unix__ -U__unix -Uunix
+
+#--------------------------------------------------------------------------
+#    La version MANUX !
+#--------------------------------------------------------------------------
+CPPFLAGS += -D__MANUX__=1
 
 #--------------------------------------------------------------------------
 #    Lecture des options en fonction du compilateur

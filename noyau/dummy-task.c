@@ -354,7 +354,7 @@ static void dummyCopieEcran(void)
    int s = TAILLE_ECRAN - 1 - 80;   // - 80 pour ne pas copier la ligne d'aide 
    int d = s; // Destination
    char * ecran = tacheEnCours->console->adresseEcran;
-   
+
 #ifdef MANUX_KMALLOC
    char * buffer = kmalloc(TAILLE_ECRAN);
 #else
@@ -404,19 +404,20 @@ static void dummyTraiterClavier(void)
 {
    Console * cons = tacheEnCours->console; // C'est éventuellement celle du noyau
    
-   char c;
-   int i;
-   
+   char c; //!< Le caractère lu
+
    while (cons->nbCarAttente) {
       consoleLire(cons, &c, 1);
-      for (i = 0; menuDebogage[i].touche != 0; i++){
-	 if (c == menuDebogage[i].touche) {
-            menuActif = i;
-	    afficherMenuActif();
-         } else if (c == ' ') {   // Mise-à-jour
-	    afficherMenuActif();
-         } else if (c == '!') {   // printk
-            dummyCopieEcran();
+      if (c == ' ') {   // Mise-à-jour
+         afficherMenuActif();
+      } else if (c == '!') {   // printk
+         dummyCopieEcran();
+      } else {
+         for (int i = 0; menuDebogage[i].touche != 0; i++){
+            if (c == menuDebogage[i].touche) {
+               menuActif = i;
+	       afficherMenuActif();
+            }
 	 }
       }
    }  

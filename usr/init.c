@@ -11,6 +11,22 @@
 
 #include <manux/i386.h> // halt
 
+void arcadeChoisir(void);
+
+/**
+ * Un petit test de la lecture (pour le clavier)
+ */
+void testerLire()
+{
+   char c;
+   int n;
+   while (1) {
+      n = lire(0, &c, 1);
+      printf("-> %d lu : %c\n", n, c);
+      attendreMillisecondes(500);
+   }
+}
+
 void calculerPremiers(int q)
 /*
  * Calcul et affichage des nombres premiers. Le but est juste de faire
@@ -70,10 +86,13 @@ void init()
 {
    int n=2; // nombre de messages affichés
 
-   printf("Greetings from userland !\n");
+   printf("Greetings from \033[31muserland\033[0m !\n");
 
    n = creerNouvelleTache(deuxiemeTache, FALSE);
+   n = creerNouvelleTache(arcadeChoisir, FALSE);
 
+   //testerLire();
+   
    for (n = 0; n < 10000000; n++) {
       calculerPremiers(1);
    }

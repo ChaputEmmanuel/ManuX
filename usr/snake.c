@@ -3,9 +3,9 @@
  * Concu avec l'aide de ChatGPT (OpenAI), 2026.
  * SPDX-License-Identifier: 0BSD
  */
-#include <stdio.h>
 #include <manux/config.h>
 #include <manux/types.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #define LARGEUR 50

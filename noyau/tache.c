@@ -286,7 +286,7 @@ void tacheSetConsole(Tache * tache, struct _Console * cons)
    INoeud * i;
    
    i = consoleCreerINoeud(cons);
-   f = fichierCreer(i, O_WRONLY, 0);
+   f = fichierCreer(i, O_WRONLY|O_RDONLY, 0);
    
    tache->fichiers[0] =  f;
 #endif  // MANUX_FICHIER

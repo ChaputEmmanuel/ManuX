@@ -22,6 +22,10 @@
 #ifndef MANUX_CONFIG
 #define MANUX_CONFIG
 
+// La macro suivante n'a pas grand sens en C, mais elle sera passée a
+// make. C'est la liste des fichiers à compiler dans le dossier usr
+#define MANUX_USR_OBJ tetris.o hanoi.o breakout_couleur.o arcade-menu.o pong.o snake.o
+
 #include <config/base.h>
 #include <config/pc-i386.h>
 #include <config/plan-memoire-pc.h>

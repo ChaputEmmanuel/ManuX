@@ -5,7 +5,7 @@ CC	= clang
 CFLAGS   = -fno-pie -m32 -march=i686 -Wall  \
            -g -ggdb -gdwarf  \
 	   -I$(ROOTDIR)/include  \
-           -nostdinc -fno-builtin -nodefaultlibs -nostartfiles \
+           -nostdinc -fno-builtin -nodefaultlibs -ffreestanding \
            -fno-stack-protector \
            -O3 \
 	   -Wimplicit-function-declaration \

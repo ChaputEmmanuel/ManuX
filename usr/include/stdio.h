@@ -15,6 +15,9 @@ void printf(char * format, ...);
  *    %[n]{dxo} %s \n
  */
 
+#define stdin 0
+#define stdout 1
+
 int ecrireConsole(char * buffer, int nbBytes);
 
 int lire(int fd, void * buffer, int nb);

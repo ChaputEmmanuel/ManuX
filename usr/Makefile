@@ -15,6 +15,7 @@ ASM_BIN_OPT = -f bin
 
 OBJETS      = stdio.o  \
               unistd.o \
+              $(MANUX_USR_OBJ) \
               $(MANUX_USR_INIT)
 
 libusr.a : $(OBJETS) 
