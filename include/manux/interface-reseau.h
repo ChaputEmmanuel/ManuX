@@ -7,17 +7,17 @@
 #ifndef MANUX_RESEAU_INTERFACE
 #define MANUX_RESEAU_INTERFACE
 
+#include <manux/buffer-reseau.h>
+
 /**
  * @brief Description d'un pilote d'interface réseau
  */
 typedef struct _ReseauPilote {
    char * nom;
-   void (* recevoirTrame)(void *); // La fonction permettant d'aller
-			           // récupérer des trames de façon
-			           // asynchrone 
 } ReseauPilote;
 
 typedef struct _ReseauInterface {
+   void (* recevoirTrame)(BufferReseau * buffer); //<! Traitement d'une trame reçue
    ReseauPilote * pilote;
    void * prive;
 } ReseauInterface;
@@ -30,7 +30,7 @@ void reseauEnregistrerPilote(ReseauPilote * p);
 /**
  * @brief
  */
-void reseauAjouterInterface(ReseauPilote * p, void * d);
+void reseauAjouterInterface(ReseauInterface * i);
 
 
 #endif

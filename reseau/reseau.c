@@ -4,6 +4,7 @@
  *
  *                                                                  (C) Manu Chaput 2025
  */
+#include "manux/interface-reseau.h"
 #include <manux/reseau.h>
 #include <manux/buffer-reseau.h>
 #include <manux/debug.h>
@@ -18,15 +19,31 @@
  */
 ListeBufferReseau * listeBuffersRecus = NULL;
 
+/**
+ * @brief La fonction de traitement dun buffer qui a été reçu
+ */
+static void reseauAguillerBuffer(BufferReseau *b) {
+   ReseauInterface * ir;
+  
+   assert(b != NULL);
+
+   ir = b->interfaceReception;
+   ir->recevoirTrame(b);
+}
+
+/**
+ * @brief La fonction en charge de recevoir et aiguiller tous les
+ * buffers reçus sur le système
+ */
 static
 void reseauTraiterReceptions(void)
 {
    printk_debug(DBG_KERNEL_NET, "A-t-on des buffers a recevoir ?\n");
    while (1) {
       if (!listeBufferReseauVide(listeBuffersRecus)) {
-         printk_debug(DBG_KERNEL_NET, "Buffers reseau en attente !\n");
+         reseauAguillerBuffer(listeBufferReseauExtraire(listeBuffersRecus));
       } else {
-         ordonnanceur();
+	ordonnanceur();    // WARNING, on devrait dormir en attendant
       }
    }
 }
@@ -43,9 +60,11 @@ void reseauInitialiser(void)
 #ifdef MANUX_TACHES
    // Lancement d'une tâche de traitement des trames reçues
    ordonnanceurCreerTacheNoyau(reseauTraiterReceptions);
-#endif
-   
+
    printk_debug(DBG_KERNEL_NET, "Tache de traitement des receptions lancee\n");
+#else    
+   printk_debug(DBG_KERNEL_NET, "Pas de gestion des taches, ...\n");
+#endif
 }
 
 /**

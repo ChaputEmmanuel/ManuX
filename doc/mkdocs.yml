@@ -23,6 +23,7 @@ nav:
        - "La gestion des fichiers" : systeme-fichiers-part.md
        - "Les outils de synchronisation" : synchronisation-part.md
        - "Le mode utilisateur" : userland-part.md
+       - "Le sous système réseau" : reseau-part.md
        
     - Le code :
        - "Doxygen" : doxy/html/index.html

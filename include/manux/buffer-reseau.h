@@ -7,16 +7,29 @@
 #ifndef BUFFER_RESEAU
 #define BUFFER_RESEAU
 
-#include <manux/interface-reseau.h>
+//#include <manux/interface-reseau.h>
+#include <manux/types.h>
 
 /**
  * @brief Défnition d'un buffer réseau
+ *
+ * Le champ protocole désigne le protocole véhiculé dans la trame. Ce
+ * sera donc par exemple IPv4, IPv6 mais aussi peut-être ARP, ...
+ * C'est ce champ qui déterminera ensuite l'acheminement vers la bonne
+ * fonction de réception correspondante.
  */
+#define PROTO_IPv4     0x0800
+#define PROTO_ARP      0x0806
+#define PROTO_IPv6     0x86DD
+typedef struct _ReseauInterface ReseauInterface;
 typedef struct _bufferReseau {
-   void * donnees;
-   int taille;
-   ReseauInterface * interfaceReception;  // Sur quelle interface
-                                          // l'a-t-on reçu (ou NULL) 
+   void            * donnees;
+   int               taille;
+   ReseauInterface * interfaceReception; // Sur quelle interface
+                                         // l'a-t-on reçu (ou NULL)
+   void            * enteteLiaison;
+   uint16_t protocole;                   // protocole véhiculé
+   void            * enteteProtocole;
 } BufferReseau;
 
 /**

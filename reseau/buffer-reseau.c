@@ -3,7 +3,7 @@
  * @brief
  *                                                                  (C) Manu Chaput 2025
  */
-#include "manux/printk.h"
+#include <manux/printk.h>
 #include <manux/buffer-reseau.h>
 #include <manux/debug.h>
 #include <manux/string.h>    // memcopy
@@ -119,7 +119,7 @@ BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l)
 }
 
 /**
- * @brief Affichage de la liste de buffers
+ * @brief Affichage de la liste de buffers avec printkc
  */
 void listeBufferReseauAfficher(ListeBufferReseau * l)
 {

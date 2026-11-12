@@ -3,6 +3,9 @@
  * 
  *                                                             (C) Manu Chaput 2020-2025
  */
+#include <manux/interface-reseau.h>
+#include <manux/ethernet.h>
+#include <manux/kmalloc.h>
 #include <manux/virtio-net.h>
 #include <manux/memoire.h>      // allouerPages
 #include <manux/intel-8259a.h>  // pour les interruptions 
@@ -164,7 +167,6 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    
    // On va chercher une trame, a priori dans une chaîne de buffers
    nbLu = virtioFileRecupererBuffers(fv, (void*)buffers, longueurs, 2);
-
 #ifdef MANUX_BUFFER_RESEAU
    BufferReseau * br;
 
@@ -184,7 +186,6 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
 
 /**
  * @brief
- */
 static
 void virtioNetRecevoirTramePartieBasse(void * _vr)
 {
@@ -192,6 +193,7 @@ void virtioNetRecevoirTramePartieBasse(void * _vr)
   
    printk("C'est triste je ne fais rien avec %d!\n", vr);
 }
+ */
 
 /**
  * @brief
@@ -234,7 +236,6 @@ void virtioNetGestionInt(void * pr)
  */ 
 ReseauPilote virtioPiloteReseau = {
    .nom = "virtio-net",
-   .recevoirTrame = virtioNetRecevoirTramePartieBasse
 };
 
 /**
@@ -258,7 +259,16 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // longueurs) pour passer à virtioFournirBuffers
    void                * buffers[2];
    int                   longueurs[2];
-   
+
+   // L'interface que l'on initialise
+   ReseauInterface * reseauInterface;
+
+   // Essayons d'allouer l'interface
+   reseauInterface = (ReseauInterface *)kmalloc(sizeof(ReseauInterface));
+   if (reseauInterface == NULL) {
+      return -ENOMEM;
+   }
+
    // On renseigne la structure
    virtioInitPeripheriquePCI(&(virtioReseau.virtioPeripherique),
 			  PCINumeroPeripherique,
@@ -279,7 +289,8 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // Pas de malloc, ...
    pointeur = allouerPages(NB_PAGES(fr->taille*(sizeof(VirtioReseauEntete)
 						+ VIRTIO_TAILLE_TRAME_MAX)/2));
-
+   assert(pointeur != NULL); // WARNING à traiter
+                               
    // Concrètement, puisque le réseau préfixe systématiquement par un
    // entête à lui, on va lui fourni systématiquement une chaîne avec
    // un premier buffer pour l'entête, comme ça la trame sera toute
@@ -322,7 +333,11 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    virtioReseau.nbItRecues = 0;
 
    // On l'enregistre auprès du système réseau
-   reseauAjouterInterface(&virtioPiloteReseau, &virtioReseau);
+   reseauInterface->recevoirTrame = ethernetRecevoirTrame;
+   reseauInterface->pilote = &virtioPiloteReseau;
+   reseauInterface->prive = &virtioReseau;
+   
+   reseauAjouterInterface(reseauInterface);
 
    return ESUCCES;
 }

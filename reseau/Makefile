@@ -8,6 +8,7 @@ ASM_BIN_OPT = -f bin
 
 OBJETS      = reseau.o interface-reseau.o
 OBJETS     += $(if $(MANUX_BUFFER_RESEAU), buffer-reseau.o)
+OBJETS     += $(if $(MANUX_ETHERNET), ethernet.o)
 
 libreseau.a : $(MANUX_FICHIER_CONFIG) $(OBJETS)
 	ar rf libreseau.a $(OBJETS)

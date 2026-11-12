@@ -13,9 +13,8 @@ void reseauEnregistrerPilote(ReseauPilote * p)
 /**
  * @brief Ajout d'une nouvelle interface réseau
  */
-void reseauAjouterInterface(ReseauPilote * p, void * prive)
+void reseauAjouterInterface(ReseauInterface * i)
 {
-   (void) p;
-   (void) prive;
+   (void) i;
 }
 

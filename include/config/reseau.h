@@ -7,3 +7,8 @@
 
 #define MANUX_BUFFER_RESEAU
 
+/**
+ * @brief Utilise-t-on des interfaces Ethernet ?
+ */
+#define MANUX_ETHERNET
+

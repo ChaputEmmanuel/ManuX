@@ -27,7 +27,8 @@ DOCS_PDF = index.pdf \
            synchronisation-part.pdf \
            registres-part.pdf \
            userland-part.pdf \
-	   coder-part.pdf
+	   coder-part.pdf  \
+           reseau-part.pdf
 
 DOCS_HT = $(DOCS_PDF:.pdf=.ht)
 DOCS_MD = $(DOCS_PDF:.pdf=.md)

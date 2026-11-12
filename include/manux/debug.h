@@ -1,7 +1,8 @@
 /**
- *      Ma version des assertions et autres outils de debug.
+ * @file : include/manux/debug.h
+ * @brief : Ma version des assertions et autres outils de debug.
  *
- *                                                     (C) Manu Chaput 2000-2025
+ *                                                     (C) Manu Chaput 2000-2026
  */
 #ifndef MANUX_DEBUG_DEF
 #define MANUX_DEBUG_DEF
