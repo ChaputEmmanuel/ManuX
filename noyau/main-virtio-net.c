@@ -71,7 +71,7 @@ void startManuX(void)
    }
 
    printk_debug(DBG_KERNEL_START, "C'est parti mon kiki ...\n");
-   virtioNetTestDeuxiemeEmission();
+   //   virtioNetTestDeuxiemeEmission();
 
    while(1) {};
 }   /* _startManuX */

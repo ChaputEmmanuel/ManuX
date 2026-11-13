@@ -24,4 +24,8 @@ typedef struct ethernetEntete {
  */
 void ethernetRecevoirTrame(BufferReseau * buffer);
 
+/**
+ * void Initialisation d'une interface de type Ethernet
+ */
+void ethernetInitialiserInterface(ReseauInterface * ire, uint8_t a[6]);
 #endif

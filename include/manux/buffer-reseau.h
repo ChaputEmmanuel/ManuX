@@ -21,15 +21,36 @@
 #define PROTO_IPv4     0x0800
 #define PROTO_ARP      0x0806
 #define PROTO_IPv6     0x86DD
+
 typedef struct _ReseauInterface ReseauInterface;
+
+/**
+ * @brief La structure générale permettant de manipuler les messages
+ * réseau
+ *
+ * On a une zone générale avec des données dans laquelle on a les
+ * entêtes qui se succèdent. C'est cette même structure qui est
+ * manipulée par les différentes couches réseau, de sorte à éviter les
+ * copies successives. Du coup, on a des pointeurs pour savoir où
+ * chaque protocole commence.
+ * On suppose ici qu'il n'y a pas d'enqueue donc pour chaque couche le
+ * message se termine a donnees+taille
+ */
 typedef struct _bufferReseau {
-   void            * donnees;
-   int               taille;
-   ReseauInterface * interfaceReception; // Sur quelle interface
-                                         // l'a-t-on reçu (ou NULL)
-   void            * enteteLiaison;
-   uint16_t protocole;                   // protocole véhiculé
-   void            * enteteProtocole;
+   // Interface sur laquelle on l'a reçu (ou NULL)
+   ReseauInterface * interfaceReception;
+  
+   // L'intégralité des données significatives
+   void            * donnees;   // Pointeur sur le premier octet
+   int               taille;    // Taille totale
+
+   // Couche liaison
+   void            * enteteLiaison;    // Pointeur sur le premier octet
+
+   // Couche réseau (ou ARP, ...)
+   uint16_t          protocole;       // protocole véhiculé
+   void            * enteteProtocole; // Pointeur sur l'entête
+
 } BufferReseau;
 
 /**
@@ -43,6 +64,11 @@ typedef struct _ListeBufferReseau ListeBufferReseau;
  * d'un buffer réseau.
  */
 BufferReseau * bufferReseauCreer(void * donnees, int taille);
+
+/**
+ * @brief Destruction d'un buffer
+ */
+void bufferReseauLiberer(BufferReseau * b);
 
 /**
  * @brief Création d'une liste vide de buffers réseau
@@ -65,6 +91,11 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b);
  * NULL si liste inexistante ou vide
  */
 BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l);
+
+/**
+ * @brief Nombre de buffers dans la liste
+ */
+int listeBufferReseauTaille(ListeBufferReseau * l);
 
 /**
  * @brief Affichage de la liste de buffers

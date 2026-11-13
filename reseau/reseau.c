@@ -4,14 +4,39 @@
  *
  *                                                                  (C) Manu Chaput 2025
  */
-#include "manux/interface-reseau.h"
+#include <manux/interface-reseau.h>
 #include <manux/reseau.h>
 #include <manux/buffer-reseau.h>
 #include <manux/debug.h>
+#include <manux/arp.h>
 
 #ifdef MANUX_TACHES
 #   include <manux/tache.h>
 #endif
+
+/**
+ * @brief Réception d'un paquet sur le système
+ */
+void reseauRecevoirPaquet(BufferReseau *b)
+{
+   switch (b->protocole) {
+      case PROTO_ARP :
+         arpRecevoir(b);
+      break;
+      /*
+      case PROTO_IPv4 :
+         ipv4Recevoir(b);
+      break;
+      case PROTO_IPv6 :
+         ipv6Recevoir(b);
+      break;
+      */
+      default :
+         bufferReseauLiberer(b);
+      break;
+	
+   }
+}
 
 /**
  * @brief La liste des buffers qui ont été reçus mais non encore
@@ -28,7 +53,13 @@ static void reseauAguillerBuffer(BufferReseau *b) {
    assert(b != NULL);
 
    ir = b->interfaceReception;
+
+   // On invoque la fonction de réception de l'interface qui va
+   // déterminer le champ protocole en fonction de son format
    ir->recevoirTrame(b);
+
+   // On peut maintenant passer le contenu au protocole correspondant
+   reseauRecevoirPaquet(b);
 }
 
 /**
@@ -38,10 +69,16 @@ static void reseauAguillerBuffer(BufferReseau *b) {
 static
 void reseauTraiterReceptions(void)
 {
+   BufferReseau * br;
+
+   printkc("Traitement de la file de reception reseau ...\n");
+
    printk_debug(DBG_KERNEL_NET, "A-t-on des buffers a recevoir ?\n");
+   
    while (1) {
       if (!listeBufferReseauVide(listeBuffersRecus)) {
-         reseauAguillerBuffer(listeBufferReseauExtraire(listeBuffersRecus));
+	 br = listeBufferReseauExtraire(listeBuffersRecus);
+         reseauAguillerBuffer(br);
       } else {
 	ordonnanceur();    // WARNING, on devrait dormir en attendant
       }

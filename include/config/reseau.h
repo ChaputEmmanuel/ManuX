@@ -12,3 +12,8 @@
  */
 #define MANUX_ETHERNET
 
+/**
+ * @brief Utilise-t-on ARP
+ */
+#define MANUX_ARP
+

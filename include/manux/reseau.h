@@ -25,4 +25,9 @@ void reseauInitialiser(void);
  */
 void reseauAfficherListeReception(void);
 
+/**
+ * @brief Réception d'un paquet sur le système
+ */
+void reseauRecevoirPaquet(BufferReseau *b);
+
 #endif

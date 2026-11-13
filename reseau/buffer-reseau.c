@@ -48,6 +48,14 @@ BufferReseau * bufferReseauCreer(void * donnees, int taille)
 }
 
 /**
+ * @brief Destruction d'un buffer
+ */
+void bufferReseauLiberer(BufferReseau * b)
+{
+   kfree(b);
+}
+
+/**
  * @brief Création d'une liste vide de buffers réseau
  */
 ListeBufferReseau * listeBufferReseauCreer(void)
@@ -84,10 +92,13 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b)
 
    if (c) {
       c->br = b;
-      c->suivant = l->premier;
-      l->premier = c;
-      if (l->dernier == NULL) {
-         l->dernier = c;
+      c->suivant = NULL;
+      if (l->dernier != NULL) {
+         l->dernier->suivant = c;
+      }
+      l->dernier = c;
+      if (l->premier == NULL) {
+         l->premier = c;
       }
       return 1;
    } else {
@@ -96,13 +107,14 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b)
 }
 
 /**
- * @brief Extraction d'un buffer réseau d'une liste
+ * @brief Extraction d'un buffer réseau en tête d'une liste
  *
  * NULL si liste inexistante ou vide
  */
 BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l)
 {
    CelluleBufferReseau * cellResult = NULL;
+   BufferReseau * result = NULL;
 
    printk_debug(DBG_KERNEL_NET, "Extraction d'un buffer\n");
    
@@ -112,10 +124,10 @@ BufferReseau * listeBufferReseauExtraire(ListeBufferReseau * l)
       if (l->dernier == cellResult) {
          l->dernier = NULL;
       }
-      return cellResult->br;
-   } else {
-      return NULL;
+      result = cellResult->br;
+      kfree(cellResult);
    }
+   return result;
 }
 
 /**
@@ -145,3 +157,18 @@ void listeBufferReseauAfficher(ListeBufferReseau * l)
    }
 }
 
+/**
+ * @brief Nombre de buffers dans la liste
+ */
+int listeBufferReseauTaille(ListeBufferReseau * l)
+{
+   int result = 0;
+   CelluleBufferReseau * cell;
+
+   if (l != NULL) {
+      for (cell = l->premier; cell != NULL; cell = cell->suivant) {
+         result++;
+      }
+   }
+   return result;
+}

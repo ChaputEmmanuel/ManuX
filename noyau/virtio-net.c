@@ -15,6 +15,7 @@
 #include <manux/io.h>           // outb
 #include <manux/debug.h>
 #include <manux/errno.h>
+
 #ifdef MANUX_RESEAU            // Est-ce que ça a vraiment du sens ?
 #   include <manux/reseau.h>
 #endif
@@ -59,9 +60,7 @@
 typedef struct VirtioReseau_t {
    VirtioPeripherique    virtioPeripherique; 
    uint16_t              nbItRecues;
-   // Les éléments ci dessous sont sûrement à mettre dans une
-   // structure liée au réseau
-   uint8_t               adresseMAC[6];
+   ReseauInterface     * reseauInterface; //< L'interface réseau associée
 } VirtioReseau;
 
 /**
@@ -172,7 +171,8 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
 
    // On fait une copie, mais ce serait mieux de la faire plus tard
    br = bufferReseauCreer(buffers[1], longueurs[1]);
-
+   br->interfaceReception = vr->reseauInterface;
+     
    // On va maintenant le placer dans une liste qui sera traitée plus tard.
    listeBufferReseauInserer(listeBuffersRecus, br);
 #endif
@@ -226,7 +226,7 @@ void virtioNetGestionInt(void * pr)
       virtioNetRecevoirTrame(vr);
       //      virtioNetTraiterEmissions(vr); // WARNING : à vérifier si ça doit être là
    } else {
-       printk_debug(DBG_KERNEL_NET, "Balek, ...\n");
+       printk_debug(DBG_KERNEL_NET, "Cette IT n'est pas pour moi, ...\n");
    }
 }
 
@@ -262,7 +262,8 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
 
    // L'interface que l'on initialise
    ReseauInterface * reseauInterface;
-
+   uint8_t           adresseMAC[6];
+   
    // Essayons d'allouer l'interface
    reseauInterface = (ReseauInterface *)kmalloc(sizeof(ReseauInterface));
    if (reseauInterface == NULL) {
@@ -312,14 +313,14 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // Lecture de l'adresse IEEE
    for (int i = 0; i < 6; i++){
       inb((uint16_t)(pciEquip->adresseES + 0x14 + i), addr);
-      virtioReseau.adresseMAC[i] = addr;
+      adresseMAC[i] = addr;
    }
    /*
    printk("MAC@ = ");
    for (int i = 0 ; i < 5 ; i++) {
-      printk("%x:", virtioReseau.adresseMAC[i]);
+      printk("%x:", adresseMAC[i]);
    }
-   printk("%x\n", virtioReseau.adresseMAC[5]);
+   printk("%x\n", adresseMAC[5]);
    */
    // On définit notre fonction de gestion des interuptions
    if (i8259aAjouterHandler(pciEquip->interruption,
@@ -329,15 +330,20 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
       paniqueNoyau("Pas possible");
       return ENOENT;
    }
-   i8259aAutoriserIRQ(pciEquip->interruption);
-   virtioReseau.nbItRecues = 0;
 
-   // On l'enregistre auprès du système réseau
-   reseauInterface->recevoirTrame = ethernetRecevoirTrame;
+   // On initialise l'interface réseau, qui est de type Ethernet
+   ethernetInitialiserInterface(reseauInterface, adresseMAC);
+
    reseauInterface->pilote = &virtioPiloteReseau;
    reseauInterface->prive = &virtioReseau;
+   virtioReseau.reseauInterface = reseauInterface;
    
+   // On l'enregistre auprès du système réseau
    reseauAjouterInterface(reseauInterface);
+
+   // On peut maintenant autoriser les réceptions
+   virtioReseau.nbItRecues = 0;
+   i8259aAutoriserIRQ(pciEquip->interruption);
 
    return ESUCCES;
 }
@@ -403,7 +409,7 @@ int virtioNetInit(void)
    }
 
    // Test d'émission
-   virtioNetEmettre(&virtioReseau, requeteARP);
+   //virtioNetEmettre(&virtioReseau, requeteARP);
 
    printk_debug(DBG_KERNEL_NET, "out\n");
    return ESUCCES;
