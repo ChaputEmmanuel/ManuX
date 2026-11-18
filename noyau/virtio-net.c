@@ -170,7 +170,7 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    BufferReseau * br;
 
    // On fait une copie, mais ce serait mieux de la faire plus tard
-   br = bufferReseauCreer(buffers[1], longueurs[1]);
+   br = bufferReseauInitialiser(buffers[1], longueurs[1]);
    br->interfaceReception = vr->reseauInterface;
      
    // On va maintenant le placer dans une liste qui sera traitée plus tard.
@@ -180,6 +180,8 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
 		vr->nbItRecues, nbLu, longueurs[0], longueurs[1]);
 
+   vr->reseauInterface->nbReceptions ++;
+   
    // On peut reprendre une activité normale
    //   virtioFileAutoriserInterruption(fv);
 }
@@ -269,6 +271,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    if (reseauInterface == NULL) {
       return -ENOMEM;
    }
+      printk_debug(DBG_KERNEL_NET, "Interface allouee !\n");
 
    // On renseigne la structure
    virtioInitPeripheriquePCI(&(virtioReseau.virtioPeripherique),
@@ -280,6 +283,8 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
                           | VIRTIO_NET_F_MRG_RXBUF   // Je ne merge pas les buffers
                           | VIRTIO_NET_F_CTRL_VQ);   // Pas de canal de contrôle
 
+   printk_debug(DBG_KERNEL_NET, "Peripherique PCI initialise !\n");
+
    // On va tout de suite remplir la file de réception de
    // buffers ([3] page 26 point 5)
    fr = &(virtioReseau.virtioPeripherique.filesVirtuelles[0]);
@@ -287,15 +292,18 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // ATTENTION ici je tente de passer des trames de taille max uniquement
    // d'où VIRTIO_TAILLE_TRAME_MAX qui remplace sizeof ...
    
-   // Pas de malloc, ...
+   // Pas de malloc, ... WARNING : pourquoi /2 !?
    pointeur = allouerPages(NB_PAGES(fr->taille*(sizeof(VirtioReseauEntete)
 						+ VIRTIO_TAILLE_TRAME_MAX)/2));
    assert(pointeur != NULL); // WARNING à traiter
+
+   printk_debug(DBG_KERNEL_NET, "Pointeur alloue !\n");
                                
    // Concrètement, puisque le réseau préfixe systématiquement par un
    // entête à lui, on va lui fourni systématiquement une chaîne avec
    // un premier buffer pour l'entête, comme ça la trame sera toute
    // seule dans son buffer, donc directement manipulable ! Malin JP, ...
+   //   printk("On va fournir %d buffer\n", fr->taille);
    for (int i = 0 ; i < fr->taille/2; i++) {
       buffers[0] = pointeur;
       longueurs[0] = sizeof(VirtioReseauEntete);
@@ -303,18 +311,25 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
       buffers[1] = pointeur;
       longueurs[1] = VIRTIO_TAILLE_TRAME_MAX;
       pointeur += VIRTIO_TAILLE_TRAME_MAX;
+      //      printk("[7]g!?");
+      //      printk("  F%d b%d l%d f%d\n", VR_FILE_RECEPTION, buffers, longueurs, VRING_DESC_F_WRITE);
       virtioFournirBuffers(&(virtioReseau.virtioPeripherique),
 			   VR_FILE_RECEPTION, // File réception
             	           buffers, longueurs,
                            2,
 		           VRING_DESC_F_WRITE); // pour recevoir
+      //      printk("[7]<");
    }
+
+   //   printk("[7]Buffers fournis !\n");
+   printk_debug(DBG_KERNEL_NET, "Buffers fournis !\n");
    
    // Lecture de l'adresse IEEE
    for (int i = 0; i < 6; i++){
       inb((uint16_t)(pciEquip->adresseES + 0x14 + i), addr);
       adresseMAC[i] = addr;
    }
+   printk_debug(DBG_KERNEL_NET, "MAC lue !\n");   
    /*
    printk("MAC@ = ");
    for (int i = 0 ; i < 5 ; i++) {
@@ -334,6 +349,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    // On initialise l'interface réseau, qui est de type Ethernet
    ethernetInitialiserInterface(reseauInterface, adresseMAC);
 
+   // Nos spécificités liées à virtio
    reseauInterface->pilote = &virtioPiloteReseau;
    reseauInterface->prive = &virtioReseau;
    virtioReseau.reseauInterface = reseauInterface;
@@ -351,11 +367,12 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
 /**
  * Émission d'une trame via une interface ...
  */
+[[maybe_unused]]
 static
-void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
+void virtioNetEmettre(VirtioReseau * vr, BufferReseau * b, uint8_t * adresse)
 {
    (void) vr; // WARNING, pas normal
-   
+   (void) adresse;
    // On va construire un tableau de buffers (et un de leurs
    // longueurs) pour passer à virtioFournirBuffers
    void                * buffers[2];
@@ -363,6 +380,9 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
 
    printk_debug(DBG_KERNEL_NET, "IN\n");
 
+   // On construit l'entête liaison, en se fondant sur ethernet
+   ethernetInitialiserEntete(vr->reseauInterface, b, adresse);
+   
    // On ne délègue rien à l'interface
    virtioReseauEntete.flags = 0;
    virtioReseauEntete.typeGSO = 0;
@@ -370,9 +390,13 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
    virtioReseauEntete.debutSommeControle = 0;
    virtioReseauEntete.decalageSommeControle = 0;
 
+   // Le premier buffer est là uniquement pour héberger l'entête
+   // spécifique à virtio.
    buffers[0] = (void *)&virtioReseauEntete;
    longueurs[0] = sizeof(VirtioReseauEntete);
-   buffers[1] = (void*)trame;
+
+   // Maintenant le second buffer, qui contient la trame elle-même
+   buffers[1] = (void*)b;
    longueurs[1] = 42;
 
    virtioFournirBuffers(&(virtioReseau.virtioPeripherique),
@@ -386,6 +410,9 @@ void virtioNetEmettre(VirtioReseau * vr, uint8_t * trame)
 
 /**
  * @brief Initialisation des périphériques
+ *
+ * Cette fonction est sensée chercher toutes les interfaces réseaux
+ * virtio et les configurer. Pour le moment elle n'en gère qu'une !
  */
 int virtioNetInit(void)
 {
@@ -401,6 +428,14 @@ int virtioNetInit(void)
 		PCI_VENDEUR_VIRTIO,PCI_PERIPHERIQUE_VIRTIO_NET);
    PCINumeroPeripherique = PCIObtenirProchainEquipement(PCI_VENDEUR_VIRTIO,
 							PCI_PERIPHERIQUE_VIRTIO_NET, -1);
+
+   // Si on n'en trouve pas
+   if (PCINumeroPeripherique < 0) {
+     printk_debug(DBG_KERNEL_NET, "Pas de peripherique reseau virtio\n");
+     return ENOENT;
+   }
+
+   // Si on a un périphérique, the show must go on !
    printk_debug(DBG_KERNEL_NET, "Peripherique PCI %d\n", PCINumeroPeripherique);
 
    // Initialisation de l'unique périphérique pour le moment
@@ -419,6 +454,6 @@ int virtioNetInit(void)
 void virtioNetTestDeuxiemeEmission(void)
 {
    printk_debug(DBG_KERNEL_NET, "in\n");
-   virtioNetEmettre(&virtioReseau, requeteARP2);
+   //   virtioNetEmettre(&virtioReseau, requeteARP2);
    printk_debug(DBG_KERNEL_NET, "out\n");
 }

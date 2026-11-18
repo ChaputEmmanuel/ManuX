@@ -26,6 +26,7 @@
 #include <manux/exclusion-mutuelle.h>
 #include <manux/appelsysteme.h>
 #include <manux/pci.h>
+#include <manux/reseau.h>
 #include <manux/ramdisk.h>
 #include <manux/printk.h>
 #include <manux/debug.h>
@@ -49,7 +50,6 @@ void startManuX(void)
    // Initialisation de la console
    consoleInitialisation();
    printk(logoManuXTexte());
-   printk("\n\n");
    
 #if MANUX_ARCH == i386
    union {
@@ -66,7 +66,7 @@ void startManuX(void)
 		descriptionProc.caracteres);
 #endif
 #ifdef MANUX_CONSOLES_VIRTUELLES
-   printk("\n\n                                              (ESC pour basculer entre consoles)\n");
+   printk("\n                                              (ESC pour basculer entre consoles)\n");
 #endif
 
    // Initialisation du journal
@@ -87,7 +87,7 @@ void startManuX(void)
    printk_debug(DBG_KERNEL_START, "Memoire : %d + %d Ko\n",
 		infoSysteme.memoireDeBase,
 		infoSysteme.memoireEtendue);
-
+   
    // Initialisation des descripteurs de segments
    initialiserGDT();
 
@@ -110,26 +110,12 @@ void startManuX(void)
    bootloaderLireLigneCmd();
 
    // Initialisation du système de debug
-   printk_debug(DBG_KERNEL_START, "Initialisation du debug ...\n");
+   //   printk_debug(DBG_KERNEL_START, "Initialisation du debug ...\n");
    debugInitialiser();
 
    // Initialisation de la table des appels système
    printk_debug(DBG_KERNEL_START, "Initialisation appels systeme ...\n");
    initialiserAppelsSysteme();
-   
-   // Initialisation du bus PCI
-   printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
-   PCIEnumerationDesEquipements();
-
-   printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
-   if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
-      fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
-      journalAffecterFichier(&fichierVirtioConsole);
-   }
-
-   // Initialisation du réseau
-   printk_debug(DBG_KERNEL_START, "Initialisation du reseau ...\n");
-   virtioNetInit();
 
    // Initialisation de la gestion des systèmes de fichiers
    printk_debug(DBG_KERNEL_START, "Initialisation du systeme de fichiers ...\n");
@@ -145,6 +131,26 @@ void startManuX(void)
 
    printk_debug(DBG_KERNEL_START, "Initialisation de l'horloge ...\n");
    initialiserHorloge();
+
+   // On initialise le sous-système réseau
+   printk_debug(DBG_KERNEL_START, "Initialisation du reseau ...\n");
+   reseauInitialiser();
+
+   // Initialisation du bus PCI
+   printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
+   PCIEnumerationDesEquipements();
+   /*
+   printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
+   if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
+      fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
+      journalAffecterFichier(&fichierVirtioConsole);
+   }
+   */
+   // Le pilote réseau virtio
+   printk_debug(DBG_KERNEL_START, "Initialisation de virtio net ...\n");
+   if (virtioNetInit() != ESUCCES) {
+      printk_debug(DBG_KERNEL_START, "Impossible d'initialiser periph reseau ...\n");
+   }
 
    // On va maintenant faire de la tâche en cours une tâche "banale"
    printk_debug(DBG_KERNEL_START, "On se dote d'une console\n");

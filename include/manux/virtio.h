@@ -14,7 +14,10 @@
  * le .c, mais le soucis c'est qu'elles doivent ensuite être utilisées
  * via des pointeurs (cf le premier champs de virtioReseauPeriph) et
  * comme pour le moment je n'ai pas de malloc, ...
+ *
+ *                                                            (C) E. Chaput 2022
  */
+
 #ifndef VIRTIO_DEF
 #define VIRTIO_DEF
 

@@ -210,6 +210,7 @@ int PCIObtenirProchainEquipement(uint16_t vendeur, uint16_t equipement, int prec
 	      || (PCIEquipements[result].equipement != equipement))
    ) {}
 
+   // Si je n'ai rien trouvé
    if (result >= PCINombreEquipements)
       result = -1;
    

@@ -9,6 +9,11 @@
 #include <manux/string.h>    // memcopy
 #include <manux/kmalloc.h>
 
+#define MANUX_RESEAU_AUDIT
+
+#define MIN(a, b) (((a)<(b))?(a):(b))
+#define MAX(a, b) (((a)>(b))?(a):(b))
+
 typedef struct _CelluleBufferReseau {
    BufferReseau                * br;
    struct _CelluleBufferReseau * suivant;
@@ -17,31 +22,65 @@ typedef struct _CelluleBufferReseau {
 typedef struct _ListeBufferReseau {
    CelluleBufferReseau * premier;
    CelluleBufferReseau * dernier;
+#ifdef MANUX_RESEAU_AUDIT
+   uint32_t nbBuffersCumul;
+#endif 
 } ListeBufferReseau;
 
 /**
- * @brief Création (allocation et initialisation des champs de base)
- * d'un buffer réseau.
- *
- * On va ici créer une structure et y recopier les données. A voir :
- * ne peut-on pas plutôt utiliser les données telles qu'elles arrivent
- * (pour virtio par exemple) ? Ca éviterait une copie, ou ça nous
- * permettrait au moins de la faire plus tard, dans la partie basse.
+ * @brief Combien reste-t-il d'octets utilisable en fin de buffer ?
  */
-BufferReseau * bufferReseauCreer(void * donnees, int taille)
+uint16_t bufferReseauPlaceLibreFin(BufferReseau * b)
+{
+  return b->base + MANUX_BUFFER_RESEAU_TAILLE_MAX - (b->donnees + b->taille);
+}
+
+/**
+ * @brief Création allocation et mise à zéro d'un buffer réseau.
+ *
+ * Cette fonction crée un buffer vide dont les champs devront ensuite
+ * être initialisé au grès de la traversée des couches protocolaires.
+ *
+ * WARNNG : ne pas utiliser kmalloc !! mettre 2 paquets dans une page
+ * avec un allocateur spécifique.
+ */
+BufferReseau * bufferReseauCreer()
 {
    BufferReseau * result = (BufferReseau *)kmalloc(sizeof(BufferReseau));
 
    if (result) {
-      printk_debug(DBG_KERNEL_NET, "Creation d'un buffer reseau de taille %d\n", taille);
-      result->donnees = kmalloc(taille);
-      if (result->donnees) {
-         memcpy(result->donnees, donnees, taille);
-         result->taille = taille;
-      } else {
+      printk_debug(DBG_KERNEL_NET, "Creation d'un buffer reseau de taille %d\n",
+		   MANUX_BUFFER_RESEAU_TAILLE_MAX);
+      result->base = kmalloc(MANUX_BUFFER_RESEAU_TAILLE_MAX);
+      if (result->base == NULL) {
          kfree(result);
          result = NULL;
       }
+      result->donnees = result->base + MANUX_BUFFER_RESEAU_DEBUT;
+      result->taille = 0;
+   }
+   
+   return result;
+}
+
+/**
+ * @brief Création et initialisation d'un buffer avec des données
+ *
+ * Cette fonction utilise bufferReseauCreer() pour créer un buffer
+ * vide, puis elle copie les données dans ce buffer. Elle ne peut pas
+ * analyser le contenu pour initialiser les champs de la structure,
+ * c'est donc à l'appelant de s'en charger (par exemple une fonction
+ * de réception d'une trame pourra l'utiliser puis initialiser
+ * enteteLiaison, protocole, ...
+ */
+BufferReseau * bufferReseauInitialiser(void * donnees, int taille)
+{
+   BufferReseau * result = bufferReseauCreer();
+   taille = MIN(taille, bufferReseauPlaceLibreFin(result));
+   
+   if (result != NULL) {
+      memcpy(result->donnees, donnees, taille);
+      result->taille = taille;
    }
    
    return result;
@@ -52,7 +91,19 @@ BufferReseau * bufferReseauCreer(void * donnees, int taille)
  */
 void bufferReseauLiberer(BufferReseau * b)
 {
+   printk_debug(DBG_KERNEL_A_FAIRE, "Fuite memoire a corriger !\n");
    kfree(b);
+}
+
+/**
+ * @brief Étendre la mémoire par le début (pour ajouter un nouvel
+ * entête)
+ */
+void * bufferReseauEtendreDebut(BufferReseau * b, uint16_t taille)
+{
+   b->donnees = MAX(b->base, b->donnees - taille);
+
+   return b->donnees;
 }
 
 /**
@@ -100,6 +151,9 @@ int listeBufferReseauInserer(ListeBufferReseau * l, BufferReseau * b)
       if (l->premier == NULL) {
          l->premier = c;
       }
+#ifdef MANUX_RESEAU_AUDIT
+      l->nbBuffersCumul++;
+#endif 
       return 1;
    } else {
       return 0;
@@ -139,11 +193,12 @@ void listeBufferReseauAfficher(ListeBufferReseau * l)
    CelluleBufferReseau * cell;
    uint8_t * data;
    
-   if (!listeBufferReseauVide(l)) {
-      for (cell = l->premier; cell != NULL; cell = cell->suivant) {
-         n++;
-      }
+   if (l != NULL) {
+      n = listeBufferReseauTaille(l);
       printkc("Il y a %d paquet(s) dans la file :\n", n);
+#ifdef MANUX_RESEAU_AUDIT
+      printkc("Il y en a eu %d en tout\n", l->nbBuffersCumul);
+#endif 
       for (cell = l->premier, n=0; (cell != NULL) && (n<20); cell = cell->suivant, n++) {
          data = (uint8_t*)cell->br->donnees;
          printkc("l=%4d : ", cell->br->taille);

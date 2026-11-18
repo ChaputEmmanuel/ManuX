@@ -11,7 +11,7 @@
  */
 void arpRecevoir(BufferReseau * b)
 {
-  (void)b;
+   (void)b;
    printkc("Reception requete ARP\n");
 }
 

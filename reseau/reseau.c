@@ -71,9 +71,7 @@ void reseauTraiterReceptions(void)
 {
    BufferReseau * br;
 
-   printkc("Traitement de la file de reception reseau ...\n");
-
-   printk_debug(DBG_KERNEL_NET, "A-t-on des buffers a recevoir ?\n");
+   printk_debug(DBG_KERNEL_NET, "Traitement de la file de reception reseau ...\n");
    
    while (1) {
       if (!listeBufferReseauVide(listeBuffersRecus)) {
@@ -96,6 +94,7 @@ void reseauInitialiser(void)
    
 #ifdef MANUX_TACHES
    // Lancement d'une tâche de traitement des trames reçues
+   printk_debug(DBG_KERNEL_NET, "Lancement de la tache de reception\n");
    ordonnanceurCreerTacheNoyau(reseauTraiterReceptions);
 
    printk_debug(DBG_KERNEL_NET, "Tache de traitement des receptions lancee\n");

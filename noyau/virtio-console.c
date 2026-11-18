@@ -104,7 +104,7 @@ void virtioConsoleGestionInt(void * pr)
       // La suite est à déférer dans une partie basse
       virtioConsoleTraiterBuffers(vc);
    } else {
-     printk_debug(DBG_KERNEL_VIRTIO, "Fuck\n");
+      printk_debug(DBG_KERNEL_VIRTIO, "Pas pour moi\n");
    }
 }
 

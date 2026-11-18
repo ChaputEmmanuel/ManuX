@@ -313,13 +313,14 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    uint32_t                  ad;
    
    nbFournis+=nb;
-   
+
    for (n = 0 ; (n < nb) && (fv->nbDescripteursLibres); n++) {
       // On va chercher un descripteur de buffer (2.4.1.1 (a))
       // on sait qu'il en reste puisqu'on les compte
       vb = &(fv->tableDescripteurs[(prochainDesc + n)%fv->taille]);
 
-      //      printk("[7](0x%x) ", vb);
+      //      printk("[7]\n");
+      //printk("[7](0x%x) %d %d/%d %d", vp, prochainDesc, n, nb, fv->nbDescripteursLibres);
       
       // L'adresse des données (2.4.1.1 (b))
       ad = (uint32_t)bu[n];
@@ -346,12 +347,13 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
             prochainDesc;
       }
 
-      // Un de moins qui soit disponible
+      // Un de moins qui soit libre
       fv->nbDescripteursLibres--;
    }
 
+   //   printk("[7]/%d/", n);
    if (n == 0) {
-     //printk("[7]x");
+     // printk("[7]FINI");
       return n;
    }
    
@@ -369,6 +371,7 @@ int virtioFournirBuffers(VirtioPeripherique * vp,
    outw((uint16_t)(vp->pciEquipement->adresseES + VIRTIO_HIST_FILE_NOTIF), id);
    nbAcceptes += n;
    
+   //   printk("[7]DONE");
    return n;
 }
 

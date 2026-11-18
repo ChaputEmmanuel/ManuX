@@ -104,6 +104,13 @@ void demarquerPage(uint32_t i)
    proprietairePage[i] = (TacheID)0;
 }
 
+/**
+ * @brief Initialisation de la mémoire au niveau pages.
+ *
+ * Cette initialisation est nécessaire avant toute demande
+ * d'allocation. C'est elle qui va permettre de mettre en place le
+ * mécanisme d'allocation des pages dans le système.
+ */
 void initialiserMemoire(uint32_t tailleMemoireDeBase,
 			uint32_t tailleMemoireEtendue)
 {
@@ -290,6 +297,8 @@ void * allouerPages(uint32_t nombre)
    void *   result = NULL;
    uint32_t numeroPage = 0;
 
+   assert(nombre > 0); // C'est la moindre des choses ;-)
+      
    // On cherche la première page libre
    while (  (numeroPage < nombrePages - nombre)
 	    && (nombrePagesLibres(numeroPage) < nombre)) {
@@ -298,7 +307,7 @@ void * allouerPages(uint32_t nombre)
      numeroPage += nombrePagesLibres(numeroPage) + 1;
    }
 
-   /* Si on trouve une page dispo */
+   /* Si on trouve une plage dispo */
    if ((numeroPage < nombrePages)  && (nombrePagesLibres(numeroPage) >= nombre)){
      for (uint32_t i = numeroPage; i < numeroPage+nombre; i++) {
          reserverPage(i);

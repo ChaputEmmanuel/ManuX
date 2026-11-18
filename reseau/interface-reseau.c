@@ -18,3 +18,11 @@ void reseauAjouterInterface(ReseauInterface * i)
    (void) i;
 }
 
+/**
+ * @brief Initialisation d'une interface
+ */
+void interfaceReseauInitialiser(ReseauInterface * i)
+{
+   i->nbReceptions =0;
+   i->nbEmissions =0;
+}

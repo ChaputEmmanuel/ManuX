@@ -30,6 +30,14 @@ typedef struct _ReseauInterface {
    // lgAdresse 
    uint8_t adresse[MANUX_ADRESSE_MAC_LG_MAX];
    int lgAdresse;  // 0 si pas d'adresse
+
+   // S'il y a une adresse (lgAdresse > 0), il put y avoir une adresse
+   // de diffusion
+   uint8_t adresseDiffusion[MANUX_ADRESSE_MAC_LG_MAX];
+
+   // Quelques stats
+   uint32_t nbReceptions;
+   uint32_t nbEmissions;
 } ReseauInterface;
 
 /**
@@ -38,9 +46,25 @@ typedef struct _ReseauInterface {
 void reseauEnregistrerPilote(ReseauPilote * p);
 
 /**
- * @brief
+ * @brief Initialisation d'une interface
+ */
+void interfaceReseauInitialiser(ReseauInterface * i);
+
+/**
+ * @brief Ajout d'une interface dans le sytème
  */
 void reseauAjouterInterface(ReseauInterface * i);
 
+
+/**
+ * @brief Émission d'une trame via une interface réseau
+ *
+ * Le buffer b doit être initialisé et contenir tout ce concerne les
+ * couches supérieures à la couche liaison. L'adresse du destinataire
+ * est passée en paramètre.
+ */
+int reseauInterfaceEmettre(ReseauInterface * i,
+			   BufferReseau * b,
+			   uint8_t * adresse);
 
 #endif
