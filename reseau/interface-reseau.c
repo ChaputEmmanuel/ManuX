@@ -10,13 +10,6 @@ void reseauEnregistrerPilote(ReseauPilote * p)
 {
    (void) p;
 }
-/**
- * @brief Ajout d'une nouvelle interface réseau
- */
-void reseauAjouterInterface(ReseauInterface * i)
-{
-   (void) i;
-}
 
 /**
  * @brief Initialisation d'une interface
@@ -24,5 +17,6 @@ void reseauAjouterInterface(ReseauInterface * i)
 void interfaceReseauInitialiser(ReseauInterface * i)
 {
    i->nbReceptions =0;
-   i->nbEmissions =0;
+   i->nbEmissions = 0;
+   i->receptionEnAttente = FALSE;
 }

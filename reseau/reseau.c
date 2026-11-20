@@ -14,6 +14,16 @@
 #   include <manux/tache.h>
 #endif
 
+#ifndef MANUX_RESEAU_NBMAX_INTERFACES 
+#   define  MANUX_RESEAU_NBMAX_INTERFACES 8
+#endif
+
+/**
+ * @brief Les interfaces réseau du système
+ */
+static ReseauInterface * interfacesReseau[MANUX_RESEAU_NBMAX_INTERFACES];
+static int nbInterfacesReseau = 0;
+
 /**
  * @brief Réception d'un paquet sur le système
  */
@@ -46,7 +56,7 @@ ListeBufferReseau * listeBuffersRecus = NULL;
 
 /**
  * @brief La fonction de traitement dun buffer qui a été reçu
- */
+
 static void reseauAguillerBuffer(BufferReseau *b) {
    ReseauInterface * ir;
   
@@ -56,15 +66,32 @@ static void reseauAguillerBuffer(BufferReseau *b) {
 
    // On invoque la fonction de réception de l'interface qui va
    // déterminer le champ protocole en fonction de son format
-   ir->recevoirTrame(b);
+   ir->recevoirTrame(ir);
 
    // On peut maintenant passer le contenu au protocole correspondant
    reseauRecevoirPaquet(b);
+}
+ */
+/**
+ * @brief Exécution des parties basses de réception de trames
+ */
+static void reseauTraiterPartiesBasses(void) {
+   int n;
+   ReseauInterface * i;
+
+   for (n = 0; n < nbInterfacesReseau; n++) {
+      i = interfacesReseau[n];
+      if (i->receptionEnAttente) {
+         i->recevoirTrame(i);
+      }
+   }
 }
 
 /**
  * @brief La fonction en charge de recevoir et aiguiller tous les
  * buffers reçus sur le système
+ * WARNING on traite aussi les parties basses et on boucle bêtement !
+ * Il faudra peut-être plutôt faire une attente passive.
  */
 static
 void reseauTraiterReceptions(void)
@@ -72,11 +99,12 @@ void reseauTraiterReceptions(void)
    BufferReseau * br;
 
    printk_debug(DBG_KERNEL_NET, "Traitement de la file de reception reseau ...\n");
-   
+
    while (1) {
+      reseauTraiterPartiesBasses();
       if (!listeBufferReseauVide(listeBuffersRecus)) {
 	 br = listeBufferReseauExtraire(listeBuffersRecus);
-         reseauAguillerBuffer(br);
+         reseauRecevoirPaquet(br);
       } else {
 	ordonnanceur();    // WARNING, on devrait dormir en attendant
       }
@@ -101,6 +129,14 @@ void reseauInitialiser(void)
 #else    
    printk_debug(DBG_KERNEL_NET, "Pas de gestion des taches, ...\n");
 #endif
+}
+
+/**
+ * @brief Ajout d'une nouvelle interface réseau
+ */
+void reseauAjouterInterface(ReseauInterface * i)
+{
+   interfacesReseau[nbInterfacesReseau++] = i;
 }
 
 /**

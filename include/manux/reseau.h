@@ -8,6 +8,7 @@
 #define MANUX_RESEAU_COMMUN
 
 #include <manux/buffer-reseau.h>
+#include <manux/interface-reseau.h>
 
 /**
  * @brief La liste des buffers qui ont été reçus mais non encore
@@ -19,6 +20,11 @@ extern ListeBufferReseau * listeBuffersRecus;
  * @brief Initialisation du sous système réseau
  */
 void reseauInitialiser(void);
+
+/**
+ * @brief Ajout d'une interface dans le sytème
+ */
+void reseauAjouterInterface(ReseauInterface * i);
 
 /**
  * @brief Affichage de la liste de buffers de réception

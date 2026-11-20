@@ -21,3 +21,30 @@ chaque fois les données.
 \subsection{La liste des buffers reçus}
 
 
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{La réception d'une trame}
+
+   Lorsqu'une trame arrive sur le système, sa réception engendre une
+interruption dont le traitement est réalisé en deux temps
+
+\begin{itemize}
+   \item La partie haute est le traitement d'interruption ({\em
+     handler}) lui-même. Il fait le minimum syndical : prévenir le
+     matériel qu'il a bien reçu l'interface, et noter que la trame
+     doit effectivement être reçue.
+   \item La partie basse (ou {\em bottom half}) 
+\end{itemize}     
+
+
+\subsubsection{La partie haute}
+\subsubsection{La partie basses
+}
+
+%-------------------------------------------------------------------------------
+%
+%-------------------------------------------------------------------------------
+\subsection{Mise en oeuve dans \manux}
+
+   Dans \manux

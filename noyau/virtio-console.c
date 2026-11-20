@@ -108,7 +108,6 @@ void virtioConsoleGestionInt(void * pr)
    }
 }
 
-
 /**
  * @brief Initialisation d'un périphérique console virtio
  *

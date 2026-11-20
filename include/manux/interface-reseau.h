@@ -22,10 +22,14 @@ typedef struct _ReseauPilote {
  * @brief Définition d'une interface réseau générale
  */
 typedef struct _ReseauInterface {
-   void (* recevoirTrame)(BufferReseau * buffer); //<! Traitement d'une trame reçue
    ReseauPilote * pilote;
    void * prive;
 
+   // La fonction suivante constitue la partie basse de la réception
+   // d'une trame sur l'interface
+   void (* recevoirTrame)(ReseauInterface *);
+   booleen receptionEnAttente;
+  
    // Une interface peut avoir une adresse (eg Ethernet) de longueur
    // lgAdresse 
    uint8_t adresse[MANUX_ADRESSE_MAC_LG_MAX];
@@ -49,12 +53,6 @@ void reseauEnregistrerPilote(ReseauPilote * p);
  * @brief Initialisation d'une interface
  */
 void interfaceReseauInitialiser(ReseauInterface * i);
-
-/**
- * @brief Ajout d'une interface dans le sytème
- */
-void reseauAjouterInterface(ReseauInterface * i);
-
 
 /**
  * @brief Émission d'une trame via une interface réseau

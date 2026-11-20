@@ -139,13 +139,13 @@ void startManuX(void)
    // Initialisation du bus PCI
    printk_debug(DBG_KERNEL_START, "Initialisation du bus PCI ...\n");
    PCIEnumerationDesEquipements();
-   /*
+
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio console ...\n");
    if (virtioConsoleInitialisation(&iNoeudVirtioConsole) == ESUCCES) {
       fichierOuvrir(&iNoeudVirtioConsole, &fichierVirtioConsole, O_WRONLY, 0);
       journalAffecterFichier(&fichierVirtioConsole);
    }
-   */
+
    // Le pilote réseau virtio
    printk_debug(DBG_KERNEL_START, "Initialisation de virtio net ...\n");
    if (virtioNetInit() != ESUCCES) {

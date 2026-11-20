@@ -152,8 +152,9 @@ void virtioNetTraiterEmissions(VirtioReseau * vr)
  * trame (ou plusieurs) sur la file de réception.
  */
 static
-void virtioNetRecevoirTrame(VirtioReseau * vr)
+void virtioNetRecevoirTrame(ReseauInterface * ir)
 {
+   VirtioReseau        * vr = (VirtioReseau *)ir->prive;
    uint8_t             * buffers[2];
    int                   longueurs[2];
    int                   nbLu;
@@ -167,14 +168,19 @@ void virtioNetRecevoirTrame(VirtioReseau * vr)
    // On va chercher une trame, a priori dans une chaîne de buffers
    nbLu = virtioFileRecupererBuffers(fv, (void*)buffers, longueurs, 2);
 #ifdef MANUX_BUFFER_RESEAU
-   BufferReseau * br;
+   if (nbLu > 0) {
+      BufferReseau * br;
+  
+      // On fait une copie, mais ce serait mieux de la faire plus tard
+      br = bufferReseauInitialiser(buffers[1], longueurs[1]);
+      br->interfaceReception = vr->reseauInterface;
 
-   // On fait une copie, mais ce serait mieux de la faire plus tard
-   br = bufferReseauInitialiser(buffers[1], longueurs[1]);
-   br->interfaceReception = vr->reseauInterface;
-     
-   // On va maintenant le placer dans une liste qui sera traitée plus tard.
-   listeBufferReseauInserer(listeBuffersRecus, br);
+      // On la traite comme une trame Ethernet
+      ethernetRecevoirTrame(br);
+      
+      // On va maintenant le placer dans une liste qui sera traitée plus tard.
+      listeBufferReseauInserer(listeBuffersRecus, br);
+   }
 #endif
    
    printk_debug(DBG_KERNEL_NET, "%d IT recues, trame : %d/%d+%d\n",
@@ -199,12 +205,12 @@ void virtioNetRecevoirTramePartieBasse(void * _vr)
 
 /**
  * @brief
- */
+
 void virtioReseauPoll(void)
 {
   virtioNetRecevoirTrame(&virtioReseau);
 }
-
+ */
 /**
  *  Cf [3] section 2.4.2
  */
@@ -225,7 +231,8 @@ void virtioNetGestionInt(void * pr)
       //i8259aAckIRQ(vr->virtioPeripherique.pciEquipement->interruption); fait par le handler
 
       // La suite est à déférer dans une partie basse
-      virtioNetRecevoirTrame(vr);
+      vr->reseauInterface->receptionEnAttente = TRUE;
+      //virtioNetRecevoirTrame(vr);
       //      virtioNetTraiterEmissions(vr); // WARNING : à vérifier si ça doit être là
    } else {
        printk_debug(DBG_KERNEL_NET, "Cette IT n'est pas pour moi, ...\n");
@@ -353,6 +360,7 @@ int virtioNetInitPeripherique(int PCINumeroPeripherique)
    reseauInterface->pilote = &virtioPiloteReseau;
    reseauInterface->prive = &virtioReseau;
    virtioReseau.reseauInterface = reseauInterface;
+   reseauInterface->recevoirTrame = virtioNetRecevoirTrame;
    
    // On l'enregistre auprès du système réseau
    reseauAjouterInterface(reseauInterface);

@@ -37,7 +37,6 @@ void ethernetRecevoirTrame(BufferReseau * buffer) {
  */
 void ethernetInitialiserInterface(ReseauInterface * ire, uint8_t a[6])
 {
-   ire->recevoirTrame = ethernetRecevoirTrame;
    memcpy(ire->adresse, a, 6);
    ire->lgAdresse = 6;
 }
